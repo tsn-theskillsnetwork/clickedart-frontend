@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Heart } from "lucide-react";
+import { Heart, Search } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -174,22 +174,39 @@ export default function ThemesResultPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const { theme } = useParams();
+  // const { theme } = useParams();
 
   // const themeValue = searchParams.get("theme") || "nature";
   const sortValue = searchParams.get("sort") || "date";
+  const themeValue = searchParams.get("theme") || "all";
+  const searchValue = searchParams.get("search") || "";
 
   const [filter, setFilter] = useState("price");
+  const [theme, setTheme] = useState(themeValue);
   const [sort, setSort] = useState(sortValue);
+  const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
 
+  const handleSearch = () => {
+    router.push(`/images?theme=${theme}&sort=${sort}&search=${search}`);
+  };
+
   useEffect(() => {
     setSort(sortValue);
-  }, [theme, sortValue]);
+    setTheme(themeValue);
+    setSearch(searchValue);
+  }, [themeValue, sortValue, searchValue]);
 
   const sortedImages = [...images]
-    .filter((image) => image.theme === theme)
+    .filter((image) => {
+      if (theme === "all") return true;
+      return image.theme === theme;
+    })
+    .filter((image) => {
+      if (!searchValue) return true;
+      return image.title.toLowerCase().includes(searchValue.toLowerCase());
+    })
     .sort((a, b) => {
       if (sort === "price") return a.price - b.price;
       if (sort === "rating") return b.rating - a.rating;
@@ -216,7 +233,7 @@ export default function ThemesResultPage() {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        className="flex mt-10 flex-col min-h-screen"
+        className="flex my-10 flex-col min-h-screen"
       >
         <div className="flex flex-col sm:flex-row px-20 justify-between gap-5">
           <div className="flex flex-col">
@@ -227,7 +244,10 @@ export default function ThemesResultPage() {
               className="w-36"
               defaultValue={theme}
               onValueChange={(value) => {
-                router.push(`/themes/${value}?sort=${sort}`);
+                setTheme(value);
+                router.push(
+                  `/images?theme=${value}&sort=${sort}&search=${search}`
+                );
               }}
             >
               <SelectTrigger className="!text-paragraph py-5 w-full sm:w-40 font-semibold shadow-sm bg-gray-200">
@@ -235,6 +255,7 @@ export default function ThemesResultPage() {
                 <p className="sr-only">Themes</p>
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="all">All</SelectItem>
                 <SelectItem value="nature">Nature</SelectItem>
                 <SelectItem value="wildlife">Wildlife</SelectItem>
                 <SelectItem value="religious">Religious</SelectItem>
@@ -243,6 +264,25 @@ export default function ThemesResultPage() {
                 <SelectItem value="grayscale">Grayscale</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div className="pl-5 relative flex flex-row bg-white border border-primary-200 text-black group rounded-lg items-center gap-4 w-full focus-within:outline focus-within:outline-blue-500">
+            <input
+              type="text"
+              placeholder="Search Themes"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              className="active:border-none active:outline-none focus:outline-none focus:border-none py-4 text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-semibold my-1 w-full"
+            />
+            <button
+              onClick={handleSearch}
+              className="bg-accent-200 h-full aspect-[1/1] text-white rounded-r-lg absolute inset-y-0 right-0"
+            >
+              {/* <p className="sr-only">Search</p> */}
+              <div className="h-full aspect-[1/1] flex justify-center items-center">
+                <Search size={40} className="mx-auto" />
+              </div>
+            </button>
           </div>
           <div className="flex flex-col sm:flex-row gap-5">
             <div className="flex flex-col">
@@ -274,7 +314,9 @@ export default function ThemesResultPage() {
                 defaultValue={sort}
                 onValueChange={(value) => {
                   setSort(value);
-                  router.push(`/themes/${theme}?sort=${value}`);
+                  router.push(
+                    `/images?theme=${theme}&sort=${value}&search=${search}`
+                  );
                 }}
               >
                 <SelectTrigger className="!text-paragraph w-full sm:w-40 py-5 font-semibold shadow-sm bg-gray-200">

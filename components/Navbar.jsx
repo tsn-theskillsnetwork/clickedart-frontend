@@ -127,7 +127,15 @@ export default function Navbar() {
                 scrollLocation > 50 || pathname !== "/"
                   ? "text-surface-600"
                   : "text-white"
-              } cursor-pointer ${pathname === item.url ? "menuActive" : ""}`}
+              } cursor-pointer ${
+                item.url === "/"
+                  ? pathname === item.url
+                    ? "menuActive"
+                    : ""
+                  : pathname.startsWith(item.url)
+                  ? "menuActive"
+                  : ""
+              }`}
             >
               {item.name}
             </p>
