@@ -5,8 +5,11 @@ import Button from "@/components/Button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Textarea } from "@/components/ui/textarea";
+import { useRouter } from "next/navigation";
 
 const RegistrationForm = () => {
+  const router = useRouter();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -14,7 +17,7 @@ const RegistrationForm = () => {
     address: "",
     age: "",
     dob: "",
-    image: "",
+    image: "", // Initialize with an empty string
     bio: "",
     interests: "",
   });
@@ -26,34 +29,33 @@ const RegistrationForm = () => {
   // Input change handler
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData({ ...formData, [name]: value ?? "" }); // Ensure value is not undefined
   };
 
   // Image upload handler
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
+    if (!file) return; // Avoid undefined issues
+
     // Send file to server
-    const formData = new FormData();
-    formData.append("image", file);
+    const uploadData = new FormData();
+    uploadData.append("image", file);
 
     try {
       const res = await fetch(
-        `localhost:5000/uploadPhotoWithSizeCheck`,
+        `http://localhost:5000/api/upload/uploadSingleImage`,
         {
           method: "POST",
-          body: formData,
+          body: uploadData,
         }
       );
-      const data = await res.json();
-
+      const data = await res.text(); // Parse as plain text
       if (res.ok) {
-        // Assuming the backend returns the URLs in the 'urls' field
-        setFormData({
-          ...formData,
-          image: data.urls.original, // You can set the appropriate size here
-        });
-      } else {
-        console.log("Error uploading image", data);
+        setFormData((prev) => ({
+          ...prev,
+          image: data, // Save the file location URL
+        }));
+        console.log("Image uploaded successfully", data);
       }
     } catch (error) {
       console.log(error);
@@ -89,11 +91,14 @@ const RegistrationForm = () => {
 
     setErrors({});
     try {
-      const response = await fetch(`${process.env.BACKEND_URL}/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        `http://localhost:5000/api/user/register`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
 
       const data = await response.json();
 
@@ -111,6 +116,7 @@ const RegistrationForm = () => {
           bio: "",
           interests: "",
         });
+        router.push("/signin");
       } else {
         setError(data.message);
         setMessage("");
@@ -122,7 +128,10 @@ const RegistrationForm = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] mt-5 mb-10">
-      <form onSubmit={handleSubmit} className="flex flex-col w-1/2 gap-4">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col w-full md:w-1/2 px-5 gap-4"
+      >
         <h2 className="text-heading-04 font-medium text-center">
           User Registration
         </h2>
@@ -184,28 +193,15 @@ const RegistrationForm = () => {
           <Input
             type="date"
             name="dob"
-            value={formData.dob}
+            value={formData.dob || ""} // Ensure default empty string
             onChange={handleInputChange}
           />
           {errors.dob && <p className="text-red-500 text-sm">{errors.dob}</p>}
         </div>
 
         <div>
-          <Label>Age</Label>
-          <p className="text-primary-darker">
-            {new Date().getFullYear() - new Date(formData.dob).getFullYear()}
-          </p>
-          {errors.age && <p className="text-red-500 text-sm">{errors.age}</p>}
-        </div>
-
-        <div>
           <Label>Profile Image</Label>
-          <Input
-            type="file"
-            name="image"
-            value={formData.image}
-            onChange={handleImageUpload}
-          />
+          <Input type="file" name="image" onChange={handleImageUpload} />
         </div>
 
         <p>{formData.image}</p>

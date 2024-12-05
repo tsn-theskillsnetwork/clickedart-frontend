@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronRight, Search } from "lucide-react";
 import { Icon } from "@iconify/react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 // Image data
 const images = [
@@ -22,11 +23,13 @@ const taglines = [
 ];
 
 export default function HeroSection() {
+  const router = useRouter();
+
   const [currentImage, setCurrentImage] = useState(0);
   const [search, setSearch] = useState("");
 
   const handleSearch = () => {
-    alert(`Searching for ${search}`);
+    router.push(`/images?search=${search}`);
   };
 
   useEffect(() => {

@@ -13,6 +13,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
+import Logout from "./auth/signout";
+import Signout from "./auth/signout";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -181,13 +183,19 @@ export default function Navbar() {
               : "text-white"
           } cursor-pointer`}
         />
-        <User2
-          className={`${
-            scrollLocation > 50 || pathname !== "/"
-              ? "text-surface-600"
-              : "text-white"
-          } cursor-pointer`}
-        />
+        {sessionStorage.getItem("token") ? (
+          <Signout />
+        ) : (
+          <Link href="/signin">
+            <User2
+              className={`${
+                scrollLocation > 50 || pathname !== "/"
+                  ? "text-surface-600"
+                  : "text-white"
+              } cursor-pointer`}
+            />
+          </Link>
+        )}
         <ShoppingCart
           className={`${
             scrollLocation > 50 || pathname !== "/"

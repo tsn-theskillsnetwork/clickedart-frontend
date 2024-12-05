@@ -46,7 +46,7 @@ export default function Featured({ artists }) {
                   height={256}
                   src={artist.image}
                   alt={artist.name || `Slide ${index + 1}`}
-                  className=" object-cover w-64 aspect-[1/1]"
+                  className=" object-cover object-top w-64 aspect-[1/1]"
                 />
                 <div className="flex flex-col items-center justify-center gap-2 pb-5">
                   <p className="text-heading-04 font-semibold text-black">

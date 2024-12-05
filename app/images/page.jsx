@@ -370,6 +370,13 @@ export default function ThemesResultPage() {
               </div>
             </div>
           ))}
+          {
+            paginatedImages.length === 0 && (
+              <div className="text-center text-paragraph text-2xl font-semibold">
+                No images found
+              </div>
+            )
+          }
         </div>
         <div className="flex justify-center items-center mt-10">
           {Array.from({ length: totalPages }, (_, index) => (

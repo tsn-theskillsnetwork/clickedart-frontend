@@ -33,7 +33,7 @@ export default function Testimonial() {
   const testimonials = [
     {
       avatar:
-        "https://s3-alpha-sig.figma.com/img/0d63/5630/71ee0be67a603e99a26544662f2b5442?Expires=1733097600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=QejvFO1QVwt~7-6qbzMow1~RNgtZbvnMucqgVqh2Hww6dS~TlxvgQ~Qn9D7rGeJ9lQoWCgZd1BzKf01BLGOfmLmD4zt4dRisxvVIuBbqklQ0P1q611aS~t5rUItnFvQe8mljNNXTpuj0dK~Ce5rM2Pd-Dag9PkqxksxB6qK9c02aVMrQQ24Mg9l8VWx2sHitjQ-PfHGLiEBrTfe6mfzE41mG2RfAR5erp4fGvN7o8xGpT5XDSCWiK9Efv4OwfFPgd1fxo4fhIDQqm7U1eppDgbLbB40L3Z3M3F7RPYj1EFKVwRiYhGFqaQQm~x0uoYP4oY0boD3TcWjKkwhz5pjBEQ__",
+        "/assets/images/avatar1.jpg",
       name: "John Doe",
       stars: 5,
       comment:
@@ -41,7 +41,7 @@ export default function Testimonial() {
     },
     {
       avatar:
-        "https://s3-alpha-sig.figma.com/img/0d63/5630/71ee0be67a603e99a26544662f2b5442?Expires=1733097600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=QejvFO1QVwt~7-6qbzMow1~RNgtZbvnMucqgVqh2Hww6dS~TlxvgQ~Qn9D7rGeJ9lQoWCgZd1BzKf01BLGOfmLmD4zt4dRisxvVIuBbqklQ0P1q611aS~t5rUItnFvQe8mljNNXTpuj0dK~Ce5rM2Pd-Dag9PkqxksxB6qK9c02aVMrQQ24Mg9l8VWx2sHitjQ-PfHGLiEBrTfe6mfzE41mG2RfAR5erp4fGvN7o8xGpT5XDSCWiK9Efv4OwfFPgd1fxo4fhIDQqm7U1eppDgbLbB40L3Z3M3F7RPYj1EFKVwRiYhGFqaQQm~x0uoYP4oY0boD3TcWjKkwhz5pjBEQ__",
+        "/assets/images/avatar2.jpg",
       name: "Jane Doe",
       stars: 4,
       comment:
@@ -49,7 +49,7 @@ export default function Testimonial() {
     },
     {
       avatar:
-        "https://s3-alpha-sig.figma.com/img/0d63/5630/71ee0be67a603e99a26544662f2b5442?Expires=1733097600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=QejvFO1QVwt~7-6qbzMow1~RNgtZbvnMucqgVqh2Hww6dS~TlxvgQ~Qn9D7rGeJ9lQoWCgZd1BzKf01BLGOfmLmD4zt4dRisxvVIuBbqklQ0P1q611aS~t5rUItnFvQe8mljNNXTpuj0dK~Ce5rM2Pd-Dag9PkqxksxB6qK9c02aVMrQQ24Mg9l8VWx2sHitjQ-PfHGLiEBrTfe6mfzE41mG2RfAR5erp4fGvN7o8xGpT5XDSCWiK9Efv4OwfFPgd1fxo4fhIDQqm7U1eppDgbLbB40L3Z3M3F7RPYj1EFKVwRiYhGFqaQQm~x0uoYP4oY0boD3TcWjKkwhz5pjBEQ__",
+        "/assets/images/avatar3.jpg",
       name: "John Smith",
       stars: 5,
       comment:
@@ -57,16 +57,8 @@ export default function Testimonial() {
     },
     {
       avatar:
-        "https://s3-alpha-sig.figma.com/img/0d63/5630/71ee0be67a603e99a26544662f2b5442?Expires=1733097600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=QejvFO1QVwt~7-6qbzMow1~RNgtZbvnMucqgVqh2Hww6dS~TlxvgQ~Qn9D7rGeJ9lQoWCgZd1BzKf01BLGOfmLmD4zt4dRisxvVIuBbqklQ0P1q611aS~t5rUItnFvQe8mljNNXTpuj0dK~Ce5rM2Pd-Dag9PkqxksxB6qK9c02aVMrQQ24Mg9l8VWx2sHitjQ-PfHGLiEBrTfe6mfzE41mG2RfAR5erp4fGvN7o8xGpT5XDSCWiK9Efv4OwfFPgd1fxo4fhIDQqm7U1eppDgbLbB40L3Z3M3F7RPYj1EFKVwRiYhGFqaQQm~x0uoYP4oY0boD3TcWjKkwhz5pjBEQ__",
+        "/assets/images/avatar4.jpg",
       name: "Jane Smith",
-      stars: 4,
-      comment:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam at justo ut arcu semper venenatis. Nulla facilisi. Nulla facilisi. Nulla facilisi.",
-    },
-    {
-      avatar:
-        "https://s3-alpha-sig.figma.com/img/0d63/5630/71ee0be67a603e99a26544662f2b5442?Expires=1733097600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=QejvFO1QVwt~7-6qbzMow1~RNgtZbvnMucqgVqh2Hww6dS~TlxvgQ~Qn9D7rGeJ9lQoWCgZd1BzKf01BLGOfmLmD4zt4dRisxvVIuBbqklQ0P1q611aS~t5rUItnFvQe8mljNNXTpuj0dK~Ce5rM2Pd-Dag9PkqxksxB6qK9c02aVMrQQ24Mg9l8VWx2sHitjQ-PfHGLiEBrTfe6mfzE41mG2RfAR5erp4fGvN7o8xGpT5XDSCWiK9Efv4OwfFPgd1fxo4fhIDQqm7U1eppDgbLbB40L3Z3M3F7RPYj1EFKVwRiYhGFqaQQm~x0uoYP4oY0boD3TcWjKkwhz5pjBEQ__",
-      name: "John Doe",
       stars: 4,
       comment:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam at justo ut arcu semper venenatis. Nulla facilisi. Nulla facilisi. Nulla facilisi.",
