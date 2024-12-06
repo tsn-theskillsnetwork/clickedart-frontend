@@ -92,7 +92,7 @@ const RegistrationForm = () => {
     setErrors({});
     try {
       const response = await fetch(
-        `http://localhost:5000/api/user/register`,
+        `${process.env.NEXT_PUBLIC_SERVER}/api/user/register`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

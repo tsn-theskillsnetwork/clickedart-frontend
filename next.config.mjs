@@ -25,6 +25,11 @@ const nextConfig = {
         hostname: "images.pexels.com",
         pathname: "**",
       },
+      {
+        protocol: "https",
+        hostname: "tawreed-s3.s3.ap-south-1.amazonaws.com",
+        pathname: "**",
+      },
     ],
   },
 };

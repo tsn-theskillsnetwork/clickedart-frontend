@@ -13,11 +13,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
-import Logout from "./auth/signout";
 import Signout from "./auth/signout";
+import useAuthStore from "@/authStore";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const isSignedIn = useAuthStore((state) => state.isSignedIn);
 
   const [scrollLocation, setScrollLocation] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -165,6 +166,19 @@ export default function Navbar() {
               </p>
             </Link>
           ))}
+          {isSignedIn ? (
+            <Link href="/profile">
+              <p className="text-lg font-semibold text-black cursor-pointer">
+                Profile
+              </p>
+            </Link>
+          ) : (
+            <Link href="/signin">
+              <p className="text-lg font-semibold text-black cursor-pointer">
+                Sign In
+              </p>
+            </Link>
+          )}
         </div>
       )}
 
@@ -183,8 +197,19 @@ export default function Navbar() {
               : "text-white"
           } cursor-pointer`}
         />
-        {sessionStorage.getItem("token") ? (
-          <Signout />
+        {isSignedIn ? (
+          <>
+            <Link href="/profile">
+              <User2
+                className={`${
+                  scrollLocation > 50 || pathname !== "/"
+                    ? "text-surface-600"
+                    : "text-white"
+                } cursor-pointer`}
+              />
+            </Link>
+            <Signout />
+          </>
         ) : (
           <Link href="/signin">
             <User2

@@ -1,12 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "@/components/Button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { useRouter } from "next/navigation";
+import useAuthStore from "@/authStore";
 
 const SignInPage = () => {
+  const signin = useAuthStore((state) => state.signin);
+  const setUser = useAuthStore((state) => state.setUser);
+  const signedIn = useAuthStore((state) => state.isSignedIn);
+
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -17,21 +22,19 @@ const SignInPage = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  // Input change handler
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Form submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage(""); // Clear previous messages
-    setError(""); // Clear previous errors
+    setMessage("");
+    setError("");
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/user/login`,
+        `${process.env.NEXT_PUBLIC_SERVER}/api/user/login`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -45,9 +48,15 @@ const SignInPage = () => {
         setMessage("Sign-in successful!");
         setError("");
 
-        // Save token to localStorage or cookies for authentication
+        // Update sessionStorage
         sessionStorage.setItem("token", data.token);
+        sessionStorage.setItem("user", JSON.stringify(data.user));
 
+        // Update Zustand store
+        signin(data.token);
+        setUser(data.user);
+
+        // Redirect to home page
         router.push("/");
       } else {
         setError(data.message || "Invalid credentials. Please try again.");
@@ -57,44 +66,58 @@ const SignInPage = () => {
     }
   };
 
+  useEffect(() => {
+    if (sessionStorage.getItem("token")) {
+      router.push("/");
+    }
+  }, []);
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[50vh] mt-5 mb-10">
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-col w-full md:w-1/2 gap-4 px-5"
-      >
-        <h2 className="text-heading-04 font-medium text-center">
-          User Sign In
-        </h2>
-        {message && <p className="text-green-500">{message}</p>}
-        {error && <p className="text-red-500">{error}</p>}
-
-        <div>
-          <Label>Email</Label>
-          <Input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
-            required
-          />
+      {signedIn ? (
+        <div className="flex flex-col items-center justify-center min-h-[50vh]">
+          <p>You are already signed in.</p>
         </div>
+      ) : (
+        <>
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col w-full md:w-1/2 gap-4 px-5"
+          >
+            <h2 className="text-heading-04 font-medium text-center">
+              User Sign In
+            </h2>
+            {message && <p className="text-green-500">{message}</p>}
+            {error && <p className="text-red-500">{error}</p>}
 
-        <div>
-          <Label>Password</Label>
-          <Input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
+            <div>
+              <Label>Email</Label>
+              <Input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
 
-        <div className="flex flex-col items-center">
-          <Button type="submit">Sign In</Button>
-        </div>
-      </form>
+            <div>
+              <Label>Password</Label>
+              <Input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+
+            <div className="flex flex-col items-center">
+              <Button type="submit">Sign In</Button>
+            </div>
+          </form>
+        </>
+      )}
     </div>
   );
 };
