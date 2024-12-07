@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/authStore";
+import Link from "next/link";
 
 const SignInPage = () => {
   const signin = useAuthStore((state) => state.signin);
@@ -118,6 +119,15 @@ const SignInPage = () => {
           </form>
         </>
       )}
+
+      <div className="flex flex-col items-center mt-4">
+        <p>
+          Don't have an account?{" "}
+          <Link className="underline" href="/signup">
+            Sign Up
+          </Link>
+        </p>
+      </div>
     </div>
   );
 };

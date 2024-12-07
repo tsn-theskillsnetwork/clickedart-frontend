@@ -75,6 +75,7 @@ export default function Navbar() {
             src="/assets/Logo.png"
             className="h-full w-full"
             alt="logo"
+            priority
             width={200}
             height={50}
           />

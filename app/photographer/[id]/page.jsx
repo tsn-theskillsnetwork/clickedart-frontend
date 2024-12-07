@@ -4,10 +4,11 @@ import Button from "@/components/Button";
 import Loader from "@/components/loader";
 import { Icon } from "@iconify/react";
 import Image from "next/image";
+import { useParams } from "next/navigation";
 import React, { use, useEffect, useState } from "react";
 
-export default function ProfilePage({ params }) {
-  const { id } = use(params);
+export default function ProfilePage() {
+  const id = useParams().id;
 
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
