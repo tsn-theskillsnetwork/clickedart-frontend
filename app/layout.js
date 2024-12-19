@@ -10,12 +10,12 @@ export const metadata = {
   title: "ClickedArt",
   description:
     "ClickedArt is a platform for photographers to showcase their work.",
-  link: [
-    {
-      rel: "stylesheet",
-      href: "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap",
-    },
-  ],
+  // link: [
+  //   {
+  //     rel: "stylesheet",
+  //     href: "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap",
+  //   },
+  // ],
 };
 
 export default async function RootLayout({ children }) {

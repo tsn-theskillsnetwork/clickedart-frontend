@@ -43,7 +43,7 @@ export default function ProductCategories() {
             aspectRatio: hovered1 || hovered2 ? 1 / 1 : 2 / 1,
           }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
-          className={`card1 relative flex flex-row gap-4 shadow-xl shadow-zinc-300 rounded-2xl justify-center cursor-pointer`}
+          className={`card1 relative flex flex-row gap-4 shadow-xl shadow-zinc-300 rounded-2xl justify-center cursor-pointer overflow-hidden`}
           onClick={() => {
             router.push("/images?theme=wildlife");
           }}

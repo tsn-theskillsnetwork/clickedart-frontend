@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 export default function ImagePage() {
   const id = useParams().id;
 
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -24,7 +24,7 @@ export default function ImagePage() {
 
       const data = await response.json();
       console.log(data);
-      setImage(data.image);
+      setImage(data.photo);
     } catch (error) {
       console.error("Error fetching image data", error);
       setError(error.message);
@@ -47,7 +47,7 @@ export default function ImagePage() {
         <>
           {image && (
             <div className="flex flex-col items-center justify-center min-h-[50vh]">
-              <img src={image.url} alt={image.title} />
+              <img src={image.imageLinks?.original} alt={image.title} />
               <p>{image.title}</p>
             </div>
           )}

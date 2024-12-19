@@ -4,7 +4,6 @@ import BestSelling from "@/components/home/BestSelling";
 import Button from "@/components/Button";
 import HeroSection from "@/components/home/HeroSection";
 import ProductCategories from "@/components/home/ProductCategories";
-import Head from "next/head";
 import Discover from "@/components/home/Discover";
 import ProductCategoriesMobile from "@/components/home/ProductCategoriesMobile";
 import Stats from "@/components/home/Stats";
@@ -42,7 +41,7 @@ export default function Home() {
             </Button>
           </div>
         </div>
-        <div className="overflow-hidden hidden lg:block">
+        <div className="hidden lg:block">
           <ProductCategories />
         </div>
         <div className="px-4 block mt-10 lg:hidden">

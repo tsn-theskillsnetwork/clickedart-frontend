@@ -9,184 +9,25 @@ import {
 } from "@/components/ui/select";
 import { Heart, Search } from "lucide-react";
 import Image from "next/image";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-
-const images = [
-  {
-    title: "Artwork 1",
-    artist: "Artist 1",
-    src: "/assets/hero/bg2.jpg",
-    theme: "nature",
-    rating: 4,
-    size: 100,
-    price: 1000,
-    downloadCount: 100,
-    date: "2024-10-10",
-  },
-  {
-    title: "Artwork 2",
-    artist: "Artist 2",
-    src: "/assets/hero/bg2.jpg",
-    theme: "nature",
-    rating: 3,
-    size: 200,
-    price: 2000,
-    downloadCount: 200,
-    date: "2024-10-11",
-  },
-  {
-    title: "Artwork 2",
-    artist: "Artist 2",
-    src: "/assets/hero/bg2.jpg",
-    theme: "nature",
-    rating: 3,
-    size: 200,
-    price: 2000,
-    downloadCount: 200,
-    date: "2024-10-11",
-  },
-  {
-    title: "Artwork 2",
-    artist: "Artist 2",
-    src: "/assets/hero/bg2.jpg",
-    theme: "nature",
-    rating: 3,
-    size: 200,
-    price: 2000,
-    downloadCount: 200,
-    date: "2024-10-11",
-  },
-  {
-    title: "Artwork 3",
-    artist: "Artist 3",
-    src: "/assets/Hahnemuhle Photo Pearl 310 GSM.png",
-    theme: "nature",
-    rating: 5,
-    size: 300,
-    price: 1500,
-    downloadCount: 300,
-    date: "2024-10-12",
-  },
-  {
-    title: "Artwork 4",
-    artist: "Artist 4",
-    src: "/assets/hero/bg2.jpg",
-    theme: "nature",
-    rating: 3,
-    size: 400,
-    price: 2400,
-    downloadCount: 400,
-    date: "2024-10-13",
-  },
-  {
-    title: "Artwork 1",
-    artist: "Artist 1",
-    src: "/assets/hero/bg1.jpg",
-    theme: "wildlife",
-    rating: 3,
-    size: 400,
-    price: 2400,
-    downloadCount: 400,
-    date: "2024-10-13",
-  },
-  {
-    title: "Artwork 2",
-    artist: "Artist 2",
-    src: "/assets/ST Cuthberts Mill-UK Somerset Photo Satin 300gsm.png",
-    theme: "wildlife",
-    rating: 3,
-    size: 400,
-    price: 2400,
-    downloadCount: 400,
-    date: "2024-10-13",
-  },
-  {
-    title: "Artwork 3",
-    artist: "Artist 3",
-    src: "/assets/hero/bg1.jpg",
-    theme: "wildlife",
-    rating: 3,
-    size: 400,
-    price: 2400,
-    downloadCount: 400,
-    date: "2024-10-13",
-  },
-  {
-    title: "Artwork 4",
-    artist: "Artist 4",
-    src: "/assets/ST Cuthberts Mill-UK Somerset Photo Satin 300gsm.png",
-    theme: "wildlife",
-    rating: 3,
-    size: 400,
-    price: 2400,
-    downloadCount: 400,
-    date: "2024-10-13",
-  },
-  {
-    title: "Artwork 1",
-    artist: "Artist 1",
-    src: "/assets/VMS Luster Photo 240 Gsm  Paper.JPG",
-    theme: "religious",
-    rating: 3,
-    size: 400,
-    price: 2400,
-    downloadCount: 400,
-    date: "2024-10-13",
-  },
-  {
-    title: "Artwork 2",
-    artist: "Artist 2",
-    src: "/assets/VMS Luster Photo 240 Gsm  Paper.JPG",
-    theme: "religious",
-    rating: 3,
-    size: 400,
-    price: 2400,
-    downloadCount: 400,
-    date: "2024-10-13",
-  },
-  {
-    title: "Artwork 3",
-    artist: "Artist 3",
-    src: "/assets/VMS Luster Photo 240 Gsm  Paper.JPG",
-    theme: "religious",
-    rating: 3,
-    size: 400,
-    price: 2400,
-    downloadCount: 400,
-    date: "2024-10-13",
-  },
-  {
-    title: "Artwork 4",
-    artist: "Artist 4",
-    src: "/assets/VMS Luster Photo 240 Gsm  Paper.JPG",
-    theme: "religious",
-    rating: 3,
-    size: 400,
-    price: 2400,
-    downloadCount: 400,
-    date: "2024-10-13",
-  },
-];
 
 export default function ThemesResultPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // const { theme } = useParams();
+  const [images, setImages] = useState([]);
 
-  // const themeValue = searchParams.get("theme") || "nature";
   const sortValue = searchParams.get("sort") || "date";
   const themeValue = searchParams.get("theme") || "all";
   const searchValue = searchParams.get("search") || "";
 
   const [filter, setFilter] = useState("price");
+  const [themes, setThemes] = useState([]);
   const [theme, setTheme] = useState(themeValue);
   const [sort, setSort] = useState(sortValue);
   const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4;
 
   const handleSearch = () => {
     router.push(`/images?theme=${theme}&sort=${sort}&search=${search}`);
@@ -214,17 +55,48 @@ export default function ThemesResultPage() {
       return new Date(b.date) - new Date(a.date);
     });
 
-  const totalItems = sortedImages.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const paginatedImages = sortedImages.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  useEffect(() => {
+    const fetchThemes = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/category/get`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await res.json();
+        console.log(data);
+        setThemes(data.categories);
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+    const fetchImages = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-all-images`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await res.json();
+        setImages(data.photos);
+        console.log(data.photos);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchThemes();
+    fetchImages();
+  }, []);
 
   return (
     <AnimatePresence mode="popLayout">
@@ -246,7 +118,9 @@ export default function ThemesResultPage() {
               onValueChange={(value) => {
                 setTheme(value);
                 router.push(
-                  `/images?theme=${value}&sort=${sort}&search=${search}`
+                  `/images?theme=${value}&sort=${sort}${
+                    search && `&search=${search}`
+                  }`
                 );
               }}
             >
@@ -256,16 +130,15 @@ export default function ThemesResultPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All</SelectItem>
-                <SelectItem value="nature">Nature</SelectItem>
-                <SelectItem value="wildlife">Wildlife</SelectItem>
-                <SelectItem value="religious">Religious</SelectItem>
-                <SelectItem value="portrait">Portrait</SelectItem>
-                <SelectItem value="landscape">Landscape</SelectItem>
-                <SelectItem value="grayscale">Grayscale</SelectItem>
+                {themes.map((theme, index) => (
+                  <SelectItem key={index} value={theme.name.toLowerCase()}>
+                    {theme.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
-          <div className="pl-5 relative flex flex-row bg-white border border-primary-200 text-black group rounded-lg items-center gap-4 w-full focus-within:outline focus-within:outline-blue-500">
+          {/* <div className="pl-5 relative flex flex-row bg-white border border-primary-200 text-black group rounded-lg items-center gap-4 w-full focus-within:outline focus-within:outline-blue-500">
             <input
               type="text"
               placeholder="Search Themes"
@@ -278,12 +151,12 @@ export default function ThemesResultPage() {
               onClick={handleSearch}
               className="bg-accent-200 h-full aspect-[1/1] text-white rounded-r-lg absolute inset-y-0 right-0"
             >
-              {/* <p className="sr-only">Search</p> */}
+              <p className="sr-only">Search</p>
               <div className="h-full aspect-[1/1] flex justify-center items-center">
                 <Search size={40} className="mx-auto" />
               </div>
             </button>
-          </div>
+          </div> */}
           <div className="flex flex-col sm:flex-row gap-5">
             <div className="flex flex-col">
               <p className="font-semibold text-primary-dark text-paragraph">
@@ -315,7 +188,9 @@ export default function ThemesResultPage() {
                 onValueChange={(value) => {
                   setSort(value);
                   router.push(
-                    `/images?theme=${theme}&sort=${value}&search=${search}`
+                    `/images?theme=${theme}&sort=${value}${
+                      search && `&search=${search}`
+                    }`
                   );
                 }}
               >
@@ -334,27 +209,37 @@ export default function ThemesResultPage() {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-44">
-          {paginatedImages.map((image, index) => (
+          {sortedImages.map((image, index) => (
             <div key={index}>
               <div className="relative group">
-                <Image
-                  width={400}
-                  height={400}
-                  src={image.src}
-                  alt={image.title}
-                  className="object-cover w-full aspect-[1/1] opacity-100 group-hover:opacity-0 transition-all duration-200 ease-linear"
-                />
-                <Image
-                  width={800}
-                  height={800}
-                  src={image.src}
-                  alt={image.title}
-                  className="absolute inset-0 object-contain w-full aspect-[1/1] opacity-0 group-hover:opacity-100 transition-all duration-200 ease-linear"
-                />
+                {image.imageLinks?.small &&
+                image.imageLinks.small.trim() !== "" ? (
+                  <Image
+                    width={400}
+                    height={400}
+                    src={image.imageLinks?.small}
+                    alt={image.description}
+                    className="object-cover w-full aspect-[1/1] opacity-100 group-hover:opacity-0 transition-all duration-200 ease-linear"
+                  />
+                ) : (
+                  <div className="bg-gray-200 w-full aspect-[1/1] object-cover opacity-100 group-hover:opacity-0 transition-all duration-200 ease-linear"></div>
+                )}
+                {image.imageLinks?.small &&
+                image.imageLinks.small.trim() !== "" ? (
+                  <Image
+                    width={800}
+                    height={800}
+                    src={image.imageLinks?.small}
+                    alt={image.description}
+                    className="absolute inset-0 object-contain w-full aspect-[1/1] opacity-0 group-hover:opacity-100 transition-all duration-200 ease-linear"
+                  />
+                ) : (
+                  <div className="bg-gray-200 w-full aspect-[1/1] absolute inset-0 object-contain opacity-0 group-hover:opacity-100 transition-all duration-200 ease-linear"></div>
+                )}
                 <div className="absolute inset-0">
                   <div className="flex justify-between mx-4 mt-4">
                     <div className="bg-white px-2 text-paragraph group-hover:opacity-0 bg-opacity-75 w-fit transition-all duration-200 ease-linear cursor-default">
-                      <p>{image.downloadCount} Downloads</p>
+                      <p>{image.imageAnalytics?.downloads} Downloads</p>
                     </div>
                     <Heart
                       size={28}
@@ -364,35 +249,25 @@ export default function ThemesResultPage() {
                 </div>
               </div>
               <div className="text-neutral-600">
-                <h2 className="text-heading-06 font-bold">{image.title}</h2>
-                <p className="text-paragraph">{image.artist}</p>
-                <p className="text-paragraph">{image.size} MP</p>
+                <h2 className="text-heading-06 font-bold">
+                  Description: {image.description}
+                </h2>
+                <p className="text-paragraph">
+                  Photographer: {image.photographer?.name}
+                </p>
+                <p className="text-paragraph">
+                  {(
+                    (image.resolutions?.original?.height *
+                      image.resolutions?.original?.width) /
+                    1000000
+                  ).toFixed(1)}{" "}
+                  MP
+                </p>
               </div>
             </div>
           ))}
-          {
-            paginatedImages.length === 0 && (
-              <div className="text-center text-paragraph text-2xl font-semibold">
-                No images found
-              </div>
-            )
-          }
         </div>
-        <div className="flex justify-center items-center mt-10">
-          {Array.from({ length: totalPages }, (_, index) => (
-            <button
-              key={index}
-              onClick={() => handlePageChange(index + 1)}
-              className={`mx-1 px-4 py-2 rounded-full ${
-                currentPage === index + 1
-                  ? "bg-black text-white"
-                  : "bg-gray-200 text-black"
-              } rounded`}
-            >
-              {index + 1}
-            </button>
-          ))}
-        </div>
+        <div className="flex justify-center items-center mt-10"></div>
       </motion.div>
     </AnimatePresence>
   );

@@ -6,12 +6,11 @@ const useAuthStore = create(
     (set) => ({
       token: null,
       user: null,
-      isSignedIn: false,
+      photographer: null,
 
       signin: (newToken) =>
         set({
           token: newToken,
-          isSignedIn: true,
         }),
 
       setUser: (newUser) =>
@@ -19,11 +18,16 @@ const useAuthStore = create(
           user: newUser,
         }),
 
+      setPhotographer: (newPhotographer) =>
+        set({
+          photographer: newPhotographer,
+        }),
+
       signout: () =>
         set({
           token: null,
           user: null,
-          isSignedIn: false,
+          photographer: null,
         }),
     }),
     {
@@ -41,7 +45,6 @@ const useAuthStore = create(
             return {
               token: token || null,
               user: user ? JSON.parse(user) : null,
-              isSignedIn: !!token,
             };
           }
 

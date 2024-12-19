@@ -13,7 +13,7 @@ const ProfilePage = () => {
 
   return (
     <>
-      {isSignedIn ? (
+      {user ? (
         <div className="flex flex-col items-center min-h-[80vh]">
           <div className="relative flex flex-col items-center pb-10 justify-center mt-4 w-full md:w-11/12 lg:w-10/12 xl:w-9/12">
             <div className="absolute inset-0 bg-black opacity-15 z-0">

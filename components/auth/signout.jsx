@@ -3,23 +3,24 @@ import React from "react";
 import { Button } from "../ui/button";
 import useAuthStore from "@/authStore";
 import { LogOut } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function Signout() {
   const router = useRouter();
   const signout = useAuthStore((state) => state.signout);
 
   const handleLogout = () => {
-    sessionStorage.removeItem("token");
-    sessionStorage.removeItem("user");
-    signout(); // Clear Zustand state
-    router.push("/"); // Redirect to home page
+    signout();
+    toast.success("Logged out successfully");
+    router.push("/");
   };
   return (
     <div>
-      {/* <Button variant="destructive" onClick={handleLogout}>
-        Sign Out
-      </Button> */}
-      <LogOut onClick={handleLogout} className="text-red-500 cursor-pointer" size={24} />
+      <LogOut
+        onClick={handleLogout}
+        className="text-red-500 cursor-pointer"
+        size={24}
+      />
     </div>
   );
 }

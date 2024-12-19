@@ -198,7 +198,7 @@ const ProfileEditPage = () => {
   return (
     <>
       <Toaster position="top-center" reverseOrder={false} />
-      {isSignedIn ? (
+      {user ? (
         <div className="flex flex-col items-center justify-center min-h-[80vh] mt-5 mb-10">
           <form
             onSubmit={handleSubmit}
@@ -425,14 +425,6 @@ const ProfileEditPage = () => {
             {message && <p className="text-green-500">{message}</p>}
             {error && <p className="text-red-500">{error}</p>}
           </form>
-          <div className="flex flex-col items-center mt-4">
-            <p>
-              Already have an account?{" "}
-              <Link className="underline" href="/signin">
-                Sign In
-              </Link>
-            </p>
-          </div>
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center min-h-screen">

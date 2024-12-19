@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
 import Button from "@/components/Button";
@@ -26,35 +26,39 @@ const RegistrationForm = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    connectedAccounts: [],
     password: "",
-    address: "",
-    age: "",
-    dob: "",
-    image: "", // Initialize with an empty string
     bio: "",
-    interests: "",
+    dob: "",
+    profileImage: "",
+    address: "",
+    isCompany: false,
+    companyName: "",
+    companyEmail: "",
+    companyAddress: "",
+    companyPhone: "",
+    portfolioLink: "",
+    photographyStyles: "",
+    yearsOfExperience: "",
+    accountType: "freelance",
+    connectedAccounts: [],
   });
 
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [cropperImage, setCropperImage] = useState(null); // For image preview and cropping
-  const [croppedImageUrl, setCroppedImageUrl] = useState(null); // Final cropped image URL
+  const [cropperImage, setCropperImage] = useState(null);
+  const [croppedImageUrl, setCroppedImageUrl] = useState(null);
   const cropperRef = useRef(null);
 
-  // Input change handler
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value ?? "" }); // Ensure value is not undefined
+    setFormData({ ...formData, [name]: value ?? "" });
   };
 
-  // Image upload handler
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
-    if (!file) return; // Avoid undefined issues
+    if (!file) return;
 
-    // Send file to server
     const uploadData = new FormData();
     uploadData.append("image", file);
 
@@ -66,11 +70,11 @@ const RegistrationForm = () => {
           body: uploadData,
         }
       );
-      const data = await res.text(); // Parse as plain text
+      const data = await res.text();
       if (res.ok) {
         setFormData((prev) => ({
           ...prev,
-          image: data, // Save the file location URL
+          profileImage: data,
         }));
         console.log("Image uploaded successfully", data);
       }
@@ -84,13 +88,12 @@ const RegistrationForm = () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        setCropperImage(reader.result); // Set the base64 image to Cropper
+        setCropperImage(reader.result);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  // Form validation logic
   const validateForm = () => {
     const newErrors = {};
     if (formData.name.length < 5)
@@ -98,12 +101,20 @@ const RegistrationForm = () => {
     if (!/^\S+@\S+\.\S+$/.test(formData.email))
       newErrors.email = "Enter a valid email address.";
     if (!formData.password) newErrors.password = "Password is required.";
-    if (formData.age && (formData.age < 0 || isNaN(formData.age)))
-      newErrors.age = "Age must be a positive number.";
+    if (
+      formData.yearsOfExperience &&
+      (formData.yearsOfExperience < 0 || isNaN(formData.yearsOfExperience))
+    )
+      newErrors.yearsOfExperience =
+        "Years of experience must be a positive number.";
     if (formData.dob && isNaN(new Date(formData.dob).getTime()))
       newErrors.dob = "Date of birth is invalid.";
-    if (formData.interests && !/^[\w\s,]*$/.test(formData.interests))
-      newErrors.interests = "Interests must be comma-separated.";
+    if (
+      formData.photographyStyles &&
+      !/^[\w\s,]*$/.test(formData.photographyStyles)
+    )
+      newErrors.photographyStyles =
+        "Photography styles must be comma-separated.";
     return newErrors;
   };
 
@@ -111,15 +122,12 @@ const RegistrationForm = () => {
     const cropper = cropperRef.current?.cropper;
     if (cropper) {
       const croppedCanvas = cropper.getCroppedCanvas();
-      // Show loading toast
       const toastId = toast.loading("Processing image...");
 
-      // Send the cropped canvas to the server as a file
       const blob = await new Promise((resolve) =>
         croppedCanvas.toBlob(resolve)
       );
 
-      // FormData to send image to the server
       const formData = new FormData();
       formData.append("image", blob);
 
@@ -131,15 +139,14 @@ const RegistrationForm = () => {
             body: formData,
           }
         );
-        const data = await res.text(); // Expect URL from server
+        const data = await res.text();
 
         if (res.ok) {
-          setCroppedImageUrl(data); // Store the URL of the uploaded image
+          setCroppedImageUrl(data);
           setFormData((prev) => ({
             ...prev,
-            image: data, // Save external image URL in formData
+            profileImage: data,
           }));
-          // Remove cropper and show updated image
           setCropperImage(null);
           toast.success("Image cropped and uploaded successfully!", {
             id: toastId,
@@ -154,7 +161,6 @@ const RegistrationForm = () => {
     }
   };
 
-  // Form submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -167,7 +173,7 @@ const RegistrationForm = () => {
     setErrors({});
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/user/register`,
+        `${process.env.NEXT_PUBLIC_SERVER}/api/photographer/register`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -184,12 +190,20 @@ const RegistrationForm = () => {
           name: "",
           email: "",
           password: "",
-          address: "",
-          age: "",
-          dob: "",
-          image: "",
           bio: "",
-          interests: "",
+          dob: "",
+          profileImage: "",
+          address: "",
+          isCompany: false,
+          companyName: "",
+          companyEmail: "",
+          companyAddress: "",
+          companyPhone: "",
+          portfolioLink: "",
+          photographyStyles: "",
+          yearsOfExperience: "",
+          accountType: "freelance",
+          connectedAccounts: [],
         });
         router.push("/signin");
       } else {
@@ -201,8 +215,6 @@ const RegistrationForm = () => {
     }
   };
 
-  console.log(formData);
-
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] mt-5 mb-10">
       <Toaster position="top-center" reverseOrder={false} />
@@ -212,10 +224,9 @@ const RegistrationForm = () => {
         className="flex flex-col w-full md:w-1/2 px-5 gap-4"
       >
         <h2 className="text-heading-04 font-medium text-center">
-          User Registration
+          Photographer Registration
         </h2>
-        {message && <p className="text-green-500">{message}</p>}
-        {error && <p className="text-red-500">{error}</p>}
+
         <div className="flex flex-col items-center gap-4">
           {cropperImage ? (
             <Cropper
@@ -228,7 +239,7 @@ const RegistrationForm = () => {
             />
           ) : (
             <Image
-              src={formData.image || "/assets/default.jpg"}
+              src={formData.profileImage || "/assets/default.jpg"}
               alt="Profile Image"
               width={200}
               height={200}
@@ -236,7 +247,7 @@ const RegistrationForm = () => {
             />
           )}
           <Label className="w-full">Profile Image</Label>
-          <Input type="file" name="image" onChange={handleImageChange} />
+          <Input type="file" name="profileImage" onChange={handleImageChange} />
           {cropperImage && (
             <button
               type="button"
@@ -247,6 +258,7 @@ const RegistrationForm = () => {
             </button>
           )}
         </div>
+
         <div>
           <Label>
             Name <span className="text-red-500">*</span>
@@ -278,97 +290,6 @@ const RegistrationForm = () => {
         </div>
 
         <div>
-          <Label>Connect Accounts</Label>
-          <div className="flex flex-col gap-2">
-            {formData.connectedAccounts?.map((account, index) => (
-              <div key={index} className="flex gap-2">
-                <Select
-                  className="w-36"
-                  value={account.accountName}
-                  onValueChange={(value) => {
-                    const newAccounts = [...formData.connectedAccounts];
-                    newAccounts[index].accountName = value;
-                    setFormData({
-                      ...formData,
-                      connectedAccounts: newAccounts,
-                    });
-                  }}
-                >
-                  <SelectTrigger className="w-40">
-                    <SelectValue />
-                    <p className="sr-only">Account Name</p>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="facebook">Facebook</SelectItem>
-                    <SelectItem value="twitter">Twitter</SelectItem>
-                    <SelectItem value="instagram">Instagram</SelectItem>
-                    <SelectItem value="linkedIn">LinkedIn</SelectItem>
-                  </SelectContent>
-                </Select>
-                {/* <Input
-                type="text"
-                name="accountName"
-                value={account.accountName}
-                onChange={(e) => {
-                  const newAccounts = [...formData.connectedAccounts];
-                  newAccounts[index].accountName = e.target.value;
-                  setFormData({ ...formData, connectedAccounts: newAccounts });
-                  }}
-                  placeholder="Account Name"
-                  /> */}
-                <Input
-                  type="text"
-                  name="accountLink"
-                  value={account.accountLink}
-                  onChange={(e) => {
-                    const newAccounts = [...formData.connectedAccounts];
-                    newAccounts[index].accountLink = e.target.value;
-                    setFormData({
-                      ...formData,
-                      connectedAccounts: newAccounts,
-                    });
-                  }}
-                  placeholder="Account Link"
-                />
-              </div>
-            ))}
-          </div>
-          <div className="flex flex-row gap-2 mt-2">
-            <button
-              type="button"
-              className="p-2 rounded-md border-2 border-green-500 hover:bg-green-500 hover:text-white"
-              onClick={() =>
-                setFormData({
-                  ...formData,
-                  connectedAccounts: [
-                    ...formData.connectedAccounts,
-                    {
-                      accountName: "",
-                      accountLink: "",
-                    },
-                  ],
-                })
-              }
-            >
-              <Plus size={16} />
-            </button>
-            <button
-              type="button"
-              className="p-2 rounded-md border-2 border-red-500 hover:bg-red-500 hover:text-white disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-current"
-              disabled={formData.connectedAccounts?.length === 0}
-              onClick={() =>
-                setFormData({
-                  ...formData,
-                  connectedAccounts: formData.connectedAccounts.slice(0, -1),
-                })
-              }
-            >
-              <Trash size={16} />
-            </button>
-          </div>
-        </div>
-
-        <div>
           <Label>
             Password <span className="text-red-500">*</span>
           </Label>
@@ -385,7 +306,9 @@ const RegistrationForm = () => {
         </div>
 
         <div>
-          <Label>Address</Label>
+          <Label>
+            Address <span className="text-red-500">*</span>
+          </Label>
           <Input
             type="text"
             name="address"
@@ -395,53 +318,153 @@ const RegistrationForm = () => {
         </div>
 
         <div>
-          <Label>Date of Birth</Label>
-          <Input
-            type="date"
-            name="dob"
-            value={formData.dob || ""} // Ensure default empty string
-            onChange={handleInputChange}
-          />
-          {errors.dob && <p className="text-red-500 text-sm">{errors.dob}</p>}
-        </div>
-
-        <p>{formData.image}</p>
-
-        <div>
           <Label>Bio</Label>
           <Textarea
             name="bio"
             value={formData.bio}
             onChange={handleInputChange}
-          ></Textarea>
+          />
         </div>
 
         <div>
-          <Label>Interests</Label>
+          <Label>Account Type</Label>
+          <Select
+            value={formData.accountType}
+            onValueChange={(value) =>
+              setFormData({ ...formData, accountType: value })
+            }
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select Account Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="freelance">Freelance</SelectItem>
+              <SelectItem value="studio">Studio</SelectItem>
+              <SelectItem value="agency">Agency</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <Label>Date of Birth</Label>
+          <Input
+            type="date"
+            name="dob"
+            value={formData.dob}
+            onChange={handleInputChange}
+          />
+          {errors.dob && <p className="text-red-500 text-sm">{errors.dob}</p>}
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Label>Is this a company account?</Label>
+          <input
+            type="checkbox"
+            name="isCompany"
+            checked={formData.isCompany}
+            onChange={(e) =>
+              setFormData({ ...formData, isCompany: e.target.checked })
+            }
+          />
+        </div>
+
+        {formData.isCompany && (
+          <>
+            <div>
+              <Label>Company Name</Label>
+              <Input
+                type="text"
+                name="companyName"
+                value={formData.companyName}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div>
+              <Label>Company Email</Label>
+              <Input
+                type="email"
+                name="companyEmail"
+                value={formData.companyEmail}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div>
+              <Label>Company Address</Label>
+              <Input
+                type="text"
+                name="companyAddress"
+                value={formData.companyAddress}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div>
+              <Label>Company Phone</Label>
+              <Input
+                type="tel"
+                name="companyPhone"
+                value={formData.companyPhone}
+                onChange={handleInputChange}
+              />
+            </div>
+          </>
+        )}
+
+        <div>
+          <Label>Portfolio Link</Label>
+          <Input
+            type="url"
+            name="portfolioLink"
+            value={formData.portfolioLink}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div>
+          <Label>Photography Styles</Label>
           <Input
             type="text"
-            name="interests"
-            value={formData.interests}
+            name="photographyStyles"
+            value={formData.photographyStyles}
             onChange={handleInputChange}
-            placeholder="Comma-separated interests"
           />
-          {errors.interests && (
-            <p className="text-red-500 text-sm">{errors.interests}</p>
+          {errors.photographyStyles && (
+            <p className="text-red-500 text-sm">{errors.photographyStyles}</p>
           )}
         </div>
 
-        <div className="flex flex-col items-center">
-          <Button type="submit">Register</Button>
+        <div>
+          <Label>Years of Experience</Label>
+          <Input
+            type="number"
+            name="yearsOfExperience"
+            value={formData.yearsOfExperience}
+            onChange={handleInputChange}
+          />
+          {errors.yearsOfExperience && (
+            <p className="text-red-500 text-sm">{errors.yearsOfExperience}</p>
+          )}
         </div>
+
+        <div>
+          <Label>Connected Accounts</Label>
+          <Textarea
+            name="connectedAccounts"
+            value={formData.connectedAccounts.join(", ")}
+            onChange={handleInputChange}
+            placeholder="Comma-separated list of connected accounts"
+          />
+        </div>
+
+        {message && <p className="text-green-500">{message}</p>}
+        {error && <p className="text-red-500">{error}</p>}
+
+        <Button type="submit" variant="primary" fullWidth>
+          Register
+        </Button>
       </form>
-      <div className="flex flex-col items-center mt-4">
-        <p>
-          Already have an account?{" "}
-          <Link className="underline" href="/signin">
-            Sign In
-          </Link>
-        </p>
-      </div>
     </div>
   );
 };

@@ -7,7 +7,6 @@ import {
   User2,
   Menu,
   X,
-  ChevronRight,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -18,7 +17,7 @@ import useAuthStore from "@/authStore";
 
 export default function Navbar() {
   const pathname = usePathname();
-  const isSignedIn = useAuthStore((state) => state.isSignedIn);
+  const {user, photographer} = useAuthStore();
 
   const [scrollLocation, setScrollLocation] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -127,7 +126,7 @@ export default function Navbar() {
         {menuItems.map((item, index) => (
           <Link key={index} href={item.url}>
             <p
-              className={`text-sm md:text-md lg:text-lg xl:text-cl menuHover px-1 xl:px-4 py-2 rounded-lg text-center font-semibold ${
+              className={`text-sm md:text-md lg:text-lg xl:text-cl px-1 xl:px-4 py-2 rounded-lg text-center font-semibold ${
                 scrollLocation > 50 || pathname !== "/"
                   ? "text-surface-600"
                   : "text-white"
@@ -135,10 +134,10 @@ export default function Navbar() {
                 item.url === "/"
                   ? pathname === item.url
                     ? "menuActive"
-                    : ""
+                    : "menuHover"
                   : pathname.startsWith(item.url)
                   ? "menuActive"
-                  : ""
+                  : "menuHover"
               }`}
             >
               {item.name}
@@ -198,7 +197,7 @@ export default function Navbar() {
               : "text-white"
           } cursor-pointer`}
         />
-        {isSignedIn ? (
+        {user || photographer ? (
           <>
             <Link href="/profile">
               <User2

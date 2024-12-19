@@ -9,6 +9,7 @@ import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
 import Featured from "@/components/featuredArtists/Featured";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
+import "./styles.css";
 
 const images = [
   {
@@ -197,10 +198,10 @@ export default function page() {
     },
     breakpoints: {
       "(min-width: 768px)": {
-        slides: { perView: 2, spacing: 15 },
+        slides: { perView: 2, spacing: 30 },
       },
       "(min-width: 1024px)": {
-        slides: { perView: 3, spacing: 15 },
+        slides: { perView: 3, spacing: 120 },
       },
     },
   });
@@ -224,8 +225,8 @@ export default function page() {
         <h2 className="text-heading-04 sm:text-heading-03 md:text-heading-02 font-bold text-primary-400">
           Artist of the Month
         </h2>
-        <div className="relative flex flex-col items-center justify-center mt-4 w-full md:w-11/12 lg:w-10/12 xl:w-9/12">
-          <div className="absolute inset-0 bg-black opacity-15 z-0">
+        <div className="relative flex flex-col items-center justify-center mt-4 w-full">
+          <div className="absolute inset-0 bg-black opacity-0 sm:opacity-15 z-0">
             <Image
               width={800}
               height={600}
@@ -234,20 +235,41 @@ export default function page() {
               className="object-cover w-full h-full"
             />
           </div>
-          <div className="flex flex-col sm:flex-row items-center w-full justify-center md:px-12 sm:px-8 lg:px-16 xl:px-20 pt-5 z-10">
-            <div className="w-8/12 md:w-6/12 lg:w-5/12 xl:w-3/12 flex items-center">
+          <div className="flex flex-col sm:flex-row items-center my-10 w-full justify-center md:px-12 sm:px-8 lg:px-16 xl:px-20 pt-5 z-10">
+            <div className="w-full px-16 sm:w-[40vh] mb-auto pt-12 flex items-center">
               <Image
-                width={300}
-                height={300}
-                src="/assets/hero/bg4.jpg"
+                width={800}
+                height={800}
+                src="/assets/images/avatar4.jpg"
                 alt="artist"
-                className="object-cover border-4 border-white mx-auto w-60 aspect-[1/1] rounded-full"
+                className="object-cover object-top sm:border-4 sm:border-white w-full mx-auto aspect-[1/1] sm:rounded-full sm:!shadow-none profile"
               />
             </div>
-            <div className="sm:w-9/12 p-4 sm:p-8 z-20">
-              <h3 className="text-heading-04 font-semibold text-black">
-                Artist Name
-              </h3>
+            <div className="sm:w-9/12 py-4 px-6 flex-grow sm:p-8 z-20">
+              <div className="flex flex-col gap-2 px-12 sm:px-0 justify-between items-center sm:items-start">
+                <h3 className="text-heading-04 font-semibold text-black">
+                  Artist Name
+                </h3>
+                <div className="flex sm:hidden flex-row gap-2">
+                  <Icon
+                    icon="akar-icons:instagram-fill"
+                    className="text-2xl text-primary"
+                  />
+                  <Icon
+                    icon="akar-icons:twitter-fill"
+                    className="text-2xl text-primary"
+                  />
+                  <Icon
+                    icon="akar-icons:facebook-fill"
+                    className="text-2xl text-primary"
+                  />
+                </div>
+              </div>
+              <div className="flex sm:hidden pt-4 sm::pt-0 items-center justify-center">
+                <Button color="primary" size="lg" className="">
+                  View Profile
+                </Button>
+              </div>
               <p className="text-paragraph text-justify text-gray-500 mt-4">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit.
                 Repellat nobis quam consequuntur nisi aut cumque omnis ratione
@@ -256,30 +278,30 @@ export default function page() {
                 porro assumenda voluptate harum minima recusandae totam
                 cupiditate architecto,
               </p>
+              <div className="hidden sm:flex flex-col sm:flex-row gap-12 items-center mt-8 z-20">
+                <Button color="primary" size="lg" className="">
+                  View Profile
+                </Button>
+                <div className="flex flex-row gap-4">
+                  <Icon
+                    icon="akar-icons:instagram-fill"
+                    className="text-3xl text-primary"
+                  />
+                  <Icon
+                    icon="akar-icons:twitter-fill"
+                    className="text-3xl text-primary"
+                  />
+                  <Icon
+                    icon="akar-icons:facebook-fill"
+                    className="text-3xl text-primary"
+                  />
+                </div>
+              </div>
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-4 items-center mt-8 z-20">
-            <Button color="primary" size="lg" className="">
-              View Profile
-            </Button>
-            <div className="flex flex-row gap-4">
-              <Icon
-                icon="akar-icons:instagram-fill"
-                className="text-3xl text-primary"
-              />
-              <Icon
-                icon="akar-icons:twitter-fill"
-                className="text-3xl text-primary"
-              />
-              <Icon
-                icon="akar-icons:facebook-fill"
-                className="text-3xl text-primary"
-              />
-            </div>
-          </div>
-          <div className="flex flex-row justify-around items-center w-full">
+          <div className="flex flex-row justify-around items-center w-full px-10">
             <button
-              className=" z-20 rounded-full"
+              className="hidden sm:block z-20 rounded-full"
               onClick={() => handleNavigation("left")}
             >
               <p className="sr-only">Featured Artist Photos Left</p>
@@ -332,7 +354,7 @@ export default function page() {
               </div>
             </div>
             <button
-              className=" z-20 rounded-full"
+              className="hidden sm:block z-20 rounded-full"
               onClick={() => handleNavigation("right")}
             >
               <p className="sr-only">Featured Artist Photos Right</p>
@@ -405,19 +427,24 @@ export default function page() {
             height={900}
             src="https://images.pexels.com/photos/268533/pexels-photo-268533.jpeg"
             alt=""
-            className="w-full h-80 sm:h-[35vh] md:h-[40vh] xl:h-[80vh] object-cover object-center"
+            className="w-full h-96 sm:h-[35vh] md:h-[40vh] xl:h-[80vh] object-cover object-center"
           />
           <div className="absolute flex flex-col md:justify-start justify-center inset-0 bg-white bg-opacity-25">
-            <div className="md:pt-10 text-center sm:text-start px-10 sm:px-28 lg:w-3/4">
-              <h1 className="text-heading-03 sm:text-heading-04 md:text-heading-03 xl:text-heading-lg font-bold text-white">
+            <div className="md:pt-10 flex flex-col gap-4 text-start sm:text-start px-10 sm:px-28 lg:w-3/4">
+              <h1 className="text-heading-05 sm:text-heading-04 md:text-heading-03 xl:text-heading-lg font-bold text-white">
                 Sell with Us
               </h1>
-              <p className="text-paragraph sm:text-heading-06 md:text-heading-05 xl:text-heading-04 text-white font-semibold">
+              <p className="text-paragraph sm:text-heading-06 md:text-heading-05 xl:text-heading-04 text-white font-medium">
                 Are you an artist looking to showcase your work and sell it on
                 our platform?
               </p>
+              <p className="sm:text-paragraph md:text-heading-06 xl:text-heading-05 text-white">
+                Turn your passion into profit with ClickedART. Join our platform
+                to showcase your art to a global audience, access powerful
+                tools, and enjoy secure payments.
+              </p>
               <div className="mt-10">
-                <button className="bg-white text-primary rounded-lg font-semibold p-4 text-heading-05 hover:bg-primary hover:text-white transition-all duration-200 ease-linear active:bg-primary-200 active:text-white">
+                <button className="bg-white text-primary rounded-lg font-semibold p-2 sm:p-4 text-heading-06 sm:text-heading-05 hover:bg-primary hover:text-white transition-all duration-200 ease-linear active:bg-primary-200 active:text-white">
                   Sell Your Artwork
                 </button>
               </div>

@@ -9,7 +9,7 @@ import useAuthStore from "@/authStore";
 import Link from "next/link";
 
 const SignInPage = () => {
-  const { signin, setUser, user, photographer } = useAuthStore();
+  const { signin, setPhotographer, user, photographer } = useAuthStore();
 
   const router = useRouter();
 
@@ -33,7 +33,7 @@ const SignInPage = () => {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/user/login`,
+        `${process.env.NEXT_PUBLIC_SERVER}/api/photographer/login`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -49,7 +49,7 @@ const SignInPage = () => {
 
         // Update Zustand store
         signin(data.token);
-        setUser(data.user);
+        setPhotographer(data.photographer);
 
         // Redirect to home page
         router.push("/");
@@ -82,8 +82,6 @@ const SignInPage = () => {
             <h2 className="text-heading-04 font-medium text-center">
               User Sign In
             </h2>
-            {message && <p className="text-green-500">{message}</p>}
-            {error && <p className="text-red-500">{error}</p>}
 
             <div>
               <Label>Email</Label>
@@ -105,6 +103,10 @@ const SignInPage = () => {
                 onChange={handleInputChange}
                 required
               />
+            </div>
+            <div className="mx-auto">
+              {message && <p className="text-green-500">{message}</p>}
+              {error && <p className="text-red-500">{error}</p>}
             </div>
 
             <div className="flex flex-col items-center">
