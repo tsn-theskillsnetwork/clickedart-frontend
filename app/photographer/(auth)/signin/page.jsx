@@ -80,7 +80,7 @@ const SignInPage = () => {
             className="flex flex-col w-full md:w-1/2 gap-4 px-5"
           >
             <h2 className="text-heading-04 font-medium text-center">
-              User Sign In
+              Photographer Sign In
             </h2>
 
             <div>

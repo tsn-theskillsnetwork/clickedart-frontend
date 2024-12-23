@@ -5,4 +5,6 @@ export const metadata = {
   description:
     'This is the membership page',
 };
-export default Page;
+export default async function RootLayout({ children }) {
+  return <div>{children}</div>;
+}

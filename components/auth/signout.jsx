@@ -1,11 +1,10 @@
 import { useRouter } from "next/navigation";
 import React from "react";
-import { Button } from "../ui/button";
 import useAuthStore from "@/authStore";
 import { LogOut } from "lucide-react";
 import toast from "react-hot-toast";
 
-export default function Signout() {
+export default function Signout({ variant = "icon" }) {
   const router = useRouter();
   const signout = useAuthStore((state) => state.signout);
 
@@ -16,11 +15,17 @@ export default function Signout() {
   };
   return (
     <div>
-      <LogOut
-        onClick={handleLogout}
-        className="text-red-500 cursor-pointer"
-        size={24}
-      />
+      <button onClick={handleLogout}>
+        {variant === "icon" && (
+          <LogOut className="text-red-500 cursor-pointer" size={24} />
+        )}
+        {variant === "text" && (
+          <p className="text-lg font-semibold text-red-600 cursor-pointer">
+            Sign out
+          </p>
+        )}
+        {}
+      </button>
     </div>
   );
 }

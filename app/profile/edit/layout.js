@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Profile - ClickedArt",
+  title: "Edit Profile - ClickedArt",
   description: "This is the profile page",
 };
 export default async function RootLayout({ children }) {

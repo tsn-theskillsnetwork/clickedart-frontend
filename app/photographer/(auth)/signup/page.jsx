@@ -29,7 +29,7 @@ const RegistrationForm = () => {
     password: "",
     bio: "",
     dob: "",
-    profileImage: "",
+    profileImage: "https://images.pexels.com/photos/29078812/pexels-photo-29078812/free-photo-of-scenic-mountain-trail-with-hikers-in-rocky-terrain.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
     address: "",
     isCompany: false,
     companyName: "",
@@ -55,33 +55,33 @@ const RegistrationForm = () => {
     setFormData({ ...formData, [name]: value ?? "" });
   };
 
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  // const handleImageUpload = async (e) => {
+  //   const file = e.target.files[0];
+  //   if (!file) return;
 
-    const uploadData = new FormData();
-    uploadData.append("image", file);
+  //   const uploadData = new FormData();
+  //   uploadData.append("image", file);
 
-    try {
-      const res = await fetch(
-        `http://localhost:5000/api/upload/uploadSingleImage`,
-        {
-          method: "POST",
-          body: uploadData,
-        }
-      );
-      const data = await res.text();
-      if (res.ok) {
-        setFormData((prev) => ({
-          ...prev,
-          profileImage: data,
-        }));
-        console.log("Image uploaded successfully", data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //   try {
+  //     const res = await fetch(
+  //       `http://localhost:5000/api/upload/uploadSingleImage`,
+  //       {
+  //         method: "POST",
+  //         body: uploadData,
+  //       }
+  //     );
+  //     const data = await res.text();
+  //     if (res.ok) {
+  //       setFormData((prev) => ({
+  //         ...prev,
+  //         profileImage: data,
+  //       }));
+  //       console.log("Image uploaded successfully", data);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -205,7 +205,7 @@ const RegistrationForm = () => {
           accountType: "freelance",
           connectedAccounts: [],
         });
-        router.push("/signin");
+        router.push("/photographer/signin");
       } else {
         setError(data.message);
         setMessage("");

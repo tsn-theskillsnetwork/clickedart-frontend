@@ -1,6 +1,9 @@
+import Page from "./page";
+
 export const metadata = {
-  title: "Profile - ClickedArt",
-  description: "This is the profile page",
+  title: 'Cart',
+  description:
+    'This is the cart page',
 };
 export default async function RootLayout({ children }) {
   return <div>{children}</div>;

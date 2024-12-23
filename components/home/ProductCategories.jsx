@@ -33,7 +33,7 @@ export default function ProductCategories() {
       <h1 className="font-bold text-heading-01 text-accent-400 mb-10">
         Themes
       </h1>
-      <div className="flex mx-40 gap-4 justify-end">
+      <div className="flex mx-2 sm:mx-40 gap-2 sm:gap-4 justify-end">
         {/* card 1 */}
         <motion.div
           layout
@@ -124,7 +124,7 @@ export default function ProductCategories() {
           />
         </motion.div>
       </div>
-      <div className="flex mx-40 mt-10 gap-4 justify-end mb-16">
+      <div className="flex mx-2 sm:mx-40 mt-2 sm:mt-5 gap-2 sm:gap-4 justify-end mb-16">
         {/* card 4 */}
         <motion.div
           onHoverStart={handleHover3}

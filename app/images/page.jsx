@@ -12,8 +12,14 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import useCartStore from "@/cartStore";
+import useAuthStore from "@/authStore";
+import useWishlistStore from "@/wishlistStore";
 
 export default function ThemesResultPage() {
+  const { user } = useAuthStore();
+  const { wishlist, fetchWishlist } = useWishlistStore();
+
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -28,9 +34,69 @@ export default function ThemesResultPage() {
   const [theme, setTheme] = useState(themeValue);
   const [sort, setSort] = useState(sortValue);
   const [search, setSearch] = useState("");
+  // const [wishlist, setWishlist] = useState([]);
 
-  const handleSearch = () => {
-    router.push(`/images?theme=${theme}&sort=${sort}&search=${search}`);
+  const addImageToWishlist = async (imageId) => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/wishlist/add-images-in-wishlist`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: user?._id,
+            imageIds: [imageId],
+          }),
+        }
+      );
+
+      const data = await res.json(); // Parse the response JSON
+      console.log(data); // Log the response data
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to add image to wishlist");
+      }
+      fetchWishlist(user?._id);
+      // Handle success response if needed
+      // Example: show a toast message or update the UI
+    } catch (error) {
+      console.error("Error adding image to wishlist:", error);
+      // Handle error if needed
+    }
+  };
+
+  const removeImageFromWishlist = async (imageId) => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/wishlist/remove-images-from-wishlist`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: user?._id,
+            imageIds: [imageId],
+          }),
+        }
+      );
+
+      const data = await res.json(); // Parse the response JSON
+      console.log(data); // Log the response data
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to remove image from wishlist");
+      }
+      fetchWishlist(user?._id);
+
+      // Handle success response if needed
+      // Example: show a toast message or update the UI
+    } catch (error) {
+      console.error("Error removing image from wishlist:", error);
+      // Handle error if needed
+    }
   };
 
   useEffect(() => {
@@ -42,7 +108,7 @@ export default function ThemesResultPage() {
   const sortedImages = [...images]
     .filter((image) => {
       if (theme === "all") return true;
-      return image.theme === theme;
+      return image.category.name.toLowerCase() === theme.toLowerCase();
     })
     .filter((image) => {
       if (!searchValue) return true;
@@ -97,6 +163,25 @@ export default function ThemesResultPage() {
     fetchThemes();
     fetchImages();
   }, []);
+
+  // useEffect(() => {
+  //   const fetchWishlist = async () => {
+  //     try {
+  //       const response = await fetch(
+  //         `${process.env.NEXT_PUBLIC_SERVER}/api/wishlist/get-my-wishlist?userId=${user?._id}`,
+  //         {
+  //           method: "GET",
+  //         }
+  //       );
+  //       const data = await response.json();
+  //       setWishlist(data.wishlist?.images);
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   };
+
+  //   fetchWishlist();
+  // }, [user]);
 
   return (
     <AnimatePresence mode="popLayout">
@@ -211,7 +296,12 @@ export default function ThemesResultPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-44">
           {sortedImages.map((image, index) => (
             <div key={index}>
-              <div className="relative group">
+              <div
+                onClick={() => {
+                  router.push(`/images/${image._id}`);
+                }}
+                className="relative group"
+              >
                 {image.imageLinks?.small &&
                 image.imageLinks.small.trim() !== "" ? (
                   <Image
@@ -243,7 +333,17 @@ export default function ThemesResultPage() {
                     </div>
                     <Heart
                       size={28}
-                      className="text-white group-hover:text-zinc-400 transition-all duration-200 ease-linear"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        wishlist?.some((item) => item._id === image._id)
+                          ? removeImageFromWishlist(image._id)
+                          : addImageToWishlist(image._id);
+                      }}
+                      className={` ${
+                        wishlist?.some((item) => item._id === image._id)
+                          ? "text-red-400 fill-red-500"
+                          : "text-white group-hover:text-zinc-400"
+                      }  transition-all duration-200 ease-linear cursor-pointer`}
                     />
                   </div>
                 </div>

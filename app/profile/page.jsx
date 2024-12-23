@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import useAuthStore from "@/authStore";
 import Image from "next/image";
 import Button from "@/components/Button";
@@ -8,12 +8,17 @@ import Link from "next/link";
 import { Icon } from "@iconify/react";
 
 const ProfilePage = () => {
-  const user = useAuthStore((state) => state.user);
-  const isSignedIn = useAuthStore((state) => state.isSignedIn);
+  const { photographer, user } = useAuthStore();
+
+  const [data, setData] = useState(user || photographer);
+
+  useEffect(() => {
+    setData(user || photographer);
+  }, [user, photographer]);
 
   return (
     <>
-      {user ? (
+      {data ? (
         <div className="flex flex-col items-center min-h-[80vh]">
           <div className="relative flex flex-col items-center pb-10 justify-center mt-4 w-full md:w-11/12 lg:w-10/12 xl:w-9/12">
             <div className="absolute inset-0 bg-black opacity-15 z-0">
@@ -31,17 +36,17 @@ const ProfilePage = () => {
                 <Image
                   width={300}
                   height={300}
-                  src={user?.image || "/assets/default.jpg"}
+                  src={data?.image || "/assets/default.jpg"}
                   alt={`${user?.name || "Default"}'s profile picture`}
                   className="object-cover border-4 border-white mx-auto w-60 aspect-[1/1] rounded-full"
                 />
               </div>
               <div className="sm:w-9/12 p-4 sm:p-8 z-20">
                 <h3 className="text-heading-04 font-semibold text-black">
-                  {user?.name || "Anonymous"}
+                  {data?.name || "Anonymous"}
                 </h3>
                 <p className="text-paragraph text-justify text-gray-500 mt-4">
-                  {user?.bio || "No bio available."}
+                  {data?.bio || "No bio available."}
                 </p>
               </div>
             </div>
@@ -52,7 +57,7 @@ const ProfilePage = () => {
                 </Button>
               </Link>
               <div className="flex flex-row gap-4">
-                {user?.connectedAccounts?.map((account) => (
+                {data?.connectedAccounts?.map((account) => (
                   <Link key={account.accountName} href={account.accountLink}>
                     <Icon
                       icon={`akar-icons:${account.accountName}-fill`}

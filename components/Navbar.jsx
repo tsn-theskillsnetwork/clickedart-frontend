@@ -7,6 +7,7 @@ import {
   User2,
   Menu,
   X,
+  Heart,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,11 +15,16 @@ import { usePathname } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import Signout from "./auth/signout";
 import useAuthStore from "@/authStore";
+import useCartStore from "@/cartStore";
+import useWishlistStore from "@/wishlistStore";
 
 export default function Navbar() {
   const pathname = usePathname();
-  const {user, photographer} = useAuthStore();
+  const { user, photographer } = useAuthStore();
+  const { cart } = useCartStore();
+  const { wishlist, fetchWishlist } = useWishlistStore();
 
+  // const [wishlist, setWishlist] = useState([]);
   const [scrollLocation, setScrollLocation] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -60,6 +66,10 @@ export default function Navbar() {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  useEffect(() => {
+    user && fetchWishlist(user?._id);
+  }, [user]);
+
   return (
     <div
       className={`fixed flex flex-row items-center justify-between px-6 gap-5 sm:px-10 ${
@@ -68,11 +78,11 @@ export default function Navbar() {
           : "bg-transparent shadow-none"
       } h-20 sm:h-24 z-50 w-full`}
     >
-      <div className="hidden sm:block">
+      <div className="hidden lg:block">
         {scrollLocation > 50 || pathname !== "/" ? (
           <Image
             src="/assets/Logo.png"
-            className="h-full w-full"
+            className="h-auto w-4/5"
             alt="logo"
             priority
             width={200}
@@ -81,15 +91,17 @@ export default function Navbar() {
         ) : (
           <Image
             src="/assets/LogoWhite.png"
-            className="h-full w-full"
+            className="h-auto w-4/5"
             alt="logo"
             width={200}
             height={50}
           />
         )}
       </div>
-      <div className="sm:hidden mt-[5%] w-full flex flex-row gap-2 items-center justify-around">
-        <button
+
+      {/* Mobile Logo (buttons) */}
+      <div className="lg:hidden w-full flex flex-row gap-2 items-center justify-between">
+        {/* <button
           className={`border ${
             scrollLocation > 50 || pathname !== "/"
               ? "text-black border-black"
@@ -107,9 +119,29 @@ export default function Navbar() {
         >
           {" "}
           <p className="text-xs">Sell your photos</p>
-        </button>
+        </button> */}
+        {scrollLocation > 50 || pathname !== "/" ? (
+          <Image
+            src="/assets/Logo.png"
+            className="h-8 max-w-max"
+            alt="logo"
+            priority
+            width={200}
+            height={50}
+          />
+        ) : (
+          <Image
+            src="/assets/LogoWhite.png"
+            className="h-8 max-w-max"
+            alt="logo"
+            width={200}
+            height={50}
+          />
+        )}
       </div>
-      <div className="sm:hidden pt-3">
+
+      {/* Mobile Navbar */}
+      <div className="lg:hidden pt-0">
         <Menu
           ref={menuButtonRef}
           size={30}
@@ -122,11 +154,12 @@ export default function Navbar() {
         />
       </div>
 
-      <div className="hidden sm:flex flex-row gap-0">
+      {/* Desktop Menu */}
+      <div className="hidden lg:flex flex-row gap-0">
         {menuItems.map((item, index) => (
           <Link key={index} href={item.url}>
             <p
-              className={`text-sm md:text-md lg:text-lg xl:text-cl px-1 xl:px-4 py-2 rounded-lg text-center font-semibold ${
+              className={`text-sm md:text-md lg:text-lg xl:text-xl px-1 xl:px-4 py-2 rounded-lg text-center font-semibold ${
                 scrollLocation > 50 || pathname !== "/"
                   ? "text-surface-600"
                   : "text-white"
@@ -146,10 +179,11 @@ export default function Navbar() {
         ))}
       </div>
 
+      {/* Mobile Menu */}
       {isMenuOpen && (
         <div
           ref={menuRef}
-          className="absolute top-0 left-0 right-0 bg-white shadow-lg p-6 sm:hidden flex flex-col gap-4"
+          className="absolute top-0 left-0 right-0 bg-white shadow-lg p-6 lg:hidden flex flex-col gap-4"
         >
           <div className="flex justify-end">
             <X
@@ -160,18 +194,25 @@ export default function Navbar() {
           </div>
 
           {menuItems.map((item, index) => (
-            <Link key={index} href={item.url}>
+            <Link
+              key={index}
+              href={item.url}
+              onClick={() => setIsMenuOpen(false)}
+            >
               <p className="text-lg font-semibold text-black cursor-pointer">
                 {item.name}
               </p>
             </Link>
           ))}
-          {isSignedIn ? (
-            <Link href="/profile">
-              <p className="text-lg font-semibold text-black cursor-pointer">
-                Profile
-              </p>
-            </Link>
+          {user || photographer ? (
+            <>
+              <Link href="/profile">
+                <p className="text-lg font-semibold text-black cursor-pointer">
+                  Profile
+                </p>
+              </Link>
+              <Signout variant="text" />
+            </>
           ) : (
             <Link href="/signin">
               <p className="text-lg font-semibold text-black cursor-pointer">
@@ -182,7 +223,7 @@ export default function Navbar() {
         </div>
       )}
 
-      <div className="hidden sm:flex flex-row gap-2 xl:gap-10">
+      <div className="hidden lg:flex flex-row gap-2 xl:gap-10">
         <MessageSquare
           className={`${
             scrollLocation > 50 || pathname !== "/"
@@ -221,13 +262,36 @@ export default function Navbar() {
             />
           </Link>
         )}
-        <ShoppingCart
-          className={`${
-            scrollLocation > 50 || pathname !== "/"
-              ? "text-surface-600"
-              : "text-white"
-          } cursor-pointer`}
-        />
+        <Link href="/wishlist" className="relative">
+          <Heart
+            className={`${
+              scrollLocation > 50 || pathname !== "/"
+                ? "text-surface-600"
+                : "text-white"
+            } cursor-pointer`}
+          />
+          {wishlist?.length > 0 && (
+            <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+              <p className="text-xs text-white font-semibold">
+                {wishlist.length}
+              </p>
+            </div>
+          )}
+        </Link>
+        <Link href="/cart" className="relative">
+          <ShoppingCart
+            className={`${
+              scrollLocation > 50 || pathname !== "/"
+                ? "text-surface-600"
+                : "text-white"
+            } cursor-pointer`}
+          />
+          {cart?.length > 0 && (
+            <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+              <p className="text-xs text-white font-semibold">{cart.length}</p>
+            </div>
+          )}
+        </Link>
       </div>
     </div>
   );

@@ -2,13 +2,11 @@
 import React, { useRef, useState, useEffect } from "react";
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
-import Button from "@/components/Button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 import { Plus, Trash } from "lucide-react";
-import Link from "next/link";
 import {
   Select,
   SelectContent,
@@ -226,9 +224,7 @@ const ProfileEditPage = () => {
                   className="rounded-full object-cover"
                 />
               )}
-              <Label className="w-full">
-                Profile Image
-              </Label>
+              <Label className="w-full">Profile Image</Label>
               <Input type="file" name="image" onChange={handleImageChange} />
               {cropperImage && (
                 <button

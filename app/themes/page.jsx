@@ -12,27 +12,20 @@ export default function ThemesPage() {
   const [search, setSearch] = useState("");
   const [themes, setThemes] = useState([]);
 
-  const handleSearch = () => {
-    alert(`Searching for ${search}`);
-  };
+  // const handleSearch = () => {
+  //   alert(`Searching for ${search}`);
+  // };
 
   useEffect(() => {
     const fetchThemes = async () => {
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/category/get`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/category/get`
         );
-        const data = await res.json();
-        console.log(data);
+        const data = await response.json();
         setThemes(data.categories);
       } catch (error) {
-        console.error(error);
+        console.log(error);
       }
     };
     fetchThemes();

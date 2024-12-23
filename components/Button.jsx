@@ -20,8 +20,8 @@ export default function Button({
   };
 
   const variantClasses = {
-    filled: 'bg-primary-dark text-white rounded hover:bg-primary-dark active:bg-primary-darker',
-    pill: 'bg-primary-dark text-white rounded-full hover:bg-primary-dark active:bg-primary-darker',
+    filled: 'bg-primary text-white rounded hover:bg-primary-dark active:bg-primary-darker',
+    pill: 'bg-primary text-white rounded-full hover:bg-primary-dark active:bg-primary-darker',
     secondary: 'border border-secondary text-secondary hover:bg-secondary-light active:bg-secondary-dark',
   };
 

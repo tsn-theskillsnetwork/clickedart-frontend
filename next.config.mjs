@@ -30,6 +30,11 @@ const nextConfig = {
         hostname: "tawreed-s3.s3.ap-south-1.amazonaws.com",
         pathname: "**",
       },
+      {
+        protocol: "https",
+        hostname: "orancia-s3.s3.ap-south-1.amazonaws.com",
+        pathname: "**",
+      },
     ],
   },
 };
