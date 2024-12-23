@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Button from "@/components/Button";
-import { Input } from "@/components/ui/Input";
-import { Label } from "@/components/ui/Label";
+import Button from "@/components/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/authStore";
 import Link from "next/link";

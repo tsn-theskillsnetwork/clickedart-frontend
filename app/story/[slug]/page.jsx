@@ -1,6 +1,6 @@
 "use client";
 
-import Button from "@/components/Button";
+import Button from "@/components/button";
 import { Icon } from "@iconify/react";
 import {
   Link2,

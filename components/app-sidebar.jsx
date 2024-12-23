@@ -50,7 +50,7 @@ export function AppSidebar({ currentUrl, ...props }) {
 
   return (
     <Sidebar {...props}>
-      <SidebarContent className="pt-24">
+      <SidebarContent className="md:pt-24">
         {data.navMain.map((group) => (
           <SidebarGroup key={group.title}>
             <SidebarGroupLabel>{group.title}</SidebarGroupLabel>

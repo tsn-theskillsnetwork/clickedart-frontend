@@ -1,12 +1,12 @@
 "use client";
 
-import Button from "@/components/Button";
+import Button from "@/components/button";
 import { Icon } from "@iconify/react";
 import React from "react";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
-import Featured from "@/components/featuredArtists/Featured";
+import Featured from "@/components/featuredArtists/featured";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import "./styles.css";

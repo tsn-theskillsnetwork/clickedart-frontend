@@ -2,7 +2,7 @@
 
 import useAuthStore from "@/authStore";
 import useCartStore from "@/cartStore";
-import Button from "@/components/Button";
+import Button from "@/components/button";
 import useWishlistStore from "@/wishlistStore";
 import React from "react";
 import { motion } from "framer-motion";

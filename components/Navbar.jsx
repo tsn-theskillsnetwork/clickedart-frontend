@@ -39,6 +39,57 @@ export default function Navbar() {
     // { name: "More", url: "/more" },
   ];
 
+  const MoreDropdown = () => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    const toggleDropdown = () => {
+      setIsOpen(!isOpen);
+    };
+
+    return (
+      <div className="relative">
+        <button
+          onClick={toggleDropdown}
+          className={`text-sm md:text-md lg:text-lg xl:text-xl px-1 xl:px-4 py-2 rounded-lg text-center font-semibold ${
+            scrollLocation > 50 || pathname !== "/"
+              ? "text-surface-600"
+              : "text-white"
+          } cursor-pointer ${isOpen ? "menuActive" : "menuHover"}`}
+        >
+          More
+        </button>
+        {isOpen && (
+          <div className="absolute left-0 mt-2 space-y-2 bg-white shadow-lg w-max p-2 rounded-md z-10">
+            <Link
+              href="/blog"
+              className={`text-sm md:text-md lg:text-lg xl:text-xl px-1 xl:px-4 py-2 rounded-lg text-center font-semibold ${
+                pathname.startsWith("/blog") ? "menuActive" : "menuHover"
+              } cursor-pointer block`}
+            >
+              Blog
+            </Link>
+            <Link
+              href="/story"
+              className={`text-sm md:text-md lg:text-lg xl:text-xl px-1 xl:px-4 py-2 rounded-lg text-center font-semibold ${
+                pathname.startsWith("/story") ? "menuActive" : "menuHover"
+              } cursor-pointer block`}
+            >
+              Story
+            </Link>
+            <Link
+              href="/contact"
+              className={`text-sm md:text-md lg:text-lg xl:text-xl px-1 xl:px-4 py-2 rounded-lg text-center font-semibold ${
+                pathname.startsWith("/contact") ? "menuActive" : "menuHover"
+              } cursor-pointer block`}
+            >
+              Contact Us
+            </Link>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   useEffect(() => {
     window.addEventListener("scroll", () => {
       setScrollLocation(window.scrollY);
@@ -177,6 +228,7 @@ export default function Navbar() {
             </p>
           </Link>
         ))}
+        <MoreDropdown />
       </div>
 
       {/* Mobile Menu */}

@@ -1,6 +1,6 @@
 "use client";
 
-import Button from "@/components/Button";
+import Button from "@/components/button";
 import Loader from "@/components/loader";
 import { Icon } from "@iconify/react";
 import Image from "next/image";

@@ -1,14 +1,14 @@
 "use client";
 
-import BestSelling from "@/components/home/BestSelling";
-import Button from "@/components/Button";
-import HeroSection from "@/components/home/HeroSection";
-import ProductCategories from "@/components/home/ProductCategories";
-import Discover from "@/components/home/Discover";
-import ProductCategoriesMobile from "@/components/home/ProductCategoriesMobile";
-import Stats from "@/components/home/Stats";
-import Testimonial from "@/components/home/Testimonial";
-import DiscoverMobile from "@/components/home/DiscoverMobile";
+import BestSelling from "@/components/home/bestSelling";
+import Button from "@/components/button";
+import HeroSection from "@/components/home/heroSection";
+import ProductCategories from "@/components/home/productCategories";
+import Discover from "@/components/home/discover";
+import ProductCategoriesMobile from "@/components/home/productCategoriesMobile";
+import Stats from "@/components/home/stats";
+import Testimonial from "@/components/home/testimonial";
+import DiscoverMobile from "@/components/home/discoverMobile";
 import { AnimatePresence, motion } from "framer-motion";
 
 export default function Home() {

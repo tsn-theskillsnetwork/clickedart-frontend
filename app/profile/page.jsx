@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import useAuthStore from "@/authStore";
 import Image from "next/image";
-import Button from "@/components/Button";
+import Button from "@/components/button";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 

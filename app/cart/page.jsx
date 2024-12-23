@@ -1,8 +1,8 @@
 "use client";
 
 import useCartStore from "@/cartStore";
-import Button from "@/components/Button";
-import { Input } from "@/components/ui/Input";
+import Button from "@/components/button";
+import { Input } from "@/components/ui/input";
 import React from "react";
 
 export default function CartPage() {

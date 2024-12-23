@@ -1,5 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import Button from "@/components/Button";
+import Button from "@/components/button";
 import {
   Breadcrumb,
   BreadcrumbItem,

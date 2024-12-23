@@ -494,18 +494,6 @@ export default async function Page() {
             <div className="container mx-auto py-10">
               <DataTable columns={columns} data={data} />
             </div>
-            <button
-              popoverTarget="test"
-              popoverTargetAction="click"
-              className="bg-blue-500 text-white px-4 py-2 rounded-md mb-10"
-            >
-              TEST
-            </button>
-            <div
-              id="test"
-              popover="test"
-              className="transition-all duration-500 transition-discrete bg-white border border-gray-200 shadow-lg rounded-md p-4"
-            >just test</div>
           </div>
         </div>
       </SidebarInset>

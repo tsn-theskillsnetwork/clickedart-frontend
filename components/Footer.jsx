@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import React from "react";
-import Button from "./Button";
+import Button from "./button";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 

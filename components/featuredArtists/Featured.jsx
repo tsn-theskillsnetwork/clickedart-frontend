@@ -4,7 +4,7 @@ import React from "react";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
-import Button from "../Button";
+import Button from "../button";
 import Image from "next/image";
 
 export default function Featured({ artists }) {

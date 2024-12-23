@@ -1,5 +1,5 @@
 import React from "react";
-import BestSellingCard from "../cards/BestSellingCard";
+import BestSellingCard from "../cards/bestSellingCard";
 
 export default function BestSelling() {
   return (

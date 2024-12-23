@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import TestimonialCard from "../cards/TestimonialCard";
+import TestimonialCard from "../cards/testimonialCard";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import { ChevronLeft } from "lucide-react";

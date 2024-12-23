@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import Button from "../Button";
+import Button from "../button";
 import { motion } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
 import Image from "next/image";

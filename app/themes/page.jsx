@@ -32,7 +32,7 @@ export default function ThemesPage() {
   }, []);
 
   return (
-    <div className="bg-[#F6F5F4] flex flex-col -mt-4 pt-5 items-center">
+    <div className="bg-[#F6F5F4] flex flex-col pt-5 items-center">
       <h4 className="block sm:hidden text-heading-04 font-semibold text-primary">
         Themes
       </h4>

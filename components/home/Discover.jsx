@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import Button from "../Button";
+import Button from "../button";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import { motion } from "framer-motion";

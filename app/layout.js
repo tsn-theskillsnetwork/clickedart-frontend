@@ -1,8 +1,7 @@
-import Footer from "@/components/Footer";
+import Footer from "@/components/footer";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
-import Navbar from "@/components/Navbar";
-import NavbarMobile from "@/components/NavbarMobile";
+import Navbar from "@/components/navbar";
 
 //import font
 
@@ -25,7 +24,7 @@ export default async function RootLayout({ children }) {
         <Toaster />
         {/* <NavbarMobile /> */}
         <Navbar />
-        <div className="pt-24 sm:pt-28">{children}</div>
+        <div className="pt-20 sm:pt-24">{children}</div>
         <Footer />
       </body>
     </html>
