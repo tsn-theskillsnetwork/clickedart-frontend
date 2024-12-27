@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import useAuthStore from "./authStore";
 
 const useWishlistStore = create((set) => ({
   wishlist: [],

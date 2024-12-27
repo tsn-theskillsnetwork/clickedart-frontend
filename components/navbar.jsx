@@ -15,8 +15,8 @@ import { usePathname } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import Signout from "./auth/signout";
 import useAuthStore from "@/authStore";
-import useCartStore from "@/cartStore";
-import useWishlistStore from "@/wishlistStore";
+import useCartStore from "@/store/cart";
+import useWishlistStore from "@/store/wishlist";
 
 export default function Navbar() {
   const pathname = usePathname();

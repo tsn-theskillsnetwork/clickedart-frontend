@@ -1,17 +1,18 @@
 "use client";
 
 import useAuthStore from "@/authStore";
-import useCartStore from "@/cartStore";
+import useCartStore from "@/store/cart";
 import Button from "@/components/button";
-import useWishlistStore from "@/wishlistStore";
+import useWishlistStore from "@/store/wishlist";
 import React from "react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
+import { Heart } from "lucide-react";
 
 export default function WishlistPage() {
   const { user } = useAuthStore();
   const { wishlist, fetchWishlist, loading, error } = useWishlistStore();
-  const { addToCart, removeFromCart, cart } = useCartStore();
+  const { addToCart, removeFromCart, cart, isImageInCart } = useCartStore();
   console.log({ wishlist, loading, error });
 
   const removeImageFromWishlist = async (imageId) => {
@@ -44,43 +45,66 @@ export default function WishlistPage() {
   };
 
   return (
-    <div className="flex flex-col gap-10 px-40 py-20">
+    <div className="flex flex-col gap-10 px-4 sm:px-20 lg:px-40 py-20">
       <div className="flex justify-between items-center">
         <h5 className="text-heading-05 font-bold">
           Wishlist ({wishlist?.length})
         </h5>
         <Button>Move All To Bag</Button>
       </div>
-      <div className="grid grid-cols-4 gap-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
         {wishlist.map((item) => (
           <motion.div
             layout
             key={item._id}
-            className="flex flex-col shadow-[2px_2px_6px_rgba(0,0,0,0.1)] hover:shadow-[3px_3px_12px_rgba(0,0,0,0.3)] rounded-sm p-4"
+            className="relative flex flex-col shadow-[2px_2px_6px_rgba(0,0,0,0.1)] hover:shadow-[3px_3px_12px_rgba(0,0,0,0.3)] rounded-sm p-4"
           >
             <img
               className="w-full aspect-[1/1] mb-4"
               src={item.image || "/assets/images/img6.jpg"}
               alt={item.title}
             />
-            <h5 className="text-heading-06 text-surface-600 font-semibold">
-              {item.title || "Art Name"}
-            </h5>
-            <p className="text-sm font-medium text-surface-500">
-              {item.artist?.name || "Artist name"}
-            </p>
-            <p className="text-sm font-medium text-surface-500">
-              {(
-                (item.resolutions?.original?.height *
-                  item.resolutions?.original?.width) /
-                1000000
-              ).toFixed(1)}{" "}
-              MP
-            </p>
-            <p className="text-base font-medium text-surface-600">
-              ₹{item.price.original}
-            </p>
-            <div className="flex gap-4 mx-auto">
+            <Heart
+              onClick={(e) => {
+                e.stopPropagation();
+                removeImageFromWishlist(item._id);
+              }}
+              className="absolute top-6 right-6 w-6 h-6 text-red-600 cursor-pointer fill-red-600 hover:fill-red-400 hover:text-red-400"
+            />
+            <div className="grid grid-cols-2 gap-2   items-start">
+              <div className="flex flex-col">
+                <h5 className="text-heading-06 text-surface-600 font-semibold">
+                  {item.title || "Art Name"}
+                </h5>
+                <p className="text-sm font-medium text-surface-500">
+                  {item.artist?.name || "Artist name"}
+                </p>
+                <p className="text-sm font-medium text-surface-500">
+                  {(
+                    (item.resolutions?.original?.height *
+                      item.resolutions?.original?.width) /
+                    1000000
+                  ).toFixed(1)}{" "}
+                  MP
+                </p>
+                <p className="text-base font-medium text-surface-600">
+                  ₹{item.price.original}
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  isImageInCart ? removeFromCart(item._id) : addToCart(item);
+                }}
+                className={`font-medium  text-surface-600 px-2 p-3 rounded-md transition-all duration-200 hover:shadow ${
+                  isImageInCart
+                    ? "text-black border border-surface-600 hover:bg-surface-200"
+                    : "bg-primary text-white border-none hover:bg-primary-dark"
+                }`}
+              >
+                {isImageInCart ? "Remove" : "Move to Bag"}
+              </button>
+            </div>
+            {/* <div className="flex gap-4 mx-auto">
               <button
                 onClick={() => {
                   const isInCart = cart.some(
@@ -105,7 +129,7 @@ export default function WishlistPage() {
               >
                 Remove
               </button>
-            </div>
+            </div> */}
           </motion.div>
         ))}
       </div>

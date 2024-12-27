@@ -12,9 +12,9 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import useCartStore from "@/cartStore";
+import useCartStore from "@/store/cart";
 import useAuthStore from "@/authStore";
-import useWishlistStore from "@/wishlistStore";
+import useWishlistStore from "@/store/wishlist";
 
 export default function ThemesResultPage() {
   const { user } = useAuthStore();

@@ -243,7 +243,7 @@ const RegistrationForm = () => {
               alt="Profile Image"
               width={200}
               height={200}
-              className="rounded-full object-cover"
+              className="rounded-full object-cover aspect-[1/1]"
             />
           )}
           <Label className="w-full">Profile Image</Label>

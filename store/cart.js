@@ -8,18 +8,36 @@ const useCartStore = create(
       cart: [],
       addToCart: (product) =>
         set((state) => {
-          // Return the updated state object
-          const updatedCart = [...state.cart, product];
+          const updatedCart = [
+            ...state.cart,
+            {
+              ...product,
+              imageInfo: null,
+              frameInfo: null,
+              canvasInfo: null,
+            },
+          ];
           toast.success("Item added to cart");
-          return { cart: updatedCart }; // Ensure the state is returned here
+          return { cart: updatedCart };
         }),
+
       removeFromCart: (productId) =>
         set((state) => {
           const updatedCart = state.cart.filter(
             (item) => item._id !== productId
           );
           toast.success("Item removed from cart");
-          return { cart: updatedCart }; // Return the updated state here as well
+          return { cart: updatedCart };
+        }),
+
+      updateCartItem: (productId, updatedFields) =>
+        set((state) => {
+          const updatedCart = state.cart.map((item) =>
+            item._id === productId
+              ? { ...item, ...updatedFields }
+              : item
+          );
+          return { cart: updatedCart };
         }),
     }),
     {
