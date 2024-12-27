@@ -6,11 +6,26 @@ import { Input } from "@/components/ui/input";
 import React from "react";
 
 export default function CartPage() {
-  const { cart } = useCartStore();
+  const { increaseQuantity, decreaseQuantity, cartItems } = useCartStore();
+
+  const onIncreaseQuantity = (productId) => {
+    increaseQuantity(productId);
+  };
+
+  const onDecreaseQuantity = (productId) => {
+    decreaseQuantity(productId);
+  };
+
+  const onRemoveItem = (productId) => {
+    removeItemFromCart(productId);
+  };
+
   const [coupon, setCoupon] = React.useState("");
   return (
     <div className="flex flex-col px-4 sm:px-8 md:px-12 lg:px-20 xl:px-32 gap-10 py-20">
-      <h5 className="text-heading-05 font-bold">Cart ({cart?.length || 0})</h5>
+      <h5 className="text-heading-05 font-bold">
+        Cart ({cartItems?.length || 0})
+      </h5>
       <div className="flex flex-col gap-12">
         <div className="px-6 hidden sm:flex shadow-[0_0_6px_rgba(0,_0,_0,_0.1)] rounded-sm p-5 text-heading-06 font-semibold">
           <div className="w-2/6">Product</div>
@@ -19,7 +34,7 @@ export default function CartPage() {
           <div className="w-1/6">Quantity</div>
           <div className="w-1/6">Subtotal</div>
         </div>
-        {cart?.map((product) => (
+        {cartItems?.map((product) => (
           <div
             key={product._id}
             className="px-6 flex flex-col gap-2 sm:gap-0 sm:flex-row shadow-[0_0_6px_rgba(0,_0,_0,_0.1)] rounded-sm hover:shadow-[0_0_12px_rgba(0,_0,_0,_0.2)] p-4 transition-all duration-200 ease-in-out"
@@ -59,11 +74,17 @@ export default function CartPage() {
                   Quantity
                 </p>
                 <div className="flex flex-row gap-4 text-heading-06 font-semibold">
-                  <button className="w-8 h-8 pb-3 bg-primary text-white rounded-full hover:bg-primary-dark active:bg-primary-darker">
+                  <button
+                    onClick={() => onDecreaseQuantity(product._id)}
+                    className="w-8 h-8 pb-3 bg-primary text-white rounded-full hover:bg-primary-dark active:bg-primary-darker"
+                  >
                     -
                   </button>
-                  1
-                  <button className="w-8 h-8  bg-primary text-white rounded-full hover:bg-primary-dark active:bg-primary-darker">
+                  {product.quantity}
+                  <button
+                    onClick={() => onIncreaseQuantity(product._id)}
+                    className="w-8 h-8  bg-primary text-white rounded-full hover:bg-primary-dark active:bg-primary-darker"
+                  >
                     +
                   </button>
                 </div>

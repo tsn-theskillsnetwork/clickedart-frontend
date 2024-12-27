@@ -1,74 +1,78 @@
-import toast from "react-hot-toast";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 const useCartStore = create(
   persist(
-    (set) => ({
-      cart: [],
-      addToCart: (product) =>
-        set((state) => {
-          const updatedCart = [
-            ...state.cart,
-            {
-              ...product,
-              imageInfo: null,
-              frameInfo: null,
-              canvasInfo: null,
-            },
-          ];
-          toast.success("Item added to cart");
-          return { cart: updatedCart };
-        }),
+    (set, get) => ({
+      cartItems: [],
 
-      removeFromCart: (productId) =>
-        set((state) => {
-          const updatedCart = state.cart.filter(
-            (item) => item._id !== productId
-          );
-          toast.success("Item removed from cart");
-          return { cart: updatedCart };
-        }),
+      addItemToCart: (item) => {
+        const itemExists = get().cartItems.find(
+          (cartItem) => cartItem._id === item._id
+        );
 
-      updateCartItem: (productId, updatedFields) =>
-        set((state) => {
-          const updatedCart = state.cart.map((item) =>
-            item._id === productId
-              ? { ...item, ...updatedFields }
-              : item
-          );
-          return { cart: updatedCart };
-        }),
+        if (itemExists) {
+          if (typeof itemExists.quantity === "number") {
+            itemExists.quantity++;
+          }
+
+          set({ cartItems: [...get().cartItems] });
+        } else {
+          set({ cartItems: [...get().cartItems, { ...item, quantity: 1 }] });
+        }
+      },
+
+      increaseQuantity: (productId) => {
+        const itemExists = get().cartItems.find(
+          (cartItem) => cartItem._id === productId
+        );
+
+        if (itemExists) {
+          if (typeof itemExists.quantity === "number") {
+            itemExists.quantity++;
+          }
+
+          set({ cartItems: [...get().cartItems] });
+        }
+      },
+
+      decreaseQuantity: (productId) => {
+        const itemExists = get().cartItems.find(
+          (cartItem) => cartItem._id === productId
+        );
+
+        if (itemExists) {
+          if (typeof itemExists.quantity === "number") {
+            if (itemExists.quantity === 1) {
+              const updatedCartItems = get().cartItems.filter(
+                (item) => item._id !== productId
+              );
+              set({ cartItems: updatedCartItems });
+            } else {
+              itemExists.quantity--;
+              set({ cartItems: [...get().cartItems] });
+            }
+          }
+        }
+      },
+
+      removeItemFromCart: (productId) => {
+        const itemExists = get().cartItems.find(
+          (cartItem) => cartItem._id === productId
+        );
+
+        if (itemExists) {
+          if (typeof itemExists.quantity === "number") {
+            const updatedCartItems = get().cartItems.filter(
+              (item) => item._id !== productId
+            );
+            set({ cartItems: updatedCartItems });
+          }
+        }
+      },
     }),
     {
-      name: "cart-storage",
-      storage: {
-        getItem: (name) => {
-          if (typeof window === "undefined") return null;
-
-          const storedData = localStorage.getItem(name);
-
-          if (!storedData) {
-            const cart = localStorage.getItem("cart");
-
-            return {
-              cart: cart ? JSON.parse(cart) : [],
-            };
-          }
-
-          return JSON.parse(storedData);
-        },
-        setItem: (name, value) => {
-          if (typeof window !== "undefined") {
-            localStorage.setItem(name, JSON.stringify(value));
-          }
-        },
-        removeItem: (name) => {
-          if (typeof window !== "undefined") {
-            localStorage.removeItem(name);
-          }
-        },
-      },
+      name: "cart-items",
     }
   )
 );

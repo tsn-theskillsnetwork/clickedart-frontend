@@ -21,7 +21,7 @@ import useWishlistStore from "@/store/wishlist";
 export default function Navbar() {
   const pathname = usePathname();
   const { user, photographer } = useAuthStore();
-  const { cart } = useCartStore();
+  const { cartItems } = useCartStore();
   const { wishlist, fetchWishlist } = useWishlistStore();
 
   // const [wishlist, setWishlist] = useState([]);
@@ -338,9 +338,9 @@ export default function Navbar() {
                 : "text-white"
             } cursor-pointer`}
           />
-          {cart?.length > 0 && (
+          {cartItems?.length > 0 && (
             <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
-              <p className="text-xs text-white font-semibold">{cart.length}</p>
+              <p className="text-xs text-white font-semibold">{cartItems.length}</p>
             </div>
           )}
         </Link>

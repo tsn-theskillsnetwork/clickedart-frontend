@@ -23,6 +23,7 @@ import useCartStore from "@/store/cart";
 import Button from "@/components/button";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
+import toast from "react-hot-toast";
 
 const recommended = [
   {
@@ -85,7 +86,11 @@ const recommended = [
 
 export default function ImagePage() {
   const id = useParams().id;
-  const { addToCart, removeFromCart, cart } = useCartStore();
+  const { addItemToCart } = useCartStore();
+  const onAddToCart = () => {
+    addItemToCart(image);
+    toast.success("Added to cart");
+  };
 
   const [image, setImage] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -529,25 +534,10 @@ export default function ImagePage() {
                     </div>
                     <div className="flex items-center gap-10 mt-32">
                       <button
-                        onClick={() => {
-                          const isInCart = cart.some(
-                            (item) => item._id === image._id
-                          );
-                          isInCart
-                            ? removeFromCart(image._id)
-                            : addToCart(image);
-                        }}
-                        className={`flex flex-grow items-center gap-4 justify-center border-2 border-primary py-5 ${
-                          cart?.some((item) => item._id === image._id)
-                            ? "bg-transparent  text-red-700 hover:bg-primary-100"
-                            : "bg-primary text-white hover:bg-primary-dark hover:border-primary-dark"
-                        } rounded-lg text-heading-05 font-semibold transition-all duration-300 ease-in-out`}
+                        onClick={onAddToCart}
+                        className={`flex flex-grow items-center gap-4 justify-center border-2 border-primary py-5 bg-primary text-white hover:bg-primary-dark hover:border-primary-dark rounded-lg text-heading-05 font-semibold transition-all duration-300 ease-in-out`}
                       >
-                        <p>
-                          {cart?.some((item) => item._id === image._id)
-                            ? "Remove from Cart"
-                            : "Add to Cart"}
-                        </p>
+                        <p>{"Add to Cart"}</p>
                         <ShoppingCart scale={32} strokeWidth={3} />
                       </button>
                       <button className="btn-secondary flex-shrink-0 p-4 border-2 border-primary rounded-2xl h-full aspect-[1/1] flex items-center justify-center group">
