@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/authStore";
 import Link from "next/link";
+import axios from "axios";
 
 const SignInPage = () => {
   const { signin, setUser, user, photographer } = useAuthStore();
@@ -32,32 +33,35 @@ const SignInPage = () => {
     setError("");
 
     try {
-      const response = await fetch(
+      const response = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/user/login`,
+        formData,
         {
-          method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
         }
       );
 
-      const data = await response.json();
+      const data = response.data;
 
-      if (response.ok) {
+      if (response.status === 200) {
         setMessage("Sign-in successful!");
         setError("");
 
-        // Update Zustand store
         signin(data.token);
         setUser(data.user);
 
-        // Redirect to home page
         router.push("/");
       } else {
         setError(data.message || "Invalid credentials. Please try again.");
       }
     } catch (err) {
-      setError("An error occurred. Please try again later.");
+      if (err.response && err.response.data) {
+        setError(
+          err.response.data.message || "Invalid credentials. Please try again."
+        );
+      } else {
+        setError("An error occurred. Please try again later.");
+      }
     }
   };
 

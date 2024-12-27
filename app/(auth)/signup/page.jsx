@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
-import { Plus, Trash } from "lucide-react";
+import { ImageIcon, Plus, Trash } from "lucide-react";
 import Link from "next/link";
 import {
   Select,
@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import Image from "next/image";
 import toast, { Toaster } from "react-hot-toast";
+import axios from "axios";
 
 const RegistrationForm = () => {
   const router = useRouter();
@@ -42,6 +43,7 @@ const RegistrationForm = () => {
   const [cropperImage, setCropperImage] = useState(null); // For image preview and cropping
   const [croppedImageUrl, setCroppedImageUrl] = useState(null); // Final cropped image URL
   const cropperRef = useRef(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   // Input change handler
   const handleInputChange = (e) => {
@@ -111,48 +113,53 @@ const RegistrationForm = () => {
     const cropper = cropperRef.current?.cropper;
     if (cropper) {
       const croppedCanvas = cropper.getCroppedCanvas();
-      // Show loading toast
       const toastId = toast.loading("Processing image...");
-
-      // Send the cropped canvas to the server as a file
+  
+      // Convert canvas to Blob
       const blob = await new Promise((resolve) =>
         croppedCanvas.toBlob(resolve)
       );
-
-      // FormData to send image to the server
+  
       const formData = new FormData();
       formData.append("image", blob);
-
+  
       try {
-        const res = await fetch(
+        const res = await axios.post(
           "http://localhost:5000/api/upload/uploadSingleImage",
+          formData,
           {
-            method: "POST",
-            body: formData,
+            headers: {
+              "Content-Type": "multipart/form-data", // Ensure proper headers for multipart
+            },
+            onUploadProgress: (progressEvent) => {
+              const percentCompleted = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total
+              );
+              setUploadProgress(percentCompleted);
+              toast.loading("Uploading image...", { id: toastId });
+            },
           }
         );
-        const data = await res.text(); // Expect URL from server
-
-        if (res.ok) {
-          setCroppedImageUrl(data); // Store the URL of the uploaded image
-          setFormData((prev) => ({
-            ...prev,
-            image: data, // Save external image URL in formData
-          }));
-          // Remove cropper and show updated image
-          setCropperImage(null);
-          toast.success("Image cropped and uploaded successfully!", {
-            id: toastId,
-          });
-        } else {
-          toast.error("Image upload failed.", { id: toastId });
-        }
+  
+        const data = res.data;
+  
+        // Save the cropped image URL to formData.image
+        setFormData((prev) => ({
+          ...prev,
+          image: data, // This should be the URL or path of the uploaded image
+        }));
+        setCropperImage(null);
+  
+        toast.success("Image cropped and uploaded successfully!", {
+          id: toastId,
+        });
       } catch (error) {
-        console.log("Error uploading cropped image", error);
+        console.error("Error uploading cropped image:", error);
         toast.error("Image upload failed.", { id: toastId });
       }
     }
   };
+  
 
   // Form submission handler
   const handleSubmit = async (e) => {
@@ -166,38 +173,40 @@ const RegistrationForm = () => {
 
     setErrors({});
     try {
-      const response = await fetch(
+      const response = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/user/register`,
+        formData,
         {
-          method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
         }
       );
 
-      const data = await response.json();
+      const data = response.data;
 
-      if (response.ok) {
-        setMessage(data.message);
-        setError("");
-        setFormData({
-          name: "",
-          email: "",
-          password: "",
-          address: "",
-          age: "",
-          dob: "",
-          image: "",
-          bio: "",
-          interests: "",
-        });
-        router.push("/signin");
-      } else {
-        setError(data.message);
-        setMessage("");
-      }
+      setMessage(data.message);
+      setError("");
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+        address: "",
+        age: "",
+        dob: "",
+        image: "",
+        bio: "",
+        interests: "",
+      });
+      router.push("/signin");
     } catch (err) {
-      setError("Something went wrong. Please try again later.");
+      if (err.response && err.response.data) {
+        setError(
+          err.response.data.message ||
+            "Something went wrong. Please try again later."
+        );
+      } else {
+        setError("Something went wrong. Please try again later.");
+      }
+      setMessage("");
     }
   };
 
@@ -226,17 +235,48 @@ const RegistrationForm = () => {
               guides={false}
               ref={cropperRef}
             />
+          ) : formData.image ? (
+            <>
+              <Image
+                src={formData.image}
+                alt="Profile Image"
+                width={200}
+                height={200}
+                className="rounded-full object-cover aspect-[1/1]"
+              />
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, profileImage: "" })}
+                className="text-red-500"
+              >
+                Remove
+              </button>
+            </>
           ) : (
-            <Image
-              src={formData.image || "/assets/default.jpg"}
-              alt="Profile Image"
-              width={200}
-              height={200}
-              className="rounded-full object-cover"
-            />
+            <div className="max-w-md mx-auto rounded-lg overflow-hidden md:max-w-xl">
+              <div className="md:flex">
+                <div className="w-full p-3">
+                  <div className="relative h-48 rounded-lg border-2 border-blue-500 bg-gray-50 flex justify-center items-center shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
+                    <div className="absolute flex flex-col items-center">
+                      <ImageIcon className="w-12 h-12 text-blue-500" />
+                      <span className="block text-gray-500 font-semibold">
+                        Drag &amp; drop your files here
+                      </span>
+                      <span className="block text-gray-400 font-normal mt-1">
+                        or click to upload
+                      </span>
+                    </div>
+                    <input
+                      name=""
+                      onChange={handleImageChange}
+                      className="h-full w-full opacity-0 cursor-pointer"
+                      type="file"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
-          <Label className="w-full">Profile Image</Label>
-          <Input type="file" name="image" onChange={handleImageChange} />
           {cropperImage && (
             <button
               type="button"
@@ -247,6 +287,12 @@ const RegistrationForm = () => {
             </button>
           )}
         </div>
+        {uploadProgress > 0 && uploadProgress < 100 && (
+          <div>
+            <progress value={uploadProgress} max={100}></progress>
+            <span>{uploadProgress}%</span>
+          </div>
+        )}
         <div>
           <Label>
             Name <span className="text-red-500">*</span>

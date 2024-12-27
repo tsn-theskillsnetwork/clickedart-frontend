@@ -132,7 +132,9 @@ export default function HeroSection() {
               </p>
             </div>
           </button>
-          <button className="border-2 border-white rounded-2xl px-2 py-1 sm:px-4 sm:py-2 sm:pl-5 w-72 group">
+          <button onClick={
+            () => router.push("/photographer/signin")
+          } className="border-2 bg-gradient-to-tr from-transparent to-transparent hover:from-black border-white rounded-2xl px-2 py-1 sm:px-4 sm:py-2 sm:pl-5 w-72 group transition-all duration-200 ease-linear">
             <div className="flex flex-row gap-2 items-center">
               <div className="flex items-center justify-center h-10 w-10">
                 <div className="rounded-full bg-white flex outline-offset-2 outline outline-1 group-hover:outline-none outline-white items-center justify-center w-1 h-1 group-hover:w-10 group-hover:h-10 transition-all duration-200">
