@@ -56,6 +56,11 @@ const ProfilePage = () => {
                   Edit Profile
                 </Button>
               </Link>
+              <Link href="/profile/orders">
+                <Button color="primary" size="lg">
+                  Orders
+                </Button>
+              </Link>
               <div className="flex flex-row gap-4">
                 {data?.connectedAccounts?.map((account) => (
                   <Link key={account.accountName} href={account.accountLink}>

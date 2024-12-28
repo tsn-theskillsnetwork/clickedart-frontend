@@ -6,19 +6,22 @@ const useCartStore = create(
     (set, get) => ({
       cartItems: [],
 
-      addItemToCart: (item) => {
+      addItemToCart: (item, options) => {
         const itemExists = get().cartItems.find(
           (cartItem) => cartItem._id === item._id
         );
 
-        if (itemExists) {
-          if (typeof itemExists.quantity === "number") {
-            itemExists.quantity++;
-          }
+        if (item && options) {
+          item = { ...item, ...options };
+        }
 
-          set({ cartItems: [...get().cartItems] });
+        if (itemExists) {
+          const updatedCartItems = get().cartItems.map((cartItem) =>
+            cartItem._id === item._id ? { ...cartItem, ...item } : cartItem
+          );
+          set({ cartItems: updatedCartItems });
         } else {
-          set({ cartItems: [...get().cartItems, { ...item, quantity: 1 }] });
+          set({ cartItems: [...get().cartItems, { ...item }] });
         }
       },
 
@@ -57,18 +60,14 @@ const useCartStore = create(
       },
 
       removeItemFromCart: (productId) => {
-        const itemExists = get().cartItems.find(
-          (cartItem) => cartItem._id === productId
+        const updatedCartItems = get().cartItems.filter(
+          (item) => item._id !== productId
         );
+        set({ cartItems: updatedCartItems });
+      },
 
-        if (itemExists) {
-          if (typeof itemExists.quantity === "number") {
-            const updatedCartItems = get().cartItems.filter(
-              (item) => item._id !== productId
-            );
-            set({ cartItems: updatedCartItems });
-          }
-        }
+      isItemInCart: (productId) => {
+        return get().cartItems.some((cartItem) => cartItem._id === productId);
       },
     }),
     {

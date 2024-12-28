@@ -4,9 +4,14 @@ import useCartStore from "@/store/cart";
 import Button from "@/components/button";
 import { Input } from "@/components/ui/input";
 import React from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export default function CartPage() {
-  const { increaseQuantity, decreaseQuantity, cartItems } = useCartStore();
+  const router = useRouter();
+  const { increaseQuantity, decreaseQuantity, removeItemFromCart, cartItems } =
+    useCartStore();
+  const [coupon, setCoupon] = React.useState("");
 
   const onIncreaseQuantity = (productId) => {
     increaseQuantity(productId);
@@ -16,11 +21,47 @@ export default function CartPage() {
     decreaseQuantity(productId);
   };
 
-  const onRemoveItem = (productId) => {
-    removeItemFromCart(productId);
+  const calculateSubtotal = (product) => {
+    if (product.mode === "digital") {
+      return product.price[product.selectedSize] * product.quantity;
+    }
+    const getFramePrice = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/frames/calculate-frames-prices?frameId=${product.selectedFrame._id}&imageId=${product._id}`
+        );
+        console.log(res.data);
+        return res.data.price;
+      } catch (error) {
+        console.error("Error getting frame price:", error);
+      }
+    };
+
+    const getPaperPrice = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/paper/calculate-paper-prices?paperId=${product.selectedPaper._id}&imageId=${product._id}`
+        );
+        console.log(res.data);
+        return res.data.price;
+      } catch (error) {
+        console.error("Error getting paper price:", error);
+      }
+    };
+
+    const framePrice = getFramePrice();
+    const paperPrice = getPaperPrice();
+
+    return (
+      (product.price[product.selectedSize] + framePrice + paperPrice) *
+      product.quantity
+    );
   };
 
-  const [coupon, setCoupon] = React.useState("");
+  const calculateTotal = () => {
+    return cartItems?.reduce((acc, item) => acc + calculateSubtotal(item), 0);
+  };
+
   return (
     <div className="flex flex-col px-4 sm:px-8 md:px-12 lg:px-20 xl:px-32 gap-10 py-20">
       <h5 className="text-heading-05 font-bold">
@@ -41,7 +82,7 @@ export default function CartPage() {
           >
             <div className="sm:w-2/6 flex flex-col sm:flex-row gap-4">
               <img
-                src="/assets/images/img6.jpg"
+                src={product.imageLinks.original || "/assets/images/img6.jpg"}
                 className="w-1/3"
                 alt="Canvas Print 72x30"
               />
@@ -55,17 +96,29 @@ export default function CartPage() {
               </div>
             </div>
             <div className="sm:w-1/6 flex flex-col gap-2 border-b sm:border-b-0">
-              <p className="text-heading-06 font-semibold">
-                Canvas Print 72 x 30
-              </p>
-              <p className="text-sm font-medium text-surface-500">
-                White Frame
-              </p>
+              {product.mode === "print" ? (
+                <>
+                  <p className="text-heading-06 font-semibold">
+                    {product.selectedPaper.name}
+                  </p>
+                  <p className="text-heading-06 font-semibold">
+                    {product.selectedSize?.width} x{" "}
+                    {product.selectedSize?.height} in
+                  </p>
+                  <p className="text-sm font-medium text-surface-500">
+                    {product.selectedFrame.name}
+                  </p>
+                </>
+              ) : (
+                <p className="text-heading-06 font-semibold">
+                  Digital Download
+                </p>
+              )}
             </div>
             <div className="sm:w-1/6 text-heading-06 font-medium text-surface-600">
               <div className="flex justify-between">
                 <p className="sm:hidden">Price</p>
-                <p>₹30000</p>
+                <p>₹{product.price[product.selectedSize]}</p>
               </div>
             </div>
             <div className="sm:w-1/6 flex flex-col sm:items-start gap-4">
@@ -93,7 +146,7 @@ export default function CartPage() {
             <div className="sm:w-1/6 text-heading-06 font-medium text-surface-600">
               <div className="flex justify-between">
                 <p className="sm:hidden">Subtotal</p>
-                <p>₹30000</p>
+                <p>₹{calculateSubtotal(product)}</p>
               </div>
             </div>
           </div>
@@ -115,7 +168,7 @@ export default function CartPage() {
           <div className="grid grid-cols-2 gap-4">
             <p className="text-heading-06 font-medium">Subtotal:</p>
             <p className="text-heading-06 font-medium text-surface-600 text-right">
-              ₹30000
+              ₹{calculateTotal()}
             </p>
             <p className="text-heading-06 font-medium">Shipping:</p>
             <p className="text-heading-06 font-medium text-surface-600 text-right">
@@ -123,10 +176,16 @@ export default function CartPage() {
             </p>
             <p className="text-heading-05 font-semibold">Cart Total:</p>
             <p className="text-heading-05 font-semibold text-surface-600 text-right">
-              ₹30000
+              ₹{calculateTotal()}
             </p>
           </div>
-          <Button size="lg" className="font-semibold">
+          <Button
+            onClick={() => {
+              router.push("/checkout");
+            }}
+            size="lg"
+            className="font-semibold"
+          >
             Checkout
           </Button>
           <button className="font-semibold text-paragraph p-3 rounded-md text-surface-500 border border-surface-600 hover:bg-surface-200">

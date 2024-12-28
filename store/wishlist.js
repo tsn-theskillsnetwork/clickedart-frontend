@@ -1,3 +1,4 @@
+import axios from "axios";
 import { create } from "zustand";
 
 const useWishlistStore = create((set) => ({
@@ -5,23 +6,15 @@ const useWishlistStore = create((set) => ({
   loading: false,
   error: null,
 
-  // Fetch wishlist from the backend
   fetchWishlist: async (userId) => {
     set({ loading: true, error: null });
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/wishlist/get-my-wishlist?userId=${userId}`,
-        {
-          method: "GET",
-        }
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/wishlist/get-my-wishlist?userId=${userId}`
       );
-      if (!response.ok) {
-        throw new Error("Failed to fetch wishlist");
-      }
-      const data = await response.json();
-      set({ wishlist: data.wishlist?.images, loading: false });
+      set({ wishlist: response.data?.wishlist?.images, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error.response.message, loading: false });
     }
   },
 }));
