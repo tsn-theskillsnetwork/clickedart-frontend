@@ -52,18 +52,15 @@ export default function ThemesResultPage() {
         }
       );
 
-      const data = await res.json(); // Parse the response JSON
-      console.log(data); // Log the response data
+      const data = await res.json(); 
+      console.log(data); 
 
       if (!res.ok) {
         throw new Error(data.message || "Failed to add image to wishlist");
       }
       fetchWishlist(user?._id);
-      // Handle success response if needed
-      // Example: show a toast message or update the UI
     } catch (error) {
       console.error("Error adding image to wishlist:", error);
-      // Handle error if needed
     }
   };
 
@@ -83,19 +80,16 @@ export default function ThemesResultPage() {
         }
       );
 
-      const data = await res.json(); // Parse the response JSON
-      console.log(data); // Log the response data
+      const data = await res.json(); 
+      console.log(data); 
 
       if (!res.ok) {
         throw new Error(data.message || "Failed to remove image from wishlist");
       }
       fetchWishlist(user?._id);
 
-      // Handle success response if needed
-      // Example: show a toast message or update the UI
     } catch (error) {
       console.error("Error removing image from wishlist:", error);
-      // Handle error if needed
     }
   };
 

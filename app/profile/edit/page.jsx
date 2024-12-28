@@ -47,14 +47,12 @@ const ProfileEditPage = () => {
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [cropperImage, setCropperImage] = useState(null); // For image preview and cropping
-  const [croppedImageUrl, setCroppedImageUrl] = useState(null); // Final cropped image URL
+  const [cropperImage, setCropperImage] = useState(null); 
+  const [croppedImageUrl, setCroppedImageUrl] = useState(null); 
   const cropperRef = useRef(null);
 
-  // Input change handler
   const handleInputChange = ({ currentTarget: input }) => {
     if (input.name === "interests") {
-      // Split the comma-separated input into an array
       const newInterests = input.value.split(",").map((item) => item.trim());
       setFormData({ ...formData, [input.name]: newInterests });
     } else {
@@ -62,7 +60,6 @@ const ProfileEditPage = () => {
     }
   };
 
-  // Fetch user data on initial render
   const fetchUserData = async () => {
     try {
       const res = await fetch(
@@ -94,32 +91,27 @@ const ProfileEditPage = () => {
     }
   };
 
-  // Image change handler for Cropper
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        setCropperImage(reader.result); // Set the base64 image to Cropper
+        setCropperImage(reader.result);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  // Crop the image and set to form data (skip base64 conversion, store as external URL)
   const handleCrop = async () => {
     const cropper = cropperRef.current?.cropper;
     if (cropper) {
       const croppedCanvas = cropper.getCroppedCanvas();
-      // Show loading toast
       const toastId = toast.loading("Processing image...");
 
-      // Send the cropped canvas to the server as a file
       const blob = await new Promise((resolve) =>
         croppedCanvas.toBlob(resolve)
       );
 
-      // FormData to send image to the server
       const formData = new FormData();
       formData.append("image", blob);
 
@@ -131,15 +123,14 @@ const ProfileEditPage = () => {
             body: formData,
           }
         );
-        const data = await res.text(); // Expect URL from server
+        const data = await res.text(); 
 
         if (res.ok) {
-          setCroppedImageUrl(data); // Store the URL of the uploaded image
+          setCroppedImageUrl(data); 
           setFormData((prev) => ({
             ...prev,
-            image: data, // Save external image URL in formData
+            image: data, 
           }));
-          // Remove cropper and show updated image
           setCropperImage(null);
           toast.success("Image cropped and uploaded successfully!", {
             id: toastId,
@@ -154,7 +145,6 @@ const ProfileEditPage = () => {
     }
   };
 
-  // Form submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
 

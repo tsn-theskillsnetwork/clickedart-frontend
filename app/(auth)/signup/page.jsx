@@ -32,7 +32,7 @@ const RegistrationForm = () => {
     address: "",
     age: "",
     dob: "",
-    image: "", // Initialize with an empty string
+    image: "",
     bio: "",
     interests: "",
   });
@@ -40,23 +40,21 @@ const RegistrationForm = () => {
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [cropperImage, setCropperImage] = useState(null); // For image preview and cropping
-  const [croppedImageUrl, setCroppedImageUrl] = useState(null); // Final cropped image URL
+  const [cropperImage, setCropperImage] = useState(null);
+  const [croppedImageUrl, setCroppedImageUrl] = useState(null); 
   const cropperRef = useRef(null);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  // Input change handler
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value ?? "" }); // Ensure value is not undefined
+    setFormData({ ...formData, [name]: value ?? "" }); 
   };
 
-  // Image upload handler
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
-    if (!file) return; // Avoid undefined issues
+    if (!file) return; 
 
-    // Send file to server
     const uploadData = new FormData();
     uploadData.append("image", file);
 
@@ -68,11 +66,11 @@ const RegistrationForm = () => {
           body: uploadData,
         }
       );
-      const data = await res.text(); // Parse as plain text
+      const data = await res.text(); 
       if (res.ok) {
         setFormData((prev) => ({
           ...prev,
-          image: data, // Save the file location URL
+          image: data, 
         }));
         console.log("Image uploaded successfully", data);
       }
@@ -86,13 +84,12 @@ const RegistrationForm = () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        setCropperImage(reader.result); // Set the base64 image to Cropper
+        setCropperImage(reader.result); 
       };
       reader.readAsDataURL(file);
     }
   };
 
-  // Form validation logic
   const validateForm = () => {
     const newErrors = {};
     if (formData.name.length < 5)
@@ -114,8 +111,7 @@ const RegistrationForm = () => {
     if (cropper) {
       const croppedCanvas = cropper.getCroppedCanvas();
       const toastId = toast.loading("Processing image...");
-  
-      // Convert canvas to Blob
+
       const blob = await new Promise((resolve) =>
         croppedCanvas.toBlob(resolve)
       );
@@ -129,7 +125,7 @@ const RegistrationForm = () => {
           formData,
           {
             headers: {
-              "Content-Type": "multipart/form-data", // Ensure proper headers for multipart
+              "Content-Type": "multipart/form-data", 
             },
             onUploadProgress: (progressEvent) => {
               const percentCompleted = Math.round(
@@ -142,11 +138,10 @@ const RegistrationForm = () => {
         );
   
         const data = res.data;
-  
-        // Save the cropped image URL to formData.image
+
         setFormData((prev) => ({
           ...prev,
-          image: data, // This should be the URL or path of the uploaded image
+          image: data, 
         }));
         setCropperImage(null);
   
@@ -160,8 +155,6 @@ const RegistrationForm = () => {
     }
   };
   
-
-  // Form submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
 

@@ -2,14 +2,14 @@ import React from 'react';
 
 export default function Button2({
   children = 'Button text',
-  size = 'base',        // Options: 'xs', 'sm', 'base', 'lg', 'xl'
-  variant = 'filled',   // Options: 'filled', 'pill', 'secondary'
-  state = 'default',    // Options: 'default', 'disabled'
-  icon = null,          // Optional: Add icon component if needed
-  onClick,              // Function to handle click
+  size = 'base',  
+  variant = 'filled', 
+  state = 'default',   
+  icon = null,        
+  onClick,            
 }) {
   const baseClasses =
-    'flex items-center justify-center font-semibold transition duration-200 ease-in-out'; // Smooth transition
+    'flex items-center justify-center font-semibold transition duration-200 ease-in-out';
 
   const sizeClasses = {
     xs: 'text-xs py-2 px-2',
@@ -28,7 +28,7 @@ export default function Button2({
   return (
     <button
       className={`${baseClasses} ${sizeClasses[size]} ${variantClasses[variant]}`}
-      onClick={state !== 'disabled' ? onClick : undefined} // Prevent clicks in disabled state
+      onClick={state !== 'disabled' ? onClick : undefined} 
       disabled={state === 'disabled'}
     >
       {icon && <span className="mr-2">{icon}</span>}

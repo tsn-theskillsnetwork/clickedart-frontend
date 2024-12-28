@@ -127,35 +127,28 @@ const RegistrationForm = () => {
       const croppedCanvas = cropper.getCroppedCanvas();
       const toastId = toast.loading("Processing image...");
 
-      // Convert canvas to Blob
       const blob = await new Promise((resolve) =>
         croppedCanvas.toBlob(resolve)
       );
 
-      // Create FormData for multipart upload
       const formData = new FormData();
       formData.append("image", blob);
 
-      // State to track upload progress
 
       try {
-        // Send FormData with multipart upload
         const res = await axios.post(
           "http://localhost:5000/api/upload/uploadSingleImage",
           formData,
           {
             headers: {
-              "Content-Type": "multipart/form-data", // Ensure proper headers for multipart
+              "Content-Type": "multipart/form-data", 
             },
             onUploadProgress: (progressEvent) => {
-              // Calculate the upload percentage
               const percentCompleted = Math.round(
                 (progressEvent.loaded * 100) / progressEvent.total
               );
-              // Update progress in state
               setUploadProgress(percentCompleted);
 
-              // Update toast message with progress
               toast.loading("Uploading image...", {
                 id: toastId,
               });
@@ -163,10 +156,8 @@ const RegistrationForm = () => {
           }
         );
 
-        // Handle server response
         const data = res.data;
 
-        // Update state with the uploaded image URL
         setCroppedImageUrl(data);
         setFormData((prev) => ({
           ...prev,

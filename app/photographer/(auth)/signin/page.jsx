@@ -46,11 +46,9 @@ const SignInPage = () => {
       setMessage("Sign-in successful!");
       setError("");
 
-      // Update Zustand store
       signin(data.token);
       setPhotographer(data.photographer);
 
-      // Redirect to home page
       router.push("/profile");
     } catch (err) {
       if (err.response && err.response.data) {
