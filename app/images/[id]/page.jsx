@@ -18,6 +18,7 @@ import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import toast from "react-hot-toast";
 import { fetchData } from "@/helpers/api";
+import RecommendedSection from "@/components/image/recommendedSection";
 
 export default function ImagePage() {
   const id = useParams().id;
@@ -43,6 +44,7 @@ export default function ImagePage() {
       selectedSize: selectedSize,
       selectedFrame: selectedFrame,
       quantity: selectedQuantity,
+      subTotal: subTotal,
     };
 
     addItemToCart(productToAdd);
@@ -71,6 +73,7 @@ export default function ImagePage() {
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [desc, setDesc] = useState(true);
   const [buySectionActive, setBuySectionActive] = useState(false);
+  const [subTotal, setSubTotal] = useState(image.price?.original || 0);
 
   const [sliderRef, slider] = useKeenSlider({
     slides: {
@@ -116,6 +119,38 @@ export default function ImagePage() {
       setLoading(false);
     }
   };
+
+  console.log(
+    "frame price",
+    (selectedSize?.width + selectedSize?.height) *
+      2 *
+      selectedFrame?.basePricePerLinearInch
+  );
+
+  useEffect(() => {
+    const calculateSubtotal = () => {
+      if (selectedSize) {
+        if (mode === "print") {
+          const width = selectedSize?.width || 0;
+          const height = selectedSize?.height || 0;
+          const basePricePerInch = selectedFrame?.basePricePerLinearInch || 0;
+
+          const framePrice = (width + height) * 2 * basePricePerInch;
+
+          const imageOriginalPrice = image.price?.original || 0;
+          const selectedSizePrice = selectedSize?.price || 0;
+
+          return imageOriginalPrice + selectedSizePrice + framePrice;
+        } else {
+          return image.price[selectedSize] || 0;
+        }
+      } else {
+        return image.price?.original || 0;
+      }
+    };
+
+    setSubTotal(calculateSubtotal());
+  }, [selectedSize, image, selectedFrame, mode]);
 
   const [selected, setSelected] = useState(0);
 
@@ -190,7 +225,7 @@ export default function ImagePage() {
               className="relative flex flex-col gap-5"
             >
               <div ref={sliderRef} className="keen-slider">
-                {recommended.map((image, index) => (
+                {papers?.map((image, index) => (
                   <div key={index} className="keen-slider__slide">
                     <div className=" flex flex-col gap-4">
                       <div className="flex items-center gap-2">
@@ -233,70 +268,15 @@ export default function ImagePage() {
     </div>
   );
 
-  // const recommendedSection = (
-  //   <div className="flex flex-col items-start gap-5 px-4 sm:px-6 md:px-10 lg:px-20 my-5">
-  //     <p className="text-paragraph sm:text-heading-06 md:text-heading-04 lg:text-heading-03 font-semibold">
-  //       Recommended for You
-  //     </p>
-  //     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 md:gap-6 lg:gap-8">
-  //       {recommended.slice(0, recommendedLength).map((image, index) => (
-  //         <div key={index} className="flex flex-col gap-4">
-  //           <div className="relative group">
-  //             <Image
-  //               width={800}
-  //               height={800}
-  //               src={image.src1}
-  //               alt={image.title}
-  //               className="object-cover w-full aspect-[1/1] opacity-100 group-hover:opacity-0 transition-all duration-200 ease-linear"
-  //             />
-  //             <div className="absolute inset-0 bg-white object-contain w-full aspect-[1/1] opacity-0 group-hover:opacity-100 transition-all duration-200 ease-linear" />
-  //             <Image
-  //               width={800}
-  //               height={800}
-  //               src={image.src2}
-  //               alt={image.title}
-  //               className="absolute inset-0 object-contain w-full aspect-[1/1] opacity-0 group-hover:opacity-100 transition-all duration-200 ease-linear"
-  //             />
-  //             <div className="absolute inset-0">
-  //               <div className="flex justify-end mx-4 mt-4">
-  //                 <Heart
-  //                   size={28}
-  //                   className="text-white group-hover:text-zinc-400 transition-all duration-200 ease-linear"
-  //                 />
-  //               </div>
-  //             </div>
-  //           </div>
-  //           <div className="text-neutral-600">
-  //             <h2 className="text-base sm:text-paragraph md:text-heading-06 lg:text-heading-05 font-bold">
-  //               {image.title}
-  //             </h2>
-  //             <p className="text-xs sm:text-base lg:text-paragraph font-medium">
-  //               {image.artist}
-  //             </p>
-  //             <p className="text-xs sm:text-base lg:text-paragraph font-medium">
-  //               {image.resolutions?.original} MP
-  //             </p>
-  //           </div>
-  //         </div>
-  //       ))}
-  //     </div>
-  //     <div className="w-full">
-  //       {recommendedLength < recommended.length && (
-  //         <div className="col-span-4 flex justify-center">
-  //           <button
-  //             onClick={() => setRecommendedLength(recommendedLength + 4)}
-  //             className="bg-white text-xs sm:text-base lg:text-primary font-semibold border-2 border-primary px-8 py-2 rounded-md hover:bg-primary hover:text-white transition-all duration-200"
-  //           >
-  //             Load More
-  //           </button>
-  //         </div>
-  //       )}
-  //     </div>
-  //   </div>
-  // );
+  useEffect(() => {
+    setSubTotal(image.price?.original);
+  }, [image]);
 
   const buySection = (
     <div className="flex flex-col">
+      <h5 className="text-heading-05 uppercase font-bold text-surface-600">
+        ₹ {subTotal * selectedQuantity}
+      </h5>
       <div className="flex flex-row relative items-center justify-between w-full py-5 my-10 rounded-full">
         <div
           className={`absolute inset-0 bg-primary-100 shadow-inner inner-shadow rounded-full`}
@@ -329,7 +309,7 @@ export default function ImagePage() {
           }}
           className={`text-base md:text-paragraph lg:text-base xl:text-heading-06 drop-shadow-md z-10 font-bold ${
             mode === "print" ? "text-surface-500" : "text-zinc-100"
-          } text-surface-600 text-center w-full cursor-pointer transition-colors duration-200 ease-in-out`}
+          } text-center w-full cursor-pointer transition-colors duration-200 ease-in-out`}
         >
           Digital Copy
         </p>
@@ -394,11 +374,16 @@ export default function ImagePage() {
                 <p className="sr-only">Frame</p>
               </SelectTrigger>
               <SelectContent>
-                {frames.map((frame) => (
-                  <SelectItem key={frame._id} value={frame}>
-                    {frame.name}
-                  </SelectItem>
-                ))}
+                <SelectItem value={null}>No Frame</SelectItem>
+                {selectedPaper && (
+                  <>
+                    {frames.map((frame) => (
+                      <SelectItem key={frame._id} value={frame}>
+                        {frame.name}
+                      </SelectItem>
+                    ))}
+                  </>
+                )}
               </SelectContent>
             </Select>
           </>
@@ -416,19 +401,28 @@ export default function ImagePage() {
                 <p className="sr-only">Size</p>
               </SelectTrigger>
               <SelectContent>
-                {image.resolutions &&
-                  Object.entries(image.resolutions).map(([key, value]) => (
-                    <SelectItem
-                      className="!text-paragraph text-surface-500"
-                      key={key}
-                      value={key}
-                    >
-                      <span className="text-black capitalize font-medium">
-                        {key}
-                      </span>{" "}
-                      - {((value.width * value.height) / 1000000).toFixed(1)} MP
-                    </SelectItem>
-                  ))}
+                {image.price &&
+                  Object.entries(image.price).map(([key, value]) => {
+                    const resolution = image.resolutions[key];
+
+                    return resolution ? (
+                      <SelectItem
+                        className="!text-paragraph text-surface-500"
+                        key={key}
+                        value={key}
+                      >
+                        <span className="text-black capitalize font-medium">
+                          {key}
+                        </span>{" "}
+                        -{" "}
+                        {(
+                          (resolution.width * resolution.height) /
+                          1000000
+                        ).toFixed(1)}{" "}
+                        MP
+                      </SelectItem>
+                    ) : null;
+                  })}
               </SelectContent>
             </Select>
           </>
@@ -504,6 +498,7 @@ export default function ImagePage() {
     );
 
     setInCart(isItemInCart(id));
+    setSubTotal(image.price?.original);
   }, []);
 
   return (
@@ -521,7 +516,7 @@ export default function ImagePage() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-16 py-20 bg-[#FBFBFB] -mt-2">
                 <div className="lg:col-span-2 flex flex-col gap-10">
                   <div className="relative group h-[50vw] lg:h-[30vw] w-full bg-white lg:col-span-2 shadow-[3px_3px_3px_rgba(0,0,0,0.2)] flex flex-col items-center justify-center border border-gray-300">
-                    <AnimatePresence mode="popLayout">
+                    {/* <AnimatePresence mode="popLayout">
                       <motion.div
                         key={selected}
                         className="relative w-full h-full"
@@ -530,6 +525,14 @@ export default function ImagePage() {
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.5 }}
                       >
+                        </motion.div>
+                      </AnimatePresence> */}
+                    <div
+                      className={`relative flex h-full w-full ${
+                        selectedFrame ? "p-3" : "p-0"
+                      } bg-white transition-all duration-300 ease-in-out`}
+                    >
+                      <div className="relative w-full h-full inner-shadow-3">
                         <Image
                           src={
                             image.imageLinks?.original ||
@@ -538,11 +541,25 @@ export default function ImagePage() {
                           alt={images[selected].alt || "Image"}
                           fill
                           priority
-                          className="object-contain"
+                          className="z-10 object-cover"
                         />
-                      </motion.div>
-                    </AnimatePresence>
-                    <button
+                      </div>
+                      {selectedFrame && (
+                        <AnimatePresence mode="popLayout">
+                          <motion.img
+                            key={selectedFrame._id}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute z-0 inset-0 w-full h-full"
+                            src={selectedFrame.image}
+                            alt={selectedFrame.name}
+                          />
+                        </AnimatePresence>
+                      )}
+                    </div>
+
+                    {/* <button
                       disabled={selected === 0}
                       onClick={() => {
                         setSelected(selected - 1);
@@ -559,7 +576,7 @@ export default function ImagePage() {
                       className={`hidden lg:block absolute top-1/2 right-0 transform -translate-y-1/2 text-primary  cursor-pointer disabled:opacity-50 disabled:cursor-default`}
                     >
                       <ChevronRight className="opacity-0 border-2 border-white rounded-full group-hover:opacity-100 size-8 lg:size-12" />
-                    </button>
+                    </button> */}
                   </div>
                   <div className="grid lg:hidden grid-cols-2 gap-4 w-full">
                     {images.map((img, index) => (
@@ -590,7 +607,7 @@ export default function ImagePage() {
                     <h5 className="text-heading-sm lg:text-heading-05 uppercase font-semibold text-surface-500">
                       Artist Name
                     </h5>
-                    <h5 className="text-paragraph lg:text-heading-05 uppercase font-semibold lg:font-bold text-surface-600">
+                    <h5 className="lg:hidden text-paragraph lg:text-heading-05 uppercase font-semibold lg:font-bold text-surface-600">
                       ₹ 55,000
                     </h5>
                   </div>
@@ -624,7 +641,7 @@ export default function ImagePage() {
               </div>
               {/* Desktop Desc */}
               <div className="hidden lg:block">{descriptionSection}</div>
-              {/* {recommendedSection} */}
+              <RecommendedSection />
             </div>
           )}
         </>

@@ -6,3 +6,7 @@
     box-shadow: 0px 4px 20px 0px rgba(137, 127, 117, 0.25) inset;
     
 }
+
+.inner-shadow-3{
+    box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.75) inset;
+}

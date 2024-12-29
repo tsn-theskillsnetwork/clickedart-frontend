@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import React from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function CartPage() {
   const router = useRouter();
@@ -22,40 +23,7 @@ export default function CartPage() {
   };
 
   const calculateSubtotal = (product) => {
-    if (product.mode === "digital") {
-      return product.price[product.selectedSize] * product.quantity;
-    }
-    const getFramePrice = async () => {
-      try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/frames/calculate-frames-prices?frameId=${product.selectedFrame._id}&imageId=${product._id}`
-        );
-        console.log(res.data);
-        return res.data.price;
-      } catch (error) {
-        console.error("Error getting frame price:", error);
-      }
-    };
-
-    const getPaperPrice = async () => {
-      try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/paper/calculate-paper-prices?paperId=${product.selectedPaper._id}&imageId=${product._id}`
-        );
-        console.log(res.data);
-        return res.data.price;
-      } catch (error) {
-        console.error("Error getting paper price:", error);
-      }
-    };
-
-    const framePrice = getFramePrice();
-    const paperPrice = getPaperPrice();
-
-    return (
-      (product.price[product.selectedSize] + framePrice + paperPrice) *
-      product.quantity
-    );
+    return product.subTotal * product.quantity;
   };
 
   const calculateTotal = () => {
@@ -81,11 +49,12 @@ export default function CartPage() {
             className="px-6 flex flex-col gap-2 sm:gap-0 sm:flex-row shadow-[0_0_6px_rgba(0,_0,_0,_0.1)] rounded-sm hover:shadow-[0_0_12px_rgba(0,_0,_0,_0.2)] p-4 transition-all duration-200 ease-in-out"
           >
             <div className="sm:w-2/6 flex flex-col sm:flex-row gap-4">
-              <img
-                src={product.imageLinks.original || "/assets/images/img6.jpg"}
-                className="w-1/3"
-                alt="Canvas Print 72x30"
-              />
+              <Link className="sm:w-1/3" href={`/images/${product._id}`} passHref>
+                <img
+                  src={product.imageLinks.original || "/assets/images/img6.jpg"}
+                  alt="Canvas Print 72x30"
+                />
+              </Link>
               <div className="flex flex-col">
                 <p className="text-heading-06 font-semibold">
                   {product.title || "Art Name"}
@@ -106,7 +75,7 @@ export default function CartPage() {
                     {product.selectedSize?.height} in
                   </p>
                   <p className="text-sm font-medium text-surface-500">
-                    {product.selectedFrame.name}
+                    {product.selectedFrame?.name}
                   </p>
                 </>
               ) : (
@@ -118,7 +87,7 @@ export default function CartPage() {
             <div className="sm:w-1/6 text-heading-06 font-medium text-surface-600">
               <div className="flex justify-between">
                 <p className="sm:hidden">Price</p>
-                <p>₹{product.price[product.selectedSize]}</p>
+                <p>₹{product.subTotal}</p>
               </div>
             </div>
             <div className="sm:w-1/6 flex flex-col sm:items-start gap-4">
