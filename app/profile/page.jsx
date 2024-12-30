@@ -6,6 +6,7 @@ import Image from "next/image";
 import Button from "@/components/button";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
+import Button2 from "@/components/button2";
 
 const ProfilePage = () => {
   const { photographer, user } = useAuthStore();
@@ -61,6 +62,11 @@ const ProfilePage = () => {
                   Orders
                 </Button>
               </Link>
+              {photographer && (
+                <Link href="/profile/photo-upload">
+                  <Button2>Upload Image</Button2>
+                </Link>
+              )}
               <div className="flex flex-row gap-4">
                 {data?.connectedAccounts?.map((account) => (
                   <Link key={account.accountName} href={account.accountLink}>

@@ -19,6 +19,7 @@ import "keen-slider/keen-slider.min.css";
 import toast from "react-hot-toast";
 import { fetchData } from "@/helpers/api";
 import RecommendedSection from "@/components/image/recommendedSection";
+import ImageSection from "@/components/image/imageSection";
 
 export default function ImagePage() {
   const id = useParams().id;
@@ -515,70 +516,41 @@ export default function ImagePage() {
             <div className={`px-5 lg:px-20`}>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-16 py-20 bg-[#FBFBFB] -mt-2">
                 <div className="lg:col-span-2 flex flex-col gap-10">
-                  <div className="relative group h-[50vw] lg:h-[30vw] w-full bg-white lg:col-span-2 shadow-[3px_3px_3px_rgba(0,0,0,0.2)] flex flex-col items-center justify-center border border-gray-300">
-                    {/* <AnimatePresence mode="popLayout">
-                      <motion.div
-                        key={selected}
-                        className="relative w-full h-full"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.5 }}
-                      >
-                        </motion.div>
-                      </AnimatePresence> */}
-                    <div
-                      className={`relative flex h-full w-full ${
-                        selectedFrame ? "p-3" : "p-0"
-                      } bg-white transition-all duration-300 ease-in-out`}
+                  <motion.div layout className="relative">
+                    <motion.div
+                      layout
+                      className={`${
+                        selectedFrame &&
+                        "absolute bottom-[60%] w-1/3 h-auto left-0 right-0 mx-auto"
+                      }  z-10 shadow-[2px_2px_6px_rgba(0,0,0,0.7)]`}
                     >
-                      <div className="relative w-full h-full inner-shadow-3">
-                        <Image
-                          src={
-                            image.imageLinks?.original ||
-                            "/assets/images/img3.jpg"
-                          }
-                          alt={images[selected].alt || "Image"}
-                          fill
-                          priority
-                          className="z-10 object-cover"
-                        />
-                      </div>
-                      {selectedFrame && (
-                        <AnimatePresence mode="popLayout">
-                          <motion.img
-                            key={selectedFrame._id}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="absolute z-0 inset-0 w-full h-full"
-                            src={selectedFrame.image}
-                            alt={selectedFrame.name}
+                      <ImageSection
+                        selectedFrame={selectedFrame}
+                        image={image}
+                      />
+                      {/* <img className="absolute top-0" src={image.imageLinks.original} /> */}
+                    </motion.div>
+                    {selectedFrame && (
+                      <AnimatePresence mode="sync">
+                        <motion.div
+                          layout
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                        >
+                          <Image
+                            src="https://plus.unsplash.com/premium_photo-1661780295073-98db12600af0?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                            alt="mockup"
+                            priority
+                            width={800}
+                            height={400}
+                            className=" w-full h-full object-cover"
                           />
-                        </AnimatePresence>
-                      )}
-                    </div>
-
-                    {/* <button
-                      disabled={selected === 0}
-                      onClick={() => {
-                        setSelected(selected - 1);
-                      }}
-                      className={`hidden lg:block absolute top-1/2 left-0 transform -translate-y-1/2 text-primary cursor-pointer disabled:opacity-50 disabled:cursor-default`}
-                    >
-                      <ChevronLeft className="opacity-0 border-2 border-white rounded-full group-hover:opacity-100 size-8 lg:size-12" />
-                    </button>
-                    <button
-                      disabled={selected === images.length - 1}
-                      onClick={() => {
-                        setSelected(selected + 1);
-                      }}
-                      className={`hidden lg:block absolute top-1/2 right-0 transform -translate-y-1/2 text-primary  cursor-pointer disabled:opacity-50 disabled:cursor-default`}
-                    >
-                      <ChevronRight className="opacity-0 border-2 border-white rounded-full group-hover:opacity-100 size-8 lg:size-12" />
-                    </button> */}
-                  </div>
-                  <div className="grid lg:hidden grid-cols-2 gap-4 w-full">
+                        </motion.div>
+                      </AnimatePresence>
+                    )}
+                  </motion.div>
+                  {/* <div className="grid lg:hidden grid-cols-2 gap-4 w-full">
                     {images.map((img, index) => (
                       <Image
                         key={index}
@@ -596,7 +568,7 @@ export default function ImagePage() {
                         }}
                       />
                     ))}
-                  </div>
+                  </div> */}
                 </div>
 
                 <div className="">
@@ -605,7 +577,7 @@ export default function ImagePage() {
                       {image.title || "Artwork name"}
                     </h2>
                     <h5 className="text-heading-sm lg:text-heading-05 uppercase font-semibold text-surface-500">
-                      Artist Name
+                      {image.photographer?.name || "Artist Name"}
                     </h5>
                     <h5 className="lg:hidden text-paragraph lg:text-heading-05 uppercase font-semibold lg:font-bold text-surface-600">
                       ₹ 55,000

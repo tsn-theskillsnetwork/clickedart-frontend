@@ -52,8 +52,8 @@ export default function ThemesResultPage() {
         }
       );
 
-      const data = await res.json(); 
-      console.log(data); 
+      const data = await res.json();
+      console.log(data);
 
       if (!res.ok) {
         throw new Error(data.message || "Failed to add image to wishlist");
@@ -80,14 +80,13 @@ export default function ThemesResultPage() {
         }
       );
 
-      const data = await res.json(); 
-      console.log(data); 
+      const data = await res.json();
+      console.log(data);
 
       if (!res.ok) {
         throw new Error(data.message || "Failed to remove image from wishlist");
       }
       fetchWishlist(user?._id);
-
     } catch (error) {
       console.error("Error removing image from wishlist:", error);
     }
@@ -296,30 +295,27 @@ export default function ThemesResultPage() {
                 }}
                 className="relative group"
               >
-                {image.imageLinks?.small &&
-                image.imageLinks.small.trim() !== "" ? (
-                  <Image
-                    width={400}
-                    height={400}
-                    src={image.imageLinks?.small}
-                    alt={image.description}
-                    className="object-cover w-full aspect-[1/1] opacity-100 group-hover:opacity-0 transition-all duration-200 ease-linear"
-                  />
-                ) : (
-                  <div className="bg-gray-200 w-full aspect-[1/1] object-cover opacity-100 group-hover:opacity-0 transition-all duration-200 ease-linear"></div>
-                )}
-                {image.imageLinks?.small &&
-                image.imageLinks.small.trim() !== "" ? (
-                  <Image
-                    width={800}
-                    height={800}
-                    src={image.imageLinks?.small}
-                    alt={image.description}
-                    className="absolute inset-0 object-contain w-full aspect-[1/1] opacity-0 group-hover:opacity-100 transition-all duration-200 ease-linear"
-                  />
-                ) : (
-                  <div className="bg-gray-200 w-full aspect-[1/1] absolute inset-0 object-contain opacity-0 group-hover:opacity-100 transition-all duration-200 ease-linear"></div>
-                )}
+                <Image
+                  width={800}
+                  height={800}
+                  priority
+                  src={
+                    image.imageLinks.small ||
+                    image.imageLinks.medium ||
+                    image.imageLinks.original
+                  }
+                  alt={image.description}
+                  className="object-cover w-full aspect-[1/1] opacity-100 group-hover:opacity-0 transition-all duration-200 ease-linear"
+                />
+
+                <Image
+                  width={400}
+                  height={400}
+                  src={image.imageLinks.original}
+                  alt={image.description}
+                  className="absolute inset-0 object-contain w-full aspect-[1/1] opacity-0 group-hover:opacity-100 transition-all duration-200 ease-linear"
+                />
+
                 <div className="absolute inset-0">
                   <div className="flex justify-between mx-4 mt-4">
                     <div className="bg-white px-2 text-paragraph group-hover:opacity-0 bg-opacity-75 w-fit transition-all duration-200 ease-linear cursor-default">
@@ -344,12 +340,15 @@ export default function ThemesResultPage() {
               </div>
               <div className="text-neutral-600">
                 <h2 className="text-heading-06 font-bold">
+                  {image.title || "Untitled"}
+                </h2>
+                <h2 className="text-paragaph font-medium">
                   Description: {image.description}
                 </h2>
-                <p className="text-paragraph">
+                <p className="text-paragraph font-medium">
                   Photographer: {image.photographer?.name}
                 </p>
-                <p className="text-paragraph">
+                <p className="text-paragraph font-medium">
                   {(
                     (image.resolutions?.original?.height *
                       image.resolutions?.original?.width) /

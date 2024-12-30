@@ -35,6 +35,11 @@ const nextConfig = {
         hostname: "orancia-s3.s3.ap-south-1.amazonaws.com",
         pathname: "**",
       },
+      {
+        protocol: "https",
+        hostname: "plus.unsplash.com",
+        pathname: "**",
+      },
     ],
   },
 };
