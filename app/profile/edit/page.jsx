@@ -19,10 +19,7 @@ import Image from "next/image";
 import toast, { Toaster } from "react-hot-toast";
 
 const ProfileEditPage = () => {
-  const user = useAuthStore((state) => state.user);
-  const isSignedIn = useAuthStore((state) => state.isSignedIn);
-  const token = useAuthStore((state) => state.token);
-  const setUser = useAuthStore((state) => state.setUser);
+  const { user, token, photographer, setUser } = useAuthStore();
 
   const router = useRouter();
 
@@ -47,8 +44,8 @@ const ProfileEditPage = () => {
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [cropperImage, setCropperImage] = useState(null); 
-  const [croppedImageUrl, setCroppedImageUrl] = useState(null); 
+  const [cropperImage, setCropperImage] = useState(null);
+  const [croppedImageUrl, setCroppedImageUrl] = useState(null);
   const cropperRef = useRef(null);
 
   const handleInputChange = ({ currentTarget: input }) => {
@@ -91,6 +88,37 @@ const ProfileEditPage = () => {
     }
   };
 
+  const fetchPhotographerData = async () => {
+    try {
+      const res = await fetch(
+        `http://localhost:5000/api/photographer/get-photographer-by-id?photographerId=${user._id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await res.json();
+      if (res.ok) {
+        setFormData({
+          userId: data.photographer._id,
+          name: data.photographer.name,
+          email: data.photographer.email,
+          connectedAccounts: data.photographer.connectedAccounts,
+          address: data.photographer.address,
+          age: data.photographer.age,
+          dob: new Date(data.photographer.dob).toISOString().split("T")[0],
+          image: data.photographer.image,
+          bio: data.photographer.bio,
+          interests: data.photographer.interests,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -123,13 +151,13 @@ const ProfileEditPage = () => {
             body: formData,
           }
         );
-        const data = await res.text(); 
+        const data = await res.text();
 
         if (res.ok) {
-          setCroppedImageUrl(data); 
+          setCroppedImageUrl(data);
           setFormData((prev) => ({
             ...prev,
-            image: data, 
+            image: data,
           }));
           setCropperImage(null);
           toast.success("Image cropped and uploaded successfully!", {
@@ -180,13 +208,14 @@ const ProfileEditPage = () => {
   };
 
   useEffect(() => {
-    if (isSignedIn) fetchUserData();
-  }, [isSignedIn]);
+    if (user) fetchUserData();
+    if (photographer) fetchPhotographerData();
+  }, [user, photographer]);
 
   return (
     <>
       <Toaster position="top-center" reverseOrder={false} />
-      {user ? (
+      {user || photographer ? (
         <div className="flex flex-col items-center justify-center min-h-[80vh] mt-5 mb-10">
           <form
             onSubmit={handleSubmit}
