@@ -4,8 +4,9 @@ import useAuthStore from "@/authStore";
 import Button from "@/components/button";
 import Loader from "@/components/loader";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/Label";
+import { Label } from "@/components/ui/label";
 import useCartStore from "@/store/cart";
+import axios from "axios";
 import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import React, { use, useEffect, useState } from "react";
@@ -13,15 +14,13 @@ import toast from "react-hot-toast";
 
 export default function CheckoutPage() {
   const { user, token } = useAuthStore();
-  const { cartItems } = useCartStore();
+  const { cartItems, removeItemFromCart } = useCartStore();
   const [coupon, setCoupon] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [orderData, setOrderData] = useState({
     userId: "",
     imageInfo: { image: "", photographer: "", resolution: "", price: "" },
-    frameInfo: { frame: "", price: "", size: "" },
-    paperInfo: { paper: "", price: "", size: "" },
     subTotal: "",
     paymentMethod: "",
     shippingAddress: {
@@ -40,9 +39,9 @@ export default function CheckoutPage() {
     invoiceId: "",
   });
 
-  console.log("cartItems", cartItems);
-  console.log("User", user);
-  console.log("orderData", orderData);
+  // console.log("cartItems", cartItems);
+  // console.log("User", user);
+  // console.log("orderData", orderData);
 
   const calculateSubtotal = () => {
     return cartItems?.reduce((acc, item) => acc + item.subTotal, 0);
@@ -51,33 +50,50 @@ export default function CheckoutPage() {
   const createOrder = async () => {
     try {
       setLoading(true);
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/download/create-order`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-auth-token": token,
+      for (const item of cartItems) {
+        const orderDetails = {
+          ...orderData,
+          userId: user?._id,
+          imageInfo: {
+            image: item?._id,
+            photographer: item?.photographer?._id,
+            resolution:
+              item?.mode === "print" ? "original" : item?.selectedSize,
+            price: item?.subTotal,
           },
-          body: JSON.stringify(orderData),
-        }
-      );
+          frameInfo: {
+            frame: item?.selectedFrame?._id,
+            price: item?.selectedFrame?.price,
+            size: item?.selectedFrame ? item.selectedSize : null,
+          },
+          paperInfo: {
+            paper: item?.selectedPaper?._id,
+            price: item?.selectedPaper?.price,
+            size: item?.selectedPaper ? item.selectedSize : null,
+          },
+          subTotal: item?.subTotal,
+          totalAmount: item?.subTotal + item?.subTotal * 0.18,
+        };
 
-      const data = await res.json();
-      console.log(data);
+        const res = await axios.post(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/download/create-order`,
+          orderDetails,
+          {
+            headers: {
+              "x-auth-token": token,
+            },
+          }
+        );
 
-      if (!res.ok) {
-        setError(data.message);
-        console.log(data.message);
+        console.log("Order created for item", res.data);
+        toast.success(`Order placed successfully for item: ${item.title}`);
+        removeItemFromCart(item._id);
       }
-
-      toast.success("Order placed successfully");
-
-
       setLoading(false);
     } catch (error) {
       console.log(error);
-      setError("Something went wrong");
+      setError("Something went wrong while creating orders");
+      toast.error("Something went wrong");
       setLoading(false);
     }
   };
@@ -92,21 +108,24 @@ export default function CheckoutPage() {
       imageInfo: {
         image: cartItems[0]?._id,
         photographer: cartItems[0]?.photographer?._id,
-        resolution: cartItems[0]?.mode === "print" ? "original" : cartItems[0]?.selectedSize,
+        resolution:
+          cartItems[0]?.mode === "print"
+            ? "original"
+            : cartItems[0]?.selectedSize,
         price: cartItems[0]?.subTotal,
       },
       frameInfo: {
         frame: cartItems[0]?.selectedFrame?._id,
         price: cartItems[0]?.selectedFrame?.price,
-        size: cartItems[0]?.selectedSize,
+        size: cartItems[0]?.selectedFrame ? cartItems[0].selectedSize : null,
       },
       paperInfo: {
         paper: cartItems[0]?.selectedPaper?._id,
         price: cartItems[0]?.selectedPaper?.price,
-        size: cartItems[0]?.selectedSize,
+        size: cartItems[0]?.selectedPaper ? cartItems[0].selectedSize : null,
       },
       subTotal: newSubtotal,
-      paymentMethod: "COD",
+      paymentMethod: "Credit Card",
       shippingAddress: {
         ...prev.shippingAddress,
       },

@@ -1,6 +1,8 @@
 import React from "react";
 import Button from "@/components/button";
-import { Dot } from "lucide-react";
+import { Dot, Download } from "lucide-react";
+import Button2 from "../button2";
+import Link from "next/link";
 
 export default function downloadOrders({ orders }) {
   if (!orders || orders.length === 0)
@@ -25,7 +27,11 @@ export default function downloadOrders({ orders }) {
             <div className="sm:w-3/5 flex flex-col sm:flex-row gap-5 sm:gap-10">
               <div className="sm:w-1/2">
                 <img
-                  src={order.imageLinks?.original || "/assets/images/img6.jpg"}
+                  src={
+                    order?.imageInfo?.image?.imageLinks[
+                      order?.imageInfo?.resolution
+                    ] || "/assets/images/img6.jpg"
+                  }
                   className=""
                   alt="Canvas Print 72x30"
                 />
@@ -34,7 +40,10 @@ export default function downloadOrders({ orders }) {
                 <p className="text-heading-06 font-semibold">
                   {order.imageInfo.image.title || "Art Name"}
                 </p>
-                {order.paperInfo && (
+                <p className="text-sm font-medium text-surface-500 capitalize">
+                  {order?.imageInfo?.resolution}
+                </p>
+                {/* {order.paperInfo && (
                   <div className="flex flex-col">
                     <p className="text-base font-semibold text-surface-500">
                       {order.paperInfo.paper.name}
@@ -44,15 +53,15 @@ export default function downloadOrders({ orders }) {
                       {order.paperInfo.size.height} in
                     </p>
                   </div>
-                )}
+                )} */}
                 {/* {order.paperInfo && order.frameInfo && <hr className="" />} */}
-                {order.frameInfo && (
+                {/* {order.frameInfo && (
                   <div className="flex flex-col">
                     <p className="text-base font-semibold text-surface-500">
                       {order.frameInfo.frame.name}
                     </p>
                   </div>
-                )}
+                )} */}
                 <hr />
                 <div className="flex flex-col">
                   <p className="text-base font-semibold text-surface-500">
@@ -89,7 +98,7 @@ export default function downloadOrders({ orders }) {
                 Method: {order.paymentMethod}
               </p>
               <p className="text-sm font-medium text-surface-500">
-                Invoice: {order.invoiceId}
+                Invoice: {order.invoiceId || "N/A"}
               </p>
               <p className="text-base mt-5 font-semibold text-surface-500">
                 Sub Total: {order.subTotal}
@@ -107,7 +116,7 @@ export default function downloadOrders({ orders }) {
                 </p>
               )}
             </div>
-            <div className="sm:px-2 sm:w-1/5 flex flex-col items-start gap-2 border-b sm:border-b-0">
+            <div className="sm:px-2 sm:w-1/5 flex flex-col items-center gap-2 border-b sm:border-b-0">
               <div
                 className={`flex items-center p-1 pr-3 ${
                   order.orderStatus === "completed" &&
@@ -124,6 +133,23 @@ export default function downloadOrders({ orders }) {
                   {order.orderStatus}
                 </p>
               </div>
+              {order.orderStatus != "completed" && (
+                <a
+                  download
+                  href={
+                    order?.imageInfo?.image?.imageLinks[
+                      order?.imageInfo?.resolution
+                    ]
+                  }
+                >
+                  <Button2
+                    size="sm"
+                    icon={<Download size={18} strokeWidth={2} />}
+                  >
+                    Download
+                  </Button2>
+                </a>
+              )}
               <Button size="sm">Order Support</Button>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import React from "react";
 import Button from "@/components/button";
 import { Dot } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function PrintOrders({ orders }) {
   if (!orders || orders.length === 0)
@@ -25,7 +26,11 @@ export default function PrintOrders({ orders }) {
             <div className="sm:w-3/5 flex flex-col sm:flex-row gap-5 sm:gap-10">
               <div className="sm:w-1/2">
                 <img
-                  src={order.imageLinks?.original || "/assets/images/img6.jpg"}
+                  src={
+                    order?.imageInfo?.image?.imageLinks[
+                      order?.imageInfo?.resolution
+                    ] || "/assets/images/img6.jpg"
+                  }
                   className=""
                   alt="Canvas Print 72x30"
                 />
@@ -124,7 +129,9 @@ export default function PrintOrders({ orders }) {
                   {order.orderStatus}
                 </p>
               </div>
-              <Button size="sm">Order Support</Button>
+              <Button onClick={()=> {
+                toast.success("Order Support Requested")
+              }} size="sm">Order Support</Button>
             </div>
           </div>
         ))}

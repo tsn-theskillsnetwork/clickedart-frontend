@@ -70,6 +70,9 @@ const ProfilePage = () => {
                 <Link href="/dashboard">
                   <Button2>Dashboard</Button2>
                 </Link>
+                <Link href="/profile/catalogues">
+                  <Button2>Catalogues</Button2>
+                </Link>
                 </>
               )}
               <div className="flex flex-row gap-4">

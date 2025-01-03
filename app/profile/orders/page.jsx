@@ -26,11 +26,11 @@ export default function OrdersPage() {
   }, [user]);
 
   useEffect(() => {
-    const print = orders.filter((order) => order.paperInfo);
+    const print = orders.filter((order) => order.paperInfo.size);
     setPrintOrders(print);
     console.log("printOrders", print);
 
-    const download = orders.filter((order) => !order.paperInfo);
+    const download = orders.filter((order) => !order.paperInfo.size);
     setDownloadOrders(download);
     console.log("downloadOrders", download);
   }, [orders]);
