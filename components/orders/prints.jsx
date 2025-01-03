@@ -40,8 +40,8 @@ export default function PrintOrders({ orders }) {
                       {order.paperInfo.paper.name}
                     </p>
                     <p className="text-sm font-medium text-surface-500">
-                      {order.paperInfo.size.width} x{" "}
-                      {order.paperInfo.size.height} in
+                      {order.paperInfo.size?.width} x{" "}
+                      {order.paperInfo.size?.height} in
                     </p>
                   </div>
                 )}

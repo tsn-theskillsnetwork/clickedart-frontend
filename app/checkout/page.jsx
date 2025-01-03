@@ -2,37 +2,26 @@
 
 import useAuthStore from "@/authStore";
 import Button from "@/components/button";
+import Loader from "@/components/loader";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/Label";
 import useCartStore from "@/store/cart";
 import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import React, { use, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 export default function CheckoutPage() {
-  const { user } = useAuthStore();
-  const { increaseQuantity, decreaseQuantity, cartItems } = useCartStore();
+  const { user, token } = useAuthStore();
+  const { cartItems } = useCartStore();
   const [coupon, setCoupon] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [orderData, setOrderData] = useState({
     userId: "",
-    imageInfo: {
-      image: "",
-      photographer: "",
-      resolution: "",
-      price: "",
-    },
-    frameInfo: {
-      frame: "",
-      price: "",
-      size: "",
-    },
-    paperInfo: {
-      paper: "",
-      price: "",
-      size: "",
-    },
+    imageInfo: { image: "", photographer: "", resolution: "", price: "" },
+    frameInfo: { frame: "", price: "", size: "" },
+    paperInfo: { paper: "", price: "", size: "" },
     subTotal: "",
     paymentMethod: "",
     shippingAddress: {
@@ -44,6 +33,7 @@ export default function CheckoutPage() {
       email: "",
       pincode: "",
       state: "",
+      country: "India",
     },
     totalAmount: "",
     orderStatus: "pending",
@@ -54,30 +44,55 @@ export default function CheckoutPage() {
   console.log("User", user);
   console.log("orderData", orderData);
 
-  const onIncreaseQuantity = (productId) => {
-    increaseQuantity(productId);
+  const calculateSubtotal = () => {
+    return cartItems?.reduce((acc, item) => acc + item.subTotal, 0);
   };
 
-  const onDecreaseQuantity = (productId) => {
-    decreaseQuantity(productId);
-  };
+  const createOrder = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/download/create-order`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-auth-token": token,
+          },
+          body: JSON.stringify(orderData),
+        }
+      );
 
-  const calculateSubtotal = (product) => {
-    return product.subTotal * product.quantity;
-  };
+      const data = await res.json();
+      console.log(data);
 
-  const calculateTotal = () => {
-    return cartItems?.reduce((acc, item) => acc + calculateSubtotal(item), 0);
+      if (!res.ok) {
+        setError(data.message);
+        console.log(data.message);
+      }
+
+      toast.success("Order placed successfully");
+
+
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setError("Something went wrong");
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
+    const newSubtotal = calculateSubtotal();
+    const newTotal = newSubtotal + newSubtotal * 0.18;
+
     setOrderData((prev) => ({
       ...prev,
       userId: user?._id,
       imageInfo: {
         image: cartItems[0]?._id,
-        photographer: cartItems[0]?.artist?.name,
-        resolution: cartItems[0]?.selectedSize,
+        photographer: cartItems[0]?.photographer?._id,
+        resolution: cartItems[0]?.mode === "print" ? "original" : cartItems[0]?.selectedSize,
         price: cartItems[0]?.subTotal,
       },
       frameInfo: {
@@ -90,30 +105,24 @@ export default function CheckoutPage() {
         price: cartItems[0]?.selectedPaper?.price,
         size: cartItems[0]?.selectedSize,
       },
-      subTotal: calculateTotal(),
+      subTotal: newSubtotal,
       paymentMethod: "COD",
       shippingAddress: {
-        address: user?.address,
-        city: "Test City",
-        landmark: "Test Landmark",
-        area: "Test Area",
-        mobileNumber: "1234567890",
-        email: "",
-        pincode: "123456",
-        state: "Test State",
+        ...prev.shippingAddress,
       },
-      totalAmount: calculateTotal(),
+      totalAmount: newTotal,
       orderStatus: "pending",
       invoiceId: "",
     }));
-
-    console.log("Order Data", orderData);
   }, [user, cartItems]);
 
   return (
     <div>
       <section className="bg-white py-8 antialiased d md:py-16">
-        <form action="#" className="mx-auto max-w-screen-xl px-4 2xl:px-0">
+        <form
+          action={createOrder}
+          className="mx-auto max-w-screen-xl px-4 2xl:px-0"
+        >
           <ol className="items-center flex w-full max-w-2xl text-center text-sm font-medium text-gray-500  sm:text-base">
             <li className="after:border-1 flex items-center text-primary-700 after:mx-6 after:hidden after:h-1 after:w-full after:border-b after:border-gray-200  sm:after:inline-block sm:after:content-[''] md:w-full xl:after:mx-10">
               <span className="flex items-center">
@@ -144,7 +153,7 @@ export default function CheckoutPage() {
                     <Input
                       type="text"
                       placeholder="Full Name"
-                      value={user?.name}
+                      value={user?.name || ""}
                       disabled
                     />
                   </div>
@@ -153,7 +162,7 @@ export default function CheckoutPage() {
                     <Input
                       type="email"
                       placeholder="name@mail.com"
-                      value={orderData.shippingAddress.email}
+                      value={orderData.shippingAddress.email || ""}
                       onChange={(e) =>
                         setOrderData((prev) => ({
                           ...prev,
@@ -172,7 +181,7 @@ export default function CheckoutPage() {
                     <Input
                       type="text"
                       placeholder="City"
-                      value={orderData.shippingAddress.address}
+                      value={orderData.shippingAddress.address || ""}
                       onChange={(e) =>
                         setOrderData((prev) => ({
                           ...prev,
@@ -191,7 +200,7 @@ export default function CheckoutPage() {
                     <Input
                       type="text"
                       placeholder="City"
-                      value={orderData.shippingAddress.city}
+                      value={orderData.shippingAddress.city || ""}
                       onChange={(e) =>
                         setOrderData((prev) => ({
                           ...prev,
@@ -209,7 +218,7 @@ export default function CheckoutPage() {
                       type="text"
                       placeholder="Uttar Pradesh"
                       required
-                      value={orderData.shippingAddress.state}
+                      value={orderData.shippingAddress.state || ""}
                       onChange={(e) =>
                         setOrderData((prev) => ({
                           ...prev,
@@ -247,7 +256,7 @@ export default function CheckoutPage() {
                     <Input
                       type="text"
                       placeholder="Landmark"
-                      value={orderData.shippingAddress.landmark}
+                      value={orderData.shippingAddress.landmark || ""}
                       onChange={(e) =>
                         setOrderData((prev) => ({
                           ...prev,
@@ -266,7 +275,7 @@ export default function CheckoutPage() {
                         <Input
                           type="text"
                           placeholder="Phone"
-                          value={orderData.shippingAddress.mobileNumber}
+                          value={orderData.shippingAddress.mobileNumber || ""}
                           onChange={(e) =>
                             setOrderData((prev) => ({
                               ...prev,
@@ -357,32 +366,6 @@ export default function CheckoutPage() {
                           <p className="sm:hidden">Price</p>
                           <p>₹{product.subTotal}</p>
                         </div>
-
-                        <div className="flex justify-between">
-                          <p className="sm:hidden text-heading-06 font-medium text-surface-600">
-                            Quantity
-                          </p>
-                          <div className="flex flex-row gap-4 text-heading-06 font-semibold">
-                            <button
-                              onClick={() => onDecreaseQuantity(product._id)}
-                              className="w-8 h-8 pb-3 bg-primary text-white rounded-full hover:bg-primary-dark active:bg-primary-darker"
-                            >
-                              -
-                            </button>
-                            {product.quantity}
-                            <button
-                              onClick={() => onIncreaseQuantity(product._id)}
-                              className="w-8 h-8  bg-primary text-white rounded-full hover:bg-primary-dark active:bg-primary-darker"
-                            >
-                              +
-                            </button>
-                          </div>
-                        </div>
-
-                        <div className="flex justify-between">
-                          <p className="sm:hidden">Subtotal</p>
-                          <p>₹{calculateSubtotal(product)}</p>
-                        </div>
                       </div>
                     </div>
                   ))}
@@ -391,7 +374,7 @@ export default function CheckoutPage() {
                       Subtotal
                     </dt>
                     <dd className="text-base font-medium text-gray-900 dark:text-white">
-                      $8,094.00
+                      ₹{orderData.subTotal}
                     </dd>
                   </dl>
                   <dl className="flex items-center justify-between gap-4 py-3">
@@ -402,18 +385,10 @@ export default function CheckoutPage() {
                   </dl>
                   <dl className="flex items-center justify-between gap-4 py-3">
                     <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
-                      Store Pickup
+                      GST
                     </dt>
                     <dd className="text-base font-medium text-gray-900 dark:text-white">
-                      $99
-                    </dd>
-                  </dl>
-                  <dl className="flex items-center justify-between gap-4 py-3">
-                    <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
-                      Tax
-                    </dt>
-                    <dd className="text-base font-medium text-gray-900 dark:text-white">
-                      $199
+                      ₹{orderData.subTotal * 0.18}
                     </dd>
                   </dl>
                   <dl className="flex items-center justify-between gap-4 py-3">
@@ -421,7 +396,7 @@ export default function CheckoutPage() {
                       Total
                     </dt>
                     <dd className="text-base font-bold text-gray-900 dark:text-white">
-                      $8,392.00
+                      ₹{orderData.totalAmount}
                     </dd>
                   </dl>
                 </div>
@@ -433,6 +408,11 @@ export default function CheckoutPage() {
           </div>
         </form>
       </section>
+      {loading && (
+        <div className="bg-gray-100 fixed h-screen w-screen top-0 left-0 z-50 flex items-center justify-center bg-opacity-50">
+          <Loader />
+        </div>
+      )}
     </div>
   );
 }

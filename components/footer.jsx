@@ -10,7 +10,7 @@ export default function Footer() {
   const pathname = usePathname();
   if (pathname.startsWith("/dashboard")) return null;
   return (
-    <div className={`bg-primary-100 min-h-96 px-10 sm:px-24`}>
+    <div className={`bg-primary-100 min-h-96 px-10 sm:px-24 z-50`}>
       <div className="pt-20 pb-10">
         <div className="flex flex-wrap justify-between">
           <div className="flex flex-wrap gap-10 sm:gap-28">

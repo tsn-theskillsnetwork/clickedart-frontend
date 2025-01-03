@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Heart, Search } from "lucide-react";
+import { Heart, Search, Tag } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -105,7 +105,13 @@ export default function ThemesResultPage() {
     })
     .filter((image) => {
       if (!searchValue) return true;
-      return image.title.toLowerCase().includes(searchValue.toLowerCase());
+      return (
+        image.title?.toLowerCase().includes(searchValue.toLowerCase()) ||
+        image.description?.toLowerCase().includes(searchValue.toLowerCase()) ||
+        image.keywords?.some((keyword) =>
+          keyword.toLowerCase().includes(searchValue.toLowerCase())
+        )
+      );
     })
     .sort((a, b) => {
       if (sort === "price") return a.price - b.price;
@@ -339,15 +345,26 @@ export default function ThemesResultPage() {
                 </div>
               </div>
               <div className="text-neutral-600">
-                <h2 className="text-heading-06 font-bold">
+                <h2 className="text-heading-05 font-semibold">
                   {image.title || "Untitled"}
                 </h2>
-                <h2 className="text-paragaph font-medium">
-                  Description: {image.description}
-                </h2>
-                <p className="text-paragraph font-medium">
-                  Photographer: {image.photographer?.name}
+                <p className="font-medium">{image.photographer?.name}</p>
+                <p className="font-medium text-blue-500">
+                  {image.category?.name}
                 </p>
+                <div className="flex flex-wrap gap-2">
+                  {image.keywords?.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="text-xs bg-blue-500 text-white px-2 py-1 rounded-full"
+                    >
+                      {tag} <Tag size={12} className="inline" />
+                    </span>
+                  ))}
+                </div>
+                <h2 className="text-heading-06 font-medium">
+                  {image.description}
+                </h2>
                 <p className="text-paragraph font-medium">
                   {(
                     (image.resolutions?.original?.height *

@@ -63,9 +63,14 @@ const ProfilePage = () => {
                 </Button>
               </Link>
               {photographer && (
+                <>
                 <Link href="/profile/photo-upload">
                   <Button2>Upload Image</Button2>
                 </Link>
+                <Link href="/dashboard">
+                  <Button2>Dashboard</Button2>
+                </Link>
+                </>
               )}
               <div className="flex flex-row gap-4">
                 {data?.connectedAccounts?.map((account) => (

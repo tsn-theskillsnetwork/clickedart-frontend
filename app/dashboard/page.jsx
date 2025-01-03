@@ -1,4 +1,9 @@
+"use client";
+
+import useAuthStore from "@/authStore";
 import { AppSidebar } from "@/components/app-sidebar";
+import NumberCard from "@/components/cards/numberCard";
+import Loader from "@/components/loader";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -12,14 +17,35 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import axios from "axios";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-export const metadata = {
-  title: "Dashboard",
-  description: "Dashboard page",
-};
+export default function DashboardPage() {
+  const { photographer } = useAuthStore();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [photos, setPhotos] = useState([]);
 
-export default function Page() {
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-images-by-photographer?photographer=${photographer._id}`
+        );
+        console.log(res.data);
+        setPhotos(res.data.photos);
+        setLoading(false);
+      } catch (error) {
+        setError(error);
+        setLoading(false);
+      }
+    };
+
+    fetchPhotos();
+  }, [photographer]);
+
   return (
     <SidebarProvider>
       <AppSidebar currentUrl={"/dashboard"} />
@@ -35,37 +61,34 @@ export default function Page() {
             </BreadcrumbList>
           </Breadcrumb>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4">
-          <div className="grid auto-rows-min gap-4 lg:grid-cols-2 xl:grid-cols-3">
-            <div className="rounded-xl bg-muted/50 shadow-md px-2 flex flex-col items-center gap-4 py-4">
-              <h4 className="text-heading-06 sm:text-heading-05 md:text-heading-04">
-                Create Invoice
-              </h4>
-              <Link href="/dashboard/invoice/create">
-                <Button variant="success" className="text-white">
-                  Create Invoice
-                </Button>
-              </Link>
-            </div>
-            <div className="rounded-xl bg-muted/50 shadow-md px-2 flex flex-col items-center gap-4 py-4">
-              <h4 className="text-heading-06 sm:text-heading-05 md:text-heading-04">
-                Earning This Month
-              </h4>
-              <h2 className="text-heading-04 sm:text-heading-03 md:text-heading-02 font-semibold text-green-600">
-                ₹12,000.00
-              </h2>
-            </div>
-            <div className="rounded-xl bg-muted/50 shadow-md px-2 flex flex-col items-center gap-4 py-4">
-              <h4 className="text-heading-06 sm:text-heading-05 md:text-heading-04">
-                Total Sales
-              </h4>
-              <h2 className="text-heading-04 sm:text-heading-03 md:text-heading-02 font-semibold text-secondary-200">
-                12
-              </h2>
-            </div>
+        {loading ? (
+          <div className="flex items-center justify-center h-[80vh]">
+            <Loader />;
           </div>
-          <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
-        </div>
+        ) : (
+          <div className="flex flex-1 flex-col gap-4 p-4">
+            <div className="grid auto-rows-min gap-4 lg:grid-cols-2 xl:grid-cols-3">
+              <NumberCard
+                title="Create Invoice"
+                btnText="Create Invoice"
+                url="/dashboard/invoice/create"
+                variant={"success"}
+              />
+              <NumberCard
+                title="Earning This Month"
+                number="₹12,000.00"
+                color="green"
+              />
+              <NumberCard title="Total Sales" number="12" />
+              <NumberCard
+                title="Uploaded Photos"
+                number={photos?.length || "0"}
+              />
+              <NumberCard title="Pending Photos" number="2" color="red" />
+            </div>
+            <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
+          </div>
+        )}
       </SidebarInset>
     </SidebarProvider>
   );

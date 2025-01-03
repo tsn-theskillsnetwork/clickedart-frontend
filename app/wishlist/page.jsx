@@ -4,7 +4,7 @@ import useAuthStore from "@/authStore";
 import useCartStore from "@/store/cart";
 import Button from "@/components/button";
 import useWishlistStore from "@/store/wishlist";
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { Heart } from "lucide-react";
@@ -12,7 +12,25 @@ import { Heart } from "lucide-react";
 export default function WishlistPage() {
   const { user } = useAuthStore();
   const { wishlist, fetchWishlist, loading, error } = useWishlistStore();
-  const { addToCart, removeFromCart, cart, isImageInCart } = useCartStore();
+  const { addItemToCart, isItemInCart, removeItemFromCart } = useCartStore();
+
+  const onAddToCart = (image) => {
+    const productToAdd = {
+      ...image,
+      mode: "digital",
+      selectedSize: "original",
+      subTotal: image.price.original,
+    };
+
+    addItemToCart(productToAdd);
+    toast.success("Added to cart!");
+  };
+
+  const onRemoveFromCart = (id) => {
+    removeItemFromCart(id);
+    toast.success("Removed from cart!");
+  };
+
   console.log({ wishlist, loading, error });
 
   const removeImageFromWishlist = async (imageId) => {
@@ -60,8 +78,13 @@ export default function WishlistPage() {
             className="relative flex flex-col shadow-[2px_2px_6px_rgba(0,0,0,0.1)] hover:shadow-[3px_3px_12px_rgba(0,0,0,0.3)] rounded-sm p-4"
           >
             <img
-              className="w-full aspect-[1/1] mb-4"
-              src={item.image || "/assets/images/img6.jpg"}
+              className="w-full aspect-[1/1] mb-4 object-cover rounded-sm"
+              src={
+                item.imageLinks?.small ||
+                item.imageLinks?.medium ||
+                item.imageLinks?.original ||
+                "/assets/images/img6.jpg"
+              }
               alt={item.title}
             />
             <Heart
@@ -74,10 +97,10 @@ export default function WishlistPage() {
             <div className="grid grid-cols-2 gap-2   items-start">
               <div className="flex flex-col">
                 <h5 className="text-heading-06 text-surface-600 font-semibold">
-                  {item.title || "Art Name"}
+                  {item.title || "Untitled"}
                 </h5>
                 <p className="text-sm font-medium text-surface-500">
-                  {item.artist?.name || "Artist name"}
+                  {item.photographer?.name || "Artist name"}
                 </p>
                 <p className="text-sm font-medium text-surface-500">
                   {(
@@ -93,15 +116,17 @@ export default function WishlistPage() {
               </div>
               <button
                 onClick={() => {
-                  isImageInCart ? removeFromCart(item._id) : addToCart(item);
+                  isItemInCart(item._id)
+                    ? onRemoveFromCart(item._id)
+                    : onAddToCart(item);
                 }}
                 className={`font-medium  text-surface-600 px-2 p-3 rounded-md transition-all duration-200 hover:shadow ${
-                  isImageInCart
+                  isItemInCart(item._id)
                     ? "text-black border border-surface-600 hover:bg-surface-200"
                     : "bg-primary text-white border-none hover:bg-primary-dark"
                 }`}
               >
-                {isImageInCart ? "Remove" : "Move to Bag"}
+                {isItemInCart(item._id) ? "Remove" : "Move to Bag"}
               </button>
             </div>
             {/* <div className="flex gap-4 mx-auto">

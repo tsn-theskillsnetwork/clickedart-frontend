@@ -14,20 +14,12 @@ export default function CartPage() {
     useCartStore();
   const [coupon, setCoupon] = React.useState("");
 
-  const onIncreaseQuantity = (productId) => {
-    increaseQuantity(productId);
-  };
-
-  const onDecreaseQuantity = (productId) => {
-    decreaseQuantity(productId);
-  };
-
-  const calculateSubtotal = (product) => {
-    return product.subTotal * product.quantity;
+  const onRemoveItem = (productId) => {
+    removeItemFromCart(productId);
   };
 
   const calculateTotal = () => {
-    return cartItems?.reduce((acc, item) => acc + calculateSubtotal(item), 0);
+    return cartItems?.reduce((acc, item) => acc + item.subTotal, 0);
   };
 
   return (
@@ -37,85 +29,77 @@ export default function CartPage() {
       </h5>
       <div className="flex flex-col gap-12">
         <div className="px-6 hidden sm:flex shadow-[0_0_6px_rgba(0,_0,_0,_0.1)] rounded-sm p-5 text-heading-06 font-semibold">
-          <div className="w-2/6">Product</div>
-          <div className="w-1/6">Product Type</div>
-          <div className="w-1/6">Price</div>
-          <div className="w-1/6">Quantity</div>
-          <div className="w-1/6">Subtotal</div>
+          <div className="w-2/5">Product</div>
+          <div className="w-1/5">Product Type</div>
+          <div className="w-1/5">Price</div>
+          <div className="w-1/5">Subtotal</div>
         </div>
         {cartItems?.map((product) => (
           <div
             key={product._id}
             className="px-6 flex flex-col gap-2 sm:gap-0 sm:flex-row shadow-[0_0_6px_rgba(0,_0,_0,_0.1)] rounded-sm hover:shadow-[0_0_12px_rgba(0,_0,_0,_0.2)] p-4 transition-all duration-200 ease-in-out"
           >
-            <div className="sm:w-2/6 flex flex-col sm:flex-row gap-4">
-              <Link className="sm:w-1/3" href={`/images/${product._id}`} passHref>
-                <img
-                  src={product.imageLinks.original || "/assets/images/img6.jpg"}
-                  alt="Canvas Print 72x30"
-                />
-              </Link>
+            <div className="sm:w-2/5 flex flex-col sm:flex-row gap-4">
+              <div className="sm:w-1/3 flex flex-col gap-2">
+                <Link href={`/images/${product._id}`} passHref>
+                  <img
+                    src={
+                      product.imageLinks.original || "/assets/images/img6.jpg"
+                    }
+                    alt="Canvas Print 72x30"
+                  />
+                </Link>
+                <button
+                  onClick={() => onRemoveItem(product._id)}
+                  className="text-red-600 font-medium"
+                >
+                  Remove
+                </button>
+              </div>
               <div className="flex flex-col">
                 <p className="text-heading-06 font-semibold">
                   {product.title || "Art Name"}
                 </p>
                 <p className="text-sm font-medium text-surface-500">
-                  {product.artist?.name || "Artist Name"}
+                  {product.photographer?.name || "Artist Name"}
                 </p>
               </div>
             </div>
-            <div className="sm:w-1/6 flex flex-col gap-2 border-b sm:border-b-0">
+            <div className="sm:w-1/5 flex flex-col gap-2 border-b sm:border-b-0">
               {product.mode === "print" ? (
                 <>
                   <p className="text-heading-06 font-semibold">
-                    {product.selectedPaper.name}
-                  </p>
-                  <p className="text-heading-06 font-semibold">
                     {product.selectedSize?.width} x{" "}
                     {product.selectedSize?.height} in
+                  </p>
+                  <p className="text-sm font-medium text-surface-500">
+                    {product.selectedPaper.name}
                   </p>
                   <p className="text-sm font-medium text-surface-500">
                     {product.selectedFrame?.name}
                   </p>
                 </>
               ) : (
-                <p className="text-heading-06 font-semibold">
-                  Digital Download
-                </p>
+                <>
+                  <p className="text-heading-06 font-semibold capitalize">
+                    {product.selectedSize} Size
+                  </p>
+                  <p className="text-sm font-medium text-surface-500">
+                    Digital Download
+                  </p>
+                </>
               )}
             </div>
-            <div className="sm:w-1/6 text-heading-06 font-medium text-surface-600">
+            <div className="sm:w-1/5 text-heading-06 font-medium text-surface-600">
               <div className="flex justify-between">
                 <p className="sm:hidden">Price</p>
                 <p>₹{product.subTotal}</p>
               </div>
             </div>
-            <div className="sm:w-1/6 flex flex-col sm:items-start gap-4">
-              <div className="flex justify-between">
-                <p className="sm:hidden text-heading-06 font-medium text-surface-600">
-                  Quantity
-                </p>
-                <div className="flex flex-row gap-4 text-heading-06 font-semibold">
-                  <button
-                    onClick={() => onDecreaseQuantity(product._id)}
-                    className="w-8 h-8 pb-3 bg-primary text-white rounded-full hover:bg-primary-dark active:bg-primary-darker"
-                  >
-                    -
-                  </button>
-                  {product.quantity}
-                  <button
-                    onClick={() => onIncreaseQuantity(product._id)}
-                    className="w-8 h-8  bg-primary text-white rounded-full hover:bg-primary-dark active:bg-primary-darker"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className="sm:w-1/6 text-heading-06 font-medium text-surface-600">
+            <div className="sm:w-1/5 text-heading-06 font-medium text-surface-600">
               <div className="flex justify-between">
                 <p className="sm:hidden">Subtotal</p>
-                <p>₹{calculateSubtotal(product)}</p>
+                <p>₹{product.subTotal}</p>
               </div>
             </div>
           </div>

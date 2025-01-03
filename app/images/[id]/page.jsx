@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import "./styles.css";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, frame, motion } from "framer-motion";
 import {
   Select,
   SelectContent,
@@ -44,7 +44,6 @@ export default function ImagePage() {
       selectedPaper: selectedPaper,
       selectedSize: selectedSize,
       selectedFrame: selectedFrame,
-      quantity: selectedQuantity,
       subTotal: subTotal,
     };
 
@@ -65,13 +64,13 @@ export default function ImagePage() {
   const [recommendedLength, setRecommendedLength] = useState(4);
   const [inCart, setInCart] = useState(false);
 
+  const [selected, setSelected] = useState(0);
   const [mode, setMode] = useState("print");
   const [papers, setPapers] = useState([]);
   const [frames, setFrames] = useState([]);
   const [selectedPaper, setSelectedPaper] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedFrame, setSelectedFrame] = useState(null);
-  const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [desc, setDesc] = useState(true);
   const [buySectionActive, setBuySectionActive] = useState(false);
   const [subTotal, setSubTotal] = useState(image.price?.original || 0);
@@ -128,41 +127,28 @@ export default function ImagePage() {
       selectedFrame?.basePricePerLinearInch
   );
 
-  useEffect(() => {
-    const calculateSubtotal = () => {
-      if (selectedSize) {
-        if (mode === "print") {
-          const width = selectedSize?.width || 0;
-          const height = selectedSize?.height || 0;
-          const basePricePerInch = selectedFrame?.basePricePerLinearInch || 0;
+  const handleMockup = () => {
+    setSelected(1);
+    setSelectedPaper(papers[0]);
+    setSelectedSize(papers[0]?.customDimensions[0]);
+    setSelectedFrame(frames[0]);
+    setMode("print");
+  };
 
-          const framePrice = (width + height) * 2 * basePricePerInch;
-
-          const imageOriginalPrice = image.price?.original || 0;
-          const selectedSizePrice = selectedSize?.price || 0;
-
-          return imageOriginalPrice + selectedSizePrice + framePrice;
-        } else {
-          return image.price[selectedSize] || 0;
-        }
-      } else {
-        return image.price?.original || 0;
-      }
-    };
-
-    setSubTotal(calculateSubtotal());
-  }, [selectedSize, image, selectedFrame, mode]);
-
-  const [selected, setSelected] = useState(0);
+  const handleDigital = () => {
+    setSelected(0);
+    setSelectedPaper(null);
+    setSelectedSize("original");
+    setSelectedFrame(null);
+    setMode("digital");
+  };
 
   const images = [
     {
-      id: 1,
-      src: "/assets/images/img3.jpg",
+      src: image?.imageLinks?.original,
     },
     {
-      id: 2,
-      src: "/assets/themes/nature.jpg",
+      src: "https://plus.unsplash.com/premium_photo-1661780295073-98db12600af0?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
   ];
 
@@ -276,7 +262,7 @@ export default function ImagePage() {
   const buySection = (
     <div className="flex flex-col">
       <h5 className="text-heading-05 uppercase font-bold text-surface-600">
-        ₹ {subTotal * selectedQuantity}
+        ₹ {subTotal}
       </h5>
       <div className="flex flex-row relative items-center justify-between w-full py-5 my-10 rounded-full">
         <div
@@ -325,7 +311,9 @@ export default function ImagePage() {
               }}
             >
               <SelectTrigger className="w-full font-medium !text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between">
-                <SelectValue placeholder="Select Paper" />
+                <SelectValue
+                  placeholder={selectedPaper?.name || "Select Paper"}
+                />
                 <p className="sr-only">Paper</p>
               </SelectTrigger>
               <SelectContent>
@@ -348,7 +336,16 @@ export default function ImagePage() {
               }}
             >
               <SelectTrigger className="w-full font-medium !text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between">
-                <SelectValue placeholder="Select Size" />
+                <SelectValue
+                  placeholder={
+                    selectedSize
+                      ? selectedSize?.width +
+                        " x " +
+                        selectedSize?.height +
+                        " in"
+                      : "Select Size"
+                  }
+                />
                 <p className="sr-only">Size</p>
               </SelectTrigger>
               <SelectContent>
@@ -371,7 +368,9 @@ export default function ImagePage() {
               }}
             >
               <SelectTrigger className="w-full font-medium !text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between">
-                <SelectValue placeholder="Select Frame" />
+                <SelectValue
+                  placeholder={selectedFrame?.name || "Select Frame"}
+                />
                 <p className="sr-only">Frame</p>
               </SelectTrigger>
               <SelectContent>
@@ -397,8 +396,8 @@ export default function ImagePage() {
                 setSelectedSize(value);
               }}
             >
-              <SelectTrigger className="w-full font-medium !text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between">
-                <SelectValue placeholder="Select Size" />
+              <SelectTrigger className="w-full font-medium !text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between capitalize">
+                <SelectValue placeholder={selectedSize || "Select Size"} />
                 <p className="sr-only">Size</p>
               </SelectTrigger>
               <SelectContent>
@@ -429,32 +428,7 @@ export default function ImagePage() {
           </>
         )}
       </div>
-      <div className="flex flex-row gap-4 justify-center mt-32 mb-4">
-        <p className="text-heading-06 font-semibold text-surface-600">
-          Quantity:{" "}
-        </p>
-        <button
-          onClick={() =>
-            setSelectedQuantity(selectedQuantity > 1 ? selectedQuantity - 1 : 1)
-          }
-          className="w-8 h-8 pb-1 bg-primary text-white rounded-full hover:bg-primary-dark active:bg-primary-darker"
-        >
-          -
-        </button>
-
-        <p className="text-heading-06 font-semibold">{selectedQuantity}</p>
-        <button
-          onClick={() =>
-            setSelectedQuantity(
-              selectedQuantity < 10 ? selectedQuantity + 1 : 10
-            )
-          }
-          className="w-8 h-8  bg-primary text-white rounded-full hover:bg-primary-dark active:bg-primary-darker"
-        >
-          +
-        </button>
-      </div>
-      <div className="flex items-center w-full gap-2 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-10">
+      <div className="mt-32 flex items-center w-full gap-2 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-10">
         <button
           onClick={() => {
             inCart ? onRemoveFromCart(id) : onAddToCart();
@@ -502,6 +476,30 @@ export default function ImagePage() {
     setSubTotal(image.price?.original);
   }, []);
 
+  useEffect(() => {
+    const calculateSubtotal = () => {
+      if (selectedSize) {
+        if (mode === "print") {
+          const width = selectedSize?.width || 0;
+          const height = selectedSize?.height || 0;
+          const basePricePerInch = selectedFrame?.basePricePerLinearInch || 0;
+
+          const framePrice = (width + height) * 2 * basePricePerInch;
+
+          const imageOriginalPrice = image.price?.original || 0;
+          const selectedSizePrice = selectedSize?.price || 0;
+
+          return imageOriginalPrice + selectedSizePrice + framePrice;
+        } else {
+          return image.price[selectedSize] || 0;
+        }
+      } else {
+        return image.price?.original || 0;
+      }
+    };
+    setSubTotal(calculateSubtotal());
+  }, [selectedSize, selectedPaper, selectedFrame, mode, image]);
+
   return (
     <>
       {loading ? (
@@ -521,57 +519,65 @@ export default function ImagePage() {
                       layout
                       className={`${
                         selectedFrame &&
-                        "absolute bottom-[60%] w-1/3 h-auto left-0 right-0 mx-auto"
-                      }  z-10 shadow-[2px_2px_6px_rgba(0,0,0,0.7)]`}
+                        " bottom-[60%] w-1/3 h-auto left-0 right-0 mx-auto"
+                      } absolute z-10 shadow-[2px_2px_6px_rgba(0,0,0,0.7)]`}
                     >
                       <ImageSection
                         selectedFrame={selectedFrame}
                         image={image}
                       />
-                      {/* <img className="absolute top-0" src={image.imageLinks.original} /> */}
                     </motion.div>
-                    {selectedFrame && (
-                      <AnimatePresence mode="sync">
-                        <motion.div
-                          layout
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                        >
-                          <Image
-                            src="https://plus.unsplash.com/premium_photo-1661780295073-98db12600af0?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                            alt="mockup"
-                            priority
-                            width={800}
-                            height={400}
-                            className=" w-full h-full object-cover"
-                          />
-                        </motion.div>
-                      </AnimatePresence>
-                    )}
-                  </motion.div>
-                  {/* <div className="grid lg:hidden grid-cols-2 gap-4 w-full">
-                    {images.map((img, index) => (
-                      <Image
-                        key={index}
-                        src={img.src}
-                        alt={image.title || "Image"}
-                        width={800}
-                        height={400}
-                        className={`${
-                          selected === index
-                            ? "opacity-100 border border-surface-400 shadow-[3px_3px_3px_rgba(0,0,0,0.4)]"
-                            : "opacity-50 hover:opacity-80"
-                        } w-full h-full object-cover cursor-pointer transition-all duration-300 ease-in-out`}
-                        onClick={() => {
-                          setSelected(index);
-                        }}
-                      />
-                    ))}
-                  </div> */}
-                </div>
 
+                    <AnimatePresence mode="popLayout">
+                      <motion.div
+                        layout
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                      >
+                        <Image
+                          src="https://plus.unsplash.com/premium_photo-1661780295073-98db12600af0?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                          alt="mockup"
+                          priority
+                          width={800}
+                          height={400}
+                          className={`w-full h-full object-cover ${
+                            selectedFrame ? "opacity-100" : "opacity-0"
+                          } transition-all duration-300 ease-in-out`}
+                        />
+                      </motion.div>
+                    </AnimatePresence>
+                  </motion.div>
+                </div>
                 <div className="">
+                  <div className="flex gap-4">
+                    <div
+                      className={`border-4 ${
+                        !selectedFrame
+                          ? "border-blue-400"
+                          : "border-transparent"
+                      }`}
+                      onClick={handleDigital}
+                    >
+                      <img
+                        className="object-cover h-24 w-40 border-4 border-white shadow-[0_0_4px_rgba(0,0,0,0.7)]"
+                        src={images[0].src}
+                        alt=""
+                      />
+                    </div>
+                    <div
+                      className={`border-4 ${
+                        selectedFrame ? "border-blue-400" : "border-transparent"
+                      }`}
+                      onClick={handleMockup}
+                    >
+                      <img
+                        className="object-cover h-24 w-40 border-4 border-white shadow-[0_0_4px_rgba(0,0,0,0.7)]"
+                        src={images[1].src}
+                        alt=""
+                      />
+                    </div>
+                  </div>
                   <div className="flex flex-col gap-2">
                     <h2 className="text-heading-06 lg:text-heading-02 font-semibold text-surface-600">
                       {image.title || "Artwork name"}
@@ -580,20 +586,12 @@ export default function ImagePage() {
                       {image.photographer?.name || "Artist Name"}
                     </h5>
                     <h5 className="lg:hidden text-paragraph lg:text-heading-05 uppercase font-semibold lg:font-bold text-surface-600">
-                      ₹ 55,000
+                      ₹ {subTotal}
                     </h5>
                   </div>
                   {/* Mobile Desc */}
                   <div className="lg:hidden">{descriptionSection}</div>
                   <div className="flex justify-center mt-10 lg:hidden">
-                    <button
-                      onClick={() => {
-                        setBuySectionActive(!buySectionActive);
-                      }}
-                      className="bg-primary w-full rounded-md text-white p-2 font-medium hover:bg-primary-dark active:bg-primary-darker"
-                    >
-                      Buy Now
-                    </button>
                     {buySectionActive && (
                       <div className="fixed top-0 lg:hidden bg-white z-50 h-screen pt-20 px-4 w-screen">
                         <button
@@ -616,6 +614,16 @@ export default function ImagePage() {
               <RecommendedSection />
             </div>
           )}
+          <div className="lg:hidden w-full p-4 sticky bottom-0 z-20">
+            <button
+              onClick={() => {
+                setBuySectionActive(!buySectionActive);
+              }}
+              className="bg-primary w-full rounded-md shadow-[2px_2px_4px_rgba(0,0,0,0.4)] text-white p-2 font-medium hover:bg-primary-dark active:bg-primary-darker"
+            >
+              Buy Now
+            </button>
+          </div>
         </>
       )}
       {error && (
