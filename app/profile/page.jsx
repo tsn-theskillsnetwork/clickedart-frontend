@@ -44,11 +44,8 @@ const ProfilePage = () => {
               </div>
               <div className="sm:w-9/12 p-4 sm:p-8 z-20">
                 <h3 className="text-heading-04 font-semibold text-black">
-                  {data?.name || "Anonymous"}
+                  {data?.firstName} {data?.lastName}
                 </h3>
-                <p className="text-paragraph text-justify text-gray-500 mt-4">
-                  {data?.bio || "No bio available."}
-                </p>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 items-center mt-8 z-20">
@@ -64,7 +61,7 @@ const ProfilePage = () => {
               </Link>
               {photographer && (
                 <>
-                <Link href="/profile/photo-upload">
+                <Link href="/profile/image-upload">
                   <Button2>Upload Image</Button2>
                 </Link>
                 <Link href="/dashboard">

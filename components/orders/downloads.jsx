@@ -133,7 +133,7 @@ export default function downloadOrders({ orders }) {
                   {order.orderStatus}
                 </p>
               </div>
-              {order.orderStatus != "completed" && (
+              {order.orderStatus === "completed" && (
                 <a
                   download
                   href={

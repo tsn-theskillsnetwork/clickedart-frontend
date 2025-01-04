@@ -26,6 +26,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [photos, setPhotos] = useState([]);
+  const [stats, setStats] = useState([]);
 
   useEffect(() => {
     const fetchPhotos = async () => {
@@ -42,8 +43,24 @@ export default function DashboardPage() {
         setLoading(false);
       }
     };
+    
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/photographeranalytics/get-photographer-analytics?photographer=${photographer._id}`
+        );
+        console.log("Stats",res.data);
+        setStats(res.data);
+        setLoading(false);
+      } catch (error) {
+        setError(error);
+        setLoading(false);
+      }
+    };
 
     fetchPhotos();
+    fetchStats();
   }, [photographer]);
 
   return (
@@ -79,7 +96,7 @@ export default function DashboardPage() {
                 number="₹12,000.00"
                 color="green"
               />
-              <NumberCard title="Total Sales" number="12" />
+              <NumberCard title="Total Sales" number={String(stats?.totalSales) || 0} />
               <NumberCard
                 title="Uploaded Photos"
                 number={photos?.length || "0"}

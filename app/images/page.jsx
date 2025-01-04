@@ -348,7 +348,13 @@ export default function ThemesResultPage() {
                 <h2 className="text-heading-05 font-semibold">
                   {image.title || "Untitled"}
                 </h2>
-                <p className="font-medium">{image.photographer?.name}</p>
+                <p className="font-medium">
+                  {image.photographer?.firstName
+                    ? image.photographer?.firstName +
+                      " " +
+                      image.photographer?.lastName
+                    : image.photographer?.name}
+                </p>
                 <p className="font-medium text-blue-500">
                   {image.category?.name}
                 </p>

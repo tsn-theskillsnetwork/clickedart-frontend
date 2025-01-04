@@ -9,12 +9,7 @@ import { useRouter } from "next/navigation";
 export default function ThemesPage() {
   const router = useRouter();
 
-  const [search, setSearch] = useState("");
   const [themes, setThemes] = useState([]);
-
-  // const handleSearch = () => {
-  //   alert(`Searching for ${search}`);
-  // };
 
   useEffect(() => {
     const fetchThemes = async () => {

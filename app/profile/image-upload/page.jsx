@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { fetchData } from "@/helpers/api";
 import axios from "axios";
 import { ImageIcon } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
@@ -80,7 +81,7 @@ export default function PhotoUploadPage() {
               const progress = Math.round(
                 (progressEvent.loaded / progressEvent.total) * 100
               );
-              setUploadProgress(progress); // Update the progress
+              setUploadProgress(progress);
             }
           },
         }
@@ -114,7 +115,7 @@ export default function PhotoUploadPage() {
 
       console.log(photo);
     } catch (error) {
-      console.error("Error uploading image:", error);
+      console.log("Error uploading image:", error);
     }
   };
 
@@ -161,15 +162,17 @@ export default function PhotoUploadPage() {
 
   if (!photographer) {
     return (
-      <div>
-        <h1>Not Authenticated</h1>
+      <div className="flex flex-col items-center justify-center h-[80vh]">
+        <h1 className="text-heading-03">Not Authenticated</h1>
+        <Link href="/photographer/signin">
+          <Button2>Sign In</Button2>
+        </Link>
       </div>
     );
   }
 
   return (
     <div>
-      <h1>Upload Image</h1>
       <main className="flex flex-col items-center p-4">
         <div className="flex flex-col gap-4 w-1/2">
           {photo.imageLinks.original?.length > 0 ? (
@@ -182,7 +185,7 @@ export default function PhotoUploadPage() {
                     <div className="absolute flex flex-col items-center">
                       <ImageIcon className="w-12 h-12 text-blue-500" />
                       <span className="block text-gray-500 font-semibold">
-                        Drag &amp; drop your files here
+                        Drag &amp; drop your image here
                       </span>
                       <span className="block text-gray-400 font-normal mt-1">
                         or click to upload
@@ -201,7 +204,10 @@ export default function PhotoUploadPage() {
           )}
           <div>
             <Label>Title*</Label>
-            <Input value={photo.title} onChange={(e) => setPhoto({ ...photo, title: e.target.value })} />
+            <Input
+              value={photo.title}
+              onChange={(e) => setPhoto({ ...photo, title: e.target.value })}
+            />
           </div>
           <div>
             <Label>Category</Label>
@@ -395,9 +401,7 @@ export default function PhotoUploadPage() {
           <div>
             <Label>License Type *</Label>
             <Select
-              onValueChange={(value) =>
-                setPhoto({ ...photo, license: value })
-              }
+              onValueChange={(value) => setPhoto({ ...photo, license: value })}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select License" />

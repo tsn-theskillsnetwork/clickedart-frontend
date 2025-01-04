@@ -25,23 +25,33 @@ const RegistrationForm = () => {
   const router = useRouter();
 
   const [formData, setFormData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
     password: "",
-    bio: "",
     dob: "",
+    bio: "",
+    mobile: "",
+    whatsapp: "",
+    expertise: [],
+    awards: [],
+    achivements: [],
     profileImage: "",
-    address: "",
+    username: "",
+    portfolioLink: "",
+    photographyStyles: [],
+    yearsOfExperience: undefined,
+    photosCount: undefined,
+    accountType: "freelance",
     isCompany: false,
     companyName: "",
     companyEmail: "",
     companyAddress: "",
     companyPhone: "",
-    portfolioLink: "",
-    photographyStyles: "",
-    yearsOfExperience: "",
-    accountType: "freelance",
+    companyAddress: "",
+    certifications: [],
     connectedAccounts: [],
+    bestPhotos: [],
   });
 
   const [errors, setErrors] = useState({});
@@ -102,8 +112,10 @@ const RegistrationForm = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (formData.name.length < 5)
-      newErrors.name = "Name must be at least 5 characters.";
+    if (formData.firstName.length < 3)
+      newErrors.firstName = "First Name must be at least 3 characters.";
+    if (formData.lastName.length < 3)
+      newErrors.lastName = "Last Name must be at least 3 characters.";
     if (!/^\S+@\S+\.\S+$/.test(formData.email))
       newErrors.email = "Enter a valid email address.";
     if (!formData.password) newErrors.password = "Password is required.";
@@ -134,14 +146,13 @@ const RegistrationForm = () => {
       const formData = new FormData();
       formData.append("image", blob);
 
-
       try {
         const res = await axios.post(
           "http://localhost:5000/api/upload/uploadSingleImage",
           formData,
           {
             headers: {
-              "Content-Type": "multipart/form-data", 
+              "Content-Type": "multipart/form-data",
             },
             onUploadProgress: (progressEvent) => {
               const percentCompleted = Math.round(
@@ -314,18 +325,35 @@ const RegistrationForm = () => {
             <span>{uploadProgress}%</span>
           </div>
         )}
-        <div>
-          <Label>
-            Name <span className="text-red-500">*</span>
-          </Label>
-          <Input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            required
-          />
-          {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full ">
+          <div>
+            <Label>
+              First Name <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              type="text"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleInputChange}
+              required
+            />
+            {errors.firstName && (
+              <p className="text-red-500 text-sm">{errors.firstName}</p>
+            )}
+          </div>
+
+          <div>
+            <Label>
+              Last Name <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              type="text"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
         </div>
 
         <div>
@@ -361,27 +389,6 @@ const RegistrationForm = () => {
         </div>
 
         <div>
-          <Label>
-            Address <span className="text-red-500">*</span>
-          </Label>
-          <Input
-            type="text"
-            name="address"
-            value={formData.address}
-            onChange={handleInputChange}
-          />
-        </div>
-
-        <div>
-          <Label>Bio</Label>
-          <Textarea
-            name="bio"
-            value={formData.bio}
-            onChange={handleInputChange}
-          />
-        </div>
-
-        <div>
           <Label>Account Type</Label>
           <Select
             value={formData.accountType}
@@ -398,6 +405,35 @@ const RegistrationForm = () => {
               <SelectItem value="agency">Agency</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+
+        <div>
+          <Label>Mobile</Label>
+          <Input
+            type="tel"
+            name="mobile"
+            value={formData.mobile}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div>
+          <Label>WhatsApp</Label>
+          <Input
+            type="tel"
+            name="whatsapp"
+            value={formData.whatsapp}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div>
+          <Label>Bio</Label>
+          <Textarea
+            name="bio"
+            value={formData.bio}
+            onChange={handleInputChange}
+          />
         </div>
 
         <div>
@@ -482,12 +518,64 @@ const RegistrationForm = () => {
           <Input
             type="text"
             name="photographyStyles"
-            value={formData.photographyStyles}
-            onChange={handleInputChange}
+            value={formData.photographyStyles?.join(", ")}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                photographyStyles: e.target.value
+                  .split(",")
+                  .map((s) => s.trim()),
+              })
+            }
           />
           {errors.photographyStyles && (
             <p className="text-red-500 text-sm">{errors.photographyStyles}</p>
           )}
+        </div>
+
+        <div>
+          <Label>Awards</Label>
+          <Input
+            type="text"
+            name="awards"
+            value={formData.awards?.join(", ")}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                awards: e.target.value.split(",").map((s) => s.trim()),
+              })
+            }
+          />
+        </div>
+
+        <div>
+          <Label>Achivements</Label>
+          <Input
+            type="text"
+            name="achivements"
+            value={formData.achivements?.join(", ")}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                achivements: e.target.value.split(",").map((s) => s.trim()),
+              })
+            }
+          />
+        </div>
+
+        <div>
+          <Label>Certifications</Label>
+          <Input
+            type="text"
+            name="certifications"
+            value={formData.certifications?.join(", ")}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                certifications: e.target.value.split(",").map((s) => s.trim()),
+              })
+            }
+          />
         </div>
 
         <div>
@@ -504,14 +592,85 @@ const RegistrationForm = () => {
         </div>
 
         <div>
-          <Label>Connected Accounts</Label>
-          <Textarea
-            name="connectedAccounts"
-            value={formData.connectedAccounts.join(", ")}
-            onChange={handleInputChange}
-            placeholder="Comma-separated list of connected accounts"
-          />
+          <Label>Connect Accounts</Label>
+          <div className="flex flex-col gap-2">
+            {formData.connectedAccounts?.map((account, index) => (
+              <div key={index} className="flex gap-2">
+                <Select
+                  className="w-36"
+                  value={account.accountName}
+                  onValueChange={(value) => {
+                    const newAccounts = [...formData.connectedAccounts];
+                    newAccounts[index].accountName = value;
+                    setFormData({
+                      ...formData,
+                      connectedAccounts: newAccounts,
+                    });
+                  }}
+                >
+                  <SelectTrigger className="w-40">
+                    <SelectValue />
+                    <p className="sr-only">Account Name</p>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="facebook">Facebook</SelectItem>
+                    <SelectItem value="twitter">Twitter</SelectItem>
+                    <SelectItem value="instagram">Instagram</SelectItem>
+                    <SelectItem value="linkedIn">LinkedIn</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Input
+                  type="text"
+                  name="accountLink"
+                  value={account.accountLink}
+                  onChange={(e) => {
+                    const newAccounts = [...formData.connectedAccounts];
+                    newAccounts[index].accountLink = e.target.value;
+                    setFormData({
+                      ...formData,
+                      connectedAccounts: newAccounts,
+                    });
+                  }}
+                  placeholder="Account Link"
+                />
+              </div>
+            ))}
+          </div>
+          <div className="flex flex-row gap-2 mt-2">
+            <button
+              type="button"
+              className="p-2 rounded-md border-2 border-green-500 hover:bg-green-500 hover:text-white"
+              onClick={() =>
+                setFormData({
+                  ...formData,
+                  connectedAccounts: [
+                    ...formData.connectedAccounts,
+                    {
+                      accountName: "",
+                      accountLink: "",
+                    },
+                  ],
+                })
+              }
+            >
+              <Plus size={16} />
+            </button>
+            <button
+              type="button"
+              className="p-2 rounded-md border-2 border-red-500 hover:bg-red-500 hover:text-white disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-current"
+              disabled={formData.connectedAccounts?.length === 0}
+              onClick={() =>
+                setFormData({
+                  ...formData,
+                  connectedAccounts: formData.connectedAccounts.slice(0, -1),
+                })
+              }
+            >
+              <Trash size={16} />
+            </button>
+          </div>
         </div>
+
 
         {message && <p className="text-green-500">{message}</p>}
         {error && <p className="text-red-500">{error}</p>}

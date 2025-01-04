@@ -42,17 +42,15 @@ const SignInPage = () => {
       );
 
       const data = response.data;
-
-      if (response.status === 200) {
-        setMessage("Sign-in successful!");
-        setError("");
-
-        signin(data.token);
+      if (data.user) {
         setUser(data.user);
-
+        signin(data.token);
+        setMessage("Sign in successful.");
         router.push("/");
-      } else {
-        setError(data.message || "Invalid credentials. Please try again.");
+      } else if (data.photographer) {
+        setUser(data.photographer);
+        setMessage("Sign in successful.");
+        router.push("/");
       }
     } catch (err) {
       if (err.response && err.response.data) {

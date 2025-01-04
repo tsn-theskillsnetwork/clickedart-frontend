@@ -23,7 +23,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Tag } from "lucide-react";
 import Image from "next/image";
 
@@ -143,8 +142,8 @@ export default function CataloguesPage() {
                         setSelectedImage(
                           (prev) =>
                             prev.includes(imageId)
-                              ? prev.filter((id) => id !== imageId) // Remove if already selected
-                              : [...prev, imageId] // Add if not selected
+                              ? prev.filter((id) => id !== imageId)
+                              : [...prev, imageId]
                         );
                       }}
                       value={selectedImage._id}
@@ -180,7 +179,7 @@ export default function CataloguesPage() {
           <hr />
           <div className="grid grid-cols-4 gap-4">
             {catalogue.images?.map((image) => (
-              <div key={image._id}>
+              <div key={image._id} className="shadow-[0_2px_6px_rgba(0,0,0,0.2)] rounded-lg p-4">
                 <div
                   onClick={() => {
                     router.push(`/images/${image._id}`);
@@ -220,7 +219,13 @@ export default function CataloguesPage() {
                   <h2 className="text-heading-05 font-semibold">
                     {image.title || "Untitled"}
                   </h2>
-                  <p className="font-medium">{image.photographer?.name}</p>
+                  <p className="font-medium">
+                    {image.photographer?.firstName
+                      ? image.photographer?.firstName +
+                        " " +
+                        image.photographer?.lastName
+                      : image.photographer?.name}
+                  </p>
                   <p className="font-medium text-blue-500">
                     {image.category?.name}
                   </p>

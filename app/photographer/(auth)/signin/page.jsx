@@ -42,6 +42,7 @@ const SignInPage = () => {
       );
 
       const data = response.data;
+      console.log(data);
 
       setMessage("Sign-in successful!");
       setError("");
@@ -119,7 +120,7 @@ const SignInPage = () => {
       <div className="flex flex-col items-center mt-4">
         <p>
           Don't have an account?{" "}
-          <Link className="underline" href="/signup">
+          <Link className="underline" href="/photographer/signup">
             Sign Up
           </Link>
         </p>

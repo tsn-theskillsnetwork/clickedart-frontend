@@ -9,12 +9,14 @@ import useCartStore from "@/store/cart";
 import axios from "axios";
 import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { use, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 export default function CheckoutPage() {
   const { user, token } = useAuthStore();
   const { cartItems, removeItemFromCart } = useCartStore();
+  const router = useRouter();
   const [coupon, setCoupon] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -38,10 +40,6 @@ export default function CheckoutPage() {
     orderStatus: "pending",
     invoiceId: "",
   });
-
-  // console.log("cartItems", cartItems);
-  // console.log("User", user);
-  // console.log("orderData", orderData);
 
   const calculateSubtotal = () => {
     return cartItems?.reduce((acc, item) => acc + item.subTotal, 0);
@@ -88,6 +86,7 @@ export default function CheckoutPage() {
         console.log("Order created for item", res.data);
         toast.success(`Order placed successfully for item: ${item.title}`);
         removeItemFromCart(item._id);
+        router.push("/profile/orders");
       }
       setLoading(false);
     } catch (error) {
@@ -128,6 +127,9 @@ export default function CheckoutPage() {
       paymentMethod: "Credit Card",
       shippingAddress: {
         ...prev.shippingAddress,
+        email: user?.email,
+        mobileNumber: user?.mobile
+        
       },
       totalAmount: newTotal,
       orderStatus: "pending",
@@ -172,7 +174,7 @@ export default function CheckoutPage() {
                     <Input
                       type="text"
                       placeholder="Full Name"
-                      value={user?.name || ""}
+                      value={`${user?.firstName || ""} ${user?.lastName || ""}`}
                       disabled
                     />
                   </div>

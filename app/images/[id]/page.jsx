@@ -583,7 +583,11 @@ export default function ImagePage() {
                       {image.title || "Artwork name"}
                     </h2>
                     <h5 className="text-heading-sm lg:text-heading-05 uppercase font-semibold text-surface-500">
-                      {image.photographer?.name || "Artist Name"}
+                    {image.photographer?.firstName
+                    ? image.photographer?.firstName +
+                      " " +
+                      image.photographer?.lastName
+                    : image.photographer?.name || "Photographer name"}
                     </h5>
                     <h5 className="lg:hidden text-paragraph lg:text-heading-05 uppercase font-semibold lg:font-bold text-surface-600">
                       ₹ {subTotal}

@@ -25,35 +25,47 @@ const RegistrationForm = () => {
   const router = useRouter();
 
   const [formData, setFormData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
     connectedAccounts: [],
     password: "",
-    address: "",
-    age: "",
+    mobile: undefined,
+    whatsapp: undefined,
+    shippingAddress: {
+      address: "",
+      city: "",
+      state: "",
+      country: "",
+      landmark: "",
+      pincode: "",
+      area: "",
+      email: "",
+      mobile: undefined,
+    },
+    isMarried: false,
+    anniversary: "",
     dob: "",
     image: "",
-    bio: "",
-    interests: "",
+    interests: [],
   });
 
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [cropperImage, setCropperImage] = useState(null);
-  const [croppedImageUrl, setCroppedImageUrl] = useState(null); 
+  const [croppedImageUrl, setCroppedImageUrl] = useState(null);
   const cropperRef = useRef(null);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value ?? "" }); 
+    setFormData({ ...formData, [name]: value ?? "" });
   };
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
-    if (!file) return; 
+    if (!file) return;
 
     const uploadData = new FormData();
     uploadData.append("image", file);
@@ -66,11 +78,11 @@ const RegistrationForm = () => {
           body: uploadData,
         }
       );
-      const data = await res.text(); 
+      const data = await res.text();
       if (res.ok) {
         setFormData((prev) => ({
           ...prev,
-          image: data, 
+          image: data,
         }));
         console.log("Image uploaded successfully", data);
       }
@@ -84,7 +96,7 @@ const RegistrationForm = () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        setCropperImage(reader.result); 
+        setCropperImage(reader.result);
       };
       reader.readAsDataURL(file);
     }
@@ -92,8 +104,10 @@ const RegistrationForm = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (formData.name.length < 5)
-      newErrors.name = "Name must be at least 5 characters.";
+    if (formData.firstName.length < 3)
+      newErrors.firstName = "First Name must be at least 3 characters.";
+    if (formData.lastName.length < 3)
+      newErrors.lastName = "Last Name must be at least 3 characters.";
     if (!/^\S+@\S+\.\S+$/.test(formData.email))
       newErrors.email = "Enter a valid email address.";
     if (!formData.password) newErrors.password = "Password is required.";
@@ -115,17 +129,17 @@ const RegistrationForm = () => {
       const blob = await new Promise((resolve) =>
         croppedCanvas.toBlob(resolve)
       );
-  
+
       const formData = new FormData();
       formData.append("image", blob);
-  
+
       try {
         const res = await axios.post(
           "http://localhost:5000/api/upload/uploadSingleImage",
           formData,
           {
             headers: {
-              "Content-Type": "multipart/form-data", 
+              "Content-Type": "multipart/form-data",
             },
             onUploadProgress: (progressEvent) => {
               const percentCompleted = Math.round(
@@ -136,15 +150,15 @@ const RegistrationForm = () => {
             },
           }
         );
-  
+
         const data = res.data;
 
         setFormData((prev) => ({
           ...prev,
-          image: data, 
+          image: data,
         }));
         setCropperImage(null);
-  
+
         toast.success("Image cropped and uploaded successfully!", {
           id: toastId,
         });
@@ -154,7 +168,7 @@ const RegistrationForm = () => {
       }
     }
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -179,27 +193,34 @@ const RegistrationForm = () => {
       setMessage(data.message);
       setError("");
       setFormData({
-        name: "",
+        firstName: "",
+        lastName: "",
         email: "",
+        connectedAccounts: [],
         password: "",
-        address: "",
-        age: "",
+        mobile: undefined,
+        whatsapp: undefined,
+        shippingAddress: {
+          address: "",
+          city: "",
+          state: "",
+          country: "",
+          landmark: "",
+          pincode: "",
+          area: "",
+          email: "",
+          mobile: undefined,
+        },
+        isMarried: false,
+        anniversary: "",
         dob: "",
         image: "",
-        bio: "",
-        interests: "",
+        interests: [],
       });
-      router.push("/signin");
+      router.push("/verify");
     } catch (err) {
-      if (err.response && err.response.data) {
-        setError(
-          err.response.data.message ||
-            "Something went wrong. Please try again later."
-        );
-      } else {
-        setError("Something went wrong. Please try again later.");
-      }
-      setMessage("");
+      console.error(err);
+      setError("Failed to register user.");
     }
   };
 
@@ -262,6 +283,7 @@ const RegistrationForm = () => {
                     <input
                       name=""
                       onChange={handleImageChange}
+                      accept="image/*"
                       className="h-full w-full opacity-0 cursor-pointer"
                       type="file"
                     />
@@ -286,18 +308,35 @@ const RegistrationForm = () => {
             <span>{uploadProgress}%</span>
           </div>
         )}
-        <div>
-          <Label>
-            Name <span className="text-red-500">*</span>
-          </Label>
-          <Input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            required
-          />
-          {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full ">
+          <div>
+            <Label>
+              First Name <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              type="text"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleInputChange}
+              required
+            />
+            {errors.firstName && (
+              <p className="text-red-500 text-sm">{errors.firstName}</p>
+            )}
+          </div>
+
+          <div>
+            <Label>
+              Last Name <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              type="text"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
         </div>
 
         <div>
@@ -313,6 +352,217 @@ const RegistrationForm = () => {
           />
           {errors.email && (
             <p className="text-red-500 text-sm">{errors.email}</p>
+          )}
+        </div>
+
+        <div>
+          <Label>
+            Password <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleInputChange}
+            required
+          />
+          {errors.password && (
+            <p className="text-red-500 text-sm">{errors.password}</p>
+          )}
+        </div>
+
+        <div>
+          <Label>Mobile</Label>
+          <Input
+            type="tel"
+            name="mobile"
+            value={formData.mobile}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div>
+          <Label>WhatsApp</Label>
+          <Input
+            type="tel"
+            name="whatsapp"
+            value={formData.whatsapp}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div className="py-2 my-2 border-y">
+          <p className="text-heading-06 font-semibold">Shipping Address</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <Label>Address</Label>
+              <Input
+                type="text"
+                name="shippingAddress.address"
+                value={formData.shippingAddress.address}
+                onChange={(e) => {
+                  const newAddress = { ...formData.shippingAddress };
+                  newAddress.address = e.target.value;
+                  setFormData({
+                    ...formData,
+                    shippingAddress: newAddress,
+                  });
+                }}
+              />
+            </div>
+            <div>
+              <Label>City</Label>
+              <Input
+                type="text"
+                name="shippingAddress.city"
+                value={formData.shippingAddress.city}
+                onChange={(e) => {
+                  const newAddress = { ...formData.shippingAddress };
+                  newAddress.city = e.target.value;
+                  setFormData({
+                    ...formData,
+                    shippingAddress: newAddress,
+                  });
+                }}
+              />
+            </div>
+            <div>
+              <Label>State</Label>
+              <Input
+                type="text"
+                name="shippingAddress.state"
+                value={formData.shippingAddress.state}
+                onChange={(e) => {
+                  const newAddress = { ...formData.shippingAddress };
+                  newAddress.state = e.target.value;
+                  setFormData({
+                    ...formData,
+                    shippingAddress: newAddress,
+                  });
+                }}
+              />
+            </div>
+            <div>
+              <Label>Country</Label>
+              <Input
+                type="text"
+                name="shippingAddress.country"
+                value={formData.shippingAddress.country}
+                onChange={(e) => {
+                  const newAddress = { ...formData.shippingAddress };
+                  newAddress.country = e.target.value;
+                  setFormData({
+                    ...formData,
+                    shippingAddress: newAddress,
+                  });
+                }}
+              />
+            </div>
+            <div>
+              <Label>Landmark</Label>
+              <Input
+                type="text"
+                name="shippingAddress.landmark"
+                value={formData.shippingAddress.landmark}
+                onChange={(e) => {
+                  const newAddress = { ...formData.shippingAddress };
+                  newAddress.landmark = e.target.value;
+                  setFormData({
+                    ...formData,
+                    shippingAddress: newAddress,
+                  });
+                }}
+              />
+            </div>
+            <div>
+              <Label>Pincode</Label>
+              <Input
+                type="text"
+                name="shippingAddress.pincode"
+                value={formData.shippingAddress.pincode}
+                onChange={(e) => {
+                  const newAddress = { ...formData.shippingAddress };
+                  newAddress.pincode = e.target.value;
+                  setFormData({
+                    ...formData,
+                    shippingAddress: newAddress,
+                  });
+                }}
+              />
+            </div>
+            <div>
+              <Label>Area</Label>
+              <Input
+                type="text"
+                name="shippingAddress.area"
+                value={formData.shippingAddress.area}
+                onChange={(e) => {
+                  const newAddress = { ...formData.shippingAddress };
+                  newAddress.area = e.target.value;
+                  setFormData({
+                    ...formData,
+                    shippingAddress: newAddress,
+                  });
+                }}
+              />
+            </div>
+            <div>
+              <Label>Email</Label>
+              <Input
+                type="email"
+                name="shippingAddress.email"
+                value={formData.shippingAddress.email}
+                onChange={(e) => {
+                  const newAddress = { ...formData.shippingAddress };
+                  newAddress.email = e.target.value;
+                  setFormData({
+                    ...formData,
+                    shippingAddress: newAddress,
+                  });
+                }}
+              />
+            </div>
+            <div>
+              <Label>Mobile</Label>
+              <Input
+                type="tel"
+                name="shippingAddress.mobile"
+                value={formData.shippingAddress.mobile}
+                onChange={(e) => {
+                  const newAddress = { ...formData.shippingAddress };
+                  newAddress.mobile = e.target.value;
+                  setFormData({
+                    ...formData,
+                    shippingAddress: newAddress,
+                  });
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <Label>Date of Birth</Label>
+          <Input
+            type="date"
+            name="dob"
+            value={formData.dob || ""}
+            onChange={handleInputChange}
+          />
+          {errors.dob && <p className="text-red-500 text-sm">{errors.dob}</p>}
+        </div>
+
+        <div>
+          <Label>Interests</Label>
+          <Input
+            type="text"
+            name="interests"
+            value={formData.interests}
+            onChange={handleInputChange}
+            placeholder="Comma-separated interests"
+          />
+          {errors.interests && (
+            <p className="text-red-500 text-sm">{errors.interests}</p>
           )}
         </div>
 
@@ -344,17 +594,6 @@ const RegistrationForm = () => {
                     <SelectItem value="linkedIn">LinkedIn</SelectItem>
                   </SelectContent>
                 </Select>
-                {/* <Input
-                type="text"
-                name="accountName"
-                value={account.accountName}
-                onChange={(e) => {
-                  const newAccounts = [...formData.connectedAccounts];
-                  newAccounts[index].accountName = e.target.value;
-                  setFormData({ ...formData, connectedAccounts: newAccounts });
-                  }}
-                  placeholder="Account Name"
-                  /> */}
                 <Input
                   type="text"
                   name="accountLink"
@@ -405,68 +644,6 @@ const RegistrationForm = () => {
               <Trash size={16} />
             </button>
           </div>
-        </div>
-
-        <div>
-          <Label>
-            Password <span className="text-red-500">*</span>
-          </Label>
-          <Input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleInputChange}
-            required
-          />
-          {errors.password && (
-            <p className="text-red-500 text-sm">{errors.password}</p>
-          )}
-        </div>
-
-        <div>
-          <Label>Address</Label>
-          <Input
-            type="text"
-            name="address"
-            value={formData.address}
-            onChange={handleInputChange}
-          />
-        </div>
-
-        <div>
-          <Label>Date of Birth</Label>
-          <Input
-            type="date"
-            name="dob"
-            value={formData.dob || ""} // Ensure default empty string
-            onChange={handleInputChange}
-          />
-          {errors.dob && <p className="text-red-500 text-sm">{errors.dob}</p>}
-        </div>
-
-        <p>{formData.image}</p>
-
-        <div>
-          <Label>Bio</Label>
-          <Textarea
-            name="bio"
-            value={formData.bio}
-            onChange={handleInputChange}
-          ></Textarea>
-        </div>
-
-        <div>
-          <Label>Interests</Label>
-          <Input
-            type="text"
-            name="interests"
-            value={formData.interests}
-            onChange={handleInputChange}
-            placeholder="Comma-separated interests"
-          />
-          {errors.interests && (
-            <p className="text-red-500 text-sm">{errors.interests}</p>
-          )}
         </div>
 
         <div className="flex flex-col items-center">

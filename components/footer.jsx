@@ -62,6 +62,18 @@ export default function Footer() {
                 Contact us
               </Link>
             </div>
+            <div className="flex flex-col gap-2">
+              <p className="font-semibold text-lg">Support</p>
+              <Link href="/support/bulk-download" className="mt-3 text-sm font-medium">
+                Bulk Download
+              </Link>
+              <Link href="#" className="text-sm font-medium">
+                Custom Enquiry
+              </Link>
+              <Link href="/verify" className="text-sm font-medium">
+                Verify Email
+              </Link>
+            </div>
           </div>
           <div className="flex max-w-[28%] sm:mr-20">
             <div className="flex flex-col gap-2 items-start">

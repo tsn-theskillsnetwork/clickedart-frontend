@@ -2,13 +2,13 @@
 
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { fetchData } from "@/helpers/api";
 import useAuthStore from "@/authStore";
 import PrintOrders from "@/components/orders/prints";
 import DownloadOrders from "@/components/orders/downloads";
+import axios from "axios";
 
 export default function OrdersPage() {
-  const { user, token } = useAuthStore();
+  const { user } = useAuthStore();
   const [selectedTab, setSelectedTab] = useState("downloads");
   const [orders, setOrders] = useState([]);
   const [printOrders, setPrintOrders] = useState([]);
@@ -18,21 +18,28 @@ export default function OrdersPage() {
 
   useEffect(() => {
     if (!user) return;
-    fetchData(
-      `${process.env.NEXT_PUBLIC_SERVER}/api/download/get-my-orders?userId=${user?._id}`,
-      "orders",
-      setOrders
-    );
+
+    const fetchOrders = async () => {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/download/get-my-orders?userId=${user?._id}`
+      );
+
+      setOrders(response.data.orders);
+    };
+
+    fetchOrders();
   }, [user]);
 
   useEffect(() => {
-    const print = orders.filter((order) => order.paperInfo.size);
-    setPrintOrders(print);
-    console.log("printOrders", print);
+    if (orders.length > 0) {
+      const print = orders?.filter((order) => order.paperInfo.size);
+      setPrintOrders(print);
+      console.log("printOrders", print);
 
-    const download = orders.filter((order) => !order.paperInfo.size);
-    setDownloadOrders(download);
-    console.log("downloadOrders", download);
+      const download = orders?.filter((order) => !order.paperInfo.size);
+      setDownloadOrders(download);
+      console.log("downloadOrders", download);
+    }
   }, [orders]);
 
   return (
