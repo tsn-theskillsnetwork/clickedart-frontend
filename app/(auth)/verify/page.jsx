@@ -81,7 +81,7 @@ export default function VerifyPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-[80vh]">
+    <div className="px-4 flex flex-col items-center justify-center h-[80vh]">
       <h1 className="text-xl font-semibold">Verify Your Account</h1>
       <div className="w-full max-w-3xl mx-auto flex flex-col gap-4 mt-6">
         <div>

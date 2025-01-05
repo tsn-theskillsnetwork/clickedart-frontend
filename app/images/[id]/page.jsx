@@ -518,7 +518,7 @@ export default function ImagePage() {
                     <motion.div
                       layout
                       className={`${
-                        selectedFrame &&
+                        selectedPaper && selectedSize && 
                         " bottom-[60%] w-1/3 h-auto left-0 right-0 mx-auto"
                       } absolute z-10 shadow-[2px_2px_6px_rgba(0,0,0,0.7)]`}
                     >
@@ -542,7 +542,7 @@ export default function ImagePage() {
                           width={800}
                           height={400}
                           className={`w-full h-full object-cover ${
-                            selectedFrame ? "opacity-100" : "opacity-0"
+                            (selectedPaper && selectedSize) ? "opacity-100" : "opacity-0"
                           } transition-all duration-300 ease-in-out`}
                         />
                       </motion.div>

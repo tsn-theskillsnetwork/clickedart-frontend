@@ -85,23 +85,28 @@ export default function DashboardPage() {
         ) : (
           <div className="flex flex-1 flex-col gap-4 p-4">
             <div className="grid auto-rows-min gap-4 lg:grid-cols-2 xl:grid-cols-3">
-              <NumberCard
+              {/* <NumberCard
                 title="Create Invoice"
                 btnText="Create Invoice"
                 url="/dashboard/invoice/create"
                 variant={"success"}
+              /> */}
+              <NumberCard
+                title="Total Downloads"
+                number={String(stats?.downloads) || "0"}
+                color="blue"
               />
               <NumberCard
-                title="Earning This Month"
-                number="₹12,000.00"
+                title="Total Royalty Amount"
+                number={String(stats?.totalRoyaltyAmount) || "0"}
                 color="green"
               />
-              <NumberCard title="Total Sales" number={String(stats?.totalSales) || 0} />
+              <NumberCard title="Total Sales" number={String(stats?.totalSales) || "0"} />
               <NumberCard
                 title="Uploaded Photos"
-                number={photos?.length || "0"}
+                number={String(stats?.totalUploadingImgCount) || "0"}
               />
-              <NumberCard title="Pending Photos" number="2" color="red" />
+              <NumberCard title="Pending Photos" number={String(stats?.pendingImagesCount) || "0"} color="red" />
             </div>
             <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
           </div>

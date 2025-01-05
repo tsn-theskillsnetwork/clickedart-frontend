@@ -33,6 +33,10 @@ const data = {
           url: "/dashboard",
         },
         {
+          title: "Photos",
+          url: "/dashboard/photos",
+        },
+        {
           title: "Invoice",
           url: "/dashboard/invoice",
         },
