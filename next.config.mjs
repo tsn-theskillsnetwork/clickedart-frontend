@@ -37,6 +37,11 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "clickedart-bucket.s3.ap-south-1.amazonaws.com",
+        pathname: "**",
+      },
+      {
+        protocol: "https",
         hostname: "plus.unsplash.com",
         pathname: "**",
       },

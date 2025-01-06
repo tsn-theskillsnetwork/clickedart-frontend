@@ -17,7 +17,9 @@ export default function CheckoutPage() {
   const { user, token } = useAuthStore();
   const { cartItems, removeItemFromCart } = useCartStore();
   const router = useRouter();
-  const [coupon, setCoupon] = useState("");
+  const [code, setCode] = useState("");
+  const [coupon, setCoupon] = useState([]);
+  const [discount, setDiscount] = useState(0);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [orderData, setOrderData] = useState({
@@ -39,6 +41,7 @@ export default function CheckoutPage() {
     totalAmount: "",
     orderStatus: "pending",
     invoiceId: "",
+    coupon: "",
   });
 
   const calculateSubtotal = () => {
@@ -48,50 +51,62 @@ export default function CheckoutPage() {
   const createOrder = async () => {
     try {
       setLoading(true);
+      const newOrderData = {
+        ...orderData,
+        items: [], // Store all the items in the cart
+      };
+
+      let newSubtotal = 0;
+
+      // Loop through the cart items to gather all the necessary data
       for (const item of cartItems) {
-        const orderDetails = {
-          ...orderData,
-          userId: user?._id,
+        newSubtotal += item.subTotal;
+
+        newOrderData.items.push({
           imageInfo: {
-            image: item?._id,
-            photographer: item?.photographer?._id,
-            resolution:
-              item?.mode === "print" ? "original" : item?.selectedSize,
-            price: item?.subTotal,
+            image: item._id,
+            photographer: item.photographer?._id,
+            resolution: item.mode === "print" ? "original" : item.selectedSize,
+            price: item.subTotal,
           },
           frameInfo: {
-            frame: item?.selectedFrame?._id,
-            price: item?.selectedFrame?.price,
-            size: item?.selectedFrame ? item.selectedSize : null,
+            frame: item.selectedFrame?._id,
+            price: item.selectedFrame?.price,
+            size: item.selectedFrame ? item.selectedSize : null,
           },
           paperInfo: {
-            paper: item?.selectedPaper?._id,
-            price: item?.selectedPaper?.price,
-            size: item?.selectedPaper ? item.selectedSize : null,
+            paper: item.selectedPaper?._id,
+            price: item.selectedPaper?.price,
+            size: item.selectedPaper ? item.selectedSize : null,
           },
-          subTotal: item?.subTotal,
-          totalAmount: item?.subTotal + item?.subTotal * 0.18,
-        };
-
-        const res = await axios.post(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/download/create-order`,
-          orderDetails,
-          {
-            headers: {
-              "x-auth-token": token,
-            },
-          }
-        );
-
-        console.log("Order created for item", res.data);
-        toast.success(`Order placed successfully for item: ${item.title}`);
-        removeItemFromCart(item._id);
-        router.push("/profile/orders");
+          subTotal: item.subTotal,
+        });
       }
+
+      // Apply coupon and calculate final amount
+      const newTotal = newSubtotal + newSubtotal * 0.18;
+      newOrderData.subTotal = newSubtotal;
+      newOrderData.totalAmount = newTotal - discount;
+
+      // Send the order details to the server in one call
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/download/create-order`,
+        newOrderData,
+        {
+          headers: {
+            "x-auth-token": token,
+          },
+        }
+      );
+
+      console.log("Order created", res.data);
+      toast.success("Order placed successfully");
+      removeItemFromCart(); // Clear the cart after placing the order
+      router.push("/profile/orders");
       setLoading(false);
     } catch (error) {
-      console.log(error);
-      setError("Something went wrong while creating orders");
+      console.error("Error placing order:", error);
+      setError("Something went wrong while creating the order");
       toast.error("Something went wrong");
       setLoading(false);
     }
@@ -128,14 +143,64 @@ export default function CheckoutPage() {
       shippingAddress: {
         ...prev.shippingAddress,
         email: user?.email,
-        mobileNumber: user?.mobile
-        
+        mobileNumber: user?.mobile,
       },
       totalAmount: newTotal,
       orderStatus: "pending",
       invoiceId: "",
     }));
   }, [user, cartItems]);
+
+  const handleCoupon = async (event) => {
+    event.preventDefault();
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/coupon/apply-coupon?code=${code}&userId=${user?._id}&type=user`
+      );
+
+      console.log("Coupon applied", res.data);
+      toast.success("Coupon applied successfully");
+      setCoupon(res.data.coupon);
+      setOrderData((prev) => ({
+        ...prev,
+        coupon: res.data.coupon.code,
+      }));
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setError("Something went wrong while applying coupon", error);
+      toast.error(error.response.data.message);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (coupon && coupon.discountPercentage && coupon.maxDiscountAmount) {
+      const newDiscount = (
+        orderData.subTotal *
+        (coupon.discountPercentage / 100)
+      ).toFixed(2);
+      if (newDiscount < coupon.maxDiscountAmount) {
+        if (newDiscount > orderData.subTotal) {
+          setDiscount(orderData.subTotal);
+        } else {
+          setDiscount(newDiscount);
+        }
+      } else {
+        if (coupon.maxDiscountAmount > orderData.subTotal) {
+          setDiscount(orderData.subTotal);
+        } else {
+          setDiscount(coupon.maxDiscountAmount);
+        }
+      }
+
+      setOrderData((prev) => ({
+        ...prev,
+        totalAmount: prev.subTotal - discount + prev.subTotal * 0.18,
+      }));
+    }
+  }, [coupon, orderData.subTotal, discount, orderData.totalAmount]);
 
   return (
     <div>
@@ -317,9 +382,7 @@ export default function CheckoutPage() {
                 </div>
               </div>
               <div>
-                <Label htmlFor="voucher">
-                  Enter a gift card, voucher or promotional code
-                </Label>
+                <Label htmlFor="voucher">Enter a Coupon Code</Label>
                 <div className="flex max-w-md items-center gap-4">
                   <Input
                     type="text"
@@ -327,8 +390,10 @@ export default function CheckoutPage() {
                     className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
                     placeholder=""
                     required=""
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
                   />
-                  <Button type="button">Apply</Button>
+                  <Button onClick={handleCoupon}>Apply</Button>
                 </div>
               </div>
             </div>
@@ -402,7 +467,9 @@ export default function CheckoutPage() {
                     <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
                       Savings
                     </dt>
-                    <dd className="text-base font-medium text-green-500">0</dd>
+                    <dd className="text-base font-medium text-green-500">
+                      {discount ? `- ₹${discount}` : "₹0"}
+                    </dd>
                   </dl>
                   <dl className="flex items-center justify-between gap-4 py-3">
                     <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
@@ -423,7 +490,9 @@ export default function CheckoutPage() {
                 </div>
               </div>
               <div className="space-y-3">
-                <Button type="submit">Proceed to Payment</Button>
+                <Button type="submit" disabled={loading}>
+                  Proceed to Payment
+                </Button>
               </div>
             </div>
           </div>

@@ -19,6 +19,8 @@ import { ImageIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { S3Client } from "@aws-sdk/client-s3";
+import { Upload } from "@aws-sdk/lib-storage";
 
 export default function PhotoUploadPage() {
   const router = useRouter();
@@ -61,61 +63,108 @@ export default function PhotoUploadPage() {
 
   const [categories, setCategories] = useState([]);
   const [licenses, setLicenses] = useState([]);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [progr, setProgr] = useState(0);
 
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    const formData = new FormData();
-    formData.append("image", file);
+  // const handleImageUpload = async (e) => {
+  //   const file = e.target.files[0];
+  //   const formData = new FormData();
+  //   formData.append("image", file);
 
+  //   try {
+  //     const response = await axios.post(
+  //       `${process.env.NEXT_PUBLIC_SERVER}/api/upload/uploadPhotoWithSizeCheck`,
+  //       formData,
+  //       {
+  //         headers: {
+  //           "Content-Type": "multipart/form-data",
+  //         },
+  //         onUploadProgress: (progressEvent) => {
+  //           if (progressEvent.total) {
+  //             const progress = Math.round(
+  //               (progressEvent.loaded / progressEvent.total) * 100
+  //             );
+  //             setUploadProgress(progress);
+  //           }
+  //         },
+  //       }
+  //     );
+
+  //     console.log(response.data);
+
+  //     const data = response.data;
+  //     setPhoto({
+  //       ...photo,
+  //       imageLinks: {
+  //         original: data.urls.original,
+  //         medium: data.urls.medium,
+  //         small: data.urls.small,
+  //       },
+  //       resolutions: {
+  //         original: {
+  //           width: data.resolutions.original?.width,
+  //           height: data.resolutions.original?.height,
+  //         },
+  //         medium: {
+  //           width: data.resolutions.medium?.width,
+  //           height: data.resolutions.medium?.height,
+  //         },
+  //         small: {
+  //           width: data.resolutions.small?.width,
+  //           height: data.resolutions.small?.height,
+  //         },
+  //       },
+  //     });
+
+  //     console.log(photo);
+  //   } catch (error) {
+  //     console.log("Error uploading image:", error);
+  //   }
+  // };
+
+  const handleChange = async (event) => {
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/upload/uploadPhotoWithSizeCheck`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          onUploadProgress: (progressEvent) => {
-            if (progressEvent.total) {
-              const progress = Math.round(
-                (progressEvent.loaded / progressEvent.total) * 100
-              );
-              setUploadProgress(progress);
-            }
-          },
-        }
-      );
+      const file = event.target.files[0];
 
-      console.log(response.data);
+      if (!file) {
+        console.error("No file selected");
+        return;
+      }
 
-      const data = response.data;
-      setPhoto({
-        ...photo,
-        imageLinks: {
-          original: data.urls.original,
-          medium: data.urls.medium,
-          small: data.urls.small,
-        },
-        resolutions: {
-          original: {
-            width: data.resolutions.original?.width,
-            height: data.resolutions.original?.height,
-          },
-          medium: {
-            width: data.resolutions.medium?.width,
-            height: data.resolutions.medium?.height,
-          },
-          small: {
-            width: data.resolutions.small?.width,
-            height: data.resolutions.small?.height,
-          },
+      const s3 = new S3Client({
+        region: "ap-south-1",
+        credentials: {
+          accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
+          secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
         },
       });
 
-      console.log(photo);
+      const target = {
+        Bucket: "clickedart-bucket",
+        Key: `images/${file.name}`,
+        Body: file,
+      };
+
+      const upload = new Upload({
+        client: s3,
+        params: target,
+      });
+
+      upload.on("httpUploadProgress", (progress) => {
+        const percentCompleted = Math.round(
+          (progress.loaded / progress.total) * 100
+        );
+        setProgr(percentCompleted);
+        console.log(`Progress: ${percentCompleted}%`);
+      });
+
+      await upload.done().then((r) => console.log(r));
+      console.log("File uploaded successfully!");
+      const fileUrl = `https://${target.Bucket}.s3.ap-south-1.amazonaws.com/${target.Key}`;
+      setPhoto({ ...photo, imageLinks: { original: fileUrl } });
+
+      console.log("File URL:", fileUrl);
     } catch (error) {
-      console.log("Error uploading image:", error);
+      console.error("Error uploading file:", error);
     }
   };
 
@@ -193,15 +242,27 @@ export default function PhotoUploadPage() {
                     </div>
                     <input
                       name=""
-                      onChange={handleImageUpload}
+                      onChange={handleChange}
                       className="h-full w-full opacity-0 cursor-pointer"
                       type="file"
+                      accept="image/*"
                     />
                   </div>
                 </div>
               </div>
             </div>
           )}
+          <div className="px-5 pb-5">
+            <div className="w-full bg-zinc-200 dark:bg-zinc-700 rounded-full h-2.5">
+              <div style={{ width: `${progr}%` }}
+              className={`bg-blue-600 h-2.5 rounded-full transition-all duration-200 ease-in-out`}></div>
+            </div>
+            <div className="flex justify-between items-center mt-3">
+              <span className="text-sm text-zinc-600 dark:text-zinc-400">
+                {progr}% Uploaded
+              </span>
+            </div>
+          </div>
           <div>
             <Label>Title*</Label>
             <Input
