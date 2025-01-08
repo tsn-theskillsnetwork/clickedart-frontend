@@ -83,7 +83,7 @@ export default function Footer() {
               <p className="mt-3 text-sm font-medium">
                 Turn Your Passion into Profit — Join Our Community of Creators
               </p>
-              <Link href="#">
+              <Link href="/signup/photographer">
                 <Button size="base" variant="filled" state="default">
                   <p className="font-normal">Start Selling Now</p>
                 </Button>

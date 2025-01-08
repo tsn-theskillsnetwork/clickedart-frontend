@@ -7,10 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import useCartStore from "@/store/cart";
 import axios from "axios";
-import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { use, useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useRazorpay } from "react-razorpay";
 
@@ -205,8 +204,13 @@ export default function CheckoutPage() {
       paymentMethod: "Credit Card",
       shippingAddress: {
         ...prev.shippingAddress,
+        city: user?.shippingAddress.city,
+        address: user?.shippingAddress.address,
+        state: user?.shippingAddress.state,
+        country: user?.shippingAddress.country,
         email: user?.email,
         mobileNumber: user?.mobile,
+        pincode: user?.shippingAddress.pincode,
       },
       totalAmount: newTotal,
       orderStatus: "pending",
@@ -377,7 +381,6 @@ export default function CheckoutPage() {
                       placeholder="City"
                       value={
                         orderData.shippingAddress.city ||
-                        user?.shippingAddress.city ||
                         ""
                       }
                       onChange={(e) =>
@@ -399,7 +402,6 @@ export default function CheckoutPage() {
                       required
                       value={
                         orderData.shippingAddress.state ||
-                        user?.shippingAddress.state ||
                         ""
                       }
                       onChange={(e) =>
@@ -420,7 +422,7 @@ export default function CheckoutPage() {
                     <Input
                       type="text"
                       placeholder="India"
-                      value={orderData.shippingAddress.country || "India"}
+                      value={orderData.shippingAddress.country || ""}
                       onChange={(e) =>
                         setOrderData((prev) => ({
                           ...prev,
@@ -441,7 +443,6 @@ export default function CheckoutPage() {
                       placeholder="Landmark"
                       value={
                         orderData.shippingAddress.landmark ||
-                        user?.shippingAddress.landmark ||
                         ""
                       }
                       onChange={(e) =>

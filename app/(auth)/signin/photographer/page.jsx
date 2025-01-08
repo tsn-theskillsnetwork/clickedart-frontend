@@ -11,14 +11,14 @@ import axios from "axios";
 
 const SignInPage = () => {
   const { signin, setPhotographer, user, photographer } = useAuthStore();
-
+  
   const router = useRouter();
-
+  
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-
+  
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -120,7 +120,7 @@ const SignInPage = () => {
       <div className="flex flex-col items-center mt-4">
         <p>
           Don't have an account?{" "}
-          <Link className="underline" href="/photographer/signup">
+          <Link className="underline" href="/signup/photographer">
             Sign Up
           </Link>
         </p>

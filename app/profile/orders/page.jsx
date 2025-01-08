@@ -32,6 +32,8 @@ export default function OrdersPage() {
 
   useEffect(() => {
     if (orders.length > 0) {
+      orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
       const print = orders?.filter((order) => order.paperInfo.size);
       setPrintOrders(print);
       console.log("printOrders", print);
