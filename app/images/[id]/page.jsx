@@ -20,9 +20,12 @@ import toast from "react-hot-toast";
 import { fetchData } from "@/helpers/api";
 import RecommendedSection from "@/components/image/recommendedSection";
 import ImageSection from "@/components/image/imageSection";
+import axios from "axios";
+import useAuthStore from "@/authStore";
 
 export default function ImagePage() {
   const id = useParams().id;
+  const { token } = useAuthStore();
   const { addItemToCart, isItemInCart, removeItemFromCart } = useCartStore();
   const onAddToCart = () => {
     if (mode === "print" && !selectedPaper) {
@@ -62,6 +65,7 @@ export default function ImagePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [recommendedLength, setRecommendedLength] = useState(4);
+  const [viewCount, setViewCount] = useState(0);
   const [inCart, setInCart] = useState(false);
 
   const [selected, setSelected] = useState(0);
@@ -259,6 +263,25 @@ export default function ImagePage() {
     setSubTotal(image.price?.original);
   }, [image]);
 
+  useEffect(() => {
+    if (id && token && viewCount === 0) {
+      const addViewCount = async () => {
+        try {
+          const res = await axios.post(
+            `${process.env.NEXT_PUBLIC_SERVER}/api/images/add-image-views-count`,
+            {
+              imageId: id,
+            }
+          );
+          setViewCount(1);
+        } catch (error) {
+          console.error("Error adding view count", error);
+        }
+      };
+      addViewCount();
+    }
+  }, [id, token, viewCount]);
+
   const buySection = (
     <div className="flex flex-col">
       <h5 className="text-heading-05 uppercase font-bold text-surface-600">
@@ -403,7 +426,7 @@ export default function ImagePage() {
               <SelectContent>
                 {image.price &&
                   Object.entries(image.price).map(([key, value]) => {
-                    const resolution = image.resolutions[key];
+                    const resolution = image.resolutions?.[key];
 
                     return resolution ? (
                       <SelectItem
@@ -518,7 +541,8 @@ export default function ImagePage() {
                     <motion.div
                       layout
                       className={`${
-                        selectedPaper && selectedSize && 
+                        selectedPaper &&
+                        selectedSize &&
                         " bottom-[60%] w-1/3 h-auto left-0 right-0 mx-auto"
                       } absolute z-10 shadow-[2px_2px_6px_rgba(0,0,0,0.7)]`}
                     >
@@ -542,7 +566,9 @@ export default function ImagePage() {
                           width={800}
                           height={400}
                           className={`w-full h-full object-cover ${
-                            (selectedPaper && selectedSize) ? "opacity-100" : "opacity-0"
+                            selectedPaper && selectedSize
+                              ? "opacity-100"
+                              : "opacity-0"
                           } transition-all duration-300 ease-in-out`}
                         />
                       </motion.div>
@@ -571,7 +597,9 @@ export default function ImagePage() {
                       }`}
                       onClick={handleMockup}
                     >
-                      <img
+                      <Image
+                        width={400}
+                        height={400}
                         className="object-cover h-24 w-40 border-4 border-white shadow-[0_0_4px_rgba(0,0,0,0.7)]"
                         src={images[1].src}
                         alt=""
@@ -583,11 +611,11 @@ export default function ImagePage() {
                       {image.title || "Artwork name"}
                     </h2>
                     <h5 className="text-heading-sm lg:text-heading-05 uppercase font-semibold text-surface-500">
-                    {image.photographer?.firstName
-                    ? image.photographer?.firstName +
-                      " " +
-                      image.photographer?.lastName
-                    : image.photographer?.name || "Photographer name"}
+                      {image.photographer?.firstName
+                        ? image.photographer?.firstName +
+                          " " +
+                          image.photographer?.lastName
+                        : image.photographer?.name || "Photographer name"}
                     </h5>
                     <h5 className="lg:hidden text-paragraph lg:text-heading-05 uppercase font-semibold lg:font-bold text-surface-600">
                       ₹ {subTotal}

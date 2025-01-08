@@ -33,6 +33,17 @@ const RegistrationForm = () => {
     bio: "",
     mobile: "",
     whatsapp: "",
+    shippingAddress: {
+      address: "",
+      city: "",
+      state: "",
+      country: "",
+      landmark: "",
+      pincode: "",
+      area: "",
+      email: "",
+      mobile: "",
+    },
     expertise: [],
     awards: [],
     achivements: [],
@@ -436,6 +447,156 @@ const RegistrationForm = () => {
           />
         </div>
 
+        <div className="py-2 my-2 border-y">
+          <p className="text-heading-06 font-semibold">Shipping Address</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <Label>Address</Label>
+              <Input
+                type="text"
+                name="shippingAddress.address"
+                value={formData.shippingAddress?.address}
+                onChange={(e) => {
+                  const newAddress = { ...formData.shippingAddress };
+                  newAddress.address = e.target.value;
+                  setFormData({
+                    ...formData,
+                    shippingAddress: newAddress,
+                  });
+                }}
+              />
+            </div>
+            <div>
+              <Label>City</Label>
+              <Input
+                type="text"
+                name="shippingAddress.city"
+                value={formData.shippingAddress?.city}
+                onChange={(e) => {
+                  const newAddress = { ...formData.shippingAddress };
+                  newAddress.city = e.target.value;
+                  setFormData({
+                    ...formData,
+                    shippingAddress: newAddress,
+                  });
+                }}
+              />
+            </div>
+            <div>
+              <Label>State</Label>
+              <Input
+                type="text"
+                name="shippingAddress.state"
+                value={formData.shippingAddress?.state}
+                onChange={(e) => {
+                  const newAddress = { ...formData.shippingAddress };
+                  newAddress.state = e.target.value;
+                  setFormData({
+                    ...formData,
+                    shippingAddress: newAddress,
+                  });
+                }}
+              />
+            </div>
+            <div>
+              <Label>Country</Label>
+              <Input
+                type="text"
+                name="shippingAddress.country"
+                value={formData.shippingAddress?.country}
+                onChange={(e) => {
+                  const newAddress = { ...formData.shippingAddress };
+                  newAddress.country = e.target.value;
+                  setFormData({
+                    ...formData,
+                    shippingAddress: newAddress,
+                  });
+                }}
+              />
+            </div>
+            <div>
+              <Label>Landmark</Label>
+              <Input
+                type="text"
+                name="shippingAddress.landmark"
+                value={formData.shippingAddress?.landmark}
+                onChange={(e) => {
+                  const newAddress = { ...formData.shippingAddress };
+                  newAddress.landmark = e.target.value;
+                  setFormData({
+                    ...formData,
+                    shippingAddress: newAddress,
+                  });
+                }}
+              />
+            </div>
+            <div>
+              <Label>Pincode</Label>
+              <Input
+                type="text"
+                name="shippingAddress.pincode"
+                value={formData.shippingAddress?.pincode}
+                onChange={(e) => {
+                  const newAddress = { ...formData.shippingAddress };
+                  newAddress.pincode = e.target.value;
+                  setFormData({
+                    ...formData,
+                    shippingAddress: newAddress,
+                  });
+                }}
+              />
+            </div>
+            <div>
+              <Label>Area</Label>
+              <Input
+                type="text"
+                name="shippingAddress.area"
+                value={formData.shippingAddress?.area}
+                onChange={(e) => {
+                  const newAddress = { ...formData.shippingAddress };
+                  newAddress.area = e.target.value;
+                  setFormData({
+                    ...formData,
+                    shippingAddress: newAddress,
+                  });
+                }}
+              />
+            </div>
+            <div>
+              <Label>Email</Label>
+              <Input
+                type="email"
+                name="shippingAddress.email"
+                value={formData.shippingAddress?.email}
+                onChange={(e) => {
+                  const newAddress = { ...formData.shippingAddress };
+                  newAddress.email = e.target.value;
+                  setFormData({
+                    ...formData,
+                    shippingAddress: newAddress,
+                  });
+                }}
+              />
+            </div>
+            <div>
+              <Label>Mobile</Label>
+              <Input
+                type="tel"
+                name="shippingAddress.mobile"
+                value={formData.shippingAddress?.mobile}
+                onChange={(e) => {
+                  const newAddress = { ...formData.shippingAddress };
+                  newAddress.mobile = e.target.value;
+                  setFormData({
+                    ...formData,
+                    shippingAddress: newAddress,
+                  });
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
         <div>
           <Label>Date of Birth</Label>
           <Input
@@ -670,7 +831,6 @@ const RegistrationForm = () => {
             </button>
           </div>
         </div>
-
 
         {message && <p className="text-green-500">{message}</p>}
         {error && <p className="text-red-500">{error}</p>}

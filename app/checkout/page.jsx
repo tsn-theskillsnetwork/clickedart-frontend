@@ -10,11 +10,12 @@ import axios from "axios";
 import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { use, useEffect, useState } from "react";
+import React, { use, useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useRazorpay } from "react-razorpay";
 
 export default function CheckoutPage() {
-  const { user, token } = useAuthStore();
+  const { user, photographer, token } = useAuthStore();
   const { cartItems, removeItemFromCart } = useCartStore();
   const router = useRouter();
   const [code, setCode] = useState("");
@@ -43,10 +44,71 @@ export default function CheckoutPage() {
     invoiceId: "",
     coupon: "",
   });
+  //razorpay
+  const { Razorpay } = useRazorpay();
+  const [paymentStatus, setPaymentStatus] = useState();
+  const [razorpay_payment_id, setrazorpay_payment_id] = useState();
 
   const calculateSubtotal = () => {
     return cartItems?.reduce((acc, item) => acc + item.subTotal, 0);
   };
+
+  const handleRemoveFromCart = (itemId) => {
+    removeItemFromCart(itemId);
+  };
+
+  const handlePayment = useCallback(
+    async (totalAmount) => {
+      if (!user) {
+        toast.error("Please login as User to continue");
+        return;
+      }
+      const result = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/download/payment`,
+        {
+          total: totalAmount,
+          userId: user._id,
+        }
+      );
+      console.log("result", result);
+      const options = {
+        key: result.data.result.notes.key,
+        amount: result.data.result.amount,
+        currency: "INR",
+        name: "ClickedArt",
+        description: "Total Payment",
+        image: "https://example.com/your_logo",
+        order_id: result.data.id,
+        handler: async (res) => {
+          try {
+            const paymentId = res.razorpay_payment_id;
+            if (paymentId) {
+              setrazorpay_payment_id(paymentId);
+              setPaymentStatus(true);
+            }
+          } catch (error) {
+            setUploadVisible(false);
+            createFailedOrder();
+          }
+        },
+        prefill: {
+          email: user?.email,
+          contact: user?.mobile,
+          name: `${user?.firstName} ${user?.lastName}`,
+        },
+
+        theme: {
+          color: "#3399cc",
+        },
+      };
+
+      console.log("options", options);
+
+      const rzpay = new Razorpay(options);
+      rzpay.open();
+    },
+    [Razorpay, user]
+  );
 
   const createOrder = async () => {
     try {
@@ -81,6 +143,8 @@ export default function CheckoutPage() {
           },
           subTotal: item.subTotal,
         });
+
+        handleRemoveFromCart(item._id);
       }
 
       // Apply coupon and calculate final amount
@@ -101,7 +165,6 @@ export default function CheckoutPage() {
 
       console.log("Order created", res.data);
       toast.success("Order placed successfully");
-      removeItemFromCart(); // Clear the cart after placing the order
       router.push("/profile/orders");
       setLoading(false);
     } catch (error) {
@@ -202,14 +265,36 @@ export default function CheckoutPage() {
     }
   }, [coupon, orderData.subTotal, discount, orderData.totalAmount]);
 
+  useEffect(() => {
+    if (paymentStatus === true) {
+      setOrderData((prev) => ({
+        ...prev,
+        invoiceId: razorpay_payment_id,
+      }));
+      createOrder();
+    }
+  }, [paymentStatus]);
+
+  useEffect(() => {
+    if (photographer) {
+      toast("Please Login as User to continue", {
+        duration: 4000,
+        position: "top-center",
+      });
+      router.push("/");
+    }
+  }, [photographer]);
+
   return (
     <div>
       <section className="bg-white py-8 antialiased d md:py-16">
         <form
-          action={createOrder}
+          action={() => {
+            handlePayment(orderData.totalAmount);
+          }}
           className="mx-auto max-w-screen-xl px-4 2xl:px-0"
         >
-          <ol className="items-center flex w-full max-w-2xl text-center text-sm font-medium text-gray-500  sm:text-base">
+          {/* <ol className="items-center flex w-full max-w-2xl text-center text-sm font-medium text-gray-500  sm:text-base">
             <li className="after:border-1 flex items-center text-primary-700 after:mx-6 after:hidden after:h-1 after:w-full after:border-b after:border-gray-200  sm:after:inline-block sm:after:content-[''] md:w-full xl:after:mx-10">
               <span className="flex items-center">
                 <CheckCircle2 className="me-2 h-4 w-4 sm:h-5 sm:w-5" />
@@ -226,7 +311,7 @@ export default function CheckoutPage() {
               <CheckCircle2 className="me-2 h-4 w-4 sm:h-5 sm:w-5" />
               Order summary
             </li>
-          </ol>
+          </ol> */}
           <div className="mt-6 sm:mt-8 lg:flex lg:items-start lg:gap-12 xl:gap-16">
             <div className="min-w-0 flex-1 space-y-8">
               <div className="space-y-4">
@@ -267,7 +352,11 @@ export default function CheckoutPage() {
                     <Input
                       type="text"
                       placeholder="City"
-                      value={orderData.shippingAddress.address || ""}
+                      value={
+                        orderData.shippingAddress.address ||
+                        user?.shippingAddress.address ||
+                        ""
+                      }
                       onChange={(e) =>
                         setOrderData((prev) => ({
                           ...prev,
@@ -286,7 +375,11 @@ export default function CheckoutPage() {
                     <Input
                       type="text"
                       placeholder="City"
-                      value={orderData.shippingAddress.city || ""}
+                      value={
+                        orderData.shippingAddress.city ||
+                        user?.shippingAddress.city ||
+                        ""
+                      }
                       onChange={(e) =>
                         setOrderData((prev) => ({
                           ...prev,
@@ -304,7 +397,11 @@ export default function CheckoutPage() {
                       type="text"
                       placeholder="Uttar Pradesh"
                       required
-                      value={orderData.shippingAddress.state || ""}
+                      value={
+                        orderData.shippingAddress.state ||
+                        user?.shippingAddress.state ||
+                        ""
+                      }
                       onChange={(e) =>
                         setOrderData((prev) => ({
                           ...prev,
@@ -323,7 +420,7 @@ export default function CheckoutPage() {
                     <Input
                       type="text"
                       placeholder="India"
-                      value="India"
+                      value={orderData.shippingAddress.country || "India"}
                       onChange={(e) =>
                         setOrderData((prev) => ({
                           ...prev,
@@ -342,7 +439,11 @@ export default function CheckoutPage() {
                     <Input
                       type="text"
                       placeholder="Landmark"
-                      value={orderData.shippingAddress.landmark || ""}
+                      value={
+                        orderData.shippingAddress.landmark ||
+                        user?.shippingAddress.landmark ||
+                        ""
+                      }
                       onChange={(e) =>
                         setOrderData((prev) => ({
                           ...prev,
@@ -375,10 +476,10 @@ export default function CheckoutPage() {
                       </div>
                     </div>
                   </div>
-                  {/* <div>
+                  <div>
                     <Label htmlFor="gst">GST number</Label>
-                    <Input type="text" placeholder="DE42313253" required="" />
-                  </div> */}
+                    <Input type="text" value="Unavailable" disabled />
+                  </div>
                 </div>
               </div>
               <div>
@@ -473,7 +574,7 @@ export default function CheckoutPage() {
                   </dl>
                   <dl className="flex items-center justify-between gap-4 py-3">
                     <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
-                      GST
+                      GST (18%)
                     </dt>
                     <dd className="text-base font-medium text-gray-900 dark:text-white">
                       ₹{orderData.subTotal * 0.18}

@@ -15,9 +15,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import useCartStore from "@/store/cart";
 import useAuthStore from "@/authStore";
 import useWishlistStore from "@/store/wishlist";
-import toast from "react-hot-toast";
 
-export default function ThemesResultPage() {
+export default function SearchResultPage() {
   const { user } = useAuthStore();
   const { wishlist, fetchWishlist } = useWishlistStore();
 
@@ -39,6 +38,9 @@ export default function ThemesResultPage() {
 
   const addImageToWishlist = async (imageId) => {
     try {
+      if (!user) {
+        return router.push("/login");
+      }
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER}/api/wishlist/add-images-in-wishlist`,
         {
@@ -104,21 +106,11 @@ export default function ThemesResultPage() {
       if (theme === "all") return true;
       return image.category.name.toLowerCase() === theme.toLowerCase();
     })
-    .filter((image) => {
-      if (!searchValue) return true;
-      return (
-        image.title?.toLowerCase().includes(searchValue.toLowerCase()) ||
-        image.description?.toLowerCase().includes(searchValue.toLowerCase()) ||
-        image.keywords?.some((keyword) =>
-          keyword.toLowerCase().includes(searchValue.toLowerCase())
-        )
-      );
-    })
     .sort((a, b) => {
-      if (sort === "price") return a.price - b.price;
+      if (sort === "price") return a.price?.original - b.price?.original;
       if (sort === "rating") return b.rating - a.rating;
       if (sort === "popularity") return b.downloadCount - a.downloadCount;
-      return new Date(b.date) - new Date(a.date);
+      return new Date(b.createdAt) - new Date(a.createdAt);
     });
 
   useEffect(() => {
@@ -144,7 +136,7 @@ export default function ThemesResultPage() {
     const fetchImages = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-all-images`,
+          `${process.env.NEXT_PUBLIC_SERVER}/api/images/search-images?Query=${searchValue}`,
           {
             method: "GET",
             headers: {
@@ -153,8 +145,8 @@ export default function ThemesResultPage() {
           }
         );
         const data = await res.json();
-        setImages(data.photos);
-        console.log(data.photos);
+        setImages(data.images);
+        console.log(data.images);
       } catch (error) {
         console.error(error);
       }
@@ -203,7 +195,7 @@ export default function ThemesResultPage() {
               onValueChange={(value) => {
                 setTheme(value);
                 router.push(
-                  `/images?theme=${value}&sort=${sort}${
+                  `/search?theme=${value}&sort=${sort}${
                     search && `&search=${search}`
                   }`
                 );
@@ -273,7 +265,7 @@ export default function ThemesResultPage() {
                 onValueChange={(value) => {
                   setSort(value);
                   router.push(
-                    `/images?theme=${theme}&sort=${value}${
+                    `/search?theme=${theme}&sort=${value}${
                       search && `&search=${search}`
                     }`
                   );
@@ -306,9 +298,21 @@ export default function ThemesResultPage() {
                   width={800}
                   height={800}
                   priority
-                  src={image.imageLinks.thumbnail || image.imageLinks.original}
+                  src={
+                    image.imageLinks.small ||
+                    image.imageLinks.medium ||
+                    image.imageLinks.original
+                  }
                   alt={image.description}
-                  className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear"
+                  className="object-cover w-full aspect-[1/1] opacity-100 group-hover:opacity-0 transition-all duration-200 ease-linear"
+                />
+
+                <Image
+                  width={400}
+                  height={400}
+                  src={image.imageLinks.original}
+                  alt={image.description}
+                  className="absolute inset-0 object-contain w-full aspect-[1/1] opacity-0 group-hover:opacity-100 transition-all duration-200 ease-linear"
                 />
 
                 <div className="absolute inset-0">
@@ -320,20 +324,14 @@ export default function ThemesResultPage() {
                       size={28}
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (user) {
-                          wishlist?.some((item) => item._id === image._id)
-                            ? removeImageFromWishlist(image._id)
-                            : addImageToWishlist(image._id);
-                        } else {
-                          toast.error(
-                            "Please login as User to add to wishlist"
-                          );
-                        }
+                        wishlist?.some((item) => item._id === image._id)
+                          ? removeImageFromWishlist(image._id)
+                          : addImageToWishlist(image._id);
                       }}
                       className={` ${
                         wishlist?.some((item) => item._id === image._id)
                           ? "text-red-400 fill-red-500"
-                          : "text-white group-hover:text-red-600"
+                          : "text-white group-hover:text-zinc-400"
                       }  transition-all duration-200 ease-linear cursor-pointer`}
                     />
                   </div>

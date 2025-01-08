@@ -29,7 +29,7 @@ export default function HeroSection() {
   const [search, setSearch] = useState("");
 
   const handleSearch = () => {
-    router.push(`/images?search=${search}`);
+    router.push(`/search?search=${search}`);
   };
 
   useEffect(() => {

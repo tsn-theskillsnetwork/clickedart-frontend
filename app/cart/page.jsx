@@ -7,8 +7,11 @@ import React from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import toast from "react-hot-toast";
+import useAuthStore from "@/authStore";
 
 export default function CartPage() {
+  const { user } = useAuthStore();
   const router = useRouter();
   const { increaseQuantity, decreaseQuantity, removeItemFromCart, cartItems } =
     useCartStore();
@@ -61,7 +64,11 @@ export default function CartPage() {
                   {product.title || "Art Name"}
                 </p>
                 <p className="text-sm font-medium text-surface-500">
-                  {product.photographer?.name || "Artist Name"}
+                  {product.photographer?.firstName
+                    ? product.photographer?.firstName +
+                      " " +
+                      product.photographer?.lastName
+                    : product.photographer?.name}
                 </p>
               </div>
             </div>

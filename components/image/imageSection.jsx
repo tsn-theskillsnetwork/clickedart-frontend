@@ -1,6 +1,5 @@
-import React from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
+import React from "react";
 
 export default function ImageSection({ selectedFrame, image }) {
   return (
@@ -12,13 +11,14 @@ export default function ImageSection({ selectedFrame, image }) {
       <div className="relative w-full h-full inner-shadow-3 z-10">
         <img
           src={
+            image.imageLinks?.thumbnail ||
             image.imageLinks?.small ||
             image.imageLinks?.medium ||
             image.imageLinks?.original ||
             "/assets/images/img3.jpg"
           }
           alt={image.title || "Image"}
-          className="z-10 object-cover"
+          className="z-10 object-contain w-full h-full mx-auto"
         />
       </div>
       {selectedFrame && (

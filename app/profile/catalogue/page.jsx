@@ -25,6 +25,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Tag } from "lucide-react";
 import Image from "next/image";
+import toast from "react-hot-toast";
 
 export default function CataloguesPage() {
   const { photographer, token } = useAuthStore();
@@ -42,9 +43,23 @@ export default function CataloguesPage() {
     setMessage("");
     setError("");
 
+    if (selectedImage.length === 0) {
+      toast.error("Please select an image to add to the catalogue.");
+      return;
+    }
+
+    if (
+      catalogues
+        .find((catalogue) => catalogue._id === catalogueId)
+        ?.images.some((image) => selectedImage.includes(image._id))
+    ) {
+      toast.error("Image already exists in the catalogue.");
+      return;
+    }
+
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/catalogue//update-catalogue/`,
+        `${process.env.NEXT_PUBLIC_SERVER}/api/catalogue/update-catalogue`,
         {
           catalogueId: catalogueId,
           photographer: photographer?._id,
@@ -61,6 +76,7 @@ export default function CataloguesPage() {
       console.log("response", response.data);
 
       setMessage("Image added to catalogue successfully!");
+      fetchCatalogues();
       setError("");
     } catch (err) {
       setError(err.response.data.message || "An error occurred.");
@@ -68,19 +84,61 @@ export default function CataloguesPage() {
     }
   };
 
+  const removeImage = async (catalogueId, imageIdToRemove) => {
+    setMessage("");
+    setError("");
+
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/catalogue/remove-images-from-catalogue`,
+        {
+          catalogueId: catalogueId,
+          imagesToRemove: [imageIdToRemove],
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("response", response.data);
+
+      setMessage("Image removed from catalogue successfully!");
+      setError("");
+
+      // Optionally update the UI
+      setCatalogues((prevCatalogues) =>
+        prevCatalogues.map((catalogue) =>
+          catalogue._id === catalogueId
+            ? {
+                ...catalogue,
+                images: catalogue.images.filter(
+                  (image) => image._id !== imageIdToRemove
+                ),
+              }
+            : catalogue
+        )
+      );
+    } catch (err) {
+      setError(err.response?.data?.message || "An error occurred.");
+      console.log("err", err.response?.data?.message);
+    }
+  };
+  const fetchCatalogues = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/catalogue/get-catalogues-by-photographer?photographer=${photographer?._id}`
+      );
+      console.log("res", res.data);
+      setCatalogues(res.data.catalogues);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     if (!photographer) return;
-    const fetchCatalogues = async () => {
-      try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/catalogue/get-catalogues-by-photographer?photographer=${photographer?._id}`
-        );
-        console.log("res", res.data);
-        setCatalogues(res.data.catalogues);
-      } catch (err) {
-        console.log(err);
-      }
-    };
 
     const fetchImages = async () => {
       try {
@@ -139,11 +197,10 @@ export default function CataloguesPage() {
                     </Label>
                     <Select
                       onValueChange={(imageId) => {
-                        setSelectedImage(
-                          (prev) =>
-                            prev.includes(imageId)
-                              ? prev.filter((id) => id !== imageId)
-                              : [...prev, imageId]
+                        setSelectedImage((prev) =>
+                          prev.includes(imageId)
+                            ? prev.filter((id) => id !== imageId)
+                            : [...prev, imageId]
                         );
                       }}
                       value={selectedImage._id}
@@ -179,7 +236,10 @@ export default function CataloguesPage() {
           <hr />
           <div className="grid grid-cols-4 gap-4">
             {catalogue.images?.map((image) => (
-              <div key={image._id} className="shadow-[0_2px_6px_rgba(0,0,0,0.2)] rounded-lg p-4">
+              <div
+                key={image._id}
+                className="shadow-[0_2px_6px_rgba(0,0,0,0.2)] rounded-lg p-4"
+              >
                 <div
                   onClick={() => {
                     router.push(`/images/${image._id}`);
@@ -250,6 +310,12 @@ export default function CataloguesPage() {
                     ).toFixed(1)}{" "}
                     MP
                   </p>
+                  <Button
+                    variant="outline"
+                    onClick={() => removeImage(catalogue._id, image._id)}
+                  >
+                    Remove
+                  </Button>
                 </div>
               </div>
             ))}

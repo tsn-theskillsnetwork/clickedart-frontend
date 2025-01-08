@@ -37,12 +37,12 @@ export default function PrintOrders({ orders }) {
               </div>
               <div className="flex flex-col gap-2">
                 <p className="text-heading-06 font-semibold">
-                  {order.imageInfo.image.title || "Art Name"}
+                  {order.imageInfo.image?.title || "Art Name"}
                 </p>
                 {order.paperInfo && (
                   <div className="flex flex-col">
                     <p className="text-base font-semibold text-surface-500">
-                      {order.paperInfo.paper.name}
+                      {order.paperInfo.paper?.name}
                     </p>
                     <p className="text-sm font-medium text-surface-500">
                       {order.paperInfo.size?.width} x{" "}
