@@ -20,6 +20,8 @@ import {
 import Image from "next/image";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
+import { S3Client } from "@aws-sdk/client-s3";
+import { Upload } from "@aws-sdk/lib-storage";
 
 const RegistrationForm = () => {
   const router = useRouter();
@@ -63,8 +65,9 @@ const RegistrationForm = () => {
     companyAddress: "",
     certifications: [],
     connectedAccounts: [],
-    bestPhotos: [],
+    bestPhotos: ["", "", ""],
   });
+  const [verifyPassword, setVerifyPassword] = useState("");
 
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
@@ -74,6 +77,7 @@ const RegistrationForm = () => {
   const cropperRef = useRef(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [step, setStep] = useState(1);
+  const [progr, setProgr] = useState(0);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -95,6 +99,63 @@ const RegistrationForm = () => {
     }
   };
 
+  const handleBestPhotosUpload = async (event, key) => {
+    try {
+      const file = event.target.files[0];
+
+      if (!file) {
+        console.error("No file selected");
+        return;
+      }
+
+      const s3 = new S3Client({
+        region: "ap-south-1",
+        credentials: {
+          accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
+          secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
+        },
+      });
+
+      const target = {
+        Bucket: "clickedart-bucket",
+        Key: `bestPhotos/${file.name}`,
+        Body: file,
+      };
+
+      const upload = new Upload({
+        client: s3,
+        params: target,
+      });
+
+      upload.on("httpUploadProgress", (progress) => {
+        const percentCompleted = Math.round(
+          (progress.loaded / progress.total) * 100
+        );
+        setProgr(percentCompleted);
+        console.log(`Progress: ${percentCompleted}%`);
+      });
+
+      await upload.done();
+      console.log("File uploaded successfully!");
+
+      const fileUrl = `https://${target.Bucket}.s3.ap-south-1.amazonaws.com/${target.Key}`;
+      setFormData((prev) => {
+        const newBestPhotos = [...prev.bestPhotos];
+        newBestPhotos[key] = fileUrl;
+        return {
+          ...prev,
+          bestPhotos: newBestPhotos,
+        };
+      });
+
+      console.log("File URL:", fileUrl);
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    }
+  };
+
+  console.log(formData.bestPhotos);
+
   const validateForm = () => {
     const newErrors = {};
     if (formData.firstName.length < 3)
@@ -104,6 +165,8 @@ const RegistrationForm = () => {
     if (!/^\S+@\S+\.\S+$/.test(formData.email))
       newErrors.email = "Enter a valid email address.";
     if (!formData.password) newErrors.password = "Password is required.";
+    if (formData.password !== verifyPassword)
+      newErrors.password = "Passwords do not match.";
     if (formData.yearsOfExperience && isNaN(formData.yearsOfExperience))
       newErrors.yearsOfExperience = "Years of experience must be a number.";
 
@@ -115,7 +178,11 @@ const RegistrationForm = () => {
     )
       newErrors.photographyStyles =
         "Photography styles must be comma-separated.";
-    if (formData.bestPhotos.length < 3)
+    if (
+      formData.bestPhotos[0] === "" ||
+      formData.bestPhotos[1] === "" ||
+      formData.bestPhotos[2] === ""
+    )
       newErrors.bestPhotos = "Please upload at least 3 photos.";
 
     return newErrors;
@@ -372,6 +439,21 @@ const RegistrationForm = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
+                required
+              />
+              {errors.password && (
+                <p className="text-red-500 text-sm">{errors.password}</p>
+              )}
+            </div>
+            <div>
+              <Label>
+                Verify Password <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                type="password"
+                name="password"
+                value={verifyPassword}
+                onChange={(e) => setVerifyPassword(e.target.value)}
                 required
               />
               {errors.password && (
@@ -841,198 +923,50 @@ const RegistrationForm = () => {
             <p className="text-heading-04 font-medium text-center">
               Upload your 3 Best Photos
             </p>
-            <div className="flex flex-col items-center gap-4">
-              {cropperImage ? (
-                <Cropper
-                  src={cropperImage}
-                  style={{ height: 300, width: "100%" }}
-                  initialAspectRatio={1}
-                  aspectRatio={1}
-                  guides={false}
-                  ref={cropperRef}
-                />
-              ) : formData.profileImage ? (
-                <>
-                  <Image
-                    src={formData.profileImage}
-                    alt="Profile Image"
-                    width={200}
-                    height={200}
-                    className="rounded-full object-cover aspect-[1/1]"
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setFormData({ ...formData, profileImage: "" })
-                    }
-                    className="text-red-500"
-                  >
-                    Remove
-                  </button>
-                </>
-              ) : (
-                <div className="max-w-md mx-auto rounded-lg overflow-hidden md:max-w-xl">
-                  <div className="md:flex">
-                    <div className="w-full p-3">
-                      <div className="relative h-48 rounded-lg border-2 border-blue-500 bg-gray-50 flex justify-center items-center shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
-                        <div className="absolute flex flex-col items-center">
-                          <ImageIcon className="w-12 h-12 text-blue-500" />
-                          <span className="block text-gray-500 font-semibold">
-                            Drag &amp; drop your files here
-                          </span>
-                          <span className="block text-gray-400 font-normal mt-1">
-                            or click to upload
-                          </span>
+            {formData.bestPhotos.map((photo, index) => (
+              <div key={index} className="flex flex-col items-center gap-4">
+                {photo ? (
+                  <>
+                    <Image
+                      src={photo}
+                      alt="Profile Image"
+                      width={200}
+                      height={200}
+                      className="object-contain"
+                    />
+                  </>
+                ) : (
+                  <div className="max-w-md mx-auto rounded-lg overflow-hidden md:max-w-xl">
+                    <div className="md:flex">
+                      <div className="w-full p-3">
+                        <div className="relative h-48 rounded-lg border-2 border-blue-500 bg-gray-50 flex justify-center items-center shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
+                          <div className="absolute flex flex-col items-center">
+                            <ImageIcon className="w-12 h-12 text-blue-500" />
+                            <span className="block text-gray-500 font-semibold">
+                              Drag &amp; drop your files here
+                            </span>
+                            <span className="block text-gray-400 font-normal mt-1">
+                              or click to upload
+                            </span>
+                          </div>
+                          <input
+                            name=""
+                            onChange={(event) =>
+                              handleBestPhotosUpload(event, index)
+                            }
+                            className="h-full w-full opacity-0 cursor-pointer"
+                            type="file"
+                          />
                         </div>
-                        <input
-                          name=""
-                          onChange={handleImageChange}
-                          className="h-full w-full opacity-0 cursor-pointer"
-                          type="file"
-                        />
                       </div>
                     </div>
                   </div>
-                </div>
-              )}
-              {cropperImage && (
-                <button
-                  type="button"
-                  onClick={handleCrop}
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                >
-                  Crop Image
-                </button>
-              )}
-            </div>
-            <div className="flex flex-col items-center gap-4">
-              {cropperImage ? (
-                <Cropper
-                  src={cropperImage}
-                  style={{ height: 300, width: "100%" }}
-                  initialAspectRatio={1}
-                  aspectRatio={1}
-                  guides={false}
-                  ref={cropperRef}
-                />
-              ) : formData.profileImage ? (
-                <>
-                  <Image
-                    src={formData.profileImage}
-                    alt="Profile Image"
-                    width={200}
-                    height={200}
-                    className="rounded-full object-cover aspect-[1/1]"
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setFormData({ ...formData, profileImage: "" })
-                    }
-                    className="text-red-500"
-                  >
-                    Remove
-                  </button>
-                </>
-              ) : (
-                <div className="max-w-md mx-auto rounded-lg overflow-hidden md:max-w-xl">
-                  <div className="md:flex">
-                    <div className="w-full p-3">
-                      <div className="relative h-48 rounded-lg border-2 border-blue-500 bg-gray-50 flex justify-center items-center shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
-                        <div className="absolute flex flex-col items-center">
-                          <ImageIcon className="w-12 h-12 text-blue-500" />
-                          <span className="block text-gray-500 font-semibold">
-                            Drag &amp; drop your files here
-                          </span>
-                          <span className="block text-gray-400 font-normal mt-1">
-                            or click to upload
-                          </span>
-                        </div>
-                        <input
-                          name=""
-                          onChange={handleImageChange}
-                          className="h-full w-full opacity-0 cursor-pointer"
-                          type="file"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-              {cropperImage && (
-                <button
-                  type="button"
-                  onClick={handleCrop}
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                >
-                  Crop Image
-                </button>
-              )}
-            </div>
-            <div className="flex flex-col items-center gap-4">
-              {cropperImage ? (
-                <Cropper
-                  src={cropperImage}
-                  style={{ height: 300, width: "100%" }}
-                  initialAspectRatio={1}
-                  aspectRatio={1}
-                  guides={false}
-                  ref={cropperRef}
-                />
-              ) : formData.profileImage ? (
-                <>
-                  <Image
-                    src={formData.profileImage}
-                    alt="Profile Image"
-                    width={200}
-                    height={200}
-                    className="rounded-full object-cover aspect-[1/1]"
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setFormData({ ...formData, profileImage: "" })
-                    }
-                    className="text-red-500"
-                  >
-                    Remove
-                  </button>
-                </>
-              ) : (
-                <div className="max-w-md mx-auto rounded-lg overflow-hidden md:max-w-xl">
-                  <div className="md:flex">
-                    <div className="w-full p-3">
-                      <div className="relative h-48 rounded-lg border-2 border-blue-500 bg-gray-50 flex justify-center items-center shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
-                        <div className="absolute flex flex-col items-center">
-                          <ImageIcon className="w-12 h-12 text-blue-500" />
-                          <span className="block text-gray-500 font-semibold">
-                            Drag &amp; drop your files here
-                          </span>
-                          <span className="block text-gray-400 font-normal mt-1">
-                            or click to upload
-                          </span>
-                        </div>
-                        <input
-                          name=""
-                          onChange={handleImageChange}
-                          className="h-full w-full opacity-0 cursor-pointer"
-                          type="file"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-              {cropperImage && (
-                <button
-                  type="button"
-                  onClick={handleCrop}
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                >
-                  Crop Image
-                </button>
-              )}
-            </div>
+                )}
+              </div>
+            ))}
+            {errors.bestPhotos && (
+              <p className="text-red-500 text-sm">{errors.bestPhotos}</p>
+            )}
             {message && <p className="text-green-500">{message}</p>}
             {error && <p className="text-red-500">{error}</p>}
             <div className="mt-2 flex justify-center">
