@@ -43,14 +43,14 @@ export default function DashboardPage() {
         setLoading(false);
       }
     };
-    
+
     const fetchStats = async () => {
       try {
         setLoading(true);
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_SERVER}/api/photographeranalytics/get-photographer-analytics?photographer=${photographer._id}`
         );
-        console.log("Stats",res.data);
+        console.log("Stats", res.data);
         setStats(res.data);
         setLoading(false);
       } catch (error) {
@@ -101,12 +101,28 @@ export default function DashboardPage() {
                 number={String(stats?.totalRoyaltyAmount) || "0"}
                 color="green"
               />
-              <NumberCard title="Total Sales" number={String(stats?.totalSales) || "0"} />
+              <NumberCard
+                title="Total Sales"
+                number={String(stats?.totalSales) || "0"}
+              />
               <NumberCard
                 title="Uploaded Photos"
                 number={String(stats?.totalUploadingImgCount) || "0"}
               />
-              <NumberCard title="Pending Photos" number={String(stats?.pendingImagesCount) || "0"} color="red" />
+              <NumberCard
+                title="Pending Photos"
+                number={String(stats?.pendingImagesCount) || "0"}
+                color="red"
+              />
+              <div className="rounded-xl bg-muted/50 shadow-md px-2 flex flex-col items-center gap-4 py-4">
+                <h4 className="text-heading-06 sm:text-heading-05 md:text-heading-04">
+                  Frequentry Used Categories
+                </h4>
+
+                <h2 className={`text-heading-04 sm:text-heading-03 md:text-heading-02 font-semibold text-secondary-200`}>
+                  {stats?.frequentlyUsedCategories?.map((category) => category.categoryDetails.name).join(", ") || "No Categories Found"}
+                </h2>
+              </div>
             </div>
             <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
           </div>

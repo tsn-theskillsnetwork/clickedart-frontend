@@ -233,9 +233,11 @@ const ProfilePage = () => {
               height={150}
               className="rounded-full h-28 w-28 lg:h-52 lg:w-52 object-cover border-[3px] lg:border-[6px] border-white"
             />
-            <p className="px-4 py-2 rounded-full capitalize bg-black font-medium text-white -mt-6">
-              {photographer?.rank}
-            </p>
+            {photographer && (
+              <p className="px-4 py-2 rounded-full capitalize bg-black font-medium text-white -mt-6">
+                {photographer?.rank}
+              </p>
+            )}
             <Link
               href={"/profile/edit"}
               className="absolute top-12 lg:top-20 right-[4%] sm:right-[8%] lg:right-[30%] text-surface-500 bg-white rounded-full p-2 cursor-pointer shadow-[1px_1px_2px_rgba(0,0,0,0.25)]"
@@ -260,325 +262,357 @@ const ProfilePage = () => {
               {photographer?.bio || user?.bio}
             </p>
 
-            <div className="grid grid-cols-3 gap-2 lg:gap-8 mt-4 px-4 max-w-2xl">
-              <div className="flex flex-col items-center text-center border-r-2 border-surface-500 pr-2 lg:pr-8">
-                <p className="text-paragraph lg:text-heading-01 font-normal">
-                  {photos?.length}
-                </p>
-                <p className="text-xs lg:text-heading-04 font-semibold text-surface-500">
-                  Gallery Items
-                </p>
-              </div>
-              <div className="flex flex-col items-center text-center">
-                <p className="text-paragraph lg:text-heading-01 font-normal">
-                  {photos
-                    ?.filter((photo) => photo.imageAnalytics?.views)
-                    .reduce(
-                      (acc, photo) => acc + (photo.imageAnalytics?.views || 0),
-                      0
-                    )}
-                </p>
-                <p className="text-xs lg:text-heading-04 font-semibold text-surface-500">
-                  Impressions This Month
-                </p>
-              </div>
-              <div className="flex flex-col items-center text-center border-l-2 border-surface-500 pl-2 lg:pl-8">
-                <p className="text-paragraph lg:text-heading-01 font-normal">
-                  {stats?.downloads || 0}
-                </p>
-                <p className="text-xs lg:text-heading-04 font-semibold text-surface-500">
-                  Downloads
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="relative flex gap-10 text-base lg:text-heading-03 px-4 lg:px-24 py-4">
-            <p
-              onClick={() => {
-                setSelectedTab("photos");
-              }}
-              className={`${
-                selectedTab === "photos"
-                  ? "text-primary font-semibold"
-                  : "text-surface-400"
-              } cursor-pointer`}
-            >
-              Photos
-            </p>
-            <p
-              onClick={() => {
-                setSelectedTab("catalogues");
-              }}
-              className={`${
-                selectedTab === "catalogues"
-                  ? "text-primary font-semibold"
-                  : "text-surface-400"
-              } cursor-pointer`}
-            >
-              Catalogues
-            </p>
-            <div
-              className={`h-[2px] lg:h-[4px] bg-primary absolute bottom-3 ${
-                selectedTab === "photos"
-                  ? "left-[0.8rem] w-[4rem] lg:left-[6rem] lg:w-[9rem]"
-                  : "left-[7rem] w-[6rem] lg:left-[17rem] lg:w-[15rem]"
-              } transition-all duration-300 ease-in-out`}
-            ></div>
-          </div>
-          <hr className="mt-[-14px] lg:-mt-4 border lg:border-2" />
-          <div className="py-10 px-4 lg:px-24 bg-[#FCFAFA]">
-            {selectedTab === "photos" ? (
-              <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
-                <Link
-                  href="/profile/upload"
-                  className="relative group shadow-[2px_2px_6px_rgba(0,0,0,0.4)]"
+            {user && (
+              <div className="flex gap-4 mt-4">
+                <Button
+                  className="bg-primary text-white"
+                  onClick={() => router.push("/profile/orders")}
                 >
-                  <div className="w-full aspect-[1/1] flex flex-col items-center justify-center bg-white cursor-pointer">
-                    <Plus className="w-20 h-20 text-surface-400" />
-                    <p className="text-surface-400 font-semibold">
-                      Upload New Photo
-                    </p>
-                  </div>
-                </Link>
-                {photos.map((image) => (
-                  <Link
-                    href={`/images/${image._id}`}
-                    className="relative group shadow-[2px_2px_6px_rgba(0,0,0,0.4)]"
-                    key={image._id}
-                  >
-                    <Image
-                      width={800}
-                      height={800}
-                      priority
-                      src={
-                        image.imageLinks.small ||
-                        image.imageLinks.medium ||
-                        image.imageLinks.original
-                      }
-                      alt={image.description}
-                      className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear"
-                    />
-
-                    <div className="absolute inset-0">
-                      <div className="flex justify-between px-2 pt-2">
-                        <div className="">
-                          {/* <div className="bg-white px-2 text-paragraph bg-opacity-75 w-fit transition-all duration-200 ease-linear cursor-default">
-                              <p>
-                                {image.imageAnalytics?.downloads || 0} Downloads
-                              </p>
-                            </div> */}
-                        </div>
-                        <div
-                          className={`${
-                            image.exclusiveLicenseStatus != "approved"
-                              ? "bg-red-500"
-                              : "bg-transparent"
-                          } h-2 w-2 rounded-full shadow-[0_0_4px_rgba(0,0,0,0.6)]`}
-                        />
-                      </div>
-                    </div>
-                    <div className="text-white absolute bottom-0 p-4 pt-6 bg-gradient-to-t from-black to-transparent inset-x-0 bg-opacity-50 opacity-0 group-hover:opacity-100 transition-all duration-200 ease-linear">
-                      <h2 className="text-heading-05 font-semibold">
-                        {image.title || "Untitled"}
-                      </h2>
-                      <p className="font-medium text-surface-200">
-                        {image.category?.name}
-                      </p>
-                    </div>
-                  </Link>
-                ))}
+                  Orders
+                </Button>
               </div>
-            ) : (
-              <div className="flex flex-col gap-10 py-10">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <div className="w-full h-full flex flex-col aspect-[1/1] items-center justify-center shadow-[0_4px_10px_rgba(0,0,0,0.2)] bg-white cursor-pointer">
-                        <Plus className="w-20 h-20 text-surface-400" />
-                        <p className="text-surface-400 font-semibold">
-                          Create New Category
-                        </p>
-                      </div>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px]">
-                      <DialogHeader>
-                        <DialogTitle>Create Catelogue</DialogTitle>
-                      </DialogHeader>
-                      <div className="grid gap-4 py-4">
-                        <div>
-                          <Label>Name *</Label>
-                          <Input
-                            type="text"
-                            name="name"
-                            value={newCatalogue.name}
-                            onChange={handleInputChange}
-                            required
-                          />
-                        </div>
+            )}
+            {photographer && (
+              <div className="flex gap-4 mt-4">
+                <Button
+                  className="bg-primary text-white"
+                  onClick={() => router.push("/dashboard")}
+                >
+                  Dashboard
+                </Button>
+              </div>
+            )}
 
-                        <div>
-                          <Label>Description *</Label>
-                          <Input
-                            type="text"
-                            name="description"
-                            value={newCatalogue.description}
-                            onChange={handleInputChange}
-                            required
-                          />
-                        </div>
-                      </div>
-                      <DialogFooter>
-                        <DialogClose asChild>
-                          <Button2
-                            size="sm"
-                            onClick={() => handleCreateCatelogue()}
-                          >
-                            Save changes
-                          </Button2>
-                        </DialogClose>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-
-                  {catalogues?.map((catalogue) => (
-                    <div
-                      key={catalogue._id}
-                      className="relative bg-white flex flex-col gap-2 shadow-[0_4px_10px_rgba(0,0,0,0.2)] p-4 rounded-md"
-                    >
-                      <Link
-                        href={`/profile/catalogue/${catalogue._id}`}
-                        className="grid grid-cols-2 gap-4 pb-5 aspect-[1/1]"
-                      >
-                        {catalogue.images?.length > 0 ? (
-                          <>
-                            {catalogue.images?.map((image) => (
-                              <div
-                                key={image._id}
-                                className="shadow-[0_2px_6px_rgba(0,0,0,0.2)] aspect-[1/1] rounded-md overflow-hidden"
-                              >
-                                <Image
-                                  width={800}
-                                  height={800}
-                                  priority
-                                  src={
-                                    image.imageLinks.small ||
-                                    image.imageLinks.medium ||
-                                    image.imageLinks.original
-                                  }
-                                  alt={image.description}
-                                  className="object-cover w-full aspect-[1/1]"
-                                />
-                              </div>
-                            ))}
-                          </>
-                        ) : (
-                          <div className="flex flex-col col-span-2 items-center justify-center w-full">
-                            <p className="text-paragraph font-medium">
-                              No images in this catalogue
-                            </p>
-                          </div>
-                        )}
-                      </Link>
-                      <div className=" px-4 bottom-0 flex justify-between items-center mt-0">
-                        <div className="flex flex-col">
-                          <p className="text-heading-05 font-semibold">
-                            {catalogue.name}
-                          </p>
-                        </div>
-                        <Popover>
-                          <PopoverTrigger>
-                            <EllipsisIcon className="w-6 h-6 text-gray-500" />
-                          </PopoverTrigger>
-                          <PopoverContent className="w-min">
-                            <div className="flex flex-col items-center">
-                              <Button
-                                className="text-orange-500"
-                                variant="ghost"
-                                size="sm"
-                              >
-                                <div>
-                                  <Dialog>
-                                    <DialogTrigger asChild>
-                                      <p
-                                        onClick={() => {
-                                          setSelectedCatelogue(catalogue);
-                                        }}
-                                      >
-                                        Edit
-                                      </p>
-                                    </DialogTrigger>
-                                    <DialogContent className="sm:max-w-[425px]">
-                                      <DialogHeader>
-                                        <DialogTitle>
-                                          Edit Catelogue
-                                        </DialogTitle>
-                                      </DialogHeader>
-                                      <div className="grid gap-4 py-4">
-                                        <Label
-                                          htmlFor="name"
-                                          className="text-left"
-                                        >
-                                          Name
-                                        </Label>
-                                        <Input
-                                          onChange={(e) => {
-                                            setSelectedCatelogue({
-                                              ...catalogue,
-                                              name: e.target.value,
-                                            });
-                                          }}
-                                          value={selectedCatelogue?.name}
-                                        />
-                                        <Label
-                                          htmlFor="description"
-                                          className="text-left"
-                                        >
-                                          Description
-                                        </Label>
-                                        <Input
-                                          onChange={(e) => {
-                                            setSelectedCatelogue({
-                                              ...catalogue,
-                                              description: e.target.value,
-                                            });
-                                          }}
-                                          value={selectedCatelogue?.description}
-                                        />
-                                      </div>
-                                      <DialogFooter>
-                                        <Button2
-                                          size="sm"
-                                          onClick={() =>
-                                            handleCatelogueUpdate(catalogue._id)
-                                          }
-                                        >
-                                          Save changes
-                                        </Button2>
-                                      </DialogFooter>
-                                    </DialogContent>
-                                  </Dialog>
-                                </div>
-                              </Button>
-                              <Button
-                                className="text-red-500"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() =>
-                                  handleCatelogueDelete(catalogue._id)
-                                }
-                              >
-                                Delete
-                              </Button>
-                            </div>
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-                    </div>
-                  ))}
+            {photographer && (
+              <div className="grid grid-cols-3 gap-2 lg:gap-8 mt-4 px-4 max-w-2xl">
+                <div className="flex flex-col items-center text-center border-r-2 border-surface-500 pr-2 lg:pr-8">
+                  <p className="text-paragraph lg:text-heading-01 font-normal">
+                    {photos?.length}
+                  </p>
+                  <p className="text-xs lg:text-heading-04 font-semibold text-surface-500">
+                    Gallery Items
+                  </p>
+                </div>
+                <div className="flex flex-col items-center text-center">
+                  <p className="text-paragraph lg:text-heading-01 font-normal">
+                    {photos
+                      ?.filter((photo) => photo.imageAnalytics?.views)
+                      .reduce(
+                        (acc, photo) =>
+                          acc + (photo.imageAnalytics?.views || 0),
+                        0
+                      )}
+                  </p>
+                  <p className="text-xs lg:text-heading-04 font-semibold text-surface-500">
+                    Impressions This Month
+                  </p>
+                </div>
+                <div className="flex flex-col items-center text-center border-l-2 border-surface-500 pl-2 lg:pl-8">
+                  <p className="text-paragraph lg:text-heading-01 font-normal">
+                    {stats?.downloads || 0}
+                  </p>
+                  <p className="text-xs lg:text-heading-04 font-semibold text-surface-500">
+                    Downloads
+                  </p>
                 </div>
               </div>
             )}
           </div>
+          {photographer && (
+            <div className="relative flex gap-10 text-base lg:text-heading-03 px-4 lg:px-24 py-4">
+              <p
+                onClick={() => {
+                  setSelectedTab("photos");
+                }}
+                className={`${
+                  selectedTab === "photos"
+                    ? "text-primary font-semibold"
+                    : "text-surface-400"
+                } cursor-pointer`}
+              >
+                Photos
+              </p>
+              <p
+                onClick={() => {
+                  setSelectedTab("catalogues");
+                }}
+                className={`${
+                  selectedTab === "catalogues"
+                    ? "text-primary font-semibold"
+                    : "text-surface-400"
+                } cursor-pointer`}
+              >
+                Catalogues
+              </p>
+              <div
+                className={`h-[2px] lg:h-[4px] bg-primary absolute bottom-3 ${
+                  selectedTab === "photos"
+                    ? "left-[0.8rem] w-[4rem] lg:left-[6rem] lg:w-[9rem]"
+                    : "left-[7rem] w-[6rem] lg:left-[17rem] lg:w-[15rem]"
+                } transition-all duration-300 ease-in-out`}
+              ></div>
+            </div>
+          )}
+          <hr className="mt-[-14px] lg:-mt-4 border lg:border-2" />
+          {photographer && (
+            <div className="py-10 px-4 lg:px-24 bg-[#FCFAFA]">
+              {selectedTab === "photos" ? (
+                <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
+                  <Link
+                    href="/profile/upload"
+                    className="relative group shadow-[2px_2px_6px_rgba(0,0,0,0.4)]"
+                  >
+                    <div className="w-full aspect-[1/1] flex flex-col items-center justify-center bg-white cursor-pointer">
+                      <Plus className="w-20 h-20 text-surface-400" />
+                      <p className="text-surface-400 font-semibold">
+                        Upload New Photo
+                      </p>
+                    </div>
+                  </Link>
+                  {photos.map((image) => (
+                    <Link
+                      href={`/images/${image._id}`}
+                      className="relative group shadow-[2px_2px_6px_rgba(0,0,0,0.4)]"
+                      key={image._id}
+                    >
+                      <Image
+                        width={800}
+                        height={800}
+                        priority
+                        src={
+                          image.imageLinks.small ||
+                          image.imageLinks.medium ||
+                          image.imageLinks.original
+                        }
+                        alt={image.description}
+                        className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear"
+                      />
+
+                      <div className="absolute inset-0">
+                        <div className="flex justify-between px-2 pt-2">
+                          <div className="">
+                            {/* <div className="bg-white px-2 text-paragraph bg-opacity-75 w-fit transition-all duration-200 ease-linear cursor-default">
+                              <p>
+                                {image.imageAnalytics?.downloads || 0} Downloads
+                              </p>
+                            </div> */}
+                          </div>
+                          <div
+                            className={`${
+                              image.exclusiveLicenseStatus != "approved"
+                                ? "bg-red-500"
+                                : "bg-transparent"
+                            } h-2 w-2 rounded-full shadow-[0_0_4px_rgba(0,0,0,0.6)]`}
+                          />
+                        </div>
+                      </div>
+                      <div className="text-white absolute bottom-0 p-4 pt-6 bg-gradient-to-t from-black to-transparent inset-x-0 bg-opacity-50 opacity-0 group-hover:opacity-100 transition-all duration-200 ease-linear">
+                        <h2 className="text-heading-05 font-semibold">
+                          {image.title || "Untitled"}
+                        </h2>
+                        <p className="font-medium text-surface-200">
+                          {image.category?.name}
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-10 py-10">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <div className="w-full h-full flex flex-col aspect-[1/1] items-center justify-center shadow-[0_4px_10px_rgba(0,0,0,0.2)] bg-white cursor-pointer">
+                          <Plus className="w-20 h-20 text-surface-400" />
+                          <p className="text-surface-400 font-semibold">
+                            Create New Catelogue
+                          </p>
+                        </div>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                          <DialogTitle>Create Catelogue</DialogTitle>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                          <div>
+                            <Label>Name *</Label>
+                            <Input
+                              type="text"
+                              name="name"
+                              value={newCatalogue.name}
+                              onChange={handleInputChange}
+                              required
+                            />
+                          </div>
+
+                          <div>
+                            <Label>Description *</Label>
+                            <Input
+                              type="text"
+                              name="description"
+                              value={newCatalogue.description}
+                              onChange={handleInputChange}
+                              required
+                            />
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <DialogClose asChild>
+                            <Button2
+                              size="sm"
+                              onClick={() => handleCreateCatelogue()}
+                            >
+                              Save changes
+                            </Button2>
+                          </DialogClose>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+
+                    {catalogues?.map((catalogue) => (
+                      <div
+                        key={catalogue._id}
+                        className="relative bg-white flex flex-col gap-2 shadow-[0_4px_10px_rgba(0,0,0,0.2)] p-4 rounded-md"
+                      >
+                        <Link
+                          href={`/profile/catalogue/${catalogue._id}`}
+                          className="grid grid-cols-2 gap-4 pb-5 aspect-[1/1]"
+                        >
+                          {catalogue.images?.length > 0 ? (
+                            <>
+                              {catalogue.images?.map((image) => (
+                                <div
+                                  key={image._id}
+                                  className="shadow-[0_2px_6px_rgba(0,0,0,0.2)] aspect-[1/1] rounded-md overflow-hidden"
+                                >
+                                  <Image
+                                    width={800}
+                                    height={800}
+                                    priority
+                                    src={
+                                      image.imageLinks.small ||
+                                      image.imageLinks.medium ||
+                                      image.imageLinks.original
+                                    }
+                                    alt={image.description}
+                                    className="object-cover w-full aspect-[1/1]"
+                                  />
+                                </div>
+                              ))}
+                            </>
+                          ) : (
+                            <div className="flex flex-col col-span-2 items-center justify-center w-full">
+                              <p className="text-paragraph font-medium">
+                                No images in this catalogue
+                              </p>
+                            </div>
+                          )}
+                        </Link>
+                        <div className=" px-4 bottom-0 flex justify-between items-center mt-0">
+                          <div className="flex flex-col">
+                            <p className="text-heading-05 font-semibold">
+                              {catalogue.name}
+                            </p>
+                          </div>
+                          <Popover>
+                            <PopoverTrigger>
+                              <EllipsisIcon className="w-6 h-6 text-gray-500" />
+                            </PopoverTrigger>
+                            <PopoverContent className="w-min">
+                              <div className="flex flex-col items-center">
+                                <Button
+                                  className="text-orange-500"
+                                  variant="ghost"
+                                  size="sm"
+                                >
+                                  <div>
+                                    <Dialog>
+                                      <DialogTrigger asChild>
+                                        <p
+                                          onClick={() => {
+                                            setSelectedCatelogue(catalogue);
+                                          }}
+                                        >
+                                          Edit
+                                        </p>
+                                      </DialogTrigger>
+                                      <DialogContent className="sm:max-w-[425px]">
+                                        <DialogHeader>
+                                          <DialogTitle>
+                                            Edit Catelogue
+                                          </DialogTitle>
+                                        </DialogHeader>
+                                        <div className="grid gap-4 py-4">
+                                          <Label
+                                            htmlFor="name"
+                                            className="text-left"
+                                          >
+                                            Name
+                                          </Label>
+                                          <Input
+                                            onChange={(e) => {
+                                              setSelectedCatelogue({
+                                                ...catalogue,
+                                                name: e.target.value,
+                                              });
+                                            }}
+                                            value={selectedCatelogue?.name}
+                                          />
+                                          <Label
+                                            htmlFor="description"
+                                            className="text-left"
+                                          >
+                                            Description
+                                          </Label>
+                                          <Input
+                                            onChange={(e) => {
+                                              setSelectedCatelogue({
+                                                ...catalogue,
+                                                description: e.target.value,
+                                              });
+                                            }}
+                                            value={
+                                              selectedCatelogue?.description
+                                            }
+                                          />
+                                        </div>
+                                        <DialogFooter>
+                                          <Button2
+                                            size="sm"
+                                            onClick={() =>
+                                              handleCatelogueUpdate(
+                                                catalogue._id
+                                              )
+                                            }
+                                          >
+                                            Save changes
+                                          </Button2>
+                                        </DialogFooter>
+                                      </DialogContent>
+                                    </Dialog>
+                                  </div>
+                                </Button>
+                                <Button
+                                  className="text-red-500"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() =>
+                                    handleCatelogueDelete(catalogue._id)
+                                  }
+                                >
+                                  Delete
+                                </Button>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center min-h-screen">

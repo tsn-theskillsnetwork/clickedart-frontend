@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
-import { ImageIcon, Plus, Trash } from "lucide-react";
+import { Eye, EyeClosed, ImageIcon, Plus, Trash } from "lucide-react";
 import Link from "next/link";
 import {
   Select,
@@ -22,6 +22,11 @@ import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
+import "react-datepicker/dist/react-datepicker.css";
+import DatePicker from "react-datepicker";
+import countries from "@/lib/address/countries.json";
+import states from "@/lib/address/states.json";
+import cities from "@/lib/address/cities.json";
 
 const RegistrationForm = () => {
   const router = useRouter();
@@ -39,12 +44,10 @@ const RegistrationForm = () => {
       address: "",
       city: "",
       state: "",
-      country: "",
+      country: "India",
       landmark: "",
       pincode: "",
       area: "",
-      email: "",
-      mobile: "",
     },
     expertise: [],
     awards: [],
@@ -78,6 +81,10 @@ const RegistrationForm = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [step, setStep] = useState(1);
   const [progr, setProgr] = useState(0);
+  const [showPassword, setShowPassword] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState("102");
+  const [selectedState, setSelectedState] = useState("");
+  console.log("selectedCountry", selectedCountry);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -85,17 +92,26 @@ const RegistrationForm = () => {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (reader.result) {
-          setCropperImage(reader.result);
-        } else {
-          toast.error("Failed to load image.");
-        }
-      };
-      reader.readAsDataURL(file);
+    if (e.target.files && e.target.files[0]) {
+      if (e.target.files[0].size > 5 * 1000 * 1024) {
+        toast.error("File with maximum size of 5MB is allowed");
+        return false;
+      }
+
+      // do other operation
+
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          if (reader.result) {
+            setCropperImage(reader.result);
+          } else {
+            toast.error("Failed to load image.");
+          }
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -106,6 +122,11 @@ const RegistrationForm = () => {
       if (!file) {
         console.error("No file selected");
         return;
+      }
+
+      if (e.target.files[0].size > 20 * 1000 * 1024) {
+        toast.error("File with maximum size of 20MB is allowed");
+        return false;
       }
 
       const s3 = new S3Client({
@@ -155,8 +176,9 @@ const RegistrationForm = () => {
   };
 
   console.log(formData.bestPhotos);
+  console.log(formData.shippingAddress);
 
-  const validateForm = () => {
+  const validateForm1 = () => {
     const newErrors = {};
     if (formData.firstName.length < 3)
       newErrors.firstName = "First Name must be at least 3 characters.";
@@ -178,6 +200,13 @@ const RegistrationForm = () => {
     )
       newErrors.photographyStyles =
         "Photography styles must be comma-separated.";
+    if (formData.connectedAccounts.length < 1)
+      newErrors.connectedAccounts = "Please add at least one account.";
+    return newErrors;
+  };
+
+  const validateForm2 = () => {
+    const newErrors = {};
     if (
       formData.bestPhotos[0] === "" ||
       formData.bestPhotos[1] === "" ||
@@ -186,6 +215,17 @@ const RegistrationForm = () => {
       newErrors.bestPhotos = "Please upload at least 3 photos.";
 
     return newErrors;
+  };
+
+  const handleNext = () => {
+    const newErrors = validateForm1();
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setErrors({});
+    setStep(2);
   };
 
   const handleCrop = async () => {
@@ -203,7 +243,7 @@ const RegistrationForm = () => {
 
       try {
         const res = await axios.post(
-          "http://localhost:5000/api/upload/uploadSingleImage",
+          `${process.env.NEXT_PUBLIC_SERVER}/api/upload/uploadSingleImage`,
           formData,
           {
             headers: {
@@ -247,7 +287,7 @@ const RegistrationForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newErrors = validateForm();
+    const newErrors = validateForm2();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -267,26 +307,7 @@ const RegistrationForm = () => {
 
       setMessage(data.message);
       setError("");
-      setFormData({
-        name: "",
-        email: "",
-        password: "",
-        bio: "",
-        dob: "",
-        profileImage: "",
-        address: "",
-        isCompany: false,
-        companyName: "",
-        companyEmail: "",
-        companyAddress: "",
-        companyPhone: "",
-        portfolioLink: "",
-        photographyStyles: "",
-        yearsOfExperience: "",
-        accountType: "freelance",
-        connectedAccounts: [],
-      });
-      router.push("/photographer/signin");
+      router.push("/verify?type=photographer&email=" + formData.email);
     } catch (err) {
       if (err.response && err.response.data) {
         setError(
@@ -361,6 +382,7 @@ const RegistrationForm = () => {
                           onChange={handleImageChange}
                           className="h-full w-full opacity-0 cursor-pointer"
                           type="file"
+                          accept="image/*"
                         />
                       </div>
                     </div>
@@ -373,7 +395,7 @@ const RegistrationForm = () => {
                   onClick={handleCrop}
                   className="bg-blue-500 text-white px-4 py-2 rounded"
                 >
-                  Crop Image
+                  Save Image
                 </button>
               )}
             </div>
@@ -434,13 +456,27 @@ const RegistrationForm = () => {
               <Label>
                 Password <span className="text-red-500">*</span>
               </Label>
-              <Input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                required
-              />
+              <div className="flex items-center gap-2">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  required
+                />
+
+                {showPassword ? (
+                  <EyeClosed
+                    size={16}
+                    onClick={() => setShowPassword((prev) => !prev)}
+                  />
+                ) : (
+                  <Eye
+                    size={16}
+                    onClick={() => setShowPassword((prev) => !prev)}
+                  />
+                )}
+              </div>
               {errors.password && (
                 <p className="text-red-500 text-sm">{errors.password}</p>
               )}
@@ -450,7 +486,7 @@ const RegistrationForm = () => {
                 Verify Password <span className="text-red-500">*</span>
               </Label>
               <Input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 value={verifyPassword}
                 onChange={(e) => setVerifyPassword(e.target.value)}
@@ -473,6 +509,7 @@ const RegistrationForm = () => {
                   <SelectValue placeholder="Select Account Type" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="individual">Individual</SelectItem>
                   <SelectItem value="freelance">Freelance</SelectItem>
                   <SelectItem value="studio">Studio</SelectItem>
                   <SelectItem value="agency">Agency</SelectItem>
@@ -501,7 +538,7 @@ const RegistrationForm = () => {
             </div>
 
             <div>
-              <Label>Bio</Label>
+              <Label>Bio (Max Length: 1000 Words)</Label>
               <Textarea
                 name="bio"
                 value={formData.bio}
@@ -510,8 +547,95 @@ const RegistrationForm = () => {
             </div>
 
             <div className="py-2 my-2 border-y">
-              <p className="text-heading-06 font-semibold">Shipping Address</p>
+              <p className="text-heading-06 font-semibold">Address</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <Label>Country*</Label>
+                  <Select
+                    defaultValue={formData.shippingAddress?.country}
+                    onValueChange={(value) => {
+                      const selectedCountry = countries[2].data.find(
+                        (country) => country.name === value
+                      );
+                      setSelectedCountry(selectedCountry.id);
+                      const newAddress = { ...formData.shippingAddress };
+                      newAddress.country = value;
+                      setFormData({
+                        ...formData,
+                        shippingAddress: newAddress,
+                      });
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {countries[2].data.map((country) => (
+                        <SelectItem key={country.id} value={country.name}>
+                          {country.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>State*</Label>
+                  <Select
+                    defaultValue={formData.shippingAddress?.state}
+                    onValueChange={(value) => {
+                      const selectedState = states[2].data.find(
+                        (state) => state.name === value
+                      );
+                      setSelectedState(selectedState.id);
+                      const newAddress = { ...formData.shippingAddress };
+                      newAddress.state = value;
+                      setFormData({
+                        ...formData,
+                        shippingAddress: newAddress,
+                      });
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select State" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {states[2].data
+                        .filter((state) => state.countryId === selectedCountry) // Filter states by selected country ID
+                        .map((state) => (
+                          <SelectItem key={state.id} value={state.name}>
+                            {state.name}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>City*</Label>
+                  <Select
+                    defaultValue={formData.shippingAddress?.city}
+                    onValueChange={(value) => {
+                      const newAddress = { ...formData.shippingAddress };
+                      newAddress.city = value;
+                      setFormData({
+                        ...formData,
+                        shippingAddress: newAddress,
+                      });
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select City" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {cities[2].data
+                        .filter((city) => city.stateId === selectedState) // Filter cities by selected state ID
+                        .map((city) => (
+                          <SelectItem key={city.id} value={city.name}>
+                            {city.name}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div>
                   <Label>Address</Label>
                   <Input
@@ -521,54 +645,6 @@ const RegistrationForm = () => {
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.address = e.target.value;
-                      setFormData({
-                        ...formData,
-                        shippingAddress: newAddress,
-                      });
-                    }}
-                  />
-                </div>
-                <div>
-                  <Label>City</Label>
-                  <Input
-                    type="text"
-                    name="shippingAddress.city"
-                    value={formData.shippingAddress?.city}
-                    onChange={(e) => {
-                      const newAddress = { ...formData.shippingAddress };
-                      newAddress.city = e.target.value;
-                      setFormData({
-                        ...formData,
-                        shippingAddress: newAddress,
-                      });
-                    }}
-                  />
-                </div>
-                <div>
-                  <Label>State</Label>
-                  <Input
-                    type="text"
-                    name="shippingAddress.state"
-                    value={formData.shippingAddress?.state}
-                    onChange={(e) => {
-                      const newAddress = { ...formData.shippingAddress };
-                      newAddress.state = e.target.value;
-                      setFormData({
-                        ...formData,
-                        shippingAddress: newAddress,
-                      });
-                    }}
-                  />
-                </div>
-                <div>
-                  <Label>Country</Label>
-                  <Input
-                    type="text"
-                    name="shippingAddress.country"
-                    value={formData.shippingAddress?.country}
-                    onChange={(e) => {
-                      const newAddress = { ...formData.shippingAddress };
-                      newAddress.country = e.target.value;
                       setFormData({
                         ...formData,
                         shippingAddress: newAddress,
@@ -593,7 +669,7 @@ const RegistrationForm = () => {
                   />
                 </div>
                 <div>
-                  <Label>Pincode</Label>
+                  <Label>Pincode*</Label>
                   <Input
                     type="text"
                     name="shippingAddress.pincode"
@@ -624,48 +700,23 @@ const RegistrationForm = () => {
                     }}
                   />
                 </div>
-                <div>
-                  <Label>Email</Label>
-                  <Input
-                    type="email"
-                    name="shippingAddress.email"
-                    value={formData.shippingAddress?.email}
-                    onChange={(e) => {
-                      const newAddress = { ...formData.shippingAddress };
-                      newAddress.email = e.target.value;
-                      setFormData({
-                        ...formData,
-                        shippingAddress: newAddress,
-                      });
-                    }}
-                  />
-                </div>
-                <div>
-                  <Label>Mobile</Label>
-                  <Input
-                    type="tel"
-                    name="shippingAddress.mobile"
-                    value={formData.shippingAddress?.mobile}
-                    onChange={(e) => {
-                      const newAddress = { ...formData.shippingAddress };
-                      newAddress.mobile = e.target.value;
-                      setFormData({
-                        ...formData,
-                        shippingAddress: newAddress,
-                      });
-                    }}
-                  />
-                </div>
               </div>
             </div>
 
-            <div>
+            <div className="flex flex-col gap-2">
               <Label>Date of Birth</Label>
-              <Input
+              {/* <Input
                 type="date"
                 name="dob"
                 value={formData.dob}
                 onChange={handleInputChange}
+              /> */}
+              <DatePicker
+                className="border border-gray-300 rounded-md p-2 w-full"
+                placeholderText="Select Date of Birth"
+                selected={formData.dob}
+                onChange={handleInputChange}
+                dateFormat="MMMM d, yyyy"
               />
               {errors.dob && (
                 <p className="text-red-500 text-sm">{errors.dob}</p>
@@ -823,7 +874,7 @@ const RegistrationForm = () => {
             </div>
 
             <div>
-              <Label>Connect Accounts</Label>
+              <Label>Social Media</Label>
               <div className="flex flex-col gap-2">
                 {formData.connectedAccounts?.map((account, index) => (
                   <div key={index} className="flex gap-2">
@@ -867,6 +918,12 @@ const RegistrationForm = () => {
                   </div>
                 ))}
               </div>
+              {errors.connectedAccounts && (
+                <p className="text-red-500 text-sm">
+                  {errors.connectedAccounts}
+                </p>
+              )}
+
               <div className="flex flex-row gap-2 mt-2">
                 <button
                   type="button"
@@ -905,13 +962,7 @@ const RegistrationForm = () => {
               </div>
             </div>
             <div className="mt-2 flex justify-center">
-              <Button
-                type="button"
-                onClick={() => {
-                  setStep(2);
-                  scrollTo(0, 0);
-                }}
-              >
+              <Button type="button" onClick={handleNext}>
                 Next
               </Button>
             </div>
@@ -923,6 +974,12 @@ const RegistrationForm = () => {
             <p className="text-heading-04 font-medium text-center">
               Upload your 3 Best Photos
             </p>
+            {progr > 0 && progr < 100 && (
+              <div>
+                <progress value={progr} max={100}></progress>
+                <span>{progr}%</span>
+              </div>
+            )}
             {formData.bestPhotos.map((photo, index) => (
               <div key={index} className="flex flex-col items-center gap-4">
                 {photo ? (
@@ -934,6 +991,22 @@ const RegistrationForm = () => {
                       height={200}
                       className="object-contain"
                     />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFormData((prev) => {
+                          const newBestPhotos = [...prev.bestPhotos];
+                          newBestPhotos[index] = "";
+                          return {
+                            ...prev,
+                            bestPhotos: newBestPhotos,
+                          };
+                        })
+                      }
+                      className="text-red-500"
+                    >
+                      Remove
+                    </button>
                   </>
                 ) : (
                   <div className="max-w-md mx-auto rounded-lg overflow-hidden md:max-w-xl">
@@ -954,6 +1027,7 @@ const RegistrationForm = () => {
                             onChange={(event) =>
                               handleBestPhotosUpload(event, index)
                             }
+                            accept="image/*"
                             className="h-full w-full opacity-0 cursor-pointer"
                             type="file"
                           />

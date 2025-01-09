@@ -4,17 +4,19 @@ import Button2 from "@/components/button2";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 
 export default function VerifyPage() {
-  const [email, setEmail] = useState("");
+  const type = useSearchParams().get("type");
+  const emailadd = useSearchParams().get("email");
+  const [email, setEmail] = useState(emailadd || "");
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [otpResent, setOtpResent] = useState(false);
-  const [userType, setUserType] = useState("user");
+  const [userType, setUserType] = useState(type || "user");
 
   const router = useRouter();
 
@@ -39,7 +41,8 @@ export default function VerifyPage() {
       setError("");
       setLoading(false);
       toast.success("Account verified successfully.");
-      router.push("/signin");
+      if (userType === "user") router.push("/signin");
+      else router.push("/signin/photographer");
     } catch (error) {
       setError(error.message);
       setLoading(false);
@@ -117,14 +120,14 @@ export default function VerifyPage() {
           />
         </div>
 
-        <div className="flex justify-center gap-4 mt-4">
+        <div className="flex flex-col items-center gap-4 mt-4">
           <Button2 size="sm" onClick={handleVerify} disabled={loading}>
             {loading ? "Verifying..." : "Verify OTP"}
           </Button2>
 
-          <Button2 size="sm" onClick={handleResendOTP} disabled={loading}>
+          <button onClick={handleResendOTP} disabled={loading}>
             {loading ? "Resending..." : "Send OTP"}
-          </Button2>
+          </button>
         </div>
 
         {error && <p className="text-red-500 text-center mt-2">{error}</p>}

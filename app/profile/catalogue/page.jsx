@@ -5,7 +5,7 @@ import Button2 from "@/components/button2";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import Link from "next/link";
-import React, { use, useEffect, useState } from "react";
+import React, {useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,

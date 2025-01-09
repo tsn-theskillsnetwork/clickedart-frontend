@@ -22,6 +22,7 @@ import RecommendedSection from "@/components/image/recommendedSection";
 import ImageSection from "@/components/image/imageSection";
 import axios from "axios";
 import useAuthStore from "@/authStore";
+import { Icon } from "@iconify/react";
 
 export default function ImagePage() {
   const id = useParams().id;
@@ -69,7 +70,7 @@ export default function ImagePage() {
   const [inCart, setInCart] = useState(false);
 
   const [selected, setSelected] = useState(0);
-  const [mode, setMode] = useState("print");
+  const [mode, setMode] = useState("digital");
   const [papers, setPapers] = useState([]);
   const [frames, setFrames] = useState([]);
   const [selectedPaper, setSelectedPaper] = useState(null);
@@ -190,7 +191,7 @@ export default function ImagePage() {
       <AnimatePresence mode="popLayout">
         <motion.div layout key={desc} className="flex flex-col gap-5">
           {desc ? (
-            <motion.p
+            <motion.div
               layout
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -198,14 +199,34 @@ export default function ImagePage() {
               transition={{ duration: 0.2 }}
               className="text-xs sm:text-sm md:text-heading-06 lg:text-heading-05 font-medium text-surface-600"
             >
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Architecto cum earum minus, recusandae quidem mollitia nesciunt
-              voluptas, consequatur sunt doloribus odio iste. In labore
-              laudantium porro expedita tempora repellendus nostrum quisquam?
-              Obcaecati laudantium asperiores, totam repellat consectetur porro,
-              itaque doloribus incidunt quibusdam ducimus provident aut aliquid
-              velit ad, atque et.
-            </motion.p>
+              {image.description}
+              <div className="flex flex-wrap items-start justify-start gap-4">
+                <div className="flex flex-row gap-2 items-center">
+                  <Icon icon="ic:round-location-on" />
+                  <p>Location: {image.location}</p>
+                </div>
+                <div className="flex flex-row gap-2 items-center">
+                  <Icon icon="ic:outline-camera-alt" />
+                  <p>Camera: {image.cameraDetails?.camera}</p>
+                </div>
+                <div className="flex flex-row gap-2 items-center">
+                  <Icon icon="ic:outline-lens" />
+                  <p>Lens: {image.cameraDetails?.lens}</p>
+                </div>
+                <div className="flex flex-row gap-2 items-center">
+                  <Icon icon="ic:round-camera" />
+                  <p>Aperture: {image.cameraDetails?.settings?.aperture}</p>
+                </div>
+                <div className="flex flex-row gap-2 items-center">
+                  <Icon icon="ic:round-shutter-speed" />
+                  <p>Shutter Speed: {image.cameraDetails?.shutterSpeed}</p>
+                </div>
+                <div className="flex flex-row gap-2 items-center">
+                  <Icon icon="ic:round-iso" />
+                  <p>ISO: {image.cameraDetails?.iso}</p>
+                </div>
+              </div>
+            </motion.div>
           ) : (
             <motion.div
               layout
@@ -261,6 +282,9 @@ export default function ImagePage() {
 
   useEffect(() => {
     setSubTotal(image.price?.original);
+    if (mode === "digital") {
+      setSelectedSize("original");
+    }
   }, [image]);
 
   useEffect(() => {
@@ -294,22 +318,9 @@ export default function ImagePage() {
         <motion.div
           layout
           className={`absolute inset-y-0 z-0 bg-gradient-to-t ${
-            mode === "digital" && "right-0"
+            mode === "print" && "right-0"
           } from-[#897F75] to-[#BCB0A4] inner-shadow-2 w-1/2 h-full rounded-full`}
         ></motion.div>
-        <p
-          onClick={() => {
-            setMode("print");
-            setSelectedPaper(null);
-            setSelectedSize(null);
-            setSelectedFrame(null);
-          }}
-          className={`text-base md:text-paragraph lg:text-base xl:text-heading-06 drop-shadow-md z-10 font-bold ${
-            mode === "digital" ? "text-surface-500" : "text-zinc-100"
-          } text-center w-full cursor-pointer transition-colors duration-200 ease-in-out`}
-        >
-          Ready to Hang
-        </p>
         <p
           onClick={() => {
             setMode("digital");
@@ -322,6 +333,19 @@ export default function ImagePage() {
           } text-center w-full cursor-pointer transition-colors duration-200 ease-in-out`}
         >
           Digital Copy
+        </p>
+        <p
+          onClick={() => {
+            setMode("print");
+            setSelectedPaper(null);
+            setSelectedSize(null);
+            setSelectedFrame(null);
+          }}
+          className={`text-base md:text-paragraph lg:text-base xl:text-heading-06 drop-shadow-md z-10 font-bold ${
+            mode === "digital" ? "text-surface-500" : "text-zinc-100"
+          } text-center w-full cursor-pointer transition-colors duration-200 ease-in-out`}
+        >
+          Ready to Hand
         </p>
       </div>
       <div className="flex flex-col gap-10">
@@ -442,7 +466,7 @@ export default function ImagePage() {
                           (resolution.width * resolution.height) /
                           1000000
                         ).toFixed(1)}{" "}
-                        MP
+                        MP - {resolution.width} x {resolution.height} px
                       </SelectItem>
                     ) : null;
                   })}
@@ -514,7 +538,7 @@ export default function ImagePage() {
 
           return imageOriginalPrice + selectedSizePrice + framePrice;
         } else {
-          return image.price[selectedSize] || 0;
+          return image.price?.[selectedSize] || 0;
         }
       } else {
         return image.price?.original || 0;
@@ -537,14 +561,14 @@ export default function ImagePage() {
             <div className={`px-5 lg:px-20`}>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-16 py-20 bg-[#FBFBFB] -mt-2">
                 <div className="lg:col-span-2 flex flex-col gap-10">
-                  <motion.div layout className="relative">
+                  <motion.div layout className="relative flex justify-center">
                     <motion.div
                       layout
                       className={`${
                         selectedPaper &&
                         selectedSize &&
-                        " bottom-[60%] w-1/3 h-auto left-0 right-0 mx-auto"
-                      } absolute z-10 shadow-[2px_2px_6px_rgba(0,0,0,0.7)]`}
+                        "mt-[5%] w-auto h-[25%] mx-auto"
+                      } absolute inset-y-0 z-10 shadow-[2px_2px_6px_rgba(0,0,0,0.7)]`}
                     >
                       <ImageSection
                         selectedFrame={selectedFrame}
@@ -607,7 +631,7 @@ export default function ImagePage() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <h2 className="text-heading-06 lg:text-heading-02 font-semibold text-surface-600">
+                    <h2 className="text-heading-06 lg:text-heading-02 font-semibold text-surface-600 capitalize">
                       {image.title || "Artwork name"}
                     </h2>
                     <h5 className="text-heading-sm lg:text-heading-05 uppercase font-semibold text-surface-500">

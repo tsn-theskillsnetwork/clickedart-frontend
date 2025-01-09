@@ -213,7 +213,7 @@ export default function PhotoUploadPage() {
     return (
       <div className="flex flex-col items-center justify-center h-[80vh]">
         <h1 className="text-heading-03">Not Authenticated</h1>
-        <Link href="/photographer/signin">
+        <Link href="/signin/photographer">
           <Button2>Sign In</Button2>
         </Link>
       </div>

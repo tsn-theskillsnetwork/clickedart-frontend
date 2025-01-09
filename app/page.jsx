@@ -10,6 +10,7 @@ import Stats from "@/components/home/stats";
 import Testimonial from "@/components/home/testimonial";
 import DiscoverMobile from "@/components/home/discoverMobile";
 import { AnimatePresence, motion } from "framer-motion";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -35,11 +36,11 @@ export default function Home() {
             professional space for them to showcase and sell their exceptional
             work.
           </p>
-          <div className="pt-10">
+          <Link href={"/contact"} className="pt-10">
             <Button size="xl" variant="filled" state="default">
               Know more about us
             </Button>
-          </div>
+          </Link>
         </div>
         <div className="hidden lg:block">
           <ProductCategories />

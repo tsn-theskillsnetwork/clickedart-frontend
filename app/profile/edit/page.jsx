@@ -47,7 +47,7 @@ const ProfileEditPage = () => {
   const fetchUserData = async () => {
     try {
       const res = await fetch(
-        `http://localhost:5000/api/user/get-user-by-id?userId=${user._id}`,
+        `${process.env.NEXT_PUBLIC_SERVER}/api/user/get-user-by-id?userId=${user._id}`,
         {
           method: "GET",
           headers: {
@@ -72,7 +72,7 @@ const ProfileEditPage = () => {
   const fetchPhotographerData = async () => {
     try {
       const res = await fetch(
-        `http://localhost:5000/api/photographer/get-photographer-by-id?photographerId=${photographer._id}`,
+        `${process.env.NEXT_PUBLIC_SERVER}/api/photographer/get-photographer-by-id?photographerId=${photographer._id}`,
         {
           method: "GET",
           headers: {
@@ -120,7 +120,7 @@ const ProfileEditPage = () => {
 
       try {
         const res = await axios.post(
-          "http://localhost:5000/api/upload/uploadSingleImage",
+          `${process.env.NEXT_PUBLIC_SERVER}/api/upload/uploadSingleImage`,
           formData,
           {
             headers: {
@@ -174,7 +174,7 @@ const ProfileEditPage = () => {
       const toastId = toast.loading("Updating profile...");
 
       const res = await fetch(
-        `http://localhost:5000/api/${
+        `${process.env.NEXT_PUBLIC_SERVER}/api/${
           photographer ? "photographer" : "user"
         }/update-profile`,
         {
@@ -401,7 +401,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="text"
                     name="shippingAddress.address"
-                    value={formData.shippingAddress?.address}
+                    value={formData.shippingAddress?.address || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.address = e.target.value;
@@ -417,7 +417,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="text"
                     name="shippingAddress.city"
-                    value={formData.shippingAddress?.city}
+                    value={formData.shippingAddress?.city || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.city = e.target.value;
@@ -433,7 +433,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="text"
                     name="shippingAddress.state"
-                    value={formData.shippingAddress?.state}
+                    value={formData.shippingAddress?.state || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.state = e.target.value;
@@ -449,7 +449,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="text"
                     name="shippingAddress.country"
-                    value={formData.shippingAddress?.country}
+                    value={formData.shippingAddress?.country || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.country = e.target.value;
@@ -465,7 +465,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="text"
                     name="shippingAddress.landmark"
-                    value={formData.shippingAddress?.landmark}
+                    value={formData.shippingAddress?.landmark || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.landmark = e.target.value;
@@ -481,7 +481,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="text"
                     name="shippingAddress.pincode"
-                    value={formData.shippingAddress?.pincode}
+                    value={formData.shippingAddress?.pincode || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.pincode = e.target.value;
@@ -497,7 +497,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="text"
                     name="shippingAddress.area"
-                    value={formData.shippingAddress?.area}
+                    value={formData.shippingAddress?.area || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.area = e.target.value;
@@ -513,7 +513,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="email"
                     name="shippingAddress.email"
-                    value={formData.shippingAddress?.email}
+                    value={formData.shippingAddress?.email || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.email = e.target.value;
@@ -529,7 +529,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="tel"
                     name="shippingAddress.mobile"
-                    value={formData.shippingAddress?.mobile}
+                    value={formData.shippingAddress?.mobile || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.mobile = e.target.value;
@@ -548,7 +548,7 @@ const ProfileEditPage = () => {
               <Input
                 type="date"
                 name="dob"
-                value={formData.dob}
+                value={formData.dob || ""}
                 onChange={handleInputChange}
               />
               {errors.dob && (
@@ -575,7 +575,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="text"
                     name="companyName"
-                    value={formData.companyName}
+                    value={formData.companyName || ""}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -585,7 +585,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="email"
                     name="companyEmail"
-                    value={formData.companyEmail}
+                    value={formData.companyEmail || ""}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -595,7 +595,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="text"
                     name="companyAddress"
-                    value={formData.companyAddress}
+                    value={formData.companyAddress || ""}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -605,7 +605,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="tel"
                     name="companyPhone"
-                    value={formData.companyPhone}
+                    value={formData.companyPhone || ""}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -617,7 +617,7 @@ const ProfileEditPage = () => {
               <Input
                 type="url"
                 name="portfolioLink"
-                value={formData.portfolioLink}
+                value={formData.portfolioLink || ""}
                 onChange={handleInputChange}
               />
             </div>
@@ -649,7 +649,7 @@ const ProfileEditPage = () => {
               <Input
                 type="text"
                 name="awards"
-                value={formData.awards?.join(", ")}
+                value={formData.awards?.join(", ") || ""}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
@@ -664,7 +664,7 @@ const ProfileEditPage = () => {
               <Input
                 type="text"
                 name="achivements"
-                value={formData.achivements?.join(", ")}
+                value={formData.achivements?.join(", ") || ""}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
@@ -679,7 +679,7 @@ const ProfileEditPage = () => {
               <Input
                 type="text"
                 name="certifications"
-                value={formData.certifications?.join(", ")}
+                value={formData.certifications?.join(", ") || ""}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
@@ -696,7 +696,7 @@ const ProfileEditPage = () => {
               <Input
                 type="number"
                 name="yearsOfExperience"
-                value={formData.yearsOfExperience}
+                value={formData.yearsOfExperience || ""}
                 onChange={handleInputChange}
               />
               {errors.yearsOfExperience && (
@@ -713,7 +713,7 @@ const ProfileEditPage = () => {
                   <div key={index} className="flex gap-2">
                     <Select
                       className="w-36"
-                      value={account.accountName}
+                      value={account.accountName  || ""}
                       onValueChange={(value) => {
                         const newAccounts = [...formData.connectedAccounts];
                         newAccounts[index].accountName = value;
@@ -737,7 +737,7 @@ const ProfileEditPage = () => {
                     <Input
                       type="text"
                       name="accountLink"
-                      value={account.accountLink}
+                      value={account.accountLink || ""}
                       onChange={(e) => {
                         const newAccounts = [...formData.connectedAccounts];
                         newAccounts[index].accountLink = e.target.value;
@@ -885,7 +885,7 @@ const ProfileEditPage = () => {
                 <Input
                   type="text"
                   name="firstName"
-                  value={formData.firstName}
+                  value={formData.firstName || ""}
                   onChange={handleInputChange}
                   required
                 />
@@ -901,7 +901,7 @@ const ProfileEditPage = () => {
                 <Input
                   type="text"
                   name="lastName"
-                  value={formData.lastName}
+                  value={formData.lastName || ""}
                   onChange={handleInputChange}
                   required
                 />
@@ -915,7 +915,7 @@ const ProfileEditPage = () => {
               <Input
                 type="email"
                 name="email"
-                value={formData.email}
+                value={formData.email || ""}
                 onChange={handleInputChange}
                 required
               />
@@ -929,7 +929,7 @@ const ProfileEditPage = () => {
               <Input
                 type="tel"
                 name="mobile"
-                value={formData.mobile}
+                value={formData.mobile || ""}
                 onChange={handleInputChange}
               />
             </div>
@@ -939,7 +939,7 @@ const ProfileEditPage = () => {
               <Input
                 type="tel"
                 name="whatsapp"
-                value={formData.whatsapp}
+                value={formData.whatsapp || ""}
                 onChange={handleInputChange}
               />
             </div>
@@ -952,7 +952,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="text"
                     name="shippingAddress.address"
-                    value={formData.shippingAddress?.address}
+                    value={formData.shippingAddress?.address || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.address = e.target.value;
@@ -968,7 +968,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="text"
                     name="shippingAddress.city"
-                    value={formData.shippingAddress?.city}
+                    value={formData.shippingAddress?.city || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.city = e.target.value;
@@ -984,7 +984,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="text"
                     name="shippingAddress.state"
-                    value={formData.shippingAddress?.state}
+                    value={formData.shippingAddress?.state || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.state = e.target.value;
@@ -1000,7 +1000,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="text"
                     name="shippingAddress.country"
-                    value={formData.shippingAddress?.country}
+                    value={formData.shippingAddress?.country || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.country = e.target.value;
@@ -1016,7 +1016,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="text"
                     name="shippingAddress.landmark"
-                    value={formData.shippingAddress?.landmark}
+                    value={formData.shippingAddress?.landmark || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.landmark = e.target.value;
@@ -1032,7 +1032,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="text"
                     name="shippingAddress.pincode"
-                    value={formData.shippingAddress?.pincode}
+                    value={formData.shippingAddress?.pincode || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.pincode = e.target.value;
@@ -1048,7 +1048,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="text"
                     name="shippingAddress.area"
-                    value={formData.shippingAddress?.area}
+                    value={formData.shippingAddress?.area || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.area = e.target.value;
@@ -1064,7 +1064,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="email"
                     name="shippingAddress.email"
-                    value={formData.shippingAddress?.email}
+                    value={formData.shippingAddress?.email || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.email = e.target.value;
@@ -1080,7 +1080,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="tel"
                     name="shippingAddress.mobile"
-                    value={formData.shippingAddress?.mobile}
+                    value={formData.shippingAddress?.mobile || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.mobile = e.target.value;
@@ -1112,7 +1112,7 @@ const ProfileEditPage = () => {
               <Input
                 type="text"
                 name="interests"
-                value={formData.interests}
+                value={formData.interests || ""}
                 onChange={handleInputChange}
                 placeholder="Comma-separated interests"
               />
@@ -1128,7 +1128,7 @@ const ProfileEditPage = () => {
                   <div key={index} className="flex gap-2">
                     <Select
                       className="w-36"
-                      value={account.accountName}
+                      value={account.accountName || ""}
                       onValueChange={(value) => {
                         const newAccounts = [...formData.connectedAccounts];
                         newAccounts[index].accountName = value;
@@ -1152,7 +1152,7 @@ const ProfileEditPage = () => {
                     <Input
                       type="text"
                       name="accountLink"
-                      value={account.accountLink}
+                      value={account.accountLink || ""}
                       onChange={(e) => {
                         const newAccounts = [...formData.connectedAccounts];
                         newAccounts[index].accountLink = e.target.value;

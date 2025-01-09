@@ -7,6 +7,7 @@ const useAuthStore = create(
       token: null,
       user: null,
       photographer: null,
+      isHydrated: false, // Flag for hydration status
 
       signin: (newToken) =>
         set({
@@ -42,17 +43,17 @@ const useAuthStore = create(
             const token = sessionStorage.getItem("token");
             const user = sessionStorage.getItem("user");
 
-            return {
+            return JSON.stringify({
               token: token || null,
               user: user ? JSON.parse(user) : null,
-            };
+            });
           }
 
-          return JSON.parse(storedData);
+          return storedData;
         },
         setItem: (name, value) => {
           if (typeof window !== "undefined") {
-            sessionStorage.setItem(name, JSON.stringify(value));
+            sessionStorage.setItem(name, value);
           }
         },
         removeItem: (name) => {
@@ -60,6 +61,10 @@ const useAuthStore = create(
             sessionStorage.removeItem(name);
           }
         },
+      },
+      onRehydrateStorage: () => (state) => {
+        // Set the `isHydrated` flag after rehydration
+        state.isHydrated = true;
       },
     }
   )

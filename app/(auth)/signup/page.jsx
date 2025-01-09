@@ -72,7 +72,7 @@ const RegistrationForm = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/upload/uploadSingleImage`,
+        `${process.env.NEXT_PUBLIC_SERVER}/api/upload/uploadSingleImage`,
         {
           method: "POST",
           body: uploadData,
@@ -135,7 +135,7 @@ const RegistrationForm = () => {
 
       try {
         const res = await axios.post(
-          "http://localhost:5000/api/upload/uploadSingleImage",
+          `${process.env.NEXT_PUBLIC_SERVER}/api/upload/uploadSingleImage`,
           formData,
           {
             headers: {

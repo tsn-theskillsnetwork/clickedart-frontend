@@ -16,6 +16,7 @@ import useCartStore from "@/store/cart";
 import useAuthStore from "@/authStore";
 import useWishlistStore from "@/store/wishlist";
 import toast from "react-hot-toast";
+import Link from "next/link";
 
 export default function ThemesResultPage() {
   const { user } = useAuthStore();
@@ -308,7 +309,14 @@ export default function ThemesResultPage() {
                   priority
                   src={image.imageLinks.thumbnail || image.imageLinks.original}
                   alt={image.description}
-                  className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear"
+                  className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear opacity-50 blur-[4px] border border-primary-200"
+                />
+                <Image
+                  width={800}
+                  height={800}
+                  src={image.imageLinks.thumbnail || image.imageLinks.original}
+                  alt={image.description}
+                  className="absolute inset-0 object-contain w-full aspect-[1/1] transition-all duration-200 ease-linear drop-shadow-md"
                 />
 
                 <div className="absolute inset-0">
@@ -343,29 +351,32 @@ export default function ThemesResultPage() {
                 <h2 className="text-heading-05 font-semibold">
                   {image.title || "Untitled"}
                 </h2>
-                <p className="font-medium">
+                <Link
+                  href={`/photographer/${image.photographer?._id}`}
+                  className="font-medium"
+                >
                   {image.photographer?.firstName
                     ? image.photographer?.firstName +
                       " " +
                       image.photographer?.lastName
                     : image.photographer?.name}
-                </p>
-                <p className="font-medium text-blue-500">
+                </Link>
+                <p className="font-medium text-surface-500">
                   {image.category?.name}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {image.keywords?.map((tag, index) => (
                     <span
                       key={index}
-                      className="text-xs bg-blue-500 text-white px-2 py-1 rounded-full"
+                      className="text-xs bg-surface-500 text-white px-2 py-1 rounded-full"
                     >
                       {tag} <Tag size={12} className="inline" />
                     </span>
                   ))}
                 </div>
-                <h2 className="text-heading-06 font-medium">
+                {/* <h2 className="text-heading-06 font-medium">
                   {image.description}
-                </h2>
+                </h2> */}
                 <p className="text-paragraph font-medium">
                   {(
                     (image.resolutions?.original?.height *

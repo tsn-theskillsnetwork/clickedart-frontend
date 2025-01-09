@@ -9,12 +9,12 @@ import useCartStore from "@/store/cart";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useRazorpay } from "react-razorpay";
 
 export default function CheckoutPage() {
-  const { user, photographer, token } = useAuthStore();
+  const { user, photographer, token, isHydrated } = useAuthStore();
   const { cartItems, removeItemFromCart } = useCartStore();
   const router = useRouter();
   const [code, setCode] = useState("");
@@ -279,15 +279,20 @@ export default function CheckoutPage() {
     }
   }, [paymentStatus]);
 
+  const toastShownRef = useRef(false);
+
   useEffect(() => {
-    if (photographer) {
+    if (!isHydrated) return;
+
+    if (!user && !toastShownRef.current) {
+      toastShownRef.current = true;
       toast("Please Login as User to continue", {
         duration: 4000,
         position: "top-center",
       });
-      router.push("/");
+      router.push("/signin");
     }
-  }, [photographer]);
+  }, [isHydrated, user, router]);
 
   return (
     <div>
@@ -379,10 +384,7 @@ export default function CheckoutPage() {
                     <Input
                       type="text"
                       placeholder="City"
-                      value={
-                        orderData.shippingAddress.city ||
-                        ""
-                      }
+                      value={orderData.shippingAddress.city || ""}
                       onChange={(e) =>
                         setOrderData((prev) => ({
                           ...prev,
@@ -400,10 +402,7 @@ export default function CheckoutPage() {
                       type="text"
                       placeholder="Uttar Pradesh"
                       required
-                      value={
-                        orderData.shippingAddress.state ||
-                        ""
-                      }
+                      value={orderData.shippingAddress.state || ""}
                       onChange={(e) =>
                         setOrderData((prev) => ({
                           ...prev,
@@ -441,10 +440,7 @@ export default function CheckoutPage() {
                     <Input
                       type="text"
                       placeholder="Landmark"
-                      value={
-                        orderData.shippingAddress.landmark ||
-                        ""
-                      }
+                      value={orderData.shippingAddress.landmark || ""}
                       onChange={(e) =>
                         setOrderData((prev) => ({
                           ...prev,
