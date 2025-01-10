@@ -7,45 +7,28 @@ import Button from "@/components/button";
 import Link from "next/link";
 import Button2 from "@/components/button2";
 import {
-  BookUserIcon,
   EllipsisIcon,
   Pencil,
   Plus,
-  Tag,
-  TextIcon,
-  UploadIcon,
 } from "lucide-react";
 import axios from "axios";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { EllipsisVertical } from "lucide-react";
-import { fetchData } from "@/helpers/api";
-import { S3Client } from "@aws-sdk/client-s3";
-import { Upload } from "@aws-sdk/lib-storage";
 import toast from "react-hot-toast";
 
 const ProfilePage = () => {
@@ -61,8 +44,6 @@ const ProfilePage = () => {
   const [selectedCatelogue, setSelectedCatelogue] = useState([]);
   const [photos, setPhotos] = useState([]);
   const [catalogues, setCatalogues] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [licenses, setLicenses] = useState([]);
   const [newCatalogue, setNewCatalogue] = useState({
     name: "",
     description: "",
@@ -399,7 +380,7 @@ const ProfilePage = () => {
                           </div>
                           <div
                             className={`${
-                              image.exclusiveLicenseStatus != "approved"
+                              !image.isActive
                                 ? "bg-red-500"
                                 : "bg-transparent"
                             } h-2 w-2 rounded-full shadow-[0_0_4px_rgba(0,0,0,0.6)]`}
@@ -480,7 +461,8 @@ const ProfilePage = () => {
                         >
                           {catalogue.images?.length > 0 ? (
                             <>
-                              {catalogue.images?.map((image) => (
+                            {/* //map only 4 images */}
+                              {catalogue.images.slice(0, 4).map((image) => (
                                 <div
                                   key={image._id}
                                   className="shadow-[0_2px_6px_rgba(0,0,0,0.2)] aspect-[1/1] rounded-md overflow-hidden"

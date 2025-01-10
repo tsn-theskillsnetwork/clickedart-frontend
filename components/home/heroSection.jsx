@@ -42,7 +42,7 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <div className="relative h-[60vh] sm:h-[80vh] md:h-[90vh] lg:h-[100vh] xl:h-[110vh] overflow-hidden">
+    <div className="relative h-[70vh] sm:h-[80vh] md:h-[90vh] lg:h-[100vh] xl:h-[110vh] overflow-hidden">
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-black opacity-30 z-10"></div>
         <AnimatePresence mode="popLayout">
@@ -64,10 +64,9 @@ export default function HeroSection() {
           </motion.div>
         </AnimatePresence>
       </div>
-
-      {/* Text content */}
-      <div className="absolute inset-0 z-20 flex flex-col mt-20 sm:mt-36 items-center text-white">
-        <h1 className="text-heading-03 md:text-heading-02 lg:text-heading-01 xl:text-heading-lg font-semibold">
+      
+      <div className="absolute inset-0 z-20 flex flex-col mt-20 sm:mt-20 items-center text-white">
+        <h1 className="text-heading-03 md:text-heading-02 lg:text-heading-01 2xl:text-heading-lg font-semibold">
           ClickedArt
         </h1>
         <div className="h-12 overflow-hidden">
@@ -90,7 +89,7 @@ export default function HeroSection() {
             </AnimatePresence>
           </div>
         </div>
-        <div className="mt-[2%] flex flex-row bg-white text-black group rounded-lg items-center gap-4 w-11/12 md:w-4/5 lg:w-2/3 xl:w-1/2 focus-within:outline focus-within:outline-blue-500">
+        <div className="mt-[1%] flex flex-row bg-white text-black group rounded-lg items-center gap-4 w-11/12 md:w-4/5 lg:w-2/3 xl:w-1/2 focus-within:outline focus-within:outline-blue-500">
           <div className="h-full aspect-[1/1] flex justify-center items-center">
             <Search size={40} color="black" className="mx-auto" />
           </div>
@@ -114,13 +113,13 @@ export default function HeroSection() {
             />
           </button>
         </div>
-        <div className="mt-[5%] w-full hidden sm:flex gap-2 items-center flex-row justify-around">
+        <div className="mt-[2%] w-full flex flex-col gap-2 items-center md:flex-row justify-around">
           <button
             onClick={() => router.push("/images")}
-            className="border-2 bg-gradient-to-tr from-transparent to-transparent hover:from-black border-white rounded-2xl px-2 py-1 sm:px-4 sm:py-2 sm:pl-5 w-72 group transition-all duration-200 ease-linear"
+            className="border-2 bg-gradient-to-tr from-transparent to-transparent hover:from-black border-white rounded-2xl px-2 py-2 sm:px-4 sm:py-2 sm:pl-5 w-52 md:w-72 group transition-all duration-200 ease-linear"
           >
             <div className="flex flex-row gap-2 items-center">
-              <div className="flex items-center justify-center h-10 w-10">
+              <div className="flex items-center justify-center h-5 w-5 md:h-10  md:w-10">
                 <div className="rounded-full bg-white flex outline-offset-2 outline outline-1 group-hover:outline-none outline-white items-center justify-center w-1 h-1 group-hover:w-10 group-hover:h-10 transition-all duration-200">
                   <ChevronRight
                     size={30}
@@ -129,7 +128,7 @@ export default function HeroSection() {
                 </div>
               </div>
               {/* The text with the outline effect */}
-              <p className="relative text-white">
+              <p className="relative text-white text-sm md:text-base">
                 Browse the collection
                 <span className="absolute bottom-0 right-0 h-[1.5px] bg-white w-10 group-hover:w-full transition-all duration-200 ease-in-out"></span>
               </p>
@@ -137,10 +136,10 @@ export default function HeroSection() {
           </button>
           <button
             onClick={() => router.push("/signin/photographer")}
-            className="border-2 bg-gradient-to-tr from-transparent to-transparent hover:from-black border-white rounded-2xl px-2 py-1 sm:px-4 sm:py-2 sm:pl-5 w-72 group transition-all duration-200 ease-linear"
+            className="border-2 bg-gradient-to-tr from-transparent to-transparent hover:from-black border-white rounded-2xl px-2 py-2 sm:px-4 sm:py-2 sm:pl-5 w-52 md:w-72 group transition-all duration-200 ease-linear"
           >
             <div className="flex flex-row gap-2 items-center">
-              <div className="flex items-center justify-center h-10 w-10">
+              <div className="flex items-center justify-center h-5 w-5 md:h-10 md:w-10">
                 <div className="rounded-full bg-white flex outline-offset-2 outline outline-1 group-hover:outline-none outline-white items-center justify-center w-1 h-1 group-hover:w-10 group-hover:h-10 transition-all duration-200">
                   <ChevronRight
                     size={30}
@@ -148,7 +147,7 @@ export default function HeroSection() {
                   />
                 </div>
               </div>
-              <p className="relative text-white">
+              <p className="relative text-white text-sm md:text-base">
                 Sell your photos
                 <span className="absolute bottom-0 right-0 h-[1.5px] bg-white w-10 group-hover:w-full transition-all duration-200 ease-in-out"></span>
               </p>
@@ -157,7 +156,7 @@ export default function HeroSection() {
         </div>
       </div>
       <div>
-        <div className="absolute bottom-3 sm:bottom-5 px-2 left-0 w-full z-40 flex justify-around gap-2 items-end">
+        <div className="absolute inset-x-0 mx-auto bottom-3 sm:bottom-5 px-2 left-0 w-[90vw] z-40 flex justify-around gap-2 items-end">
           {images.map((image, index) => (
             <div key={index}>
               <Image
@@ -167,7 +166,7 @@ export default function HeroSection() {
                 height={300}
                 loading="lazy"
                 onClick={() => setCurrentImage(index)}
-                className={`object-cover border-2 sm:border-4 transition-all duration-500 cursor-pointer ease-in-out ${
+                className={`object-cover border-2 sm:border-4 w-[90%] transition-all duration-500 cursor-pointer ease-in-out ${
                   currentImage === index ? "aspect-[6/7]" : "aspect-[7/4]"
                 }`}
               />

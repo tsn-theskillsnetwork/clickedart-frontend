@@ -32,38 +32,26 @@ const useAuthStore = create(
         }),
     }),
     {
-      name: "auth-storage",
+      name: "auth-storage", // The key for sessionStorage
       storage: {
-        getItem: (name) => {
-          if (typeof window === "undefined") return null;
-
-          const storedData = sessionStorage.getItem(name);
-
-          if (!storedData) {
-            const token = sessionStorage.getItem("token");
-            const user = sessionStorage.getItem("user");
-
-            return JSON.stringify({
-              token: token || null,
-              user: user ? JSON.parse(user) : null,
-            });
-          }
-
-          return storedData;
+        getItem: (key) => {
+          if (typeof window === "undefined") return null; // Ensure this only runs in the browser
+          const storedData = sessionStorage.getItem(key);
+          return storedData ? JSON.parse(storedData) : null;
         },
-        setItem: (name, value) => {
+        setItem: (key, value) => {
           if (typeof window !== "undefined") {
-            sessionStorage.setItem(name, value);
+            sessionStorage.setItem(key, JSON.stringify(value));
           }
         },
-        removeItem: (name) => {
+        removeItem: (key) => {
           if (typeof window !== "undefined") {
-            sessionStorage.removeItem(name);
+            sessionStorage.removeItem(key);
           }
         },
       },
       onRehydrateStorage: () => (state) => {
-        // Set the `isHydrated` flag after rehydration
+        // Set the `isHydrated` flag to true after hydration
         state.isHydrated = true;
       },
     }

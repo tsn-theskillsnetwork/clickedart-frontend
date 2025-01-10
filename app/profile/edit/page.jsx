@@ -38,6 +38,8 @@ const ProfileEditPage = () => {
   const [croppedImageUrl, setCroppedImageUrl] = useState(null);
   const cropperRef = useRef(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [selectedCountry, setSelectedCountry] = useState("102");
+  const [selectedState, setSelectedState] = useState("");
 
   const handleInputChange = ({ currentTarget: input }) => {
     if (input.name === "interests") {
@@ -72,6 +74,11 @@ const ProfileEditPage = () => {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    setSelectedCountry(formData.shippingAddress?.country);
+    setSelectedState(formData.shippingAddress?.state);
+  }, [formData]);
 
   const fetchPhotographerData = async () => {
     try {
@@ -402,7 +409,10 @@ const ProfileEditPage = () => {
                     }}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select Country" />
+                      <SelectValue
+                        placeholder="Select Country"
+                        value={formData.shippingAddress?.country}
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {countries[2].data.map((country) => (
@@ -551,7 +561,7 @@ const ProfileEditPage = () => {
               )}
             </div>
 
-            <div className="flex items-center gap-3">
+            {/* <div className="flex items-center gap-3">
               <Label>Is this a company account?</Label>
               <input
                 type="checkbox"
@@ -561,9 +571,9 @@ const ProfileEditPage = () => {
                   setFormData({ ...formData, isCompany: e.target.checked })
                 }
               />
-            </div>
+            </div> */}
 
-            {formData.isCompany && (
+            {/* {formData.isCompany && (
               <>
                 <div>
                   <Label>Company Name</Label>
@@ -605,9 +615,9 @@ const ProfileEditPage = () => {
                   />
                 </div>
               </>
-            )}
+            )} */}
 
-            <div>
+            {/* <div>
               <Label>Portfolio Link</Label>
               <Input
                 type="url"
@@ -615,9 +625,9 @@ const ProfileEditPage = () => {
                 value={formData.portfolioLink || ""}
                 onChange={handleInputChange}
               />
-            </div>
+            </div> */}
 
-            <div>
+            {/* <div>
               <Label>Photography Styles</Label>
               <Input
                 type="text"
@@ -699,7 +709,7 @@ const ProfileEditPage = () => {
                   {errors.yearsOfExperience}
                 </p>
               )}
-            </div>
+            </div> */}
 
             <div>
               <Label>Connect Accounts</Label>
@@ -912,7 +922,7 @@ const ProfileEditPage = () => {
                 name="email"
                 value={formData.email || ""}
                 onChange={handleInputChange}
-                required
+                disabled
               />
               {errors.email && (
                 <p className="text-red-500 text-sm">{errors.email}</p>
@@ -926,6 +936,7 @@ const ProfileEditPage = () => {
                 name="mobile"
                 value={formData.mobile || ""}
                 onChange={handleInputChange}
+                disabled
               />
             </div>
 
@@ -940,8 +951,98 @@ const ProfileEditPage = () => {
             </div>
 
             <div className="py-2 my-2 border-y">
-              <p className="text-heading-06 font-semibold">Shipping Address</p>
+              <p className="text-heading-06 font-semibold">Address</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <Label>Country*</Label>
+                  <Select
+                    defaultValue={formData.shippingAddress?.country}
+                    onValueChange={(value) => {
+                      const selectedCountry = countries[2].data.find(
+                        (country) => country.name === value
+                      );
+                      setSelectedCountry(selectedCountry.id);
+                      const newAddress = { ...formData.shippingAddress };
+                      newAddress.country = value;
+                      setFormData({
+                        ...formData,
+                        shippingAddress: newAddress,
+                      });
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue
+                        placeholder="Select Country"
+                        value={formData.shippingAddress?.country || ""}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {countries[2].data.map((country) => (
+                        <SelectItem key={country.id} value={country.name}>
+                          {country.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>State*</Label>
+                  <Select
+                    defaultValue={formData.shippingAddress?.state}
+                    onValueChange={(value) => {
+                      const selectedState = states[2].data.find(
+                        (state) => state.name === value
+                      );
+                      setSelectedState(selectedState.id);
+                      const newAddress = { ...formData.shippingAddress };
+                      newAddress.state = value;
+                      setFormData({
+                        ...formData,
+                        shippingAddress: newAddress,
+                      });
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select State" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {states[2].data
+                        .filter((state) => state.countryId === selectedCountry) // Filter states by selected country ID
+                        .map((state) => (
+                          <SelectItem key={state.id} value={state.name}>
+                            {state.name}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>City*</Label>
+                  <Select
+                    defaultValue={formData.shippingAddress?.city}
+                    onValueChange={(value) => {
+                      const newAddress = { ...formData.shippingAddress };
+                      newAddress.city = value;
+                      setFormData({
+                        ...formData,
+                        shippingAddress: newAddress,
+                      });
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select City" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {cities[2].data
+                        .filter((city) => city.stateId === selectedState) // Filter cities by selected state ID
+                        .map((city) => (
+                          <SelectItem key={city.id} value={city.name}>
+                            {city.name}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div>
                   <Label>Address</Label>
                   <Input
@@ -951,54 +1052,6 @@ const ProfileEditPage = () => {
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.address = e.target.value;
-                      setFormData({
-                        ...formData,
-                        shippingAddress: newAddress,
-                      });
-                    }}
-                  />
-                </div>
-                <div>
-                  <Label>City</Label>
-                  <Input
-                    type="text"
-                    name="shippingAddress.city"
-                    value={formData.shippingAddress?.city || ""}
-                    onChange={(e) => {
-                      const newAddress = { ...formData.shippingAddress };
-                      newAddress.city = e.target.value;
-                      setFormData({
-                        ...formData,
-                        shippingAddress: newAddress,
-                      });
-                    }}
-                  />
-                </div>
-                <div>
-                  <Label>State</Label>
-                  <Input
-                    type="text"
-                    name="shippingAddress.state"
-                    value={formData.shippingAddress?.state || ""}
-                    onChange={(e) => {
-                      const newAddress = { ...formData.shippingAddress };
-                      newAddress.state = e.target.value;
-                      setFormData({
-                        ...formData,
-                        shippingAddress: newAddress,
-                      });
-                    }}
-                  />
-                </div>
-                <div>
-                  <Label>Country</Label>
-                  <Input
-                    type="text"
-                    name="shippingAddress.country"
-                    value={formData.shippingAddress?.country || ""}
-                    onChange={(e) => {
-                      const newAddress = { ...formData.shippingAddress };
-                      newAddress.country = e.target.value;
                       setFormData({
                         ...formData,
                         shippingAddress: newAddress,
@@ -1023,7 +1076,7 @@ const ProfileEditPage = () => {
                   />
                 </div>
                 <div>
-                  <Label>Pincode</Label>
+                  <Label>Pincode*</Label>
                   <Input
                     type="text"
                     name="shippingAddress.pincode"
@@ -1054,38 +1107,6 @@ const ProfileEditPage = () => {
                     }}
                   />
                 </div>
-                <div>
-                  <Label>Email</Label>
-                  <Input
-                    type="email"
-                    name="shippingAddress.email"
-                    value={formData.shippingAddress?.email || ""}
-                    onChange={(e) => {
-                      const newAddress = { ...formData.shippingAddress };
-                      newAddress.email = e.target.value;
-                      setFormData({
-                        ...formData,
-                        shippingAddress: newAddress,
-                      });
-                    }}
-                  />
-                </div>
-                <div>
-                  <Label>Mobile</Label>
-                  <Input
-                    type="tel"
-                    name="shippingAddress.mobile"
-                    value={formData.shippingAddress?.mobile || ""}
-                    onChange={(e) => {
-                      const newAddress = { ...formData.shippingAddress };
-                      newAddress.mobile = e.target.value;
-                      setFormData({
-                        ...formData,
-                        shippingAddress: newAddress,
-                      });
-                    }}
-                  />
-                </div>
               </div>
             </div>
 
@@ -1107,8 +1128,12 @@ const ProfileEditPage = () => {
               <Input
                 type="text"
                 name="interests"
-                value={formData.interests || ""}
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  const newInterests = e.target.value
+                    .split(",")
+                    .map((item) => item.trim());
+                  setFormData({ ...formData, interests: newInterests });
+                }}
                 placeholder="Comma-separated interests"
               />
               {errors.interests && (

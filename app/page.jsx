@@ -42,10 +42,7 @@ export default function Home() {
             </Button>
           </Link>
         </div>
-        <div className="hidden lg:block">
-          <ProductCategories />
-        </div>
-        <div className="px-4 block mt-10 lg:hidden">
+        <div className="px-4 mt-10">
           <ProductCategoriesMobile />
         </div>
         <div className=" px-4 mb-20">

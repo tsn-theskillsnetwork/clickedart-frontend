@@ -84,10 +84,12 @@ const RegistrationForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState("102");
   const [selectedState, setSelectedState] = useState("");
-  console.log("selectedCountry", selectedCountry);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    if (name === "bio" && value.length > 100) {
+      return;
+    }
     setFormData({ ...formData, [name]: value ?? "" });
   };
 
@@ -172,9 +174,6 @@ const RegistrationForm = () => {
       console.error("Error uploading file:", error);
     }
   };
-
-  console.log(formData.bestPhotos);
-  console.log(formData.shippingAddress);
 
   const validateForm1 = () => {
     const newErrors = {};
@@ -412,6 +411,7 @@ const RegistrationForm = () => {
                   type="text"
                   name="firstName"
                   value={formData.firstName}
+                  placeholder="First Name"
                   onChange={handleInputChange}
                   required
                 />
@@ -427,6 +427,7 @@ const RegistrationForm = () => {
                 <Input
                   type="text"
                   name="lastName"
+                  placeholder="Last Name"
                   value={formData.lastName}
                   onChange={handleInputChange}
                   required
@@ -443,6 +444,7 @@ const RegistrationForm = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
+                placeholder="Email"
                 required
               />
               {errors.email && (
@@ -460,6 +462,7 @@ const RegistrationForm = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
+                  placeholder="Password"
                   required
                 />
 
@@ -488,6 +491,7 @@ const RegistrationForm = () => {
                 name="password"
                 value={verifyPassword}
                 onChange={(e) => setVerifyPassword(e.target.value)}
+                placeholder="Verify Password"
                 required
               />
               {errors.password && (
@@ -522,6 +526,7 @@ const RegistrationForm = () => {
                 name="mobile"
                 value={formData.mobile}
                 onChange={handleInputChange}
+                placeholder="Mobile Number"
               />
             </div>
 
@@ -532,15 +537,17 @@ const RegistrationForm = () => {
                 name="whatsapp"
                 value={formData.whatsapp}
                 onChange={handleInputChange}
+                placeholder="WhatsApp Number"
               />
             </div>
 
             <div>
-              <Label>Bio (Max Length: 1000 Words)</Label>
+              <Label>Bio (Max Length: 100 Words)</Label>
               <Textarea
                 name="bio"
                 value={formData.bio}
                 onChange={handleInputChange}
+                placeholder="Tell us about yourself..."
               />
             </div>
 
@@ -703,19 +710,19 @@ const RegistrationForm = () => {
 
             <div className="flex flex-col gap-2">
               <Label>Date of Birth</Label>
-              {/* <Input
+              <Input
                 type="date"
                 name="dob"
                 value={formData.dob}
                 onChange={handleInputChange}
-              /> */}
-              <DatePicker
+              />
+              {/* <DatePicker
                 className="border border-gray-300 rounded-md p-2 w-full"
                 placeholderText="Select Date of Birth"
                 selected={formData.dob}
                 onChange={handleInputChange}
                 dateFormat="MMMM d, yyyy"
-              />
+              /> */}
               {errors.dob && (
                 <p className="text-red-500 text-sm">{errors.dob}</p>
               )}
@@ -782,6 +789,7 @@ const RegistrationForm = () => {
               <Input
                 type="url"
                 name="portfolioLink"
+                placeholder="https://example.com"
                 value={formData.portfolioLink}
                 onChange={handleInputChange}
               />
@@ -792,7 +800,7 @@ const RegistrationForm = () => {
               <Input
                 type="text"
                 name="photographyStyles"
-                value={formData.photographyStyles?.join(", ")}
+                placeholder="e.g. Portrait, Landscape, etc."
                 onChange={(e) =>
                   setFormData({
                     ...formData,
@@ -814,7 +822,7 @@ const RegistrationForm = () => {
               <Input
                 type="text"
                 name="awards"
-                value={formData.awards?.join(", ")}
+                placeholder="e.g. Best Photographer 2024, etc."
                 onChange={(e) =>
                   setFormData({
                     ...formData,
@@ -829,7 +837,7 @@ const RegistrationForm = () => {
               <Input
                 type="text"
                 name="achivements"
-                value={formData.achivements?.join(", ")}
+                placeholder="e.g. Best Photographer 2024, etc."
                 onChange={(e) =>
                   setFormData({
                     ...formData,
@@ -844,7 +852,7 @@ const RegistrationForm = () => {
               <Input
                 type="text"
                 name="certifications"
-                value={formData.certifications?.join(", ")}
+                placeholder="e.g. Certified Photographer, etc."
                 onChange={(e) =>
                   setFormData({
                     ...formData,

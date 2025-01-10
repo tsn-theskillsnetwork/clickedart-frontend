@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
-import { ImageIcon, Plus, Trash } from "lucide-react";
+import { Eye, EyeClosed, ImageIcon, Plus, Trash } from "lucide-react";
 import Link from "next/link";
 import {
   Select,
@@ -61,6 +61,8 @@ const RegistrationForm = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [selectedCountry, setSelectedCountry] = useState("102");
   const [selectedState, setSelectedState] = useState("0");
+  const [showPassword, setShowPassword] = useState(false);
+  const [verifyPassword, setVerifyPassword] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -132,6 +134,8 @@ const RegistrationForm = () => {
       newErrors.dob = "Date of birth is invalid.";
     if (formData.interests && !/^[\w\s,]*$/.test(formData.interests))
       newErrors.interests = "Interests must be comma-separated.";
+    if (formData.password !== verifyPassword)
+      newErrors.password = "Passwords do not match.";
     return newErrors;
   };
 
@@ -372,11 +376,40 @@ const RegistrationForm = () => {
           <Label>
             Password <span className="text-red-500">*</span>
           </Label>
+          <div className="flex items-center gap-2">
+            <Input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              placeholder="Password"
+              required
+            />
+
+            {showPassword ? (
+              <EyeClosed
+                size={16}
+                onClick={() => setShowPassword((prev) => !prev)}
+              />
+            ) : (
+              <Eye size={16} onClick={() => setShowPassword((prev) => !prev)} />
+            )}
+          </div>
+          {errors.password && (
+            <p className="text-red-500 text-sm">{errors.password}</p>
+          )}
+        </div>
+
+        <div>
+          <Label>
+            Verify Password <span className="text-red-500">*</span>
+          </Label>
           <Input
-            type="password"
+            type={showPassword ? "text" : "password"}
             name="password"
-            value={formData.password}
-            onChange={handleInputChange}
+            value={verifyPassword || ""}
+            onChange={(e) => setVerifyPassword(e.target.value)}
+            placeholder="Verify Password"
             required
           />
           {errors.password && (
@@ -390,6 +423,7 @@ const RegistrationForm = () => {
             type="tel"
             name="mobile"
             value={formData.mobile}
+            placeholder="10-digit mobile number"
             onChange={handleInputChange}
           />
         </div>
@@ -399,6 +433,7 @@ const RegistrationForm = () => {
           <Input
             type="tel"
             name="whatsapp"
+            placeholder="10-digit WhatsApp number"
             value={formData.whatsapp}
             onChange={handleInputChange}
           />
@@ -577,9 +612,8 @@ const RegistrationForm = () => {
           <Input
             type="text"
             name="interests"
-            value={formData.interests}
             onChange={handleInputChange}
-            placeholder="Comma-separated interests"
+            placeholder="e.g. Reading, Writing, Coding"
           />
           {errors.interests && (
             <p className="text-red-500 text-sm">{errors.interests}</p>

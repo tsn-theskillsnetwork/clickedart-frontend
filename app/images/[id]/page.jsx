@@ -27,7 +27,8 @@ import { Icon } from "@iconify/react";
 export default function ImagePage() {
   const id = useParams().id;
   const { token } = useAuthStore();
-  const { addItemToCart, isItemInCart, removeItemFromCart } = useCartStore();
+  const { addItemToCart, removeItemFromCart, isItemInCart } =
+    useCartStore.getState();
   const onAddToCart = () => {
     if (mode === "print" && !selectedPaper) {
       toast.error("Please select a paper!");
@@ -37,29 +38,41 @@ export default function ImagePage() {
       toast.error("Please select a size!");
       return;
     }
-    if (mode === "print" && !selectedPaper) {
-      toast.error("Please select a paper!");
-      return;
-    }
 
     const productToAdd = {
-      ...image,
-      mode,
-      selectedPaper: selectedPaper,
-      selectedSize: selectedSize,
-      selectedFrame: selectedFrame,
+      imageInfo: {
+        image: image._id,
+        photographer: image.photographer,
+        resolution: selectedSize,
+        price: subTotal,
+        thumbnail: image.imageLinks?.thumbnail || image.imageLinks?.original,
+      },
+      paperInfo: selectedPaper
+        ? {
+            paper: selectedPaper._id,
+            price: selectedSize.price,
+            size: selectedSize,
+            name: selectedPaper.name,
+          }
+        : null,
+      frameInfo: selectedFrame
+        ? {
+            frame: selectedFrame._id,
+            price: (selectedSize?.width * selectedSize?.height) * selectedFrame.basePricePerLinearInch,
+            name: selectedFrame.name,
+          }
+        : null,
       subTotal: subTotal,
+      mode, // Differentiating mode (digital or print)
     };
 
     addItemToCart(productToAdd);
     toast.success("Added to cart!");
-    setInCart(true);
   };
 
-  const onRemoveFromCart = (id) => {
-    removeItemFromCart(id);
+  const onRemoveFromCart = () => {
+    removeItemFromCart(`${id}-${mode}`);
     toast.success("Removed from cart!");
-    setInCart(false);
   };
 
   const [image, setImage] = useState([]);
@@ -67,7 +80,6 @@ export default function ImagePage() {
   const [error, setError] = useState(null);
   const [recommendedLength, setRecommendedLength] = useState(4);
   const [viewCount, setViewCount] = useState(0);
-  const [inCart, setInCart] = useState(false);
 
   const [selected, setSelected] = useState(0);
   const [mode, setMode] = useState("digital");
@@ -79,6 +91,16 @@ export default function ImagePage() {
   const [desc, setDesc] = useState(true);
   const [buySectionActive, setBuySectionActive] = useState(false);
   const [subTotal, setSubTotal] = useState(image.price?.original || 0);
+  const [inCart, setInCart] = useState(false);
+
+  const images = [
+    {
+      src: image?.imageLinks?.original,
+    },
+    {
+      src: "https://plus.unsplash.com/premium_photo-1661780295073-98db12600af0?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    },
+  ];
 
   const [sliderRef, slider] = useKeenSlider({
     slides: {
@@ -148,14 +170,71 @@ export default function ImagePage() {
     setMode("digital");
   };
 
-  const images = [
-    {
-      src: image?.imageLinks?.original,
-    },
-    {
-      src: "https://plus.unsplash.com/premium_photo-1661780295073-98db12600af0?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    },
-  ];
+  const calculateSubtotal = () => {
+    if (selectedSize) {
+      if (mode === "print") {
+        const width = selectedSize?.width || 0;
+        const height = selectedSize?.height || 0;
+        const framePrice = selectedFrame
+          ? (width + height) * 2 * selectedFrame.basePricePerLinearInch
+          : 0;
+
+        const imagePrice = image.price?.original || 0;
+        const selectedSizePrice = selectedSize?.price || 0;
+
+        return imagePrice + selectedSizePrice + framePrice + (selectedPaper?.price || 0);
+      } else {
+        return image.price?.[selectedSize] || 0;
+      }
+    } else {
+      return image.price?.original || 0;
+    }
+  };
+
+  useEffect(() => {
+    setSubTotal(calculateSubtotal());
+  }, [selectedSize, selectedPaper, selectedFrame, mode, image]);
+
+  useEffect(() => {
+    if (id && token && viewCount === 0) {
+      const addViewCount = async () => {
+        try {
+          const res = await axios.post(
+            `${process.env.NEXT_PUBLIC_SERVER}/api/images/add-image-views-count`,
+            {
+              imageId: id,
+            }
+          );
+          setViewCount(1);
+        } catch (error) {
+          console.error("Error adding view count", error);
+        }
+      };
+      addViewCount();
+    }
+  }, [id, token, viewCount]);
+
+  useEffect(() => {
+    fetchImage();
+  }, [id]);
+
+  useEffect(() => {
+    fetchData(
+      `${process.env.NEXT_PUBLIC_SERVER}/api/paper/get-paper`,
+      "papers",
+      setPapers,
+      setError
+    );
+    fetchData(
+      `${process.env.NEXT_PUBLIC_SERVER}/api/frames/get-frames`,
+      "frames",
+      setFrames,
+      setError
+    );
+
+    setInCart(isItemInCart(id, mode));
+    setSubTotal(image.price?.original);
+  }, []);
 
   const descriptionSection = (
     <div className="flex flex-col gap-2 mt-5 px-">
@@ -279,32 +358,6 @@ export default function ImagePage() {
       </AnimatePresence>
     </div>
   );
-
-  useEffect(() => {
-    setSubTotal(image.price?.original);
-    if (mode === "digital") {
-      setSelectedSize("original");
-    }
-  }, [image]);
-
-  useEffect(() => {
-    if (id && token && viewCount === 0) {
-      const addViewCount = async () => {
-        try {
-          const res = await axios.post(
-            `${process.env.NEXT_PUBLIC_SERVER}/api/images/add-image-views-count`,
-            {
-              imageId: id,
-            }
-          );
-          setViewCount(1);
-        } catch (error) {
-          console.error("Error adding view count", error);
-        }
-      };
-      addViewCount();
-    }
-  }, [id, token, viewCount]);
 
   const buySection = (
     <div className="flex flex-col">
@@ -500,52 +553,6 @@ export default function ImagePage() {
       </div>
     </div>
   );
-
-  useEffect(() => {
-    fetchImage();
-  }, [id]);
-
-  useEffect(() => {
-    fetchData(
-      `${process.env.NEXT_PUBLIC_SERVER}/api/paper/get-paper`,
-      "papers",
-      setPapers,
-      setError
-    );
-    fetchData(
-      `${process.env.NEXT_PUBLIC_SERVER}/api/frames/get-frames`,
-      "frames",
-      setFrames,
-      setError
-    );
-
-    setInCart(isItemInCart(id));
-    setSubTotal(image.price?.original);
-  }, []);
-
-  useEffect(() => {
-    const calculateSubtotal = () => {
-      if (selectedSize) {
-        if (mode === "print") {
-          const width = selectedSize?.width || 0;
-          const height = selectedSize?.height || 0;
-          const basePricePerInch = selectedFrame?.basePricePerLinearInch || 0;
-
-          const framePrice = (width + height) * 2 * basePricePerInch;
-
-          const imageOriginalPrice = image.price?.original || 0;
-          const selectedSizePrice = selectedSize?.price || 0;
-
-          return imageOriginalPrice + selectedSizePrice + framePrice;
-        } else {
-          return image.price?.[selectedSize] || 0;
-        }
-      } else {
-        return image.price?.original || 0;
-      }
-    };
-    setSubTotal(calculateSubtotal());
-  }, [selectedSize, selectedPaper, selectedFrame, mode, image]);
 
   return (
     <>

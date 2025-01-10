@@ -13,13 +13,14 @@ import useAuthStore from "@/authStore";
 export default function CartPage() {
   const { user } = useAuthStore();
   const router = useRouter();
-  const { increaseQuantity, decreaseQuantity, removeItemFromCart, cartItems } =
-    useCartStore();
+  const { removeItemFromCart, cartItems } = useCartStore();
   const [coupon, setCoupon] = React.useState("");
 
   const onRemoveItem = (productId) => {
     removeItemFromCart(productId);
   };
+
+  console.log(cartItems);
 
   const calculateTotal = () => {
     return cartItems?.reduce((acc, item) => acc + item.subTotal, 0);
@@ -37,9 +38,9 @@ export default function CartPage() {
           <div className="w-1/5">Price</div>
           <div className="w-1/5">Subtotal</div>
         </div>
-        {cartItems?.map((product) => (
+        {cartItems?.map((product, index) => (
           <div
-            key={product._id}
+            key={index}
             className="px-6 flex flex-col gap-2 sm:gap-0 sm:flex-row shadow-[0_0_6px_rgba(0,_0,_0,_0.1)] rounded-sm hover:shadow-[0_0_12px_rgba(0,_0,_0,_0.2)] p-4 transition-all duration-200 ease-in-out"
           >
             <div className="sm:w-2/5 flex flex-col sm:flex-row gap-4">
@@ -47,7 +48,7 @@ export default function CartPage() {
                 <Link href={`/images/${product._id}`} passHref>
                   <img
                     src={
-                      product.imageLinks.original || "/assets/images/img6.jpg"
+                      product.imageInfo?.thumbnail || "/assets/images/img6.jpg"
                     }
                     alt="Canvas Print 72x30"
                   />
@@ -76,20 +77,20 @@ export default function CartPage() {
               {product.mode === "print" ? (
                 <>
                   <p className="text-heading-06 font-semibold">
-                    {product.selectedSize?.width} x{" "}
-                    {product.selectedSize?.height} in
+                    {product.paperInfo?.size?.width} x{" "}
+                    {product.paperInfo?.size?.height} in
                   </p>
                   <p className="text-sm font-medium text-surface-500">
-                    {product.selectedPaper.name}
+                    {product.paperInfo?.name}
                   </p>
                   <p className="text-sm font-medium text-surface-500">
-                    {product.selectedFrame?.name}
+                    {product.frameInfo?.name}
                   </p>
                 </>
               ) : (
                 <>
                   <p className="text-heading-06 font-semibold capitalize">
-                    {product.selectedSize} Size
+                    {product.imageInfo?.resolution} Size
                   </p>
                   <p className="text-sm font-medium text-surface-500">
                     Digital Download

@@ -60,16 +60,37 @@ const ProfilePage = () => {
       },
     },
     price: 0,
-    license: "",
-    exclusivityDetails: "",
-    exclusiveLicenseStatus: "pending",
-    identifiableData: {
-      modelRelease: "",
-      propertyRelease: "",
-    },
     title: "",
     isActive: false,
   });
+
+  const [timeoutId, setTimeoutId] = useState(null);
+
+  const handlePriceChange = (e) => {
+    const newValue = e.target.value;
+
+    setPhoto({ ...photo, price: newValue });
+
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+
+    const id = setTimeout(() => {
+      let validPrice = Number(newValue);
+
+      if (validPrice >= 200 && validPrice <= 2000) {
+        setPhoto({ ...photo, price: validPrice });
+      } else if (validPrice < 200) {
+        setPhoto({ ...photo, price: 200 });
+        toast.error("Minimum price should be 200");
+      } else if (validPrice > 2000) {
+        setPhoto({ ...photo, price: 2000 });
+        toast.error("Maximum price should be 2000");
+      }
+    }, 1000);
+
+    setTimeoutId(id);
+  };
 
   const handleChange = async (event) => {
     try {
@@ -147,7 +168,7 @@ const ProfilePage = () => {
   };
 
   const handleUpload = async (event) => {
-    event.preventDefault()
+    event.preventDefault();
     console.log("handleUpload triggered");
     try {
       const response = await axios.post(
@@ -161,6 +182,7 @@ const ProfilePage = () => {
         }
       );
       console.log(response.data);
+      toast.success("Image uploaded successfully");
       router.push("/profile");
     } catch (error) {
       console.log(error);
@@ -169,7 +191,7 @@ const ProfilePage = () => {
     }
   };
 
-  console.log(photo)
+  console.log(photo);
 
   useEffect(() => {
     fetchData(
@@ -406,9 +428,7 @@ const ProfilePage = () => {
                           type="number"
                           required
                           value={photo.price}
-                          onChange={(e) =>
-                            setPhoto({ ...photo, price: e.target.value })
-                          }
+                          onChange={handlePriceChange}
                         />
                       </div>
                     </div>
@@ -447,33 +467,10 @@ const ProfilePage = () => {
                       />
                     </div>
                     <div>
-                      <Label className="!text-paragraph">License Type *</Label>
-                      <Select
-                        onValueChange={(value) =>
-                          setPhoto({ ...photo, license: value })
-                        }
-                      >
-                        <SelectTrigger className="!text-paragraph">
-                          <SelectValue placeholder="Select License" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {licenses.map((license) => (
-                            <SelectItem
-                              className="!text-paragraph"
-                              key={license._id}
-                              value={license._id}
-                            >
-                              {license.type}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
                       <Label className="!text-paragraph">Keywords *</Label>
                       <Input
                         className="!text-paragraph"
-                        value={photo.keywords.join(", ")}
+                        placeholder="Enter keywords separated by commas(Min 5)"
                         onChange={(e) =>
                           setPhoto({
                             ...photo,
@@ -492,49 +489,6 @@ const ProfilePage = () => {
                         value={photo.story}
                         onChange={(e) =>
                           setPhoto({ ...photo, story: e.target.value })
-                        }
-                      />
-                    </div>
-
-                    <div>
-                      <Label className="!text-paragraph">Photo Privacy</Label>
-                      <Select
-                        className="!text-paragraph"
-                        onValueChange={(value) =>
-                          setPhoto({ ...photo, photoPrivacy: value })
-                        }
-                      >
-                        <SelectTrigger className="!text-paragraph">
-                          <SelectValue placeholder="Select Privacy" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem
-                            className="!text-paragraph"
-                            value="Public"
-                          >
-                            Public
-                          </SelectItem>
-                          <SelectItem
-                            className="!text-paragraph"
-                            value="Private"
-                          >
-                            Private
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label className="!text-paragraph">
-                        Exclusivity Details
-                      </Label>
-                      <Textarea
-                        className="!text-paragraph"
-                        value={photo.exclusivityDetails}
-                        onChange={(e) =>
-                          setPhoto({
-                            ...photo,
-                            exclusivityDetails: e.target.value,
-                          })
                         }
                       />
                     </div>
@@ -683,62 +637,7 @@ const ProfilePage = () => {
                         }
                       />
                     </div>
-                    <div>
-                      <Label className="!text-paragraph">Model Release</Label>
-                      <Select
-                        className="!text-paragraph"
-                        onValueChange={(value) =>
-                          setPhoto({
-                            ...photo,
-                            identifiableData: {
-                              ...photo.identifiableData,
-                              modelRelease: value,
-                            },
-                          })
-                        }
-                      >
-                        <SelectTrigger className="!text-paragraph">
-                          <SelectValue placeholder="Select Model Release" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem className="!text-paragraph" value={true}>
-                            Yes
-                          </SelectItem>
-                          <SelectItem className="!text-paragraph" value={false}>
-                            No
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label className="!text-paragraph">
-                        Property Release
-                      </Label>
-                      <Select
-                        className="!text-paragraph"
-                        onValueChange={(value) =>
-                          setPhoto({
-                            ...photo,
-                            identifiableData: {
-                              ...photo.identifiableData,
-                              propertyRelease: value,
-                            },
-                          })
-                        }
-                      >
-                        <SelectTrigger className="!text-paragraph">
-                          <SelectValue placeholder="Select Property Release" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem className="!text-paragraph" value={true}>
-                            Yes
-                          </SelectItem>
-                          <SelectItem className="!text-paragraph" value={false}>
-                            No
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+
                     <div className="grid grid-cols-2 gap-4">
                       <Button onClick={() => setStep("1")}>Back</Button>
                       <Button2 onClick={handleUpload}>Upload</Button2>
