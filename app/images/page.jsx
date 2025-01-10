@@ -364,14 +364,14 @@ export default function ThemesResultPage() {
                 <p className="font-medium text-surface-500">
                   {image.category?.name}
                 </p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-row gap-2 overflow-y-scroll no-scrollbar">
                   {image.keywords?.map((tag, index) => (
                     <span
-                      key={index}
-                      className="text-xs bg-surface-500 text-white px-2 py-1 rounded-full"
-                    >
-                      {tag} <Tag size={12} className="inline" />
-                    </span>
+                    key={index}
+                    className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-700 bg-primary-400 bg-opacity-15 rounded-lg px-2 py-1"
+                  >
+                    {tag}
+                  </span>
                   ))}
                 </div>
                 {/* <h2 className="text-heading-06 font-medium">

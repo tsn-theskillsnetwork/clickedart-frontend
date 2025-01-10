@@ -98,8 +98,6 @@ const RegistrationForm = () => {
         return false;
       }
 
-      // do other operation
-
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();

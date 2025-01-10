@@ -15,6 +15,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import useCartStore from "@/store/cart";
 import useAuthStore from "@/authStore";
 import useWishlistStore from "@/store/wishlist";
+import Link from "next/link";
 
 export default function SearchResultPage() {
   const { user } = useAuthStore();
@@ -133,6 +134,10 @@ export default function SearchResultPage() {
       }
     };
 
+    fetchThemes();
+  }, []);
+
+  useEffect(() => {
     const fetchImages = async () => {
       try {
         const res = await fetch(
@@ -152,9 +157,8 @@ export default function SearchResultPage() {
       }
     };
 
-    fetchThemes();
     fetchImages();
-  }, []);
+  }, [searchValue]);
 
   // useEffect(() => {
   //   const fetchWishlist = async () => {
@@ -286,7 +290,7 @@ export default function SearchResultPage() {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-44">
-          {sortedImages.map((image, index) => (
+        {sortedImages.map((image, index) => (
             <div key={index}>
               <div
                 onClick={() => {
@@ -298,21 +302,16 @@ export default function SearchResultPage() {
                   width={800}
                   height={800}
                   priority
-                  src={
-                    image.imageLinks.small ||
-                    image.imageLinks.medium ||
-                    image.imageLinks.original
-                  }
+                  src={image.imageLinks.thumbnail || image.imageLinks.original}
                   alt={image.description}
-                  className="object-cover w-full aspect-[1/1] opacity-100 group-hover:opacity-0 transition-all duration-200 ease-linear"
+                  className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear opacity-50 blur-[4px] border border-primary-200"
                 />
-
                 <Image
-                  width={400}
-                  height={400}
-                  src={image.imageLinks.original}
+                  width={800}
+                  height={800}
+                  src={image.imageLinks.thumbnail || image.imageLinks.original}
                   alt={image.description}
-                  className="absolute inset-0 object-contain w-full aspect-[1/1] opacity-0 group-hover:opacity-100 transition-all duration-200 ease-linear"
+                  className="absolute inset-0 object-contain w-full aspect-[1/1] transition-all duration-200 ease-linear drop-shadow-md"
                 />
 
                 <div className="absolute inset-0">
@@ -324,14 +323,20 @@ export default function SearchResultPage() {
                       size={28}
                       onClick={(e) => {
                         e.stopPropagation();
-                        wishlist?.some((item) => item._id === image._id)
-                          ? removeImageFromWishlist(image._id)
-                          : addImageToWishlist(image._id);
+                        if (user) {
+                          wishlist?.some((item) => item._id === image._id)
+                            ? removeImageFromWishlist(image._id)
+                            : addImageToWishlist(image._id);
+                        } else {
+                          toast.error(
+                            "Please login as User to add to wishlist"
+                          );
+                        }
                       }}
                       className={` ${
                         wishlist?.some((item) => item._id === image._id)
                           ? "text-red-400 fill-red-500"
-                          : "text-white group-hover:text-zinc-400"
+                          : "text-white group-hover:text-red-600"
                       }  transition-all duration-200 ease-linear cursor-pointer`}
                     />
                   </div>
@@ -341,29 +346,32 @@ export default function SearchResultPage() {
                 <h2 className="text-heading-05 font-semibold">
                   {image.title || "Untitled"}
                 </h2>
-                <p className="font-medium">
-                  {image.photographer?.firstName
-                    ? image.photographer?.firstName +
+                <Link
+                  href={`/photographer/${image.photographer[0]?._id}`}
+                  className="font-medium"
+                >
+                  {image.photographer[0]?.firstName
+                    ? image.photographer[0]?.firstName +
                       " " +
-                      image.photographer?.lastName
-                    : image.photographer?.name}
-                </p>
-                <p className="font-medium text-blue-500">
+                      image.photographer[0]?.lastName
+                    : image.photographer[0]?.name}
+                </Link>
+                <p className="font-medium text-surface-500">
                   {image.category?.name}
                 </p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-row gap-2 overflow-y-scroll no-scrollbar">
                   {image.keywords?.map((tag, index) => (
                     <span
-                      key={index}
-                      className="text-xs bg-blue-500 text-white px-2 py-1 rounded-full"
-                    >
-                      {tag} <Tag size={12} className="inline" />
-                    </span>
+                    key={index}
+                    className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-700 bg-primary-400 bg-opacity-15 rounded-lg px-2 py-1"
+                  >
+                    {tag}
+                  </span>
                   ))}
                 </div>
-                <h2 className="text-heading-06 font-medium">
+                {/* <h2 className="text-heading-06 font-medium">
                   {image.description}
-                </h2>
+                </h2> */}
                 <p className="text-paragraph font-medium">
                   {(
                     (image.resolutions?.original?.height *

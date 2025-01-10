@@ -11,15 +11,36 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import Signout from "./auth/signout";
 import useAuthStore from "@/authStore";
 import useCartStore from "@/store/cart";
 import useWishlistStore from "@/store/wishlist";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import ImageSearch from "./search";
+import { Input } from "./ui/input";
+import Button from "./button";
 
 export default function Navbar() {
   const pathname = usePathname();
+
+  const router = useRouter();
+  const [search, setSearch] = useState("");
+
+  const handleSearch = () => {
+    router.push(`/search?search=${search}`);
+  };
+
   const { user, photographer } = useAuthStore();
   const { cartItems } = useCartStore();
   const { wishlist, fetchWishlist } = useWishlistStore();
@@ -294,13 +315,36 @@ export default function Navbar() {
               : "text-white"
           } cursor-pointer`}
         />
-        <Search
-          className={`${
-            scrollLocation > 50 || pathname !== "/"
-              ? "text-surface-600"
-              : "text-white"
-          } cursor-pointer`}
-        />
+        <Dialog>
+          <DialogTrigger>
+            <Search
+              className={`${
+                scrollLocation > 50 || pathname !== "/"
+                  ? "text-surface-600"
+                  : "text-white"
+              } cursor-pointer`}
+            />
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle></DialogTitle>
+            </DialogHeader>
+            <Input
+              onChange={(e) => setSearch(e.target.value)}
+              type="text"
+              placeholder="Search for images"
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            />
+            <DialogFooter className="sm:justify-start">
+              <DialogClose asChild>
+                <Button type="button" variant="secondary" onClick={handleSearch}>
+                  Search
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         {user || photographer ? (
           <>
             <Link href="/profile">

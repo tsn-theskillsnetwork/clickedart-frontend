@@ -20,6 +20,9 @@ import {
 import Image from "next/image";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
+import countries from "@/lib/address/countries.json";
+import states from "@/lib/address/states.json";
+import cities from "@/lib/address/cities.json";
 
 const RegistrationForm = () => {
   const router = useRouter();
@@ -28,7 +31,6 @@ const RegistrationForm = () => {
     firstName: "",
     lastName: "",
     email: "",
-    connectedAccounts: [],
     password: "",
     mobile: undefined,
     whatsapp: undefined,
@@ -36,7 +38,7 @@ const RegistrationForm = () => {
       address: "",
       city: "",
       state: "",
-      country: "",
+      country: "India",
       landmark: "",
       pincode: "",
       area: "",
@@ -57,6 +59,8 @@ const RegistrationForm = () => {
   const [croppedImageUrl, setCroppedImageUrl] = useState(null);
   const cropperRef = useRef(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [selectedCountry, setSelectedCountry] = useState("102");
+  const [selectedState, setSelectedState] = useState("0");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -92,13 +96,24 @@ const RegistrationForm = () => {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setCropperImage(reader.result);
-      };
-      reader.readAsDataURL(file);
+    if (e.target.files && e.target.files[0]) {
+      if (e.target.files[0].size > 5 * 1000 * 1024) {
+        toast.error("File with maximum size of 5MB is allowed");
+        return false;
+      }
+
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          if (reader.result) {
+            setCropperImage(reader.result);
+          } else {
+            toast.error("Failed to load image.");
+          }
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -201,15 +216,13 @@ const RegistrationForm = () => {
         mobile: undefined,
         whatsapp: undefined,
         shippingAddress: {
-          address: "",
-          city: "",
-          state: "",
           country: "",
+          state: "",
+          city: "",
+          address: "",
           landmark: "",
           pincode: "",
           area: "",
-          email: "",
-          mobile: undefined,
         },
         isMarried: false,
         anniversary: "",
@@ -392,65 +405,104 @@ const RegistrationForm = () => {
         </div>
 
         <div className="py-2 my-2 border-y">
-          <p className="text-heading-06 font-semibold">Shipping Address</p>
+          <p className="text-heading-06 font-semibold">Address</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <Label>Country*</Label>
+              <Select
+                defaultValue={formData.shippingAddress?.country}
+                onValueChange={(value) => {
+                  const selectedCountry = countries[2].data.find(
+                    (country) => country.name === value
+                  );
+                  setSelectedCountry(selectedCountry.id);
+                  const newAddress = { ...formData.shippingAddress };
+                  newAddress.country = value;
+                  setFormData({
+                    ...formData,
+                    shippingAddress: newAddress,
+                  });
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Country" />
+                </SelectTrigger>
+                <SelectContent>
+                  {countries[2].data.map((country) => (
+                    <SelectItem key={country.id} value={country.name}>
+                      {country.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>State*</Label>
+              <Select
+                defaultValue={formData.shippingAddress?.state}
+                onValueChange={(value) => {
+                  const selectedState = states[2].data.find(
+                    (state) => state.name === value
+                  );
+                  setSelectedState(selectedState.id);
+                  const newAddress = { ...formData.shippingAddress };
+                  newAddress.state = value;
+                  setFormData({
+                    ...formData,
+                    shippingAddress: newAddress,
+                  });
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select State" />
+                </SelectTrigger>
+                <SelectContent>
+                  {states[2].data
+                    .filter((state) => state.countryId === selectedCountry) // Filter states by selected country ID
+                    .map((state) => (
+                      <SelectItem key={state.id} value={state.name}>
+                        {state.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>City*</Label>
+              <Select
+                defaultValue={formData.shippingAddress?.city}
+                onValueChange={(value) => {
+                  const newAddress = { ...formData.shippingAddress };
+                  newAddress.city = value;
+                  setFormData({
+                    ...formData,
+                    shippingAddress: newAddress,
+                  });
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select City" />
+                </SelectTrigger>
+                <SelectContent>
+                  {cities[2].data
+                    .filter((city) => city.stateId === selectedState) // Filter cities by selected state ID
+                    .map((city) => (
+                      <SelectItem key={city.id} value={city.name}>
+                        {city.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div>
               <Label>Address</Label>
               <Input
                 type="text"
                 name="shippingAddress.address"
-                value={formData.shippingAddress.address}
+                value={formData.shippingAddress?.address}
                 onChange={(e) => {
                   const newAddress = { ...formData.shippingAddress };
                   newAddress.address = e.target.value;
-                  setFormData({
-                    ...formData,
-                    shippingAddress: newAddress,
-                  });
-                }}
-              />
-            </div>
-            <div>
-              <Label>City</Label>
-              <Input
-                type="text"
-                name="shippingAddress.city"
-                value={formData.shippingAddress.city}
-                onChange={(e) => {
-                  const newAddress = { ...formData.shippingAddress };
-                  newAddress.city = e.target.value;
-                  setFormData({
-                    ...formData,
-                    shippingAddress: newAddress,
-                  });
-                }}
-              />
-            </div>
-            <div>
-              <Label>State</Label>
-              <Input
-                type="text"
-                name="shippingAddress.state"
-                value={formData.shippingAddress.state}
-                onChange={(e) => {
-                  const newAddress = { ...formData.shippingAddress };
-                  newAddress.state = e.target.value;
-                  setFormData({
-                    ...formData,
-                    shippingAddress: newAddress,
-                  });
-                }}
-              />
-            </div>
-            <div>
-              <Label>Country</Label>
-              <Input
-                type="text"
-                name="shippingAddress.country"
-                value={formData.shippingAddress.country}
-                onChange={(e) => {
-                  const newAddress = { ...formData.shippingAddress };
-                  newAddress.country = e.target.value;
                   setFormData({
                     ...formData,
                     shippingAddress: newAddress,
@@ -463,7 +515,7 @@ const RegistrationForm = () => {
               <Input
                 type="text"
                 name="shippingAddress.landmark"
-                value={formData.shippingAddress.landmark}
+                value={formData.shippingAddress?.landmark}
                 onChange={(e) => {
                   const newAddress = { ...formData.shippingAddress };
                   newAddress.landmark = e.target.value;
@@ -475,11 +527,11 @@ const RegistrationForm = () => {
               />
             </div>
             <div>
-              <Label>Pincode</Label>
+              <Label>Pincode*</Label>
               <Input
                 type="text"
                 name="shippingAddress.pincode"
-                value={formData.shippingAddress.pincode}
+                value={formData.shippingAddress?.pincode}
                 onChange={(e) => {
                   const newAddress = { ...formData.shippingAddress };
                   newAddress.pincode = e.target.value;
@@ -495,42 +547,10 @@ const RegistrationForm = () => {
               <Input
                 type="text"
                 name="shippingAddress.area"
-                value={formData.shippingAddress.area}
+                value={formData.shippingAddress?.area}
                 onChange={(e) => {
                   const newAddress = { ...formData.shippingAddress };
                   newAddress.area = e.target.value;
-                  setFormData({
-                    ...formData,
-                    shippingAddress: newAddress,
-                  });
-                }}
-              />
-            </div>
-            <div>
-              <Label>Email</Label>
-              <Input
-                type="email"
-                name="shippingAddress.email"
-                value={formData.shippingAddress.email}
-                onChange={(e) => {
-                  const newAddress = { ...formData.shippingAddress };
-                  newAddress.email = e.target.value;
-                  setFormData({
-                    ...formData,
-                    shippingAddress: newAddress,
-                  });
-                }}
-              />
-            </div>
-            <div>
-              <Label>Mobile</Label>
-              <Input
-                type="tel"
-                name="shippingAddress.mobile"
-                value={formData.shippingAddress.mobile}
-                onChange={(e) => {
-                  const newAddress = { ...formData.shippingAddress };
-                  newAddress.mobile = e.target.value;
                   setFormData({
                     ...formData,
                     shippingAddress: newAddress,
@@ -564,86 +584,6 @@ const RegistrationForm = () => {
           {errors.interests && (
             <p className="text-red-500 text-sm">{errors.interests}</p>
           )}
-        </div>
-
-        <div>
-          <Label>Connect Accounts</Label>
-          <div className="flex flex-col gap-2">
-            {formData.connectedAccounts?.map((account, index) => (
-              <div key={index} className="flex gap-2">
-                <Select
-                  className="w-36"
-                  value={account.accountName}
-                  onValueChange={(value) => {
-                    const newAccounts = [...formData.connectedAccounts];
-                    newAccounts[index].accountName = value;
-                    setFormData({
-                      ...formData,
-                      connectedAccounts: newAccounts,
-                    });
-                  }}
-                >
-                  <SelectTrigger className="w-40">
-                    <SelectValue />
-                    <p className="sr-only">Account Name</p>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="facebook">Facebook</SelectItem>
-                    <SelectItem value="twitter">Twitter</SelectItem>
-                    <SelectItem value="instagram">Instagram</SelectItem>
-                    <SelectItem value="linkedIn">LinkedIn</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Input
-                  type="text"
-                  name="accountLink"
-                  value={account.accountLink}
-                  onChange={(e) => {
-                    const newAccounts = [...formData.connectedAccounts];
-                    newAccounts[index].accountLink = e.target.value;
-                    setFormData({
-                      ...formData,
-                      connectedAccounts: newAccounts,
-                    });
-                  }}
-                  placeholder="Account Link"
-                />
-              </div>
-            ))}
-          </div>
-          <div className="flex flex-row gap-2 mt-2">
-            <button
-              type="button"
-              className="p-2 rounded-md border-2 border-green-500 hover:bg-green-500 hover:text-white"
-              onClick={() =>
-                setFormData({
-                  ...formData,
-                  connectedAccounts: [
-                    ...formData.connectedAccounts,
-                    {
-                      accountName: "",
-                      accountLink: "",
-                    },
-                  ],
-                })
-              }
-            >
-              <Plus size={16} />
-            </button>
-            <button
-              type="button"
-              className="p-2 rounded-md border-2 border-red-500 hover:bg-red-500 hover:text-white disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-current"
-              disabled={formData.connectedAccounts?.length === 0}
-              onClick={() =>
-                setFormData({
-                  ...formData,
-                  connectedAccounts: formData.connectedAccounts.slice(0, -1),
-                })
-              }
-            >
-              <Trash size={16} />
-            </button>
-          </div>
         </div>
 
         <div className="flex flex-col items-center">
