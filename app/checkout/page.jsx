@@ -173,6 +173,7 @@ export default function CheckoutPage() {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     const newSubtotal = calculateSubtotal();
@@ -505,9 +506,9 @@ export default function CheckoutPage() {
               <div className="mt-6 w-full space-y-6 sm:mt-8 lg:mt-0 lg:max-w-xs xl:max-w-md">
                 <div className="flow-root">
                   <div className="-my-3 divide-y divide-gray-200 dark:divide-gray-800">
-                    {cartItems?.map((product) => (
+                    {cartItems?.map((product, index) => (
                       <div
-                        key={product._id}
+                        key={index}
                         className="px-6 flex gap-2 shadow-[0_0_6px_rgba(0,_0,_0,_0.1)] rounded-sm hover:shadow-[0_0_12px_rgba(0,_0,_0,_0.2)] p-4 transition-all duration-200 ease-in-out"
                       >
                         <div className="w-1/2 flex flex-col gap-4">
@@ -518,7 +519,7 @@ export default function CheckoutPage() {
                           >
                             <img
                               src={
-                                product.imageLinks.original ||
+                                product.imageInfo?.thumbnail ||
                                 "/assets/images/img6.jpg"
                               }
                               alt="Canvas Print 72x30"
@@ -527,30 +528,39 @@ export default function CheckoutPage() {
                         </div>
                         <div className="sm:w-1/2 flex flex-col gap-2 border-b sm:border-b-0">
                           <div className="flex flex-col">
-                            <p className="text-heading-06 font-semibold">
-                              {product.title || "Art Name"}
+                            <p className="text-heading-06 font-semibold capitalize">
+                              {product.imageInfo?.title || "Art Name"}
                             </p>
                             <p className="text-sm font-medium text-surface-500">
-                              {product.artist?.name || "Artist Name"}
+                              {product.imageInfo?.photographer?.firstName
+                                ? product.imageInfo?.photographer?.firstName +
+                                  " " +
+                                  product.imageInfo?.photographer?.lastName
+                                : product.imageInfo?.photographer?.name}
                             </p>
                           </div>
                           {product.mode === "print" ? (
                             <>
                               <p className="text-heading-06 font-semibold">
-                                {product.selectedPaper.name}
-                              </p>
-                              <p className="text-heading-06 font-semibold">
-                                {product.selectedSize?.width} x{" "}
-                                {product.selectedSize?.height} in
+                                {product.paperInfo?.size?.width} x{" "}
+                                {product.paperInfo?.size?.height} in
                               </p>
                               <p className="text-sm font-medium text-surface-500">
-                                {product.selectedFrame?.name}
+                                {product.paperInfo?.name}
+                              </p>
+                              <p className="text-sm font-medium text-surface-500">
+                                {product.frameInfo?.name}
                               </p>
                             </>
                           ) : (
-                            <p className="text-heading-06 font-semibold">
-                              Digital Download
-                            </p>
+                            <>
+                              <p className="text-heading-06 font-semibold capitalize">
+                                {product.imageInfo?.resolution} Size
+                              </p>
+                              <p className="text-sm font-medium text-surface-500">
+                                Digital Download
+                              </p>
+                            </>
                           )}
 
                           <div className="flex justify-between">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Button from "@/components/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,17 +8,20 @@ import { useRouter } from "next/navigation";
 import useAuthStore from "@/authStore";
 import Link from "next/link";
 import axios from "axios";
+import Loader from "@/components/loader";
+import toast from "react-hot-toast";
 
 const SignInPage = () => {
-  const { signin, setPhotographer, user, photographer } = useAuthStore();
-  
+  const { signin, setPhotographer, user, photographer, isHydrated } =
+    useAuthStore();
+
   const router = useRouter();
-  
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-  
+
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -62,17 +65,26 @@ const SignInPage = () => {
     }
   };
 
+  const toastShownRef = useRef(false);
+
   useEffect(() => {
-    if (user || photographer) {
+    if (!isHydrated) return;
+
+    if ((user || photographer) && !toastShownRef.current) {
+      toastShownRef.current = true;
+      toast(`Already Signed In as ${user ? "User" : "Photographer"}`, {
+        duration: 4000,
+        position: "top-center",
+      });
       router.push("/");
     }
-  }, []);
+  }, [isHydrated, user, router]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[50vh] mt-5 mb-10">
-      {user || photographer ? (
+      {user || photographer || !isHydrated ? (
         <div className="flex flex-col items-center justify-center min-h-[50vh]">
-          <p>You are already signed in.</p>
+          <Loader />
         </div>
       ) : (
         <>

@@ -6,9 +6,9 @@ export default function ImageSection({ selectedFrame, image }) {
     <div
       className={`relative flex h-full w-full ${
         selectedFrame ? "p-[3.5px] sm:p-1.5 xl:p-2" : "p-0"
-      } bg-white transition-all duration-300 ease-in-out`}
+      } bg-white transition-all  duration-300 ease-in-out`}
     >
-      <div className="relative w-full h-full inner-shadow-3 z-10">
+      <div className="relative w-full h-full  inner-shadow-3 z-10">
         <img
           src={
             image.imageLinks?.thumbnail ||
@@ -18,7 +18,7 @@ export default function ImageSection({ selectedFrame, image }) {
             "/assets/images/img3.jpg"
           }
           alt={image.title || "Image"}
-          className="z-10 object-contain w-full h-full mx-auto"
+          className="z-10 object-cover h-full w-full  mx-auto"
         />
       </div>
       {selectedFrame && (

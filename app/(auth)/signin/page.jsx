@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Button from "@/components/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,9 +8,11 @@ import { useRouter } from "next/navigation";
 import useAuthStore from "@/authStore";
 import Link from "next/link";
 import axios from "axios";
+import toast from "react-hot-toast";
+import Loader from "@/components/loader";
 
 const SignInPage = () => {
-  const { signin, setUser, user, photographer } = useAuthStore();
+  const { signin, setUser, user, photographer, isHydrated } = useAuthStore();
 
   const router = useRouter();
 
@@ -42,16 +44,14 @@ const SignInPage = () => {
       );
 
       const data = response.data;
-      if (data.user) {
-        setUser(data.user);
-        signin(data.token);
-        setMessage("Sign in successful.");
-        router.push("/");
-      } else if (data.photographer) {
-        setUser(data.photographer);
-        setMessage("Sign in successful.");
-        router.push("/");
-      }
+      setUser(data.user);
+      signin(data.token);
+      setMessage("Sign in successful.");
+      toast("Sign in successful.", {
+        duration: 4000,
+        position: "top-center",
+      });
+      router.push("/");
     } catch (err) {
       if (err.response && err.response.data) {
         setError(
@@ -63,17 +63,26 @@ const SignInPage = () => {
     }
   };
 
+  const toastShownRef = useRef(false);
+
   useEffect(() => {
-    if (user || photographer) {
+    if (!isHydrated) return;
+
+    if ((user || photographer) && !toastShownRef.current) {
+      toastShownRef.current = true;
+      toast(`Already Signed In as ${user ? "User" : "Photographer"}`, {
+        duration: 4000,
+        position: "top-center",
+      });
       router.push("/");
     }
-  }, []);
+  }, [isHydrated, user, router]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[50vh] mt-5 mb-10">
-      {user || photographer ? (
+      {(user || photographer || !isHydrated) ? (
         <div className="flex flex-col items-center justify-center min-h-[50vh]">
-          <p>You are already signed in.</p>
+          <Loader />
         </div>
       ) : (
         <>

@@ -61,15 +61,15 @@ export default function CartPage() {
                 </button>
               </div>
               <div className="flex flex-col">
-                <p className="text-heading-06 font-semibold">
-                  {product.title || "Art Name"}
+                <p className="text-heading-06 font-semibold capitalize">
+                  {product.imageInfo?.title || "Art Name"}
                 </p>
                 <p className="text-sm font-medium text-surface-500">
-                  {product.photographer?.firstName
-                    ? product.photographer?.firstName +
+                  {product.imageInfo?.photographer?.firstName
+                    ? product.imageInfo?.photographer?.firstName +
                       " " +
-                      product.photographer?.lastName
-                    : product.photographer?.name}
+                      product.imageInfo?.photographer?.lastName
+                    : product.imageInfo?.photographer?.name}
                 </p>
               </div>
             </div>
@@ -131,10 +131,10 @@ export default function CartPage() {
             <p className="text-heading-06 font-medium text-surface-600 text-right">
               ₹{calculateTotal()}
             </p>
-            <p className="text-heading-06 font-medium">Shipping:</p>
+            {/* <p className="text-heading-06 font-medium">Shipping:</p>
             <p className="text-heading-06 font-medium text-surface-600 text-right">
               ₹0
-            </p>
+            </p> */}
             <p className="text-heading-05 font-semibold">Cart Total:</p>
             <p className="text-heading-05 font-semibold text-surface-600 text-right">
               ₹{calculateTotal()}

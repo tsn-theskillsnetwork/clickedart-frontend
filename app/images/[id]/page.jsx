@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./styles.css";
 import { AnimatePresence, frame, motion } from "framer-motion";
 import {
@@ -26,7 +26,7 @@ import { Icon } from "@iconify/react";
 
 export default function ImagePage() {
   const id = useParams().id;
-  const { token } = useAuthStore();
+  const { token, isHydrated } = useAuthStore();
   const { addItemToCart, removeItemFromCart, isItemInCart } =
     useCartStore.getState();
   const onAddToCart = () => {
@@ -42,6 +42,7 @@ export default function ImagePage() {
     const productToAdd = {
       imageInfo: {
         image: image._id,
+        title: image.title,
         photographer: image.photographer,
         resolution: selectedSize,
         price: subTotal,
@@ -58,7 +59,10 @@ export default function ImagePage() {
       frameInfo: selectedFrame
         ? {
             frame: selectedFrame._id,
-            price: (selectedSize?.width * selectedSize?.height) * selectedFrame.basePricePerLinearInch,
+            price:
+              selectedSize?.width *
+              selectedSize?.height *
+              selectedFrame.basePricePerLinearInch,
             name: selectedFrame.name,
           }
         : null,
@@ -79,7 +83,6 @@ export default function ImagePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [recommendedLength, setRecommendedLength] = useState(4);
-  const [viewCount, setViewCount] = useState(0);
 
   const [selected, setSelected] = useState(0);
   const [mode, setMode] = useState("digital");
@@ -182,7 +185,12 @@ export default function ImagePage() {
         const imagePrice = image.price?.original || 0;
         const selectedSizePrice = selectedSize?.price || 0;
 
-        return imagePrice + selectedSizePrice + framePrice + (selectedPaper?.price || 0);
+        return (
+          imagePrice +
+          selectedSizePrice +
+          framePrice +
+          (selectedPaper?.price || 0)
+        );
       } else {
         return image.price?.[selectedSize] || 0;
       }
@@ -195,24 +203,44 @@ export default function ImagePage() {
     setSubTotal(calculateSubtotal());
   }, [selectedSize, selectedPaper, selectedFrame, mode, image]);
 
+  // useEffect(() => {
+  //   if (id && token && viewCount === 0) {
+  //     const addViewCount = async () => {
+  //       try {
+  //         const res = await axios.post(
+  //           `${process.env.NEXT_PUBLIC_SERVER}/api/images/add-image-views-count`,
+  //           {
+  //             imageId: id,
+  //           }
+  //         );
+  //         setViewCount(1);
+  //       } catch (error) {
+  //         console.error("Error adding view count", error);
+  //       }
+  //     };
+  //     addViewCount();
+  //   }
+  // }, [id, token, viewCount]);
+
+  const toastShownRef = useRef(false);
+
   useEffect(() => {
-    if (id && token && viewCount === 0) {
-      const addViewCount = async () => {
-        try {
-          const res = await axios.post(
-            `${process.env.NEXT_PUBLIC_SERVER}/api/images/add-image-views-count`,
-            {
-              imageId: id,
-            }
-          );
-          setViewCount(1);
-        } catch (error) {
-          console.error("Error adding view count", error);
-        }
-      };
-      addViewCount();
-    }
-  }, [id, token, viewCount]);
+    if (!isHydrated || toastShownRef.current) return;
+
+    const addViewCount = async () => {
+      try {
+        await axios.post(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/images/add-image-views-count`,
+          { imageId: id }
+        );
+        toastShownRef.current = true;
+        // toast.success("View count added!");
+      } catch (error) {
+        console.error("Error adding view count", error);
+      }
+    };
+    addViewCount();
+  }, [isHydrated, id]);
 
   useEffect(() => {
     fetchImage();
@@ -398,7 +426,7 @@ export default function ImagePage() {
             mode === "digital" ? "text-surface-500" : "text-zinc-100"
           } text-center w-full cursor-pointer transition-colors duration-200 ease-in-out`}
         >
-          Ready to Hand
+          Ready to Hang
         </p>
       </div>
       <div className="flex flex-col gap-10">
@@ -554,6 +582,19 @@ export default function ImagePage() {
     </div>
   );
 
+  const minSize = 12 * 18; // Smallest size
+const maxSize = 44 * 72; // Largest size
+
+const dynamicHeight = selectedPaper && selectedSize
+  ? ((selectedSize.height * selectedSize.width) - minSize) / (maxSize - minSize) // Normalized value (0 to 1)
+  : 0;
+
+const clampedHeight = selectedPaper && selectedSize
+  ? (20 + dynamicHeight * (35 - 20)) // Scale between 20% and 35%
+  : 100;
+
+const height = clampedHeight + "%";
+
   return (
     <>
       {loading ? (
@@ -571,10 +612,28 @@ export default function ImagePage() {
                   <motion.div layout className="relative flex justify-center">
                     <motion.div
                       layout
+                      style={{
+                        aspectRatio:
+                          selectedPaper &&
+                          selectedSize &&
+                          `${
+                            image.resolutions?.original?.height >
+                            image.resolutions?.original?.width
+                              ? selectedSize.width
+                              : selectedSize.height
+                          }/${
+                            image.resolutions?.original?.height >
+                            image.resolutions?.original?.width
+                              ? selectedSize.height
+                              : selectedSize.width
+                          }`,
+                          height: selectedSize ? height : "100%",
+                          // selectedSize && (selectedSize.height * selectedSize.width) / 20 + "%",
+                      }}
                       className={`${
                         selectedPaper &&
                         selectedSize &&
-                        "mt-[5%] w-auto h-[25%] mx-auto"
+                        `mt-[4%] w-auto mx-auto`
                       } absolute inset-y-0 z-10 shadow-[2px_2px_6px_rgba(0,0,0,0.7)]`}
                     >
                       <ImageSection
