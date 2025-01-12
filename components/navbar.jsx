@@ -381,7 +381,7 @@ export default function Navbar() {
                   <Signout />
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Sign Out</p>
+                  <p className="text-white font-medium">Sign Out</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

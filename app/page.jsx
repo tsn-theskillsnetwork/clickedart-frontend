@@ -36,7 +36,7 @@ export default function Home() {
             professional space for them to showcase and sell their exceptional
             work.
           </p>
-          <Link href={"/contact"} className="pt-10">
+          <Link href={"/about"} className="pt-10">
             <Button size="xl" variant="filled" state="default">
               Know more about us
             </Button>

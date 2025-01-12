@@ -131,6 +131,26 @@ const RegistrationForm = () => {
     if (!/^\S+@\S+\.\S+$/.test(formData.email))
       newErrors.email = "Enter a valid email address.";
     if (!formData.password) newErrors.password = "Password is required.";
+    if (formData.password.length < 8)
+      newErrors.password = "Password must be at least 8 characters.";
+    if (
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+        formData.password
+      )
+    )
+      newErrors.password =
+        "Password must contain at least 8 characters, including one uppercase, one lowercase, one number and one special character.";
+    if (!formData.mobile || formData.mobile.length !== 10)
+      newErrors.mobile = "Mobile number must be 10 digits.";
+    if (formData.whatsapp && formData.whatsapp.length !== 10)
+      newErrors.whatsapp = "WhatsApp number must be 10 digits.";
+    if (!formData.shippingAddress.country)
+      newErrors.country = "Country is required.";
+    if (!formData.shippingAddress.state) newErrors.state = "State is required.";
+    if (!formData.shippingAddress.city)
+      newErrors.city = "District is required.";
+    if (!formData.shippingAddress.pincode)
+      newErrors.pincode = "Pincode is required.";
     if (formData.age && (formData.age < 0 || isNaN(formData.age)))
       newErrors.age = "Age must be a positive number.";
     if (formData.dob && isNaN(new Date(formData.dob).getTime()))
@@ -246,7 +266,6 @@ const RegistrationForm = () => {
 
   console.log(formData);
 
-  
   const toastShownRef = useRef(false);
 
   useEffect(() => {
@@ -409,7 +428,7 @@ const RegistrationForm = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  placeholder="Password"
+                  placeholder="At least 8 characters, 1 uppercase, 1 lowercase, 1 number and 1 special character"
                   required
                 />
 
@@ -448,7 +467,9 @@ const RegistrationForm = () => {
             </div>
 
             <div>
-              <Label>Mobile</Label>
+              <Label>
+                Mobile<span className="text-red-500">*</span>
+              </Label>
               <Input
                 type="tel"
                 name="mobile"
@@ -473,7 +494,9 @@ const RegistrationForm = () => {
               <p className="text-heading-06 font-semibold">Address</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <Label>Country*</Label>
+                  <Label>
+                    Country<span className="text-red-500">*</span>
+                  </Label>
                   <Select
                     defaultValue={formData.shippingAddress?.country}
                     onValueChange={(value) => {
@@ -502,7 +525,9 @@ const RegistrationForm = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label>State*</Label>
+                  <Label>
+                    State<span className="text-red-500">*</span>
+                  </Label>
                   <Select
                     defaultValue={formData.shippingAddress?.state}
                     onValueChange={(value) => {
@@ -533,7 +558,9 @@ const RegistrationForm = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label>City*</Label>
+                  <Label>
+                    District<span className="text-red-500">*</span>
+                  </Label>
                   <Select
                     defaultValue={formData.shippingAddress?.city}
                     onValueChange={(value) => {
@@ -592,7 +619,9 @@ const RegistrationForm = () => {
                   />
                 </div>
                 <div>
-                  <Label>Pincode*</Label>
+                  <Label>
+                    Pincode<span className="text-red-500">*</span>
+                  </Label>
                   <Input
                     type="text"
                     name="shippingAddress.pincode"

@@ -372,7 +372,10 @@ const ProfilePage = () => {
                         width={800}
                         height={800}
                         priority
-                        src={image.imageLinks.original}
+                        src={
+                          image.imageLinks.original ||
+                          image.imageLinks.thumbnail
+                        }
                         alt={image.description}
                         className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear"
                       />

@@ -23,10 +23,11 @@ import { fetchData } from "@/helpers/api";
 import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import toast from "react-hot-toast";
+import Loader from "@/components/loader";
 
 const ProfilePage = () => {
   const router = useRouter();
-  const { photographer, user, token } = useAuthStore();
+  const { photographer, user, token, isHydrated } = useAuthStore();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -91,6 +92,14 @@ const ProfilePage = () => {
     }, 1000);
 
     setTimeoutId(id);
+  };
+
+  const handleDescriptionChange = (e) => {
+    const newValue = e.target.value;
+
+    if (newValue.length <= 1000) {
+      setPhoto({ ...photo, description: newValue });
+    }
   };
 
   const handleChange = async (event) => {
@@ -243,6 +252,12 @@ const ProfilePage = () => {
     fetchPlan();
   }, [photographer]);
 
+  useEffect(() => {
+    if (isHydrated && !photographer) {
+      router.push("/profile");
+    }
+  }, [isHydrated, photographer, router]);
+
   console.log("categories", categories);
 
   useEffect(() => {
@@ -251,9 +266,9 @@ const ProfilePage = () => {
 
   return (
     <>
-      {photographer || user ? (
+      {photographer ? (
         <div className="flex flex-col min-h-screen pb-20">
-          <div className="w-full">
+          {/* <div className="w-full">
             <Image
               src="/assets/hero/bg2.jpg"
               alt="bg1"
@@ -300,7 +315,7 @@ const ProfilePage = () => {
             <p className="font-normal lg:font-medium text-xs lg:text-heading-05 text-surface-500 mt-2 lg:mt-4 text-center max-w-2xl">
               {photographer?.bio || user?.bio}
             </p>
-          </div>
+          </div> */}
 
           <div className="flex flex-col px-2 lg:px-24 py-10 items-center">
             <div className="relative flex justify-around w-full">
@@ -465,13 +480,14 @@ const ProfilePage = () => {
                       </Select>
                     </div>
                     <div>
-                      <Label className="!text-paragraph">Description</Label>
+                      <Label className="!text-paragraph">
+                        Description (Max 1000 characters)
+                      </Label>
                       <Textarea
                         className="!text-paragraph"
                         value={photo.description}
-                        onChange={(e) =>
-                          setPhoto({ ...photo, description: e.target.value })
-                        }
+                        placeholder="Enter a description for your photo (Max 1000 characters)"
+                        onChange={handleDescriptionChange}
                       />
                     </div>
                     <div>
@@ -690,7 +706,7 @@ const ProfilePage = () => {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center min-h-screen">
-          <p>You are not signed in.</p>
+          {isHydrated ? <p>You are not signed in.</p> : <Loader />}
         </div>
       )}
     </>

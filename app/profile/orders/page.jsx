@@ -9,6 +9,7 @@ import axios from "axios";
 import { Dot, Download } from "lucide-react";
 import Button from "@/components/button";
 import Button2 from "@/components/button2";
+import Link from "next/link";
 
 export default function OrdersPage() {
   const { user } = useAuthStore();
@@ -205,24 +206,32 @@ export default function OrdersPage() {
                     >
                       Order Support
                     </Button>
+                    {order.orderStatus === "completed" && (
+                      <div className="flex flex-col gap-2">
+                        {order.orderItems?.map((item, index) => (
+                          <div key={index}>
+                            {!item.paperInfo && (
+                              <Link
+                                
+                                href={
+                                  item.imageInfo?.image?.imageLinks[
+                                    item.imageInfo?.resolution
+                                  ]
+                                }
+                              >
+                                <Button2
+                                  size="sm"
+                                  icon={<Download size={20} />}
+                                >
+                                  Download
+                                </Button2>
+                              </Link>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                  {order.orderStatus === "completed" && (
-                    <a
-                      download
-                      href={
-                        order?.imageInfo?.image?.imageLinks[
-                          order?.imageInfo?.resolution
-                        ]
-                      }
-                    >
-                      <Button2
-                        size="sm"
-                        icon={<Download size={18} strokeWidth={2} />}
-                      >
-                        Download
-                      </Button2>
-                    </a>
-                  )}
                 </div>
               ))}
             </div>

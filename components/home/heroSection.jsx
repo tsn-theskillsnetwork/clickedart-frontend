@@ -27,10 +27,10 @@ export default function HeroSection() {
 
   const [currentImage, setCurrentImage] = useState(0);
   const [search, setSearch] = useState("");
-  const [searchType, setSearchType] = useState("image");
+  const [searchType, setSearchType] = useState("images");
 
   const handleSearch = () => {
-    router.push(`/search?search=${search}`);
+    router.push(`/search?search=${search}&type=${searchType}`);
   };
 
   useEffect(() => {
@@ -91,8 +91,6 @@ export default function HeroSection() {
           </div>
         </div>
         <div className="mt-[1%] flex flex-row bg-white text-black group rounded-lg items-center gap-4 w-11/12 md:w-4/5 lg:w-2/3 xl:w-1/2 focus-within:outline focus-within:outline-blue-500">
-          {/* Dropdown for 'Search By' */}
-
           {/* Search Input */}
           <div className="h-full aspect-[1/1] flex justify-center items-center">
             <Search size={40} color="black" className="mx-auto" />
@@ -112,9 +110,9 @@ export default function HeroSection() {
               onChange={(e) => setSearchType(e.target.value)}
               className="bg-white border-l-2 active:border-none active:outline-none focus:border-none text-black py-3 px-4 font-semibold text-sm sm:text-base md:text-lg lg:text-xl focus:outline-none focus:ring-0 "
             >
-              <option value="image">Image</option>
+              <option value="images">Images</option>
               <option value="categories">Categories</option>
-              <option value="photographers">Photographers</option>
+              {/* <option value="photographers">Photographers</option> */}
             </select>
           </div>
           {/* Search Button */}

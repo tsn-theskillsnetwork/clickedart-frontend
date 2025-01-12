@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle } from "lucide-react";
 import {
@@ -9,46 +9,92 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import axios from "axios";
+import useAuthStore from "@/authStore";
 
 export default function MembershipPage() {
+  const { photographer, token } = useAuthStore();
   const [active, setActive] = useState(0);
+  const [plans, setPlans] = useState([]);
+  const [userPlans, setUserPlans] = useState([]);
+  const [selectedPlan, setSelectedPlan] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const plans = [
-    {
-      id: 0,
-      name: "Basic",
-      price: "Free",
-      features: [
-        "Perfect for hobbyists or beginners who want to test the platform.",
-        "Upload up to 10 images and create one catalogs.",
-        "Includes basic watermarking and a fixed pricing structure.",
-        "Monthly sales report.",
-      ],
-    },
-    {
-      id: 1,
-      name: "Intermediate",
-      price: "₹xxxx",
-      features: [
-        "Tailored for semi-professional photographers. ",
-        "Upload up to 10 images and create one catalogs.",
-        "Offers flexible pricing options and detailed sales reports.",
-        "Social media auto-posting and priority support.",
-        "Free 1-month trial for new users.",
-      ],
-    },
-    {
-      id: 2,
-      name: "Premium",
-      price: "₹xxxx",
-      features: [
-        "Ideal for professional photographers and agencies.",
-        "Unlimited uploads, catalogs, and full promotional tools.",
-        "Advanced analytics with customer insights and market recommendations.",
-        "Custom licensing and branding options for complete control.",
-      ],
-    },
-  ];
+  console.log("plan", userPlans);
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/plans/get-all-plans`
+        );
+        console.log(response.data);
+        setPlans(response.data.plans);
+        setActive(response.data.plans[0]._id);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    const fetchPlan = async () => {
+      if (!photographer || !photographer._id) {
+        console.log("Photographer data is missing");
+        return; // Exit early if photographer data is not available
+      }
+      try {
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/get-user-subscription?userId=${photographer._id}`
+        );
+        console.log(res.data);
+
+        if (res.data.subscriptions) {
+          const modifiedPlans = res.data.subscriptions.map((subscription) => ({
+            name: subscription.planId?.name, // Accessing the plan name
+            isActive: subscription.isActive, // Accessing the active status
+          }));
+
+          setUserPlans(modifiedPlans);
+        }
+      } catch (error) {
+        console.log(error.response ? error.response.data : error.message);
+      }
+    };
+
+    fetchPlans();
+    fetchPlan();
+  }, [photographer] || []);
+
+  const handleSubscribe = async (planId, price, duration) => {
+    console.log(planId, price, duration);
+    if (!photographer) return;
+    if (price === "") return;
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/add-subscription`,
+        {
+          userId: photographer._id,
+          planId,
+          price,
+          duration,
+        },
+        {
+          headers: {
+            "x-auth-token": token,
+          },
+        }
+      );
+      console.log("Worked");
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  console.log("User Plans", userPlans);
+  console.log(
+    "Test",
+    userPlans.find((userplan) => userplan?.name === "Intermediate")
+  );
 
   const faqs = [
     {
@@ -124,70 +170,167 @@ export default function MembershipPage() {
           <div className="hidden md:grid grid-cols-3 sm:gap-2 md:gap-4 lg:gap-10 w-screen pt-20 items-end md:px-2 lg:px-12 xl:px-20">
             {plans.map((plan) => (
               <motion.div
-                key={plan.id}
-                onHoverStart={() => setActive(plan.id)}
-                onClick={() => setActive(plan.id)}
+                key={plan._id}
+                onHoverStart={() => setActive(plan._id)}
+                onClick={() => setActive(plan._id)}
                 className={` flex w-full h-full py-4 md:px-4 lg:px-12 xl:px-20 flex-col items-center justify-between gap-2 border-primary border-2 rounded-2xl transition-all duration-200 ease-linear ${
-                  plan.id === active
+                  plan._id === active
                     ? "bg-primary ease-in-out text-white scale-y-105 -translate-y-4"
                     : " text-primary-dark scale-y-100 -translate-y-0"
                 }`}
               >
                 <div
                   className={`flex flex-col items-center transition-transform w-full duration-200 ease-linear ${
-                    plan.id === active
+                    plan._id === active
                       ? "scale-y-95 -translate-y-3"
                       : "scale-y-100 -translate-y-0"
                   }`}
                 >
                   <div
                     className={`border px-4 py-2 rounded-2xl text-heading-05 font-semibold ${
-                      plan.id === active
+                      plan._id === active
                         ? "border-white text-white"
                         : "border-primary text-primary"
                     }`}
                   >
                     <p>{plan.name}</p>
                   </div>
-                  <p
-                    className={`text-heading-01 font-semibold ${
-                      plan.id === active ? "text-white" : "text-primary"
+                  <div
+                    className={`flex flex-col gap-2 text-heading-02 font-semibold ${
+                      plan._id === active ? "text-white" : "text-primary"
                     }`}
                   >
-                    {plan.price}
-                  </p>
-                  <p className="text-heading-06 font-medium">User/Month</p>
-
-                  <div className="flex flex-col gap-2 mt-4">
-                    {plan.features.map((feature, index) => (
-                      <div
+                    {plan.cost.map((cost, index) => (
+                      <span
                         key={index}
-                        className="flex flex-row gap-1 sm:gap-2 lg:gap-4 items-start"
+                        className="flex flex-col items-center gap-0 capitalize"
                       >
-                        <div className="w-fit pt-1">
-                          <CheckCircle size={24} />
-                        </div>
-                        <p className="sm:text-base md:text-paragraph lg:text-heading-06 font-medium">
-                          {feature}
-                        </p>
-                      </div>
+                        <p>₹{cost.price}</p>
+                        <p className="-mt-4 text-heading-06">{cost.duration}</p>
+                      </span>
                     ))}
                   </div>
+
+                  <div className="flex flex-col items-center gap-6 mt-6">
+                    <p className="text-base sm:text-heading-05 md:text-heading-04 lg:text-heading-03 font-semibold text-center">
+                      Features
+                    </p>
+                    <div className="flex flex-col items-center gap-2">
+                      <h3 className="text-lg font-semibold ">Advanced Tools</h3>
+                      <p className="">{plan.advancedTools}</p>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <h3 className="text-lg font-semibold ">
+                        Catalogue Creation
+                      </h3>
+                      <p className="">{plan.catalogCreation}</p>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <h3 className="text-lg font-semibold ">Custom Pricing</h3>
+                      <p className="">{plan.customPricing ? "Yes" : "No"}</p>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <h3 className="text-lg font-semibold ">
+                        Image Upload Limit
+                      </h3>
+                      <p className="">{plan.imageUploadLimit}</p>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <h3 className="text-lg font-semibold ">
+                        Licensing Options
+                      </h3>
+                      <p className="">{plan.licensingOptions}</p>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <h3 className="text-lg font-semibold ">
+                        Priority Support
+                      </h3>
+                      <p className="">{plan.prioritySupport}</p>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <h3 className="text-lg font-semibold ">
+                        Promotional Tools
+                      </h3>
+                      <p className="">{plan.promotionalTools}</p>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <h3 className="text-lg font-semibold">Sales Reports</h3>
+                      <p className="">{plan.salesReports}</p>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <h3 className="text-lg font-semibold ">
+                        Social Media Auto Posting
+                      </h3>
+                      <p className="">{plan.socialMediaAutoPosting}</p>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <h3 className="text-lg font-semibold ">
+                        Social Media Integration
+                      </h3>
+                      <p className="">{plan.socialMediaIntegration}</p>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <h3 className="text-lg font-semibold ">
+                        Watermarking Tools
+                      </h3>
+                      <p className="">{plan.watermarkingTools}</p>
+                    </div>
+                  </div>
                 </div>
+
                 <div
                   className={`${
-                    plan.id === active ? "scale-y-95" : "scale-y-100"
+                    plan._id === active ? "scale-y-95" : "scale-y-100"
                   } transition-transform w-40 lg:w-60 duration-200 ease-linear`}
                 >
-                  <button
-                    className={`${
-                      plan.id === active
-                        ? "bg-white text-primary "
-                        : "bg-primary text-white"
-                    } md:text-sm w-full lg:text-heading-06 xl:text-heading-05 font-medium rounded-lg py-4 px-6 mt-4`}
-                  >
-                    Choose Plan
-                  </button>
+                  {(userPlans.length === 0 ||
+                    (userPlans.some(
+                      (userPlan) =>
+                        userPlan?.name === plan.name && !userPlan.isActive
+                    ) &&
+                      plan.name !== "Basic")) &&
+                    plan.name !== "Basic" && (
+                      <div className="w-full">
+                        {/* The button */}
+                        <button
+                          onClick={() => setSelectedPlan(plan._id)}
+                          className={`${
+                            plan._id === active
+                              ? "bg-white text-primary"
+                              : "bg-primary text-white"
+                          } md:text-sm w-full lg:text-heading-06 xl:text-heading-05 font-medium rounded-lg py-4 px-6 mt-4`}
+                        >
+                          Choose Plan
+                        </button>
+                        {plan._id === selectedPlan && (
+                          <select
+                            placeholder="Select a plan"
+                            onChange={(e) => {
+                              if (e.target.value === "Select a plan") return;
+                              const duration = e.target.value;
+                              const price = plan.cost.find(
+                                (cost) => cost.duration === duration
+                              ).price;
+                              handleSubscribe(plan._id, price, duration);
+                            }}
+                            className={`${
+                              plan._id === active
+                                ? "bg-white text-primary"
+                                : "bg-primary text-white"
+                            } w-full border rounded-lg p-2 mt-2 text-sm`}
+                          >
+                            <option className="">Select a plan</option>
+                            {plan.cost.map((cost) => (
+                              <option key={cost._id} value={cost.duration}>
+                                {cost.duration.charAt(0).toUpperCase() +
+                                  cost.duration.slice(1)}{" "}
+                                - ${cost.price}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                      </div>
+                    )}
                 </div>
               </motion.div>
             ))}
@@ -196,54 +339,194 @@ export default function MembershipPage() {
           <div className="md:hidden w-screen grid grid-cols-3 px-2 gap-1 sm:gap-10 pt-10 items-end">
             {plans.map((plan) => (
               <motion.div
-                key={plan.id}
-                onHoverStart={() => setActive(plan.id)}
-                onClick={() => setActive(plan.id)}
+                key={plan._id}
+                onHoverStart={() => setActive(plan._id)}
+                onClick={() => setActive(plan._id)}
                 className={`flex w-full h-full py-5 px-2 flex-col items-center justify-between gap-2 border-primary border-2 rounded-2xl transition-all duration-200 ease-linear ${
-                  plan.id === active
+                  plan._id === active
                     ? "bg-primary ease-in-out text-white scale-y-110 -translate-y-1.5"
                     : " text-primary-dark scale-y-100 -translate-y-0"
                 }`}
               >
                 <div
                   className={`flex flex-col items-center transition-transform duration-200 ease-linear ${
-                    plan.id === active
+                    plan._id === active
                       ? "scale-y-90 translate-y-2"
                       : "scale-y-100 -translate-y-0"
                   }`}
                 >
                   <div
                     className={`border px-1 py-1 sm:px-2 w-full text-center rounded-2xl text-xs sm:text-lg font-semibold ${
-                      plan.id === active
+                      plan._id === active
                         ? "border-white text-white"
                         : "border-primary text-primary"
                     }`}
                   >
                     <p>{plan.name}</p>
                   </div>
-                  <p
-                    className={`text-heading-06 sm:text-heading-05 font-bold ${
-                      plan.id === active ? "text-white" : "text-primary"
+                  <div
+                    className={`text-heading-06 flex-flex-col gap-2 sm:text-heading-05 font-bold ${
+                      plan._id === active ? "text-white" : "text-primary"
                     }`}
                   >
-                    {plan.price}
-                  </p>
-                  <p className="text-xs sm:text-sm font-medium">User/Month</p>
+                    {plan.cost.map((cost, index) => (
+                      <div
+                        key={index}
+                        className="flex flex-col items-center gap-0 capitalize"
+                      >
+                        <p>₹{cost.price}</p>
+                        <p className="-mt-2 text-sm font-semibold">
+                          {cost.duration}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             ))}
           </div>
           <div className="flex md:hidden flex-col w-full gap-2 mt-4">
-            {plans[active].features.map((feature, index) => (
-              <div key={index} className="flex flex-row gap-4 px-4 items-start">
-                <div className="w-fit pt-0.5">
-                  <CheckCircle size={16} />
-                </div>
-                <p className="text-sm sm:text-paragraph font-medium">
-                  {feature}
-                </p>
-              </div>
-            ))}
+            {plans &&
+              plans.length > 0 &&
+              plans
+                .filter((plan) => plan._id === active)
+                .map((plan) => (
+                  <div
+                    key={plan._id}
+                    className="flex flex-col items-center gap-6 mt-6"
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <h3 className="text-base sm:text-lg font-semibold text-center">
+                        Advanced Tools
+                      </h3>
+                      <p className="text-sm sm:text-base text-center">
+                        {plan.advancedTools}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <h3 className="text-base sm:text-lg font-semibold text-center">
+                        Catalogue Creation
+                      </h3>
+                      <p className="text-sm sm:text-base text-center">
+                        {plan.catalogCreation}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <h3 className="text-base sm:text-lg font-semibold text-center">
+                        Custom Pricing
+                      </h3>
+                      <p className="text-sm sm:text-base text-center">
+                        {plan.customPricing ? "Yes" : "No"}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <h3 className="text-base sm:text-lg font-semibold text-center">
+                        Image Upload Limit
+                      </h3>
+                      <p className="text-sm sm:text-base text-center">
+                        {plan.imageUploadLimit}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <h3 className="text-base sm:text-lg font-semibold text-center">
+                        Licensing Options
+                      </h3>
+                      <p className="text-sm sm:text-base text-center">
+                        {plan.licensingOptions}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <h3 className="text-base sm:text-lg font-semibold text-center">
+                        Priority Support
+                      </h3>
+                      <p className="text-sm sm:text-base text-center">
+                        {plan.prioritySupport}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <h3 className="text-base sm:text-lg font-semibold text-center">
+                        Promotional Tools
+                      </h3>
+                      <p className="text-sm sm:text-base text-center">
+                        {plan.promotionalTools}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <h3 className="text-base sm:text-lg font-semibold text-center">
+                        Sales Reports
+                      </h3>
+                      <p className="text-sm sm:text-base text-center">
+                        {plan.salesReports}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <h3 className="text-base sm:text-lg font-semibold text-center">
+                        Social Media Auto Posting
+                      </h3>
+                      <p className="text-sm sm:text-base text-center">
+                        {plan.socialMediaAutoPosting}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <h3 className="text-base sm:text-lg font-semibold text-center">
+                        Social Media Integration
+                      </h3>
+                      <p className="text-sm sm:text-base text-center">
+                        {plan.socialMediaIntegration}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <h3 className="text-base sm:text-lg font-semibold text-center">
+                        Watermarking Tools
+                      </h3>
+                      <p className="text-sm sm:text-base text-center">
+                        {plan.watermarkingTools}
+                      </p>
+                    </div>
+                    {(userPlans.length === 0 ||
+                      (userPlans.some(
+                        (userPlan) =>
+                          userPlan?.name === plan.name && !userPlan.isActive
+                      ) &&
+                        plan.name !== "Basic")) &&
+                      plan.name !== "Basic" && (
+                        <button
+                          onClick={() => setSelectedPlan(plan._id)} // This needs to be within the correct context for `plan`
+                          className={`bg-primary text-white md:text-sm w-full lg:text-heading-06 xl:text-heading-05 font-medium rounded-lg py-4 px-6 mt-4`}
+                        >
+                          Choose Plan
+                        </button>
+                      )}
+
+                    {plan._id === selectedPlan && (
+                      <select
+                        placeholder="Select a plan"
+                        onChange={(e) => {
+                          if (e.target.value === "Select a plan") return;
+                          const duration = e.target.value;
+                          const price = plan.cost.find(
+                            (cost) => cost.duration === duration
+                          ).price;
+                          handleSubscribe(plan._id, price, duration);
+                        }}
+                        className={`${
+                          plan._id === active
+                            ? "bg-white text-primary"
+                            : "bg-primary text-white"
+                        } w-full border rounded-lg p-2 mt-2 text-sm`}
+                      >
+                        <option className="">Select a plan</option>
+                        {plan.cost.map((cost) => (
+                          <option key={cost._id} value={cost.duration}>
+                            {cost.duration.charAt(0).toUpperCase() +
+                              cost.duration.slice(1)}{" "}
+                            - ${cost.price}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
+                ))}
           </div>
           <div className="flex flex-col my-20 w-full items-center">
             <h1 className="text-heading-06 sm:text-heading-04 md:text-heading-03 lg:text-heading-02 xl:text-heading-01 font-bold mb-5 mx-auto">
@@ -280,7 +563,7 @@ export default function MembershipPage() {
               anytime!
             </h2>
             <p className="text-xs sm:text-sm md:text-paragraph lg:text-heading-06 xl:text-heading-04 font-semibold">
-              Enjoy professional tools with our Advanced Plan – free for 1
+              Enjoy professional tools with our Advanced Plan - free for 1
               month!
             </p>
             <div className="flex flex-col lg:flex-row gap-2 lg:gap-5 xl:gap-10 items-center justify-center w-full">

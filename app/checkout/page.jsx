@@ -14,8 +14,8 @@ import toast from "react-hot-toast";
 import { useRazorpay } from "react-razorpay";
 
 export default function CheckoutPage() {
-  const { user, photographer, token, isHydrated } = useAuthStore();
-  const { cartItems, removeItemFromCart } = useCartStore();
+  const { user, token, isHydrated } = useAuthStore();
+  const { cartItems, removeItemFromCart, clearCart } = useCartStore();
   const router = useRouter();
   const [code, setCode] = useState("");
   const [coupon, setCoupon] = useState([]);
@@ -128,6 +128,7 @@ export default function CheckoutPage() {
       );
 
       console.log("Order created", res.data);
+      clearCart();
       toast.success("Order placed successfully");
       router.push("/profile/orders");
       setLoading(false);

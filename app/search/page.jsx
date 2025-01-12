@@ -141,10 +141,11 @@ export default function SearchResultPage() {
 
   useEffect(() => {
     const fetchImages = async () => {
-      const type 
+      const type = typeValue === "photographers" ? "photographer" : typeValue === "categories" ? "category" : "images";
+      console.log(type)
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/images/search-images?Query=${searchValue}`,
+          `${process.env.NEXT_PUBLIC_SERVER}/api/${type}/search-${type}?Query=${searchValue}`,
           {
             method: "GET",
             headers: {
@@ -153,6 +154,7 @@ export default function SearchResultPage() {
           }
         );
         const data = await res.json();
+        console.log(data);
         setImages(data.results);
         console.log(data.results);
       } catch (error) {

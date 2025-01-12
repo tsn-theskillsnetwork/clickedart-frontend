@@ -317,7 +317,7 @@ const ProfileEditPage = () => {
                 <Input
                   type="text"
                   name="firstName"
-                  value={formData.firstName}
+                  value={formData.firstName || ""}
                   onChange={handleInputChange}
                   required
                 />
@@ -333,57 +333,18 @@ const ProfileEditPage = () => {
                 <Input
                   type="text"
                   name="lastName"
-                  value={formData.lastName}
+                  value={formData.lastName || ""}
                   onChange={handleInputChange}
                   required
                 />
               </div>
             </div>
 
-            {/* <div>
-              <Label>Account Type</Label>
-              <Select
-                value={formData.accountType}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, accountType: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Account Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="freelance">Freelance</SelectItem>
-                  <SelectItem value="studio">Studio</SelectItem>
-                  <SelectItem value="agency">Agency</SelectItem>
-                </SelectContent>
-              </Select>
-            </div> */}
-
-            {/* <div>
-              <Label>Mobile</Label>
-              <Input
-                type="tel"
-                name="mobile"
-                value={formData.mobile}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div>
-              <Label>WhatsApp</Label>
-              <Input
-                type="tel"
-                name="whatsapp"
-                value={formData.whatsapp}
-                onChange={handleInputChange}
-              />
-            </div> */}
-
             <div>
               <Label>Bio</Label>
               <Textarea
                 name="bio"
-                value={formData.bio}
+                value={formData.bio || ""}
                 onChange={handleInputChange}
               />
             </div>
@@ -411,7 +372,7 @@ const ProfileEditPage = () => {
                     <SelectTrigger>
                       <SelectValue
                         placeholder="Select Country"
-                        value={formData.shippingAddress?.country}
+                        value={formData.shippingAddress?.country || ""}
                       />
                     </SelectTrigger>
                     <SelectContent>
@@ -486,7 +447,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="text"
                     name="shippingAddress.address"
-                    value={formData.shippingAddress?.address}
+                    value={formData.shippingAddress?.address || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.address = e.target.value;
@@ -502,7 +463,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="text"
                     name="shippingAddress.landmark"
-                    value={formData.shippingAddress?.landmark}
+                    value={formData.shippingAddress?.landmark || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.landmark = e.target.value;
@@ -518,7 +479,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="text"
                     name="shippingAddress.pincode"
-                    value={formData.shippingAddress?.pincode}
+                    value={formData.shippingAddress?.pincode || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.pincode = e.target.value;
@@ -534,7 +495,7 @@ const ProfileEditPage = () => {
                   <Input
                     type="text"
                     name="shippingAddress.area"
-                    value={formData.shippingAddress?.area}
+                    value={formData.shippingAddress?.area || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.area = e.target.value;
@@ -561,156 +522,6 @@ const ProfileEditPage = () => {
               )}
             </div>
 
-            {/* <div className="flex items-center gap-3">
-              <Label>Is this a company account?</Label>
-              <input
-                type="checkbox"
-                name="isCompany"
-                checked={formData.isCompany}
-                onChange={(e) =>
-                  setFormData({ ...formData, isCompany: e.target.checked })
-                }
-              />
-            </div> */}
-
-            {/* {formData.isCompany && (
-              <>
-                <div>
-                  <Label>Company Name</Label>
-                  <Input
-                    type="text"
-                    name="companyName"
-                    value={formData.companyName || ""}
-                    onChange={handleInputChange}
-                  />
-                </div>
-
-                <div>
-                  <Label>Company Email</Label>
-                  <Input
-                    type="email"
-                    name="companyEmail"
-                    value={formData.companyEmail || ""}
-                    onChange={handleInputChange}
-                  />
-                </div>
-
-                <div>
-                  <Label>Company Address</Label>
-                  <Input
-                    type="text"
-                    name="companyAddress"
-                    value={formData.companyAddress || ""}
-                    onChange={handleInputChange}
-                  />
-                </div>
-
-                <div>
-                  <Label>Company Phone</Label>
-                  <Input
-                    type="tel"
-                    name="companyPhone"
-                    value={formData.companyPhone || ""}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </>
-            )} */}
-
-            {/* <div>
-              <Label>Portfolio Link</Label>
-              <Input
-                type="url"
-                name="portfolioLink"
-                value={formData.portfolioLink || ""}
-                onChange={handleInputChange}
-              />
-            </div> */}
-
-            {/* <div>
-              <Label>Photography Styles</Label>
-              <Input
-                type="text"
-                name="photographyStyles"
-                value={formData.photographyStyles?.join(", ")}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    photographyStyles: e.target.value
-                      .split(",")
-                      .map((s) => s.trim()),
-                  })
-                }
-              />
-              {errors.photographyStyles && (
-                <p className="text-red-500 text-sm">
-                  {errors.photographyStyles}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label>Awards</Label>
-              <Input
-                type="text"
-                name="awards"
-                value={formData.awards?.join(", ") || ""}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    awards: e.target.value.split(",").map((s) => s.trim()),
-                  })
-                }
-              />
-            </div>
-
-            <div>
-              <Label>Achivements</Label>
-              <Input
-                type="text"
-                name="achivements"
-                value={formData.achivements?.join(", ") || ""}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    achivements: e.target.value.split(",").map((s) => s.trim()),
-                  })
-                }
-              />
-            </div>
-
-            <div>
-              <Label>Certifications</Label>
-              <Input
-                type="text"
-                name="certifications"
-                value={formData.certifications?.join(", ") || ""}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    certifications: e.target.value
-                      .split(",")
-                      .map((s) => s.trim()),
-                  })
-                }
-              />
-            </div>
-
-            <div>
-              <Label>Years of Experience</Label>
-              <Input
-                type="number"
-                name="yearsOfExperience"
-                value={formData.yearsOfExperience || ""}
-                onChange={handleInputChange}
-              />
-              {errors.yearsOfExperience && (
-                <p className="text-red-500 text-sm">
-                  {errors.yearsOfExperience}
-                </p>
-              )}
-            </div> */}
-
             <div>
               <Label>Connect Accounts</Label>
               <div className="flex flex-col gap-2">
@@ -718,7 +529,7 @@ const ProfileEditPage = () => {
                   <div key={index} className="flex gap-2">
                     <Select
                       className="w-36"
-                      value={account.accountName || ""}
+                      defaultValue={account.accountName}
                       onValueChange={(value) => {
                         const newAccounts = [...formData.connectedAccounts];
                         newAccounts[index].accountName = value;

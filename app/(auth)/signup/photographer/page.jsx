@@ -71,7 +71,12 @@ const RegistrationForm = () => {
     companyPhone: "",
     companyAddress: "",
     certifications: [],
-    connectedAccounts: [],
+    connectedAccounts: [
+      {
+        accountName: "",
+        accountLink: "",
+      },
+    ],
     bestPhotos: ["", "", ""],
   });
   const [verifyPassword, setVerifyPassword] = useState("");
@@ -185,14 +190,39 @@ const RegistrationForm = () => {
       newErrors.firstName = "First Name must be at least 3 characters.";
     if (formData.lastName.length < 3)
       newErrors.lastName = "Last Name must be at least 3 characters.";
+    if (formData.username.length < 3)
+      newErrors.username = "Username must be at least 3 characters.";
+    if (!/^[a-zA-Z0-9_]+$/.test(formData.username))
+      newErrors.username =
+        "Username can only contain letters, numbers, and underscores.";
     if (!/^\S+@\S+\.\S+$/.test(formData.email))
       newErrors.email = "Enter a valid email address.";
     if (!formData.password) newErrors.password = "Password is required.";
     if (formData.password !== verifyPassword)
       newErrors.password = "Passwords do not match.";
+    if (formData.password.length < 8)
+      newErrors.password = "Password must be at least 8 characters.";
+    if (
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+        formData.password
+      )
+    )
+      newErrors.password =
+        "Password must contain at least 8 characters, including one uppercase, one lowercase, one number and one special character.";
+    if (formData.mobile && isNaN(formData.mobile))
+      newErrors.mobile = "Mobile number must be a number.";
+    if (formData.whatsapp && isNaN(formData.whatsapp))
+      newErrors.whatsapp = "WhatsApp number must be a number.";
+    if (formData.bio.length > 100)
+      newErrors.bio = "Bio must be less than 100 characters.";
+    if (!formData.shippingAddress.country)
+      newErrors.country = "Country is required.";
+    if (!formData.shippingAddress.state) newErrors.state = "State is required.";
+    if (!formData.shippingAddress.city) newErrors.city = "City is required.";
+    if (!formData.shippingAddress.pincode)
+      newErrors.pincode = "Pincode is required.";
     if (formData.yearsOfExperience && isNaN(formData.yearsOfExperience))
       newErrors.yearsOfExperience = "Years of experience must be a number.";
-
     if (formData.dob && isNaN(new Date(formData.dob).getTime()))
       newErrors.dob = "Date of birth is invalid.";
     if (
@@ -424,6 +454,19 @@ const RegistrationForm = () => {
                   <span>{uploadProgress}%</span>
                 </div>
               )}
+              <div>
+                <Label>
+                  Username <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="text"
+                  name="username"
+                  placeholder="Username"
+                  value={formData.username || ""}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full ">
                 <div>
                   <Label>
@@ -484,7 +527,7 @@ const RegistrationForm = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    placeholder="Password"
+                    placeholder="At least 8 characters, 1 uppercase, 1 lowercase, 1 number and 1 special character"
                     required
                   />
 
@@ -577,7 +620,9 @@ const RegistrationForm = () => {
                 <p className="text-heading-06 font-semibold">Address</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label>Country*</Label>
+                    <Label>
+                      Country<span className="text-red-500">*</span>
+                    </Label>
                     <Select
                       defaultValue={formData.shippingAddress?.country}
                       onValueChange={(value) => {
@@ -606,9 +651,12 @@ const RegistrationForm = () => {
                     </Select>
                   </div>
                   <div>
-                    <Label>State*</Label>
+                    <Label>
+                      State<span className="text-red-500">*</span>
+                    </Label>
                     <Select
                       defaultValue={formData.shippingAddress?.state}
+                      required
                       onValueChange={(value) => {
                         const selectedState = states[2].data.find(
                           (state) => state.name === value
@@ -639,9 +687,12 @@ const RegistrationForm = () => {
                     </Select>
                   </div>
                   <div>
-                    <Label>City*</Label>
+                    <Label>
+                      District<span className="text-red-500">*</span>
+                    </Label>
                     <Select
                       defaultValue={formData.shippingAddress?.city}
+                      required
                       onValueChange={(value) => {
                         const newAddress = { ...formData.shippingAddress };
                         newAddress.city = value;
@@ -698,11 +749,14 @@ const RegistrationForm = () => {
                     />
                   </div>
                   <div>
-                    <Label>Pincode*</Label>
+                    <Label>
+                      Pincode<span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       type="text"
                       name="shippingAddress.pincode"
                       value={formData.shippingAddress?.pincode}
+                      required
                       onChange={(e) => {
                         const newAddress = { ...formData.shippingAddress };
                         newAddress.pincode = e.target.value;
@@ -906,7 +960,9 @@ const RegistrationForm = () => {
               </div>
 
               <div>
-                <Label>Social Media</Label>
+                <Label>
+                  Social Media <span className="text-red-500">*</span>
+                </Label>
                 <div className="flex flex-col gap-2">
                   {formData.connectedAccounts?.map((account, index) => (
                     <div key={index} className="flex gap-2">
