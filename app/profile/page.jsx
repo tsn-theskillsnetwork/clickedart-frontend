@@ -10,6 +10,8 @@ import {
   EllipsisIcon,
   Pencil,
   Plus,
+  Share2Icon,
+  ShareIcon,
 } from "lucide-react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -261,6 +263,16 @@ const ProfilePage = () => {
                 >
                   Dashboard
                 </Button>
+                <Button
+                  className="bg-primary text-white"
+                  onClick={() =>
+                    navigator.clipboard.writeText(
+                      `${process.env.NEXT_PUBLIC_CLIENT}/photographer/${photographer._id}`
+                    )
+                  }
+                >
+                  <Share2Icon className="w-6 h-6" />
+                </Button>
               </div>
             )}
 
@@ -360,11 +372,7 @@ const ProfilePage = () => {
                         width={800}
                         height={800}
                         priority
-                        src={
-                          image.imageLinks.small ||
-                          image.imageLinks.medium ||
-                          image.imageLinks.original
-                        }
+                        src={image.imageLinks.original}
                         alt={image.description}
                         className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear"
                       />
@@ -380,9 +388,7 @@ const ProfilePage = () => {
                           </div>
                           <div
                             className={`${
-                              !image.isActive
-                                ? "bg-red-500"
-                                : "bg-transparent"
+                              !image.isActive ? "bg-red-500" : "bg-transparent"
                             } h-2 w-2 rounded-full shadow-[0_0_4px_rgba(0,0,0,0.6)]`}
                           />
                         </div>
@@ -461,7 +467,7 @@ const ProfilePage = () => {
                         >
                           {catalogue.images?.length > 0 ? (
                             <>
-                            {/* //map only 4 images */}
+                              {/* //map only 4 images */}
                               {catalogue.images.slice(0, 4).map((image) => (
                                 <div
                                   key={image._id}

@@ -224,6 +224,7 @@ export default function CataloguesPage() {
                 height={800}
                 priority
                 src={
+                  image.imageLinks.thumbnail ||
                   image.imageLinks.small ||
                   image.imageLinks.medium ||
                   image.imageLinks.original

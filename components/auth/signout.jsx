@@ -15,7 +15,7 @@ export default function Signout({ variant = "icon" }) {
   };
   return (
     <div>
-      <button onClick={handleLogout}>
+      <p onClick={handleLogout}>
         {variant === "icon" && (
           <LogOut className="text-red-500 cursor-pointer" size={24} />
         )}
@@ -25,7 +25,7 @@ export default function Signout({ variant = "icon" }) {
           </p>
         )}
         {}
-      </button>
+      </p>
     </div>
   );
 }

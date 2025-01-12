@@ -18,6 +18,12 @@ import useAuthStore from "@/authStore";
 import useCartStore from "@/store/cart";
 import useWishlistStore from "@/store/wishlist";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   Dialog,
   DialogClose,
   DialogContent,
@@ -337,7 +343,11 @@ export default function Navbar() {
             />
             <DialogFooter className="sm:justify-start">
               <DialogClose asChild>
-                <Button type="button" variant="secondary" onClick={handleSearch}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={handleSearch}
+                >
                   Search
                 </Button>
               </DialogClose>
@@ -347,27 +357,54 @@ export default function Navbar() {
 
         {user || photographer ? (
           <>
-            <Link href="/profile">
-              <User2
-                className={`${
-                  scrollLocation > 50 || pathname !== "/"
-                    ? "text-surface-600"
-                    : "text-white"
-                } cursor-pointer`}
-              />
-            </Link>
-            <Signout />
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Link href="/profile">
+                    <User2
+                      className={`${
+                        scrollLocation > 50 || pathname !== "/"
+                          ? "text-surface-600"
+                          : "text-white"
+                      } cursor-pointer`}
+                    />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-white font-medium">Profile</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Signout />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Sign Out</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </>
         ) : (
-          <Link href="/signin">
-            <User2
-              className={`${
-                scrollLocation > 50 || pathname !== "/"
-                  ? "text-surface-600"
-                  : "text-white"
-              } cursor-pointer`}
-            />
-          </Link>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Link href="/signin">
+                  <User2
+                    className={`${
+                      scrollLocation > 50 || pathname !== "/"
+                        ? "text-surface-600"
+                        : "text-white"
+                    } cursor-pointer`}
+                  />
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-white font-medium">Sign In</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )}
         <Link href="/wishlist" className="relative">
           <Heart

@@ -22,27 +22,32 @@ export default function CheckoutPage() {
   const [discount, setDiscount] = useState(0);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [deliveryCharges, setDeliveryCharges] = useState(0);
+  const [platformCharges, setPlatformCharges] = useState(0);
   const [orderData, setOrderData] = useState({
-    userId: "",
-    imageInfo: { image: "", photographer: "", resolution: "", price: "" },
-    subTotal: "",
+    userId: null,
+    orderItems: [],
+    gst: null,
+    orderStatus: "pending",
+    isPaid: false,
     paymentMethod: "",
+    invoiceId: "",
+    totalAmount: 0,
+    finalAmount: 0,
+    discount: 0,
     shippingAddress: {
       address: "",
+      country: "India",
       city: "",
       landmark: "",
       area: "",
-      mobileNumber: "",
+      mobile: "",
       email: "",
       pincode: "",
       state: "",
-      country: "India",
     },
-    totalAmount: "",
-    orderStatus: "pending",
-    invoiceId: "",
-    coupon: "",
   });
+
   //razorpay
   const { Razorpay } = useRazorpay();
   const [paymentStatus, setPaymentStatus] = useState();
@@ -57,7 +62,7 @@ export default function CheckoutPage() {
   };
 
   const handlePayment = useCallback(
-    async (totalAmount) => {
+    async (finalAmount) => {
       if (!user) {
         toast.error("Please login as User to continue");
         return;
@@ -65,7 +70,7 @@ export default function CheckoutPage() {
       const result = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/download/payment`,
         {
-          total: totalAmount,
+          total: finalAmount,
           userId: user._id,
         }
       );
@@ -76,7 +81,7 @@ export default function CheckoutPage() {
         currency: "INR",
         name: "ClickedArt",
         description: "Total Payment",
-        image: "https://example.com/your_logo",
+        image: "/assets/Logo.png",
         order_id: result.data.id,
         handler: async (res) => {
           try {
@@ -112,49 +117,9 @@ export default function CheckoutPage() {
   const createOrder = async () => {
     try {
       setLoading(true);
-      const newOrderData = {
-        ...orderData,
-        items: [], // Store all the items in the cart
-      };
-
-      let newSubtotal = 0;
-
-      // Loop through the cart items to gather all the necessary data
-      for (const item of cartItems) {
-        newSubtotal += item.subTotal;
-
-        newOrderData.items.push({
-          imageInfo: {
-            image: item._id,
-            photographer: item.photographer?._id,
-            resolution: item.mode === "print" ? "original" : item.selectedSize,
-            price: item.subTotal,
-          },
-          frameInfo: {
-            frame: item.selectedFrame?._id,
-            price: item.selectedFrame?.price,
-            size: item.selectedFrame ? item.selectedSize : null,
-          },
-          paperInfo: {
-            paper: item.selectedPaper?._id,
-            price: item.selectedPaper?.price,
-            size: item.selectedPaper ? item.selectedSize : null,
-          },
-          subTotal: item.subTotal,
-        });
-
-        handleRemoveFromCart(item._id);
-      }
-
-      // Apply coupon and calculate final amount
-      const newTotal = newSubtotal + newSubtotal * 0.18;
-      newOrderData.subTotal = newSubtotal;
-      newOrderData.totalAmount = newTotal - discount;
-
-      // Send the order details to the server in one call
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/download/create-order`,
-        newOrderData,
+        orderData,
         {
           headers: {
             "x-auth-token": token,
@@ -173,51 +138,82 @@ export default function CheckoutPage() {
       setLoading(false);
     }
   };
-  
 
   useEffect(() => {
-    const newSubtotal = calculateSubtotal();
-    const newTotal = newSubtotal + newSubtotal * 0.18;
+    const calculateNewSubtotal = () => {
+      return cartItems.reduce((total, item) => total + item.subTotal, 0);
+    };
+
+    const calculateNewTotal = (subtotal) => {
+      const gst = subtotal * 0.18; // 18% GST
+      const deliveryCharge = cartItems.reduce(
+        (total, item) => total + (item.delivery || 0),
+        0
+      );
+      setDeliveryCharges(deliveryCharge);
+
+      const discountedAmount = subtotal - (discount || 0); // Subtotal after discount
+      const finalAmountBeforePlatform = discountedAmount + gst;
+
+      const platformCharge = finalAmountBeforePlatform * 0.02; // 2% platform charge
+      setPlatformCharges(platformCharge.toFixed(2)); // Store rounded platform charge
+
+      // Total amount with all charges
+      return +(finalAmountBeforePlatform + platformCharge).toFixed(2); // Ensure result is rounded to 2 decimals
+    };
+
+    const newSubtotal = calculateNewSubtotal();
+    const newTotal = calculateNewTotal(newSubtotal);
 
     setOrderData((prev) => ({
       ...prev,
       userId: user?._id,
-      imageInfo: {
-        image: cartItems[0]?._id,
-        photographer: cartItems[0]?.photographer?._id,
-        resolution:
-          cartItems[0]?.mode === "print"
-            ? "original"
-            : cartItems[0]?.selectedSize,
-        price: cartItems[0]?.subTotal,
-      },
-      frameInfo: {
-        frame: cartItems[0]?.selectedFrame?._id,
-        price: cartItems[0]?.selectedFrame?.price,
-        size: cartItems[0]?.selectedFrame ? cartItems[0].selectedSize : null,
-      },
-      paperInfo: {
-        paper: cartItems[0]?.selectedPaper?._id,
-        price: cartItems[0]?.selectedPaper?.price,
-        size: cartItems[0]?.selectedPaper ? cartItems[0].selectedSize : null,
-      },
-      subTotal: newSubtotal,
+      orderItems: cartItems.map((item) => ({
+        imageInfo: {
+          image: item.imageInfo.image,
+          photographer: item.imageInfo.photographer?._id,
+          resolution:
+            item.mode === "print" ? "original" : item.imageInfo.resolution,
+          price: item.imageInfo.price,
+        },
+        frameInfo: item.frameInfo
+          ? {
+              frame: item.frameInfo.frame,
+              price: item.frameInfo.price,
+              size: item.frameInfo.size,
+            }
+          : null,
+        paperInfo: item.paperInfo
+          ? {
+              paper: item.paperInfo.paper,
+              price: item.paperInfo.price,
+              size: item.paperInfo.size,
+            }
+          : null,
+        subTotal: item.subTotal,
+        finalPrice: item.subTotal + (item.delivery || 0),
+      })),
+      gst: null,
       paymentMethod: "Credit Card",
       shippingAddress: {
         ...prev.shippingAddress,
-        city: user?.shippingAddress.city,
-        address: user?.shippingAddress.address,
-        state: user?.shippingAddress.state,
-        country: user?.shippingAddress.country,
+        city: user?.shippingAddress?.city,
+        address: user?.shippingAddress?.address,
+        state: user?.shippingAddress?.state,
+        country: user?.shippingAddress?.country || "India",
         email: user?.email,
-        mobileNumber: user?.mobile,
-        pincode: user?.shippingAddress.pincode,
+        mobile: user?.mobile,
+        pincode: user?.shippingAddress?.pincode,
       },
-      totalAmount: newTotal,
+      totalAmount: newSubtotal,
+      finalAmount: newTotal,
       orderStatus: "pending",
       invoiceId: "",
+      discount: 0,
     }));
   }, [user, cartItems]);
+
+  console.log("orderData", orderData);
 
   const handleCoupon = async (event) => {
     event.preventDefault();
@@ -305,7 +301,8 @@ export default function CheckoutPage() {
         <section className="bg-white py-8 antialiased d md:py-16">
           <form
             action={() => {
-              handlePayment(orderData.totalAmount);
+              handlePayment(orderData.finalAmount);
+              
             }}
             className="mx-auto max-w-screen-xl px-4 2xl:px-0"
           >
@@ -483,7 +480,7 @@ export default function CheckoutPage() {
                     </div>
                     <div>
                       <Label htmlFor="gst">GST number</Label>
-                      <Input type="text" value="Unavailable" disabled />
+                      <Input type="text" value={orderData.gst || ""} disabled />
                     </div>
                   </div>
                 </div>
@@ -551,6 +548,7 @@ export default function CheckoutPage() {
                               <p className="text-sm font-medium text-surface-500">
                                 {product.frameInfo?.name}
                               </p>
+                              <p>Delivery: ₹{product.delivery}</p>
                             </>
                           ) : (
                             <>
@@ -575,7 +573,7 @@ export default function CheckoutPage() {
                         Subtotal
                       </dt>
                       <dd className="text-base font-medium text-gray-900 dark:text-white">
-                        ₹{orderData.subTotal}
+                        ₹{orderData.totalAmount}
                       </dd>
                     </dl>
                     <dl className="flex items-center justify-between gap-4 py-3">
@@ -588,10 +586,29 @@ export default function CheckoutPage() {
                     </dl>
                     <dl className="flex items-center justify-between gap-4 py-3">
                       <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
+                        Delivery Charges
+                      </dt>
+                      <dd className="text-base font-medium text-green-500">
+                        <span className="line-through mr-2 text-black">
+                          ₹{deliveryCharges}
+                        </span>
+                        ₹0
+                      </dd>
+                    </dl>
+                    <dl className="flex items-center justify-between gap-4 py-3">
+                      <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
+                        Platform Charges
+                      </dt>
+                      <dd className="text-base font-medium text-gray-900">
+                        ₹{platformCharges}
+                      </dd>
+                    </dl>
+                    <dl className="flex items-center justify-between gap-4 py-3">
+                      <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
                         GST (18%)
                       </dt>
                       <dd className="text-base font-medium text-gray-900 dark:text-white">
-                        ₹{orderData.subTotal * 0.18}
+                        ₹{orderData.totalAmount * 0.18}
                       </dd>
                     </dl>
                     <dl className="flex items-center justify-between gap-4 py-3">
@@ -599,7 +616,7 @@ export default function CheckoutPage() {
                         Total
                       </dt>
                       <dd className="text-base font-bold text-gray-900 dark:text-white">
-                        ₹{orderData.totalAmount}
+                        ₹{orderData.finalAmount}
                       </dd>
                     </dl>
                   </div>

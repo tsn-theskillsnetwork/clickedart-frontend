@@ -16,6 +16,7 @@ import useCartStore from "@/store/cart";
 import useAuthStore from "@/authStore";
 import useWishlistStore from "@/store/wishlist";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 export default function SearchResultPage() {
   const { user } = useAuthStore();
@@ -29,6 +30,7 @@ export default function SearchResultPage() {
   const sortValue = searchParams.get("sort") || "date";
   const themeValue = searchParams.get("theme") || "all";
   const searchValue = searchParams.get("search") || "";
+  const typeValue = searchParams.get("type") || "image";
 
   const [filter, setFilter] = useState("price");
   const [themes, setThemes] = useState([]);
@@ -105,7 +107,7 @@ export default function SearchResultPage() {
   const sortedImages = [...images]
     .filter((image) => {
       if (theme === "all") return true;
-      return image.category.name.toLowerCase() === theme.toLowerCase();
+      return image.category?.name?.toLowerCase() === theme.toLowerCase();
     })
     .sort((a, b) => {
       if (sort === "price") return a.price?.original - b.price?.original;
@@ -139,6 +141,7 @@ export default function SearchResultPage() {
 
   useEffect(() => {
     const fetchImages = async () => {
+      const type 
       try {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_SERVER}/api/images/search-images?Query=${searchValue}`,
@@ -150,14 +153,35 @@ export default function SearchResultPage() {
           }
         );
         const data = await res.json();
-        setImages(data.images);
-        console.log(data.images);
+        setImages(data.results);
+        console.log(data.results);
       } catch (error) {
         console.error(error);
       }
     };
 
-    fetchImages();
+    const fetchAllImages = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-all-images`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await res.json();
+        setImages(data.photos);
+        console.log(data.photos);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    if (searchValue === "") {
+      fetchAllImages();
+    } else fetchImages();
   }, [searchValue]);
 
   // useEffect(() => {
@@ -290,7 +314,7 @@ export default function SearchResultPage() {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-44">
-        {sortedImages.map((image, index) => (
+          {sortedImages.map((image, index) => (
             <div key={index}>
               <div
                 onClick={() => {
@@ -319,7 +343,7 @@ export default function SearchResultPage() {
                     <div className="bg-white px-2 text-paragraph group-hover:opacity-0 bg-opacity-75 w-fit transition-all duration-200 ease-linear cursor-default">
                       <p>{image.imageAnalytics?.downloads} Downloads</p>
                     </div>
-                    <Heart
+                    {/* <Heart
                       size={28}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -338,7 +362,7 @@ export default function SearchResultPage() {
                           ? "text-red-400 fill-red-500"
                           : "text-white group-hover:text-red-600"
                       }  transition-all duration-200 ease-linear cursor-pointer`}
-                    />
+                    /> */}
                   </div>
                 </div>
               </div>
@@ -346,27 +370,40 @@ export default function SearchResultPage() {
                 <h2 className="text-heading-05 font-semibold">
                   {image.title || "Untitled"}
                 </h2>
-                <Link
-                  href={`/photographer/${image.photographer[0]?._id}`}
-                  className="font-medium"
-                >
-                  {image.photographer[0]?.firstName
-                    ? image.photographer[0]?.firstName +
-                      " " +
-                      image.photographer[0]?.lastName
-                    : image.photographer[0]?.name}
-                </Link>
+                {searchValue ? (
+                  <Link
+                    href={`/photographer/${image.photographer?._id}`}
+                    className="font-medium"
+                  >
+                    {image.photographer?.firstName
+                      ? image.photographer?.firstName +
+                        " " +
+                        image.photographer?.lastName
+                      : image.photographer?.name}
+                  </Link>
+                ) : (
+                  <Link
+                    href={`/photographer/${image.photographer?._id}`}
+                    className="font-medium"
+                  >
+                    {image.photographer?.firstName
+                      ? image.photographer?.firstName +
+                        " " +
+                        image.photographer?.lastName
+                      : image.photographer?.name}
+                  </Link>
+                )}
                 <p className="font-medium text-surface-500">
                   {image.category?.name}
                 </p>
                 <div className="flex flex-row gap-2 overflow-y-scroll no-scrollbar">
                   {image.keywords?.map((tag, index) => (
                     <span
-                    key={index}
-                    className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-700 bg-primary-400 bg-opacity-15 rounded-lg px-2 py-1"
-                  >
-                    {tag}
-                  </span>
+                      key={index}
+                      className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-700 bg-primary-400 bg-opacity-15 rounded-lg px-2 py-1"
+                    >
+                      {tag}
+                    </span>
                   ))}
                 </div>
                 {/* <h2 className="text-heading-06 font-medium">

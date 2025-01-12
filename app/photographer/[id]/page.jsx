@@ -220,13 +220,13 @@ export default function ProfilePage() {
                               </p>
                             </div> */}
                         </div>
-                        <div
+                        {/* <div
                           className={`${
                             image.exclusiveLicenseStatus != "approved"
                               ? "bg-red-500"
                               : "bg-transparent"
                           } h-2 w-2 rounded-full shadow-[0_0_4px_rgba(0,0,0,0.6)]`}
-                        />
+                        /> */}
                       </div>
                     </div>
                     <div className="text-white absolute bottom-0 p-4 pt-6 bg-gradient-to-t from-black to-transparent inset-x-0 bg-opacity-50 opacity-0 group-hover:opacity-100 transition-all duration-200 ease-linear">

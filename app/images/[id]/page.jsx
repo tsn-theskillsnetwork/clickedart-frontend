@@ -27,8 +27,25 @@ import { Icon } from "@iconify/react";
 export default function ImagePage() {
   const id = useParams().id;
   const { token, isHydrated } = useAuthStore();
-  const { addItemToCart, removeItemFromCart, isItemInCart } =
-    useCartStore.getState();
+  const { addItemToCart, removeItemFromCart, isItemInCart } = useCartStore();
+
+  const [image, setImage] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [recommendedLength, setRecommendedLength] = useState(4);
+
+  const [selected, setSelected] = useState(0);
+  const [mode, setMode] = useState("digital");
+  const [papers, setPapers] = useState([]);
+  const [frames, setFrames] = useState([]);
+  const [selectedPaper, setSelectedPaper] = useState(null);
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedFrame, setSelectedFrame] = useState(null);
+  const [desc, setDesc] = useState(true);
+  const [buySectionActive, setBuySectionActive] = useState(false);
+  const [subTotal, setSubTotal] = useState(image.price?.original || 0);
+  const [inCart, setInCart] = useState(false);
+
   const onAddToCart = () => {
     if (mode === "print" && !selectedPaper) {
       toast.error("Please select a paper!");
@@ -67,34 +84,25 @@ export default function ImagePage() {
           }
         : null,
       subTotal: subTotal,
-      mode, // Differentiating mode (digital or print)
+      mode,
+      delivery:
+        mode === "print" ? selectedSize?.width * selectedSize?.height : 0,
     };
 
     addItemToCart(productToAdd);
+    setInCart(true);
     toast.success("Added to cart!");
   };
 
   const onRemoveFromCart = () => {
-    removeItemFromCart(`${id}-${mode}`);
+    removeItemFromCart(id, mode);
     toast.success("Removed from cart!");
+    setInCart(isItemInCart(id, mode));
   };
 
-  const [image, setImage] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [recommendedLength, setRecommendedLength] = useState(4);
-
-  const [selected, setSelected] = useState(0);
-  const [mode, setMode] = useState("digital");
-  const [papers, setPapers] = useState([]);
-  const [frames, setFrames] = useState([]);
-  const [selectedPaper, setSelectedPaper] = useState(null);
-  const [selectedSize, setSelectedSize] = useState(null);
-  const [selectedFrame, setSelectedFrame] = useState(null);
-  const [desc, setDesc] = useState(true);
-  const [buySectionActive, setBuySectionActive] = useState(false);
-  const [subTotal, setSubTotal] = useState(image.price?.original || 0);
-  const [inCart, setInCart] = useState(false);
+  useEffect(() => {
+    setInCart(isItemInCart(id, mode));
+  }, [id, mode]);
 
   const images = [
     {
@@ -179,7 +187,7 @@ export default function ImagePage() {
         const width = selectedSize?.width || 0;
         const height = selectedSize?.height || 0;
         const framePrice = selectedFrame
-          ? (width + height) * 2 * selectedFrame.basePricePerLinearInch
+          ? width * height * selectedFrame.basePricePerLinearInch
           : 0;
 
         const imagePrice = image.price?.original || 0;
@@ -259,8 +267,6 @@ export default function ImagePage() {
       setFrames,
       setError
     );
-
-    setInCart(isItemInCart(id, mode));
     setSubTotal(image.price?.original);
   }, []);
 
@@ -418,9 +424,7 @@ export default function ImagePage() {
         <p
           onClick={() => {
             setMode("print");
-            setSelectedPaper(null);
-            setSelectedSize(null);
-            setSelectedFrame(null);
+            handleMockup();
           }}
           className={`text-base md:text-paragraph lg:text-base xl:text-heading-06 drop-shadow-md z-10 font-bold ${
             mode === "digital" ? "text-surface-500" : "text-zinc-100"
@@ -582,18 +586,19 @@ export default function ImagePage() {
     </div>
   );
 
-  const minSize = 12 * 18; // Smallest size
-const maxSize = 44 * 72; // Largest size
+  const minSize = 12 * 18;
+  const maxSize = 44 * 72;
 
-const dynamicHeight = selectedPaper && selectedSize
-  ? ((selectedSize.height * selectedSize.width) - minSize) / (maxSize - minSize) // Normalized value (0 to 1)
-  : 0;
+  const dynamicHeight =
+    selectedPaper && selectedSize
+      ? (selectedSize.height * selectedSize.width - minSize) /
+        (maxSize - minSize)
+      : 0;
 
-const clampedHeight = selectedPaper && selectedSize
-  ? (20 + dynamicHeight * (35 - 20)) // Scale between 20% and 35%
-  : 100;
+  const clampedHeight =
+    selectedPaper && selectedSize ? 20 + dynamicHeight * (35 - 20) : 100;
 
-const height = clampedHeight + "%";
+  const height = clampedHeight + "%";
 
   return (
     <>
@@ -627,8 +632,7 @@ const height = clampedHeight + "%";
                               ? selectedSize.height
                               : selectedSize.width
                           }`,
-                          height: selectedSize ? height : "100%",
-                          // selectedSize && (selectedSize.height * selectedSize.width) / 20 + "%",
+                        height: selectedSize ? height : "100%",
                       }}
                       className={`${
                         selectedPaper &&

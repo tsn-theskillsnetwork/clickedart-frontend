@@ -65,6 +65,7 @@ const ProfilePage = () => {
   });
 
   const [timeoutId, setTimeoutId] = useState(null);
+  const [keywordInput, setKeywordInput] = useState(photo.keywords.join(", "));
 
   const handlePriceChange = (e) => {
     const newValue = e.target.value;
@@ -183,6 +184,7 @@ const ProfilePage = () => {
       );
       console.log(response.data);
       toast.success("Image uploaded successfully");
+      alert("Image uploaded successfully. Please check your profile.");
       router.push("/profile");
     } catch (error) {
       console.log(error);
@@ -240,6 +242,12 @@ const ProfilePage = () => {
 
     fetchPlan();
   }, [photographer]);
+
+  console.log("categories", categories);
+
+  useEffect(() => {
+    scrollTo(20, 0);
+  }, []);
 
   return (
     <>
@@ -470,18 +478,52 @@ const ProfilePage = () => {
                       <Label className="!text-paragraph">Keywords *</Label>
                       <Input
                         className="!text-paragraph"
-                        placeholder="Enter keywords separated by commas(Min 5)"
-                        onChange={(e) =>
+                        placeholder="Enter keywords separated by commas (Min 5)"
+                        value={keywordInput}
+                        onChange={(e) => {
+                          const inputValue = e.target.value;
+                          setKeywordInput(inputValue);
                           setPhoto({
                             ...photo,
-                            keywords: e.target.value
+                            keywords: inputValue
                               .split(",")
-                              .map((keyword) => keyword.trim()),
-                          })
-                        }
+                              .map((keyword) => keyword.trim())
+                              .filter((keyword) => keyword !== ""),
+                          });
+                        }}
                       />
+                      <div className="mt-1">
+                        {categories
+                          ?.find((category) => category._id === photo.category)
+                          ?.tags?.map((tag) => {
+                            const isSelected = photo.keywords.includes(tag); // Check if tag is already selected
+                            return (
+                              <span
+                                key={tag}
+                                onClick={() => {
+                                  const updatedKeywords = isSelected
+                                    ? photo.keywords.filter(
+                                        (keyword) => keyword !== tag
+                                      ) // Remove tag if selected
+                                    : [...new Set([...photo.keywords, tag])]; // Add tag if not selected
+                                  setPhoto({
+                                    ...photo,
+                                    keywords: updatedKeywords,
+                                  });
+                                  setKeywordInput(updatedKeywords.join(", ")); // Update input display
+                                }}
+                                className={`text-xs px-2 py-1 rounded-full mr-2 cursor-pointer ${
+                                  isSelected
+                                    ? "bg-gray-300 text-black"
+                                    : "bg-primary text-white"
+                                }`}
+                              >
+                                {tag} {isSelected ? "×" : "+"}
+                              </span>
+                            );
+                          })}
+                      </div>
                     </div>
-
                     <div>
                       <Label className="!text-paragraph">Story</Label>
                       <Textarea
@@ -492,7 +534,6 @@ const ProfilePage = () => {
                         }
                       />
                     </div>
-
                     <div>
                       <Label className="!text-paragraph">Plan</Label>
                       <Input
@@ -637,7 +678,6 @@ const ProfilePage = () => {
                         }
                       />
                     </div>
-
                     <div className="grid grid-cols-2 gap-4">
                       <Button onClick={() => setStep("1")}>Back</Button>
                       <Button2 onClick={handleUpload}>Upload</Button2>

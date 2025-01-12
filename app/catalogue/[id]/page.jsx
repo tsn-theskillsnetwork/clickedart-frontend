@@ -164,18 +164,18 @@ export default function CataloguesPage() {
       </div>
       <hr />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
-        {catalogue.images?.map((image, index) => (
+        {catalogue.images?.slice(0, 4).map((image, index) => (
           <div key={index} className="flex flex-col gap-2">
             <Link
               href={`/images/${image._id}`}
               className="relative group shadow-[2px_2px_6px_rgba(0,0,0,0.4)]"
-              
             >
               <Image
                 width={800}
                 height={800}
                 priority
                 src={
+                  image.imageLinks.thumbnail ||
                   image.imageLinks.small ||
                   image.imageLinks.medium ||
                   image.imageLinks.original

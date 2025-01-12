@@ -27,6 +27,7 @@ export default function HeroSection() {
 
   const [currentImage, setCurrentImage] = useState(0);
   const [search, setSearch] = useState("");
+  const [searchType, setSearchType] = useState("image");
 
   const handleSearch = () => {
     router.push(`/search?search=${search}`);
@@ -64,7 +65,7 @@ export default function HeroSection() {
           </motion.div>
         </AnimatePresence>
       </div>
-      
+
       <div className="absolute inset-0 z-20 flex flex-col mt-20 sm:mt-20 items-center text-white">
         <h1 className="text-heading-03 md:text-heading-02 lg:text-heading-01 2xl:text-heading-lg font-semibold">
           ClickedArt
@@ -90,17 +91,33 @@ export default function HeroSection() {
           </div>
         </div>
         <div className="mt-[1%] flex flex-row bg-white text-black group rounded-lg items-center gap-4 w-11/12 md:w-4/5 lg:w-2/3 xl:w-1/2 focus-within:outline focus-within:outline-blue-500">
+          {/* Dropdown for 'Search By' */}
+
+          {/* Search Input */}
           <div className="h-full aspect-[1/1] flex justify-center items-center">
             <Search size={40} color="black" className="mx-auto" />
           </div>
           <input
             type="text"
-            placeholder="Search for images"
+            placeholder={`Search for ${searchType}`}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             className="active:border-none active:outline-none focus:outline-none focus:border-none py-4 text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-semibold my-1 w-full"
           />
+
+          <div className="relative">
+            <select
+              value={searchType}
+              onChange={(e) => setSearchType(e.target.value)}
+              className="bg-white border-l-2 active:border-none active:outline-none focus:border-none text-black py-3 px-4 font-semibold text-sm sm:text-base md:text-lg lg:text-xl focus:outline-none focus:ring-0 "
+            >
+              <option value="image">Image</option>
+              <option value="categories">Categories</option>
+              <option value="photographers">Photographers</option>
+            </select>
+          </div>
+          {/* Search Button */}
           <button
             onClick={handleSearch}
             className="bg-accent-200 h-full aspect-[1/1] text-white rounded-r-lg relative"
@@ -113,6 +130,7 @@ export default function HeroSection() {
             />
           </button>
         </div>
+
         <div className="mt-[2%] w-full flex flex-col gap-2 items-center md:flex-row justify-around">
           <button
             onClick={() => router.push("/images")}

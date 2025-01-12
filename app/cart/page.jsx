@@ -4,7 +4,6 @@ import useCartStore from "@/store/cart";
 import Button from "@/components/button";
 import { Input } from "@/components/ui/input";
 import React from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -13,11 +12,12 @@ import useAuthStore from "@/authStore";
 export default function CartPage() {
   const { user } = useAuthStore();
   const router = useRouter();
-  const { removeItemFromCart, cartItems } = useCartStore();
+  const { removeItemFromCart, cartItems, clearCart } = useCartStore();
   const [coupon, setCoupon] = React.useState("");
 
-  const onRemoveItem = (productId) => {
-    removeItemFromCart(productId);
+  const onRemoveItem = (id, mode) => {
+    removeItemFromCart(id, mode);
+    toast.success("Removed from cart!");
   };
 
   console.log(cartItems);
@@ -54,7 +54,7 @@ export default function CartPage() {
                   />
                 </Link>
                 <button
-                  onClick={() => onRemoveItem(product._id)}
+                  onClick={() => onRemoveItem(product.imageInfo?.image, product.mode)}
                   className="text-red-600 font-medium"
                 >
                   Remove
@@ -151,6 +151,12 @@ export default function CartPage() {
           </Button>
           <button className="font-semibold text-paragraph p-3 rounded-md text-surface-500 border border-surface-600 hover:bg-surface-200">
             Continue Shopping
+          </button>
+          <button
+            onClick={clearCart}
+            className="font-semibold text-red-600 p-3 rounded-md border border-red-600 hover:bg-red-600 hover:text-white"
+          >
+            Clear Cart
           </button>
         </div>
       </div>
