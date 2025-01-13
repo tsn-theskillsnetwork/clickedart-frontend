@@ -53,8 +53,8 @@ module.exports = {
   async rewrites() {
     return [
       {
-        source: '/api/:path*', // Matches all requests to `/api/...`
-        destination: 'http://35.154.240.254:5000/api/:path*', // Your HTTP backend
+        source: '/api/:path*',
+        destination: 'http://35.154.240.254:5000/api/:path*',
       },
     ];
   },
