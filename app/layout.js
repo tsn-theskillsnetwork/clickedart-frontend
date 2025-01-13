@@ -20,6 +20,12 @@ export const metadata = {
 export default async function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <meta
+          httpEquiv="Content-Security-Policy"
+          content="upgrade-insecure-requests"
+        />
+      </head>
       <body className={`antialiased overflow-x-hidden`}>
         <Toaster />
         {/* <NavbarMobile /> */}
