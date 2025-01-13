@@ -22,7 +22,6 @@ export default async function RootLayout({ children }) {
     <html lang="en">
       <body className={`antialiased overflow-x-hidden`}>
         <Toaster />
-        {/* <NavbarMobile /> */}
         <Navbar />
         <div className="pt-20 sm:pt-24">{children}</div>
         <Footer />
