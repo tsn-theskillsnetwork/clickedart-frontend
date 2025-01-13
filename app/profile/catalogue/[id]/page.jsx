@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Plus, Tag, Trash2Icon } from "lucide-react";
+import { ArrowLeftIcon, Plus, Tag, Trash2Icon } from "lucide-react";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { useParams } from "next/navigation";
@@ -148,7 +148,13 @@ export default function CataloguesPage() {
         </div>
       )}
 
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col gap-10">
+        <Link href="/profile">
+          <p className="flex items-center gap-2 text-heading-06 font-semibold">
+            <ArrowLeftIcon className="w-6 h-6" />
+            Back
+          </p>
+        </Link>
         <div className="flex flex-col">
           <p className="text-heading-03 font-semibold">{catalogue.name}</p>
           <p className="text-base -mt-1">{catalogue.description}</p>
@@ -249,7 +255,7 @@ export default function CataloguesPage() {
                 removeImage(catalogue._id, image._id);
               }}
             >
-              Remove
+              Remove From Catelogue
             </Button>
           </div>
         ))}

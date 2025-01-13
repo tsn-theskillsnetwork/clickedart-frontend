@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
-import { ImageIcon, Plus, Trash } from "lucide-react";
+import { CameraIcon, ImageIcon, Plus, Trash } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -22,6 +22,7 @@ import axios from "axios";
 import countries from "@/lib/address/countries.json";
 import states from "@/lib/address/states.json";
 import cities from "@/lib/address/cities.json";
+import Link from "next/link";
 
 const ProfileEditPage = () => {
   const { user, token, photographer, setUser, setPhotographer } =
@@ -40,6 +41,7 @@ const ProfileEditPage = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [selectedCountry, setSelectedCountry] = useState("102");
   const [selectedState, setSelectedState] = useState("");
+  const [editingCover, setEditingCover] = useState(false);
 
   const handleInputChange = ({ currentTarget: input }) => {
     if (input.name === "interests") {
@@ -229,86 +231,96 @@ const ProfileEditPage = () => {
   return (
     <>
       <Toaster position="top-center" reverseOrder={false} />
-      <div className="flex flex-col items-center justify-center min-h-[80vh] mt-5 mb-10">
+      <div className="flex flex-col items-center justify-center group min-h-[80vh] mb-10">
+        <div className="w-full relative">
+          <Image
+            src="/assets/hero/bg2.jpg"
+            alt="bg1"
+            width={1920}
+            height={800}
+            className="object-cover w-full h-40 lg:h-96"
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
+            <CameraIcon className="w-12 h-12 text-white mx-auto mt-20 lg:mt-40" />
+          </div>
+        </div>
+        <div className="relative flex flex-col items-center -mt-16 lg:-mt-28">
+          {cropperImage ? (
+            <Cropper
+              src={cropperImage}
+              style={{ height: 300, width: "100%" }}
+              initialAspectRatio={1}
+              aspectRatio={1}
+              guides={false}
+              ref={cropperRef}
+            />
+          ) : formData.profileImage ? (
+            <>
+              <Image
+                src={formData.profileImage}
+                alt="Profile Image"
+                width={200}
+                height={200}
+                className="rounded-full object-cover aspect-[1/1] border-4 border-white"
+              />
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, profileImage: "" })}
+                className="text-red-500"
+              >
+                Remove
+              </button>
+            </>
+          ) : (
+            <div className="max-w-md mx-auto rounded-lg overflow-hidden md:max-w-xl">
+              <div className="md:flex">
+                <div className="w-full p-3">
+                  <div className="relative h-48 rounded-lg border-2 border-blue-500 bg-gray-50 flex justify-center items-center shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
+                    <div className="absolute flex flex-col items-center">
+                      <ImageIcon className="w-12 h-12 text-blue-500" />
+                      <span className="block text-gray-500 font-semibold">
+                        Drag &amp; drop your files here
+                      </span>
+                      <span className="block text-gray-400 font-normal mt-1">
+                        or click to upload
+                      </span>
+                    </div>
+                    <input
+                      name=""
+                      onChange={handleImageChange}
+                      className="h-full w-full opacity-0 cursor-pointer"
+                      type="file"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          {cropperImage && (
+            <button
+              type="button"
+              onClick={handleCrop}
+              className="bg-blue-500 text-white px-4 py-2 rounded"
+            >
+              Crop Image
+            </button>
+          )}
+        </div>
+        {uploadProgress > 0 && uploadProgress < 100 && (
+          <div>
+            <progress value={uploadProgress} max={100}></progress>
+            <span>{uploadProgress}%</span>
+          </div>
+        )}
+
         {photographer ? (
           <form
             onSubmit={handleSubmit}
-            className="flex flex-col w-full md:w-1/2 px-5 gap-4"
+            className="flex flex-col w-full md:w-1/2 px-5 gap-4 mt-5"
           >
-            <h2 className="text-heading-04 font-medium text-center">
+            {/* <h2 className="text-heading-04 font-medium text-center">
               Profile Update
-            </h2>
-
-            <div className="flex flex-col items-center gap-4">
-              {cropperImage ? (
-                <Cropper
-                  src={cropperImage}
-                  style={{ height: 300, width: "100%" }}
-                  initialAspectRatio={1}
-                  aspectRatio={1}
-                  guides={false}
-                  ref={cropperRef}
-                />
-              ) : formData.profileImage ? (
-                <>
-                  <Image
-                    src={formData.profileImage}
-                    alt="Profile Image"
-                    width={200}
-                    height={200}
-                    className="rounded-full object-cover aspect-[1/1]"
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setFormData({ ...formData, profileImage: "" })
-                    }
-                    className="text-red-500"
-                  >
-                    Remove
-                  </button>
-                </>
-              ) : (
-                <div className="max-w-md mx-auto rounded-lg overflow-hidden md:max-w-xl">
-                  <div className="md:flex">
-                    <div className="w-full p-3">
-                      <div className="relative h-48 rounded-lg border-2 border-blue-500 bg-gray-50 flex justify-center items-center shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
-                        <div className="absolute flex flex-col items-center">
-                          <ImageIcon className="w-12 h-12 text-blue-500" />
-                          <span className="block text-gray-500 font-semibold">
-                            Drag &amp; drop your files here
-                          </span>
-                          <span className="block text-gray-400 font-normal mt-1">
-                            or click to upload
-                          </span>
-                        </div>
-                        <input
-                          name=""
-                          onChange={handleImageChange}
-                          className="h-full w-full opacity-0 cursor-pointer"
-                          type="file"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-              {cropperImage && (
-                <button
-                  type="button"
-                  onClick={handleCrop}
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                >
-                  Crop Image
-                </button>
-              )}
-            </div>
-            {uploadProgress > 0 && uploadProgress < 100 && (
-              <div>
-                <progress value={uploadProgress} max={100}></progress>
-                <span>{uploadProgress}%</span>
-              </div>
-            )}
+            </h2> */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full ">
               <div>
                 <Label>
@@ -615,7 +627,7 @@ const ProfileEditPage = () => {
         ) : user ? (
           <form
             onSubmit={handleSubmit}
-            className="flex flex-col w-full md:w-1/2 px-5 gap-4"
+            className="flex flex-col w-full md:w-1/2 px-5 gap-4 mt-5"
           >
             <h2 className="text-heading-04 font-medium text-center">
               User Registration
@@ -926,7 +938,7 @@ const ProfileEditPage = () => {
               <Input
                 type="date"
                 name="dob"
-                value={formData.dob || ""}
+                value={new Date(formData.dob).toISOString().split("T")[0] || ""}
                 onChange={handleInputChange}
               />
               {errors.dob && (

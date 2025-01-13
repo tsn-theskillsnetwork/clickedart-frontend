@@ -111,16 +111,40 @@ export default function ProfilePage() {
               {photographer?.rank}
             </p>
             <p className="text-heading-06 lg:text-heading-01 font-semibold lg:font-medium">
-              {photographer.firstName ? (photographer?.firstName + " " + photographer?.lastName) : photographer?.name}
+              {photographer.firstName
+                ? photographer?.firstName + " " + photographer?.lastName
+                : photographer?.name}
             </p>
             <p className="text-sm lg:text-heading-03 font-medium lg:font-normal text-surface-500 lg:-mt-4">
-              {photographer.shippingAddress && (photographer.shippingAddress?.city +
-                ", " +
-                photographer.shippingAddress?.country)}
+              {photographer.shippingAddress &&
+                photographer.shippingAddress?.city +
+                  ", " +
+                  photographer.shippingAddress?.country}
             </p>
             <p className="font-normal lg:font-medium text-xs lg:text-heading-05 text-surface-500 mt-2 lg:mt-4 text-center max-w-2xl">
               {photographer?.bio}
             </p>
+
+            {photographer && (
+              <div className="flex flex-row justify-center gap-5">
+                {photographer.connectedAccounts?.length > 0
+                  ? photographer.connectedAccounts.map((account, index) => (
+                      <Link
+                        href={account.accountLink}
+                        key={index}
+                        className="items-center"
+                      >
+                        <Icon
+                          icon={"entypo-social:" + account.accountName}
+                          width="40"
+                          height="40"
+                          className="text-primary"
+                        />
+                      </Link>
+                    ))
+                  : null}
+              </div>
+            )}
 
             <div className="grid grid-cols-3 gap-2 lg:gap-8 mt-4 px-4 max-w-2xl">
               <div className="flex flex-col items-center text-center border-r-2 border-surface-500 pr-2 lg:pr-8">
@@ -299,7 +323,7 @@ export default function ProfilePage() {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center min-h-screen">
-          <p>You are not signed in.</p>
+          <Loader />
         </div>
       )}
     </>

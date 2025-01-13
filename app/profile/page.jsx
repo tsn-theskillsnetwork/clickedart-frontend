@@ -8,6 +8,7 @@ import Link from "next/link";
 import Button2 from "@/components/button2";
 import {
   EllipsisIcon,
+  IndianRupeeIcon,
   Pencil,
   Plus,
   Share2Icon,
@@ -32,6 +33,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import toast from "react-hot-toast";
+import { Icon } from "@iconify/react";
 
 const ProfilePage = () => {
   const router = useRouter();
@@ -221,12 +223,25 @@ const ProfilePage = () => {
                 {photographer?.rank}
               </p>
             )}
+
             <Link
               href={"/profile/edit"}
               className="absolute top-12 lg:top-20 right-[4%] sm:right-[8%] lg:right-[30%] text-surface-500 bg-white rounded-full p-2 cursor-pointer shadow-[1px_1px_2px_rgba(0,0,0,0.25)]"
             >
               <Pencil strokeWidth={2} className="size-4 lg:size-14" />
             </Link>
+            <div className="absolute top-12 lg:top-20 right-[15%] sm:right-[15%] lg:right-[23%] text-surface-500 bg-white rounded-full p-2 cursor-pointer shadow-[1px_1px_2px_rgba(0,0,0,0.25)]">
+              <Share2Icon
+                strokeWidth={2}
+                className="size-4 lg:size-14"
+                onClick={() => {
+                  navigator.clipboard.writeText(
+                    `${process.env.NEXT_PUBLIC_CLIENT}/photographer/${photographer._id}`
+                  );
+                  toast.success("Link copied to clipboard!");
+                }}
+              />
+            </div>
             <p className="text-heading-06 lg:text-heading-01 font-semibold lg:font-medium">
               {(user || photographer)?.firstName +
                 " " +
@@ -245,6 +260,27 @@ const ProfilePage = () => {
               {photographer?.bio || user?.bio}
             </p>
 
+            {photographer && (
+              <div className="flex flex-row justify-center gap-5">
+                {photographer.connectedAccounts?.length > 0
+                  ? photographer.connectedAccounts.map((account, index) => (
+                      <Link
+                        href={account.accountLink}
+                        key={index}
+                        className="items-center"
+                      >
+                        <Icon
+                          icon={"entypo-social:" + account.accountName}
+                          width="40"
+                          height="40"
+                          className="text-primary"
+                        />
+                      </Link>
+                    ))
+                  : null}
+              </div>
+            )}
+
             {user && (
               <div className="flex gap-4 mt-4">
                 <Button
@@ -262,16 +298,6 @@ const ProfilePage = () => {
                   onClick={() => router.push("/dashboard")}
                 >
                   Dashboard
-                </Button>
-                <Button
-                  className="bg-primary text-white"
-                  onClick={() =>
-                    navigator.clipboard.writeText(
-                      `${process.env.NEXT_PUBLIC_CLIENT}/photographer/${photographer._id}`
-                    )
-                  }
-                >
-                  <Share2Icon className="w-6 h-6" />
                 </Button>
               </div>
             )}
@@ -308,6 +334,27 @@ const ProfilePage = () => {
                     Downloads
                   </p>
                 </div>
+              </div>
+            )}
+
+            {photographer && (
+              <div
+                className={`text-white ${
+                  photographer.isMonetized ? "bg-green-600" : "bg-red-600"
+                } rounded-full p-2 shadow-[1px_1px_2px_rgba(0,0,0,0.25)] mt-4`}
+              >
+                <IndianRupeeIcon className={`size-2 lg:size-8`} />
+              </div>
+            )}
+
+            {photographer && !photographer?.isMonetized && (
+              <div className="flex flex-col gap-2 items-center font-medium mt-4">
+                <p className="text-red-600 ">
+                  Monetize your account to start earning from your photos
+                </p>
+                <Link href="/support/monetize">
+                  Click here to <span className="text-green-600">Monetize Now.</span>
+                </Link>
               </div>
             )}
           </div>

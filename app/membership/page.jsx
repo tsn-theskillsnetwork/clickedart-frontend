@@ -1,8 +1,7 @@
 "use client";
 import Image from "next/image";
-import React, { use, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -11,6 +10,8 @@ import {
 } from "@/components/ui/accordion";
 import axios from "axios";
 import useAuthStore from "@/authStore";
+import { useRazorpay } from "react-razorpay";
+import toast from "react-hot-toast";
 
 export default function MembershipPage() {
   const { photographer, token } = useAuthStore();
@@ -19,6 +20,71 @@ export default function MembershipPage() {
   const [userPlans, setUserPlans] = useState([]);
   const [selectedPlan, setSelectedPlan] = useState("");
   const [loading, setLoading] = useState(false);
+
+  //razorpay
+  const { Razorpay } = useRazorpay();
+  const [paymentStatus, setPaymentStatus] = useState();
+  const [razorpay_payment_id, setrazorpay_payment_id] = useState();
+  const [selectedPlanId, setSelectedPlanId] = useState();
+  const [selectedPlanPrice, setSelectedPlanPrice] = useState();
+  const [selectedPlanDuration, setSelectedPlanDuration] = useState();
+
+  const handlePayment = useCallback(
+    async (planId, price, duration) => {
+      if (!photographer) {
+        toast.error("Please login as Photographer to continue");
+        return;
+      }
+      const result = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/payment`,
+        {
+          total: price,
+          userId: photographer._id,
+        }
+      );
+      console.log("result", result);
+
+      const options = {
+        key: result.data.result.notes.key,
+        amount: result.data.result.amount,
+        currency: "INR",
+        name: "ClickedArt",
+        description: "Total Payment",
+        image: "/assets/Logo.png",
+        order_id: result.data.id,
+        handler: async (res) => {
+          try {
+            const paymentId = res.razorpay_payment_id;
+            if (paymentId) {
+              setrazorpay_payment_id(paymentId);
+              setPaymentStatus(true);
+              setSelectedPlanId(planId);
+              setSelectedPlanPrice(price);
+              setSelectedPlanDuration(duration);
+            }
+          } catch (error) {
+            setUploadVisible(false);
+            createFailedOrder();
+          }
+        },
+        prefill: {
+          email: photographer?.email,
+          contact: photographer?.mobile,
+          name: `${photographer?.firstName} ${photographer?.lastName}`,
+        },
+
+        theme: {
+          color: "#3399cc",
+        },
+      };
+
+      console.log("options", options);
+
+      const rzpay = new Razorpay(options);
+      rzpay.open();
+    },
+    [Razorpay, photographer]
+  );
 
   console.log("plan", userPlans);
 
@@ -39,7 +105,7 @@ export default function MembershipPage() {
     const fetchPlan = async () => {
       if (!photographer || !photographer._id) {
         console.log("Photographer data is missing");
-        return; // Exit early if photographer data is not available
+        return;
       }
       try {
         const res = await axios.get(
@@ -49,8 +115,8 @@ export default function MembershipPage() {
 
         if (res.data.subscriptions) {
           const modifiedPlans = res.data.subscriptions.map((subscription) => ({
-            name: subscription.planId?.name, // Accessing the plan name
-            isActive: subscription.isActive, // Accessing the active status
+            name: subscription.planId?.name,
+            isActive: subscription.isActive,
           }));
 
           setUserPlans(modifiedPlans);
@@ -65,7 +131,6 @@ export default function MembershipPage() {
   }, [photographer] || []);
 
   const handleSubscribe = async (planId, price, duration) => {
-    console.log(planId, price, duration);
     if (!photographer) return;
     if (price === "") return;
     try {
@@ -93,8 +158,15 @@ export default function MembershipPage() {
   console.log("User Plans", userPlans);
   console.log(
     "Test",
-    userPlans.find((userplan) => userplan?.name === "Intermediate")
+    userPlans.find((userplan) => userplan?.name === "Premium")
   );
+
+  useEffect(() => {
+    if (paymentStatus === true) {
+      console.log(selectedPlanId, selectedPlanPrice, selectedPlanDuration);
+      handleSubscribe(selectedPlanId, selectedPlanPrice, selectedPlanDuration);
+    }
+  }, [paymentStatus]);
 
   const faqs = [
     {
@@ -311,7 +383,7 @@ export default function MembershipPage() {
                               const price = plan.cost.find(
                                 (cost) => cost.duration === duration
                               ).price;
-                              handleSubscribe(plan._id, price, duration);
+                              handlePayment(plan._id, price, duration);
                             }}
                             className={`${
                               plan._id === active
@@ -491,7 +563,7 @@ export default function MembershipPage() {
                         plan.name !== "Basic")) &&
                       plan.name !== "Basic" && (
                         <button
-                          onClick={() => setSelectedPlan(plan._id)} // This needs to be within the correct context for `plan`
+                          onClick={() => setSelectedPlan(plan._id)}
                           className={`bg-primary text-white md:text-sm w-full lg:text-heading-06 xl:text-heading-05 font-medium rounded-lg py-4 px-6 mt-4`}
                         >
                           Choose Plan
@@ -507,7 +579,7 @@ export default function MembershipPage() {
                           const price = plan.cost.find(
                             (cost) => cost.duration === duration
                           ).price;
-                          handleSubscribe(plan._id, price, duration);
+                          handlePayment(plan._id, price, duration);
                         }}
                         className={`${
                           plan._id === active

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import useAuthStore from "@/authStore";
 import Image from "next/image";
 import Button from "@/components/button";
@@ -24,6 +24,16 @@ import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import toast from "react-hot-toast";
 import Loader from "@/components/loader";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const ProfilePage = () => {
   const router = useRouter();
@@ -35,10 +45,13 @@ const ProfilePage = () => {
   const [licenses, setLicenses] = useState([]);
   const [progr, setProgr] = useState(0);
   const [step, setStep] = useState("1");
-  const [plan, setPlan] = useState("basic");
+  const [plan, setPlan] = useState(null);
+  const [activePlan, setActivePlan] = useState("basic");
   const [isCustomText, setIsCustomText] = useState(false);
   const [customText, setCustomText] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [watermark, setWatermark] = useState([]);
+  const [newWatermark, setNewWatermark] = useState("");
   const [photo, setPhoto] = useState({
     category: "",
     photographer: "",
@@ -64,6 +77,8 @@ const ProfilePage = () => {
     title: "",
     isActive: false,
   });
+
+  // console.log("Active Plan:", activePlan);
 
   const [timeoutId, setTimeoutId] = useState(null);
   const [keywordInput, setKeywordInput] = useState(photo.keywords.join(", "));
@@ -93,6 +108,100 @@ const ProfilePage = () => {
 
     setTimeoutId(id);
   };
+
+  const handleWatermarkImage = async (event) => {
+    const file = event.target.files[0]; // Get the first file from the input
+
+    if (!file) {
+      toast.error("No file selected for upload!");
+      return;
+    }
+
+    const toastId = toast.loading("Uploading...");
+    const uploadFormData = new FormData();
+    uploadFormData.append("image", file);
+
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/upload/uploadSingleImage`,
+        uploadFormData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            toast.loading(`Uploading... ${percentCompleted}%`, {
+              id: toastId,
+            });
+          },
+        }
+      );
+
+      const data = res.data;
+      console.log("Image uploaded successfully:", data);
+      setNewWatermark(data);
+
+      toast.success("File uploaded successfully!", { id: toastId });
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      toast.error("File upload failed.", { id: toastId });
+    }
+  };
+
+  const handleWatermarkAdd = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/customwatermark/add-custom-watermark`,
+        {
+          photographer: photographer?._id,
+          watermarkImage: newWatermark,
+        }
+      );
+      console.log("Watermark added:", response.data);
+      toast.success("Watermark added successfully");
+      setWatermark(response.data.watermark);
+    } catch (error) {
+      console.error("Error adding watermark:", error);
+    }
+  };
+
+  const handleWatermarkRemove = async (id) => {
+    try {
+      const response = await axios.delete(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/customwatermark/delete-custom-watermark?id=${id}`
+      );
+      console.log("Watermark removed:", response.data);
+      toast.success("Watermark removed successfully");
+      setWatermark("");
+    } catch (error) {
+      console.error("Error removing watermark:", error);
+    }
+  };
+
+  // console.log("New Watermark",newWatermark)
+
+  const getWatermarks = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/customwatermark/get-custom-watermark?photographer=${photographer?._id}`
+      );
+      console.log("Watermarks:", response.data);
+      setWatermark(response.data.watermarkImage);
+    } catch (error) {
+      console.log("Error fetching watermarks:", error);
+    }
+  };
+  useEffect(() => {
+    if (plan) {
+      setActivePlan(getActivePlanType(plan));
+      getWatermarks();
+    }
+  }, [plan]);
+
+  console.log("Watermark:", watermark);
 
   const handleDescriptionChange = (e) => {
     const newValue = e.target.value;
@@ -148,25 +257,46 @@ const ProfilePage = () => {
     }
   };
 
+  const getActivePlanType = (plans) => {
+    const activePlans = plans.filter((p) => p.isActive);
+
+    if (activePlans.length === 0) {
+      return "basic";
+    }
+
+    const premiumPlan = activePlans.find((p) =>
+      p.name.toLowerCase().includes("premium")
+    );
+    if (premiumPlan) {
+      return "premium";
+    }
+
+    const intermediatePlan = activePlans.find((p) =>
+      p.name.toLowerCase().includes("intermediate")
+    );
+    if (intermediatePlan) {
+      return "intermediate";
+    }
+
+    return "basic";
+  };
+
   const getResolutions = async () => {
     try {
-      const response = await fetch(
+      const planType = getActivePlanType(plan);
+      console.log("Plan type:", planType);
+      const response = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/upload/handle-photos-with-watermark-and-resolutions-options`,
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            imageUrl,
-            plan,
-            isCustomText,
-            customText: isCustomText && customText,
-          }),
+          photographer: photographer?._id,
+          imageUrl,
+          plan: planType,
+          isCustomText: activePlan === "intermediate" ? true : false,
+          customText,
         }
       );
-      const data = await response.json();
-      console.log("resolutions", data);
+      const data = response.data;
+      console.log("Resolutions data:", data);
       setPhoto((prevPhoto) => ({
         ...prevPhoto,
         imageLinks: data.urls,
@@ -202,7 +332,7 @@ const ProfilePage = () => {
     }
   };
 
-  console.log(photo);
+  // console.log(photo);
 
   useEffect(() => {
     fetchData(
@@ -217,10 +347,10 @@ const ProfilePage = () => {
     );
   }, []);
 
-  useEffect(() => {
-    if (!imageUrl) return;
-    getResolutions();
-  }, [imageUrl, plan, isCustomText, customText]);
+  // useEffect(() => {
+  //   if (!imageUrl) return;
+  //   getResolutions();
+  // }, [imageUrl, plan, isCustomText, customText]);
 
   useEffect(() => {
     setPhoto({ ...photo, photographer: photographer?._id });
@@ -231,38 +361,40 @@ const ProfilePage = () => {
     if (!photographer) return;
 
     const fetchPlan = async () => {
+      if (!photographer || !photographer._id) {
+        console.log("Photographer data is missing");
+        return;
+      }
       try {
-        setLoading(true);
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/get-user-subscription?userId=${photographer._id}`
         );
-        // console.log("plans", res.data);
-        setPlan(res.data.subscriptions);
-        if (res.data.subscriptions === "intermediate") {
-          setIsCustomText(true);
+        console.log(res.data);
+
+        if (res.data.subscriptions) {
+          const modifiedPlans = res.data.subscriptions.map((subscription) => ({
+            name: subscription.planId?.name,
+            isActive: subscription.isActive,
+          }));
+
+          setPlan(modifiedPlans);
         }
-        setLoading(false);
       } catch (error) {
-        setError(error);
-        setLoading(false);
-        // console.log(error.response.data);
+        console.log(error.response ? error.response.data : error.message);
       }
     };
 
     fetchPlan();
   }, [photographer]);
 
+  // console.log("plan", plan);
   useEffect(() => {
     if (isHydrated && !photographer) {
       router.push("/profile");
     }
   }, [isHydrated, photographer, router]);
 
-  console.log("categories", categories);
-
-  useEffect(() => {
-    scrollTo(20, 0);
-  }, []);
+  // console.log("categories", categories);
 
   return (
     <>
@@ -369,13 +501,13 @@ const ProfilePage = () => {
             </div>
             {step === "1" && (
               <div className="mt-10">
-                {photo.imageLinks.original?.length > 0 ? (
-                  <img src={photo.imageLinks.original} alt="Uploaded Image" />
+                {imageUrl ? (
+                  <img src={imageUrl} alt="Uploaded Image" />
                 ) : (
                   <div className="w-full mx-auto rounded-lg overflow-hidden">
                     <div className="md:flex">
                       <div className="w-full p-3">
-                        <div className="relative h-80 rounded-lg border flex justify-center items-center shadow-[0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_4px_10px_rgba(0,0,0,0.3)] transition-shadow duration-300 ease-in-out">
+                        <div className="relative h-[60vh] rounded-lg border flex justify-center items-center shadow-[0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_4px_10px_rgba(0,0,0,0.3)] transition-shadow duration-300 ease-in-out">
                           <div className="absolute flex flex-col items-center">
                             <Plus className="w-12 h-12 text-surface-200" />
                             <span className="block text-gray-500 font-semibold">
@@ -397,6 +529,65 @@ const ProfilePage = () => {
                     </div>
                   </div>
                 )}
+                <div className="grid grid-cols grid-cols-3 gap-4 px-4">
+                  <ul className="text-xs text-primary font-medium mt-1">
+                    <li className="text-xs mt-1">
+                      File size should be less than 5MB
+                    </li>
+                    <li className="text-xs mt-1">
+                      Ensure the resolution is at least 300 DPI for
+                      print-quality images.
+                    </li>
+                    <li className="text-xs mt-1">
+                      Minimum dimensions: 2000 x 3000 pixels (or equivalent
+                      aspect ratio).
+                    </li>
+                    <li className="text-xs mt-1">
+                      File size should not exceed 20 MB.
+                    </li>
+                  </ul>
+                  <ul className="text-xs text-primary font-medium mt-1">
+                    <li className="text-xs mt-1">
+                      Only upload original work; plagiarism or copyright
+                      infringement will result in account penalties.
+                    </li>
+                    <li className="text-xs mt-1">
+                      Avoid images with watermarks, logos, or text overlays.
+                    </li>
+                    <li className="text-xs mt-1">
+                      Ensure the photo does not contain offensive, explicit, or
+                      illegal content.
+                    </li>
+                    <li className="text-xs mt-1">
+                      Photos must align with ClickedArt's ethical standards,
+                      particularly for wildlife, cultural, and sensitive
+                      subjects.
+                    </li>
+                    <li className="text-xs mt-1">
+                      Ensure the uploaded photo is relevant to the categories
+                      you&apos;ve selected.
+                    </li>
+                  </ul>
+                  <ul className="text-xs text-primary font-medium mt-1">
+                    <li className="text-xs mt-1">
+                      Submit sharp, high-quality images free from excessive
+                      noise, blurriness, or pixelation.
+                    </li>
+                    <li className="text-xs mt-1">
+                      Post-process images tastefully; avoid over-saturation,
+                      extreme HDR, or unnatural effects.
+                    </li>
+                    <li className="text-xs mt-1">
+                      Composition should follow photography principles, such as
+                      the rule of thirds, framing, or leading lines.
+                    </li>
+                    <li className="text-xs mt-1">
+                      Ensure the photo has no distracting elements unless
+                      integral to the subject.
+                    </li>
+                  </ul>
+                </div>
+
                 <div className="px-4 lg:px-20 py-5 w-full">
                   <div className="w-full border-2 border-primary-100 p-[2px] rounded-full">
                     <div
@@ -410,10 +601,76 @@ const ProfilePage = () => {
                     </span>
                   </div>
                 </div>
+                {activePlan === "intermediate" && (
+                  <div>
+                    <Label className="!text-paragraph">
+                      Custom Text Watermark
+                    </Label>
+                    <Input
+                      className="!text-paragraph capitalize"
+                      value={customText}
+                      onChange={(e) => setCustomText(e.target.value)}
+                    />
+                  </div>
+                )}
+                {activePlan === "premium" && (
+                  <div>
+                    <Label className="!text-paragraph">Custom Watermark</Label>
+                    {watermark?.watermarkImage ? (
+                      <div className="flex items-center gap-4">
+                        <img
+                          src={watermark?.watermarkImage}
+                          alt="Watermark"
+                          className="w-20 h-20 object-cover rounded-md"
+                        />
+                        <p
+                          className="text-red-600 font-medium cursor-pointer"
+                          onClick={() => handleWatermarkRemove(watermark._id)}
+                        >
+                          Remove Watermark
+                        </p>
+                      </div>
+                    ) : (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <p className="text-black font-medium cursor-pointer">
+                            Add Watermark
+                          </p>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px]">
+                          <DialogHeader>
+                            <DialogTitle>Upload Watermark</DialogTitle>
+                            <DialogDescription>
+                              Upload a custom watermark for your photos.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="grid gap-4 py-4">
+                            <input
+                              accept=".png"
+                              type="file"
+                              onChange={handleWatermarkImage}
+                            />
+                          </div>
+                          <DialogFooter>
+                            <DialogClose asChild>
+                              <Button2 onClick={() => handleWatermarkAdd()}>
+                                Save changes
+                              </Button2>
+                            </DialogClose>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    )}
+                  </div>
+                )}
                 <div className="flex justify-center">
                   <button
-                    onClick={() => setStep("2")}
-                    disabled={!photo.imageLinks.original}
+                    onClick={() => {
+                      getResolutions();
+                      setStep("2");
+                      window.scrollTo(0, 160);
+                    }}
+                    disabled={!imageUrl}
                     className="bg-primary text-white py-2 px-4 rounded-full disabled:opacity-50"
                   >
                     Proceed
@@ -428,7 +685,7 @@ const ProfilePage = () => {
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
                   <img
-                    src={photo.imageLinks.thumbnail || "/assets/hero/bg3.jpg"}
+                    src={photo.imageLinks?.thumbnail || "/assets/hero/bg3.jpg"}
                     className="w-full h-auto shadow-[3px_3px_10px_rgba(0,0,0,0.5)]"
                     alt="Uploaded Image"
                   />
@@ -554,22 +811,11 @@ const ProfilePage = () => {
                       <Label className="!text-paragraph">Plan</Label>
                       <Input
                         className="!text-paragraph capitalize"
-                        value={plan}
+                        value={activePlan}
                         disabled
                       />
                     </div>
-                    {plan === "intermediate" && (
-                      <div>
-                        <Label className="!text-paragraph">
-                          Custom Text Watermark
-                        </Label>
-                        <Input
-                          className="!text-paragraph capitalize"
-                          value={customText}
-                          onChange={(e) => setCustomText(e.target.value)}
-                        />
-                      </div>
-                    )}
+
                     <hr />
                     <div>
                       <Label className="!text-paragraph">Camera</Label>

@@ -23,10 +23,11 @@ import ImageSection from "@/components/image/imageSection";
 import axios from "axios";
 import useAuthStore from "@/authStore";
 import { Icon } from "@iconify/react";
+import Link from "next/link";
 
 export default function ImagePage() {
   const id = useParams().id;
-  const { token, isHydrated } = useAuthStore();
+  const { isHydrated } = useAuthStore();
   const { addItemToCart, removeItemFromCart, isItemInCart } = useCartStore();
 
   const [image, setImage] = useState([]);
@@ -169,7 +170,6 @@ export default function ImagePage() {
     setSelected(1);
     setSelectedPaper(papers[0]);
     setSelectedSize(papers[0]?.customDimensions[0]);
-    setSelectedFrame(frames[0]);
     setMode("print");
   };
 
@@ -282,7 +282,7 @@ export default function ImagePage() {
             desc
               ? "text-black font-semibold underline decoration-2 underline-offset-8"
               : "text-surface-600"
-          }`}
+          } cursor-pointer`}
         >
           Product Description
         </motion.p>
@@ -295,7 +295,7 @@ export default function ImagePage() {
             !desc
               ? "text-black font-semibold underline decoration-2 underline-offset-8"
               : "text-surface-600"
-          }`}
+          } cursor-pointer`}
         >
           Comments
         </motion.p>
@@ -314,30 +314,45 @@ export default function ImagePage() {
             >
               {image.description}
               <div className="flex flex-wrap items-start justify-start gap-4">
-                <div className="flex flex-row gap-2 items-center">
-                  <Icon icon="ic:round-location-on" />
-                  <p>Location: {image.location}</p>
-                </div>
-                <div className="flex flex-row gap-2 items-center">
-                  <Icon icon="ic:outline-camera-alt" />
-                  <p>Camera: {image.cameraDetails?.camera}</p>
-                </div>
-                <div className="flex flex-row gap-2 items-center">
-                  <Icon icon="ic:outline-lens" />
-                  <p>Lens: {image.cameraDetails?.lens}</p>
-                </div>
-                <div className="flex flex-row gap-2 items-center">
-                  <Icon icon="ic:round-camera" />
-                  <p>Aperture: {image.cameraDetails?.settings?.aperture}</p>
-                </div>
-                <div className="flex flex-row gap-2 items-center">
-                  <Icon icon="ic:round-shutter-speed" />
-                  <p>Shutter Speed: {image.cameraDetails?.shutterSpeed}</p>
-                </div>
-                <div className="flex flex-row gap-2 items-center">
-                  <Icon icon="ic:round-iso" />
-                  <p>ISO: {image.cameraDetails?.iso}</p>
-                </div>
+                {image.location && (
+                  <div className="flex flex-row gap-2 items-center">
+                    <Icon icon="ic:round-location-on" />
+                    <p>Location: {image.location}</p>
+                  </div>
+                )}
+                {image.cameraDetails?.camera && (
+                  <div className="flex flex-row gap-2 items-center">
+                    <Icon icon="ic:outline-camera-alt" />
+                    <p>Camera: {image.cameraDetails?.camera}</p>
+                  </div>
+                )}
+                {image.cameraDetails?.lens && (
+                  <div className="flex flex-row gap-2 items-center">
+                    <Icon icon="ic:outline-lens" />
+                    <p>Lens: {image.cameraDetails?.lens}</p>
+                  </div>
+                )}
+                {image.cameraDetails?.settings?.aperture && (
+                  <div className="flex flex-row gap-2 items-center">
+                    <Icon icon="ic:round-camera" />
+                    <p>Aperture: {image.cameraDetails?.settings?.aperture}</p>
+                  </div>
+                )}
+                {image.cameraDetails?.settings?.shutterSpeed && (
+                  <div className="flex flex-row gap-2 items-center">
+                    <Icon icon="ic:round-shutter-speed" />
+                    <p>
+                      Shutter Speed:{" "}
+                      {image.cameraDetails?.settings?.shutterSpeed}
+                    </p>
+                  </div>
+                )}
+                {image.cameraDetails?.settings?.iso && (
+                  <div className="flex flex-row gap-2 items-center">
+                    <Icon icon="ic:round-iso" />
+                    <p>ISO: {image.cameraDetails?.settings?.iso}</p>
+                  </div>
+                )}
               </div>
             </motion.div>
           ) : (
@@ -560,22 +575,40 @@ export default function ImagePage() {
           </>
         )}
       </div>
-      <div className="mt-32 flex items-center w-full gap-2 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-10">
-        <button
-          onClick={() => {
-            inCart ? onRemoveFromCart(id) : onAddToCart();
-          }}
-          className={`${
-            inCart
-              ? "border-red-500 bg-white text-red-600 hover:bg-red-200"
-              : "border-primary bg-primary text-white hover:bg-primary-dark"
-          } flex w-full items-center gap-4 justify-center border-2 py-4 rounded-lg text-base sm:text-paragraph md:text-heading-05 lg:text-paragraph xl:text-heading-05 font-semibold transition-all duration-300 ease-in-out`}
-        >
-          <span className="flex justify-center items-center gap-2">
-            <p className="w-fit">{inCart ? "Remove" : "Add to Cart"}</p>
-            <ShoppingCart className="" strokeWidth={3} />
-          </span>
-        </button>
+      <div className="mt-10 flex items-center w-full gap-2 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-10">
+        {inCart ? (
+          <>
+            <Link
+              href="/cart"
+              className={`border-primary bg-white text-primary-dark hover:bg-primary-100 flex w-full items-center gap-4 justify-center border-2 py-4 rounded-lg text-base sm:text-paragraph md:text-heading-05 lg:text-paragraph xl:text-heading-05 font-semibold transition-all duration-300 ease-in-out`}
+            >
+              <span className="flex justify-center items-center gap-2">
+                <p className="w-fit">Visit Cart</p>
+                <ShoppingCart className="" strokeWidth={3} />
+              </span>
+            </Link>
+            <Link
+              href="/images"
+              className={`border-primary bg-white text-primary-dark hover:bg-primary-100 flex w-full items-center gap-4 justify-center border-2 py-4 rounded-lg text-base sm:text-paragraph md:text-heading-05 lg:text-paragraph xl:text-heading-05 font-semibold transition-all duration-300 ease-in-out`}
+            >
+              <span className="flex justify-center items-center gap-2">
+                <p className="w-fit">Browse More</p>
+              </span>
+            </Link>
+          </>
+        ) : (
+          <button
+            onClick={() => {
+              inCart ? onRemoveFromCart(id) : onAddToCart();
+            }}
+            className={`border-primary bg-primary text-white hover:bg-primary-dark flex w-full items-center gap-4 justify-center border-2 py-4 rounded-lg text-base sm:text-paragraph md:text-heading-05 lg:text-paragraph xl:text-heading-05 font-semibold transition-all duration-300 ease-in-out`}
+          >
+            <span className="flex justify-center items-center gap-2">
+              <p className="w-fit">Add to Cart</p>
+              <ShoppingCart className="" strokeWidth={3} />
+            </span>
+          </button>
+        )}
         <button className="btn-secondary flex-shrink-0 p-4 border-2 border-primary rounded-2xl h-full aspect-[1/1] flex items-center justify-center group">
           <Heart
             size={32}
@@ -612,7 +645,7 @@ export default function ImagePage() {
         <>
           {image && (
             <div className={`px-5 lg:px-20`}>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-16 py-20 bg-[#FBFBFB] -mt-2">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-16 pt-10 bg-[#FBFBFB] -mt-2">
                 <div className="lg:col-span-2 flex flex-col gap-10">
                   <motion.div layout className="relative flex justify-center">
                     <motion.div
@@ -673,7 +706,7 @@ export default function ImagePage() {
                   <div className="flex gap-4">
                     <div
                       className={`border-4 ${
-                        !selectedFrame
+                        !selectedPaper
                           ? "border-blue-400"
                           : "border-transparent"
                       }`}
@@ -687,7 +720,7 @@ export default function ImagePage() {
                     </div>
                     <div
                       className={`border-4 ${
-                        selectedFrame ? "border-blue-400" : "border-transparent"
+                        selectedPaper ? "border-blue-400" : "border-transparent"
                       }`}
                       onClick={handleMockup}
                     >
@@ -717,27 +750,33 @@ export default function ImagePage() {
                   </div>
                   {/* Mobile Desc */}
                   <div className="lg:hidden">{descriptionSection}</div>
-                  <div className="flex justify-center mt-10 lg:hidden">
-                    {buySectionActive && (
-                      <div className="fixed top-0 lg:hidden bg-white z-50 h-screen pt-20 px-4 w-screen">
-                        <button
-                          onClick={() => {
-                            setBuySectionActive(false);
-                          }}
-                          className="absolute top-4 right-4 font-extrabold"
-                        >
-                          X
-                        </button>
-                        {buySection}
+                  {image.photographer?.isMonetized && (
+                    <>
+                      <div className="flex justify-center mt-10 lg:hidden">
+                        {buySectionActive && (
+                          <div className="fixed top-0 lg:hidden bg-white z-50 h-screen pt-20 px-4 w-screen">
+                            <button
+                              onClick={() => {
+                                setBuySectionActive(false);
+                              }}
+                              className="absolute top-4 right-4 font-extrabold"
+                            >
+                              X
+                            </button>
+                            {buySection}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <div className="hidden lg:block">{buySection}</div>
+                    </>
+                  )}
+                  {image.photographer?.isMonetized && (
+                    <div className="hidden lg:block">{buySection}</div>
+                  )}
                 </div>
               </div>
               {/* Desktop Desc */}
               <div className="hidden lg:block">{descriptionSection}</div>
-              <RecommendedSection />
+              <RecommendedSection category={image.category?.name} id={id} />
             </div>
           )}
           <div className="lg:hidden w-full p-4 sticky bottom-0 z-20">

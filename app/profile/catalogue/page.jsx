@@ -5,7 +5,7 @@ import Button2 from "@/components/button2";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import Link from "next/link";
-import React, {useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -26,8 +26,10 @@ import { Label } from "@/components/ui/label";
 import { Tag } from "lucide-react";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export default function CataloguesPage() {
+  const router = useRouter();
   const { photographer, token } = useAuthStore();
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -155,6 +157,10 @@ export default function CataloguesPage() {
     fetchImages();
     fetchCatalogues();
   }, [photographer]);
+
+  useEffect(() => {
+    router.push("/profile");
+  }, []);
 
   return (
     <div className="flex flex-col px-4 sm:px-8 md:px-12 lg:px-20 xl:px-32 gap-10 py-20">
