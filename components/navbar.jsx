@@ -209,7 +209,7 @@ export default function Navbar() {
           />
         ) : (
           <Image
-            src="/assets/LogoWhite.png"
+            src="/assets/logoWhite.png"
             className="h-8 max-w-max"
             alt="logo"
             width={200}
