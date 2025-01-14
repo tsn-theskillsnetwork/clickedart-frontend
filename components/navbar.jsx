@@ -156,7 +156,7 @@ export default function Navbar() {
           : "bg-transparent shadow-none"
       } h-20 sm:h-24 z-50 w-full`}
     >
-      <div className="hidden lg:block">
+      <Link href={"/"} className="hidden lg:block">
         {scrollLocation > 50 || pathname !== "/" ? (
           <Image
             src="/assets/Logo.png"
@@ -175,29 +175,10 @@ export default function Navbar() {
             height={50}
           />
         )}
-      </div>
+      </Link>
 
       {/* Mobile Logo (buttons) */}
-      <div className="lg:hidden w-full flex flex-row gap-2 items-center justify-between">
-        {/* <button
-          className={`border ${
-            scrollLocation > 50 || pathname !== "/"
-              ? "text-black border-black"
-              : "text-white border-white"
-          } rounded-lg px-1 py-2  w-32 group`}
-        >
-          <p className="text-xs">Browse collections</p>
-        </button>
-        <button
-          className={`border ${
-            scrollLocation > 50 || pathname !== "/"
-              ? "text-black border-black"
-              : "text-white border-white"
-          } rounded-lg px-1 py-2  w-28 group`}
-        >
-          {" "}
-          <p className="text-xs">Sell your photos</p>
-        </button> */}
+      <Link href={"/"} className="lg:hidden w-full flex flex-row gap-2 items-center justify-between">
         {scrollLocation > 50 || pathname !== "/" ? (
           <Image
             src="/assets/Logo.png"
@@ -216,7 +197,7 @@ export default function Navbar() {
             height={50}
           />
         )}
-      </div>
+      </Link>
 
       {/* Mobile Navbar */}
       <div className="lg:hidden pt-0">
