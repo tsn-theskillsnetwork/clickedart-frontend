@@ -17,10 +17,9 @@ export default function Footer() {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/layout/get-layout-content`
       );
-      console.log(res.data);
       setSettings(res.data);
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   };
 

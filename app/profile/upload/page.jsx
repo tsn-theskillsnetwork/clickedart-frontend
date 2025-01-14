@@ -9,14 +9,8 @@ import Button2 from "@/components/button2";
 import { Pencil, Plus, TextIcon, UploadIcon } from "lucide-react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import Select from "react-select";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { fetchData } from "@/helpers/api";
@@ -45,13 +39,14 @@ const ProfilePage = () => {
   const [licenses, setLicenses] = useState([]);
   const [progr, setProgr] = useState(0);
   const [step, setStep] = useState("1");
-  const [plan, setPlan] = useState(null);
   const [activePlan, setActivePlan] = useState("basic");
   const [isCustomText, setIsCustomText] = useState(false);
   const [customText, setCustomText] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [watermark, setWatermark] = useState([]);
   const [newWatermark, setNewWatermark] = useState("");
+  const [limit, setLimit] = useState(10);
+  const [photosLength, setPhotosLength] = useState(0);
   const [photo, setPhoto] = useState({
     category: "",
     photographer: "",
@@ -79,13 +74,21 @@ const ProfilePage = () => {
   });
 
   // console.log("Active Plan:", activePlan);
-
+  console.log("CATEGORY", categories);
   const [timeoutId, setTimeoutId] = useState(null);
   const [keywordInput, setKeywordInput] = useState(photo.keywords.join(", "));
 
   const handlePriceChange = (e) => {
     const newValue = e.target.value;
 
+    let minPrice = 200;
+
+    let maxPrice =
+      activePlan === "premium"
+        ? 5000
+        : activePlan === "intermediate"
+        ? 3000
+        : 2000;
     setPhoto({ ...photo, price: newValue });
 
     if (timeoutId) {
@@ -95,14 +98,14 @@ const ProfilePage = () => {
     const id = setTimeout(() => {
       let validPrice = Number(newValue);
 
-      if (validPrice >= 200 && validPrice <= 2000) {
+      if (validPrice >= minPrice && validPrice <= maxPrice) {
         setPhoto({ ...photo, price: validPrice });
-      } else if (validPrice < 200) {
-        setPhoto({ ...photo, price: 200 });
-        toast.error("Minimum price should be 200");
-      } else if (validPrice > 2000) {
-        setPhoto({ ...photo, price: 2000 });
-        toast.error("Maximum price should be 2000");
+      } else if (validPrice < minPrice) {
+        setPhoto({ ...photo, price: minPrice });
+        toast.error(`Minimum price should be ${minPrice}`);
+      } else if (validPrice > maxPrice) {
+        setPhoto({ ...photo, price: maxPrice });
+        toast.error(`Maximum price should be ${maxPrice}`);
       }
     }, 1000);
 
@@ -195,13 +198,12 @@ const ProfilePage = () => {
     }
   };
   useEffect(() => {
-    if (plan) {
-      setActivePlan(getActivePlanType(plan));
+    if (activePlan === "premium") {
       getWatermarks();
     }
-  }, [plan]);
+  }, [activePlan]);
 
-  console.log("Watermark:", watermark);
+  console.log(photo);
 
   const handleDescriptionChange = (e) => {
     const newValue = e.target.value;
@@ -251,46 +253,25 @@ const ProfilePage = () => {
       console.log("File uploaded successfully!");
       const fileUrl = `https://${target.Bucket}.s3.ap-south-1.amazonaws.com/${target.Key}`;
       setImageUrl(fileUrl);
+      setPhoto({ ...photo, imageLinks: {} });
       console.log("File URL:", fileUrl);
     } catch (error) {
       console.error("Error uploading file:", error);
     }
   };
 
-  const getActivePlanType = (plans) => {
-    const activePlans = plans.filter((p) => p.isActive);
-
-    if (activePlans.length === 0) {
-      return "basic";
-    }
-
-    const premiumPlan = activePlans.find((p) =>
-      p.name.toLowerCase().includes("premium")
-    );
-    if (premiumPlan) {
-      return "premium";
-    }
-
-    const intermediatePlan = activePlans.find((p) =>
-      p.name.toLowerCase().includes("intermediate")
-    );
-    if (intermediatePlan) {
-      return "intermediate";
-    }
-
-    return "basic";
-  };
-
   const getResolutions = async () => {
     try {
-      const planType = getActivePlanType(plan);
-      console.log("Plan type:", planType);
+      console.log("Plan type:", activePlan);
+      if (photo.imageLinks.original) {
+        return;
+      }
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/upload/handle-photos-with-watermark-and-resolutions-options`,
         {
           photographer: photographer?._id,
           imageUrl,
-          plan: planType,
+          plan: activePlan,
           isCustomText: activePlan === "intermediate" ? true : false,
           customText,
         }
@@ -347,6 +328,11 @@ const ProfilePage = () => {
     );
   }, []);
 
+  const categoriesOptions = categories.map((category) => ({
+    value: category.name,
+    label: category.name,
+  }));
+
   // useEffect(() => {
   //   if (!imageUrl) return;
   //   getResolutions();
@@ -360,31 +346,53 @@ const ProfilePage = () => {
   useEffect(() => {
     if (!photographer) return;
 
-    const fetchPlan = async () => {
+    const fetchActivePlan = async () => {
       if (!photographer || !photographer._id) {
         console.log("Photographer data is missing");
         return;
       }
       try {
         const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/get-user-subscription?userId=${photographer._id}`
+          `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/get-user-active-subscription?photographer=${photographer._id}`
         );
-        console.log(res.data);
-
-        if (res.data.subscriptions) {
-          const modifiedPlans = res.data.subscriptions.map((subscription) => ({
-            name: subscription.planId?.name,
-            isActive: subscription.isActive,
-          }));
-
-          setPlan(modifiedPlans);
+        console.log(
+          "Active Subscription ",
+          res.data.subscription?.planId?.name
+        );
+        setActivePlan(res.data.subscription?.planId?.name?.toLowerCase());
+        if (res.data.subscription?.planId?.name?.toLowerCase() === "basic") {
+          setLimit(10);
+        } else if (
+          res.data.subscription?.planId?.name?.toLowerCase() === "intermediate"
+        ) {
+          setLimit(50);
+        } else if (
+          res.data.subscription?.planId?.name?.toLowerCase() === "premium"
+        ) {
+          setLimit(999999);
         }
       } catch (error) {
         console.log(error.response ? error.response.data : error.message);
       }
     };
 
-    fetchPlan();
+    const fetchPhotos = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-images-by-photographer?photographer=${photographer._id}`
+        );
+        console.log(res.data);
+        setPhotosLength(res.data.photos?.length);
+      } catch (error) {
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchActivePlan();
+    fetchPhotos();
   }, [photographer]);
 
   // console.log("plan", plan);
@@ -400,55 +408,6 @@ const ProfilePage = () => {
     <>
       {photographer ? (
         <div className="flex flex-col min-h-screen pb-20">
-          {/* <div className="w-full">
-            <Image
-              src="/assets/hero/bg2.jpg"
-              alt="bg1"
-              width={1920}
-              height={800}
-              className="object-cover w-full h-40 lg:h-96"
-            />
-          </div>
-          <div className="relative flex flex-col items-center -mt-16 lg:-mt-28">
-            <Image
-              src={
-                photographer?.profileImage ||
-                user?.image ||
-                "/assets/default.jpg"
-              }
-              alt="avatar"
-              width={150}
-              height={150}
-              className="rounded-full h-28 w-28 lg:h-52 lg:w-52 object-cover border-[3px] lg:border-[6px] border-white"
-            />
-            <p className="px-4 py-2 rounded-full capitalize bg-black font-medium text-white -mt-6">
-              {photographer?.rank}
-            </p>
-            <Link
-              href={"/profile/edit"}
-              className="absolute top-12 lg:top-20 right-[4%] sm:right-[8%] lg:right-[30%] text-surface-500 bg-white rounded-full p-2 cursor-pointer shadow-[1px_1px_2px_rgba(0,0,0,0.25)]"
-            >
-              <Pencil strokeWidth={2} className="size-4 lg:size-14" />
-            </Link>
-            <p className="text-heading-06 lg:text-heading-01 font-semibold lg:font-medium">
-              {(user || photographer)?.firstName +
-                " " +
-                (user || photographer)?.lastName}
-            </p>
-            <p className="text-sm lg:text-heading-03 font-medium lg:font-normal text-surface-500 lg:-mt-4">
-              {photographer
-                ? photographer.shippingAddress?.city +
-                  ", " +
-                  photographer.shippingAddress?.country
-                : user.shippingAddress?.city +
-                  ", " +
-                  user.shippingAddress?.country}
-            </p>
-            <p className="font-normal lg:font-medium text-xs lg:text-heading-05 text-surface-500 mt-2 lg:mt-4 text-center max-w-2xl">
-              {photographer?.bio || user?.bio}
-            </p>
-          </div> */}
-
           <div className="flex flex-col px-2 lg:px-24 py-10 items-center">
             <div className="relative flex justify-around w-full">
               <hr className="absolute z-0 border-primary w-[50%] top-8 lg:top-12" />
@@ -501,181 +460,199 @@ const ProfilePage = () => {
             </div>
             {step === "1" && (
               <div className="mt-10">
-                {imageUrl ? (
-                  <img src={imageUrl} alt="Uploaded Image" />
+                {photosLength >= limit ? (
+                  <div className="flex flex-col items-center gap-4">
+                    <p className="text-heading-04 text-center">
+                      You have reached the limit of your plan. Please upgrade
+                      your plan to upload more photos.
+                    </p>
+                    <Link href="/membership">
+                      <Button>Upgrade Plan</Button>
+                    </Link>
+                  </div>
                 ) : (
-                  <div className="w-full mx-auto rounded-lg overflow-hidden">
-                    <div className="md:flex">
-                      <div className="w-full p-3">
-                        <div className="relative h-[60vh] rounded-lg border flex justify-center items-center shadow-[0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_4px_10px_rgba(0,0,0,0.3)] transition-shadow duration-300 ease-in-out">
-                          <div className="absolute flex flex-col items-center">
-                            <Plus className="w-12 h-12 text-surface-200" />
-                            <span className="block text-gray-500 font-semibold">
-                              Drop your image here
-                            </span>
-                            <span className="block text-gray-400 font-normal mt-1">
-                              or click to upload
-                            </span>
+                  <>
+                    {imageUrl ? (
+                      <img src={imageUrl} alt="Uploaded Image" />
+                    ) : (
+                      <div className="w-full mx-auto rounded-lg overflow-hidden">
+                        <div className="md:flex">
+                          <div className="w-full p-3">
+                            <div className="relative h-[60vh] rounded-lg border flex justify-center items-center shadow-[0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_4px_10px_rgba(0,0,0,0.3)] transition-shadow duration-300 ease-in-out">
+                              <div className="absolute flex flex-col items-center">
+                                <Plus className="w-12 h-12 text-surface-200" />
+                                <span className="block text-gray-500 font-semibold">
+                                  Drop your image here
+                                </span>
+                                <span className="block text-gray-400 font-normal mt-1">
+                                  or click to upload
+                                </span>
+                              </div>
+                              <input
+                                name=""
+                                onChange={handleChange}
+                                className="h-full w-full opacity-0 cursor-pointer"
+                                type="file"
+                                accept="image/*"
+                              />
+                            </div>
                           </div>
-                          <input
-                            name=""
-                            onChange={handleChange}
-                            className="h-full w-full opacity-0 cursor-pointer"
-                            type="file"
-                            accept="image/*"
-                          />
                         </div>
                       </div>
-                    </div>
-                  </div>
-                )}
-                <div className="grid grid-cols grid-cols-3 gap-4 px-4">
-                  <ul className="text-xs text-primary font-medium mt-1">
-                    <li className="text-xs mt-1">
-                      File size should be less than 5MB
-                    </li>
-                    <li className="text-xs mt-1">
-                      Ensure the resolution is at least 300 DPI for
-                      print-quality images.
-                    </li>
-                    <li className="text-xs mt-1">
-                      Minimum dimensions: 2000 x 3000 pixels (or equivalent
-                      aspect ratio).
-                    </li>
-                    <li className="text-xs mt-1">
-                      File size should not exceed 20 MB.
-                    </li>
-                  </ul>
-                  <ul className="text-xs text-primary font-medium mt-1">
-                    <li className="text-xs mt-1">
-                      Only upload original work; plagiarism or copyright
-                      infringement will result in account penalties.
-                    </li>
-                    <li className="text-xs mt-1">
-                      Avoid images with watermarks, logos, or text overlays.
-                    </li>
-                    <li className="text-xs mt-1">
-                      Ensure the photo does not contain offensive, explicit, or
-                      illegal content.
-                    </li>
-                    <li className="text-xs mt-1">
-                      Photos must align with ClickedArt's ethical standards,
-                      particularly for wildlife, cultural, and sensitive
-                      subjects.
-                    </li>
-                    <li className="text-xs mt-1">
-                      Ensure the uploaded photo is relevant to the categories
-                      you&apos;ve selected.
-                    </li>
-                  </ul>
-                  <ul className="text-xs text-primary font-medium mt-1">
-                    <li className="text-xs mt-1">
-                      Submit sharp, high-quality images free from excessive
-                      noise, blurriness, or pixelation.
-                    </li>
-                    <li className="text-xs mt-1">
-                      Post-process images tastefully; avoid over-saturation,
-                      extreme HDR, or unnatural effects.
-                    </li>
-                    <li className="text-xs mt-1">
-                      Composition should follow photography principles, such as
-                      the rule of thirds, framing, or leading lines.
-                    </li>
-                    <li className="text-xs mt-1">
-                      Ensure the photo has no distracting elements unless
-                      integral to the subject.
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="px-4 lg:px-20 py-5 w-full">
-                  <div className="w-full border-2 border-primary-100 p-[2px] rounded-full">
-                    <div
-                      style={{ width: `${progr}%` }}
-                      className={`bg-gradient-to-r from-primary to-primary-100 h-4 rounded-full transition-all duration-200 ease-in-out`}
-                    />
-                  </div>
-                  <div className="flex justify-end items-center mt-3">
-                    <span className="text-sm text-zinc-600">
-                      {progr}% Uploaded
-                    </span>
-                  </div>
-                </div>
-                {activePlan === "intermediate" && (
-                  <div>
-                    <Label className="!text-paragraph">
-                      Custom Text Watermark
-                    </Label>
-                    <Input
-                      className="!text-paragraph capitalize"
-                      value={customText}
-                      onChange={(e) => setCustomText(e.target.value)}
-                    />
-                  </div>
-                )}
-                {activePlan === "premium" && (
-                  <div>
-                    <Label className="!text-paragraph">Custom Watermark</Label>
-                    {watermark?.watermarkImage ? (
-                      <div className="flex items-center gap-4">
-                        <img
-                          src={watermark?.watermarkImage}
-                          alt="Watermark"
-                          className="w-20 h-20 object-cover rounded-md"
-                        />
-                        <p
-                          className="text-red-600 font-medium cursor-pointer"
-                          onClick={() => handleWatermarkRemove(watermark._id)}
-                        >
-                          Remove Watermark
-                        </p>
-                      </div>
-                    ) : (
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <p className="text-black font-medium cursor-pointer">
-                            Add Watermark
-                          </p>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
-                          <DialogHeader>
-                            <DialogTitle>Upload Watermark</DialogTitle>
-                            <DialogDescription>
-                              Upload a custom watermark for your photos.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="grid gap-4 py-4">
-                            <input
-                              accept=".png"
-                              type="file"
-                              onChange={handleWatermarkImage}
-                            />
-                          </div>
-                          <DialogFooter>
-                            <DialogClose asChild>
-                              <Button2 onClick={() => handleWatermarkAdd()}>
-                                Save changes
-                              </Button2>
-                            </DialogClose>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
                     )}
-                  </div>
+                    <div className="grid grid-cols grid-cols-3 gap-4 px-4">
+                      <ul className="text-xs text-primary font-medium mt-1">
+                        <li className="text-xs mt-1">
+                          File size should be less than 5MB
+                        </li>
+                        <li className="text-xs mt-1">
+                          Ensure the resolution is at least 300 DPI for
+                          print-quality images.
+                        </li>
+                        <li className="text-xs mt-1">
+                          Minimum dimensions: 2000 x 3000 pixels (or equivalent
+                          aspect ratio).
+                        </li>
+                        <li className="text-xs mt-1">
+                          File size should not exceed 20 MB.
+                        </li>
+                      </ul>
+                      <ul className="text-xs text-primary font-medium mt-1">
+                        <li className="text-xs mt-1">
+                          Only upload original work; plagiarism or copyright
+                          infringement will result in account penalties.
+                        </li>
+                        <li className="text-xs mt-1">
+                          Avoid images with watermarks, logos, or text overlays.
+                        </li>
+                        <li className="text-xs mt-1">
+                          Ensure the photo does not contain offensive, explicit,
+                          or illegal content.
+                        </li>
+                        <li className="text-xs mt-1">
+                          Photos must align with ClickedArt's ethical standards,
+                          particularly for wildlife, cultural, and sensitive
+                          subjects.
+                        </li>
+                        <li className="text-xs mt-1">
+                          Ensure the uploaded photo is relevant to the
+                          categories you&apos;ve selected.
+                        </li>
+                      </ul>
+                      <ul className="text-xs text-primary font-medium mt-1">
+                        <li className="text-xs mt-1">
+                          Submit sharp, high-quality images free from excessive
+                          noise, blurriness, or pixelation.
+                        </li>
+                        <li className="text-xs mt-1">
+                          Post-process images tastefully; avoid over-saturation,
+                          extreme HDR, or unnatural effects.
+                        </li>
+                        <li className="text-xs mt-1">
+                          Composition should follow photography principles, such
+                          as the rule of thirds, framing, or leading lines.
+                        </li>
+                        <li className="text-xs mt-1">
+                          Ensure the photo has no distracting elements unless
+                          integral to the subject.
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="px-4 lg:px-20 py-5 w-full">
+                      <div className="w-full border-2 border-primary-100 p-[2px] rounded-full">
+                        <div
+                          style={{ width: `${progr}%` }}
+                          className={`bg-gradient-to-r from-primary to-primary-100 h-4 rounded-full transition-all duration-200 ease-in-out`}
+                        />
+                      </div>
+                      <div className="flex justify-end items-center mt-3">
+                        <span className="text-sm text-zinc-600">
+                          {progr}% Uploaded
+                        </span>
+                      </div>
+                    </div>
+                    {activePlan === "intermediate" && (
+                      <div>
+                        <Label className="!text-paragraph">
+                          Custom Text Watermark
+                        </Label>
+                        <Input
+                          className="!text-paragraph capitalize"
+                          value={customText}
+                          onChange={(e) => setCustomText(e.target.value)}
+                        />
+                      </div>
+                    )}
+                    {activePlan === "premium" && (
+                      <div>
+                        <Label className="!text-paragraph">
+                          Custom Watermark
+                        </Label>
+                        {watermark?.watermarkImage ? (
+                          <div className="flex items-center gap-4">
+                            <img
+                              src={watermark?.watermarkImage}
+                              alt="Watermark"
+                              className="w-20 h-20 object-cover rounded-md"
+                            />
+                            <p
+                              className="text-red-600 font-medium cursor-pointer"
+                              onClick={() =>
+                                handleWatermarkRemove(watermark._id)
+                              }
+                            >
+                              Remove Watermark
+                            </p>
+                          </div>
+                        ) : (
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <p className="text-black font-medium cursor-pointer">
+                                Add Watermark
+                              </p>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px]">
+                              <DialogHeader>
+                                <DialogTitle>Upload Watermark</DialogTitle>
+                                <DialogDescription>
+                                  Upload a custom watermark for your photos.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="grid gap-4 py-4">
+                                <input
+                                  accept=".png"
+                                  type="file"
+                                  onChange={handleWatermarkImage}
+                                />
+                              </div>
+                              <DialogFooter>
+                                <DialogClose asChild>
+                                  <Button2 onClick={() => handleWatermarkAdd()}>
+                                    Save changes
+                                  </Button2>
+                                </DialogClose>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                        )}
+                      </div>
+                    )}
+                    <div className="flex justify-center">
+                      <button
+                        onClick={() => {
+                          getResolutions();
+                          setStep("2");
+                          window.scrollTo(0, 160);
+                        }}
+                        disabled={!imageUrl || (activePlan === "intermediate" && !customText) || (activePlan === "premium" && !watermark?.watermarkImage)}
+                        className="bg-primary text-white py-2 px-4 rounded-full disabled:opacity-50"
+                      >
+                        Proceed
+                      </button>
+                    </div>
+                  </>
                 )}
-                <div className="flex justify-center">
-                  <button
-                    onClick={() => {
-                      getResolutions();
-                      setStep("2");
-                      window.scrollTo(0, 160);
-                    }}
-                    disabled={!imageUrl}
-                    className="bg-primary text-white py-2 px-4 rounded-full disabled:opacity-50"
-                  >
-                    Proceed
-                  </button>
-                </div>
               </div>
             )}
             {step === "2" && (
@@ -685,7 +662,9 @@ const ProfilePage = () => {
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
                   <img
-                    src={photo.imageLinks?.thumbnail || "/assets/hero/bg3.jpg"}
+                    src={
+                      photo.imageLinks?.thumbnail || "/assets/placeholder.webp"
+                    }
                     className="w-full h-auto shadow-[3px_3px_10px_rgba(0,0,0,0.5)]"
                     alt="Uploaded Image"
                   />
@@ -715,26 +694,20 @@ const ProfilePage = () => {
                     <div>
                       <Label className="!text-paragraph">Category*</Label>
                       <Select
-                        required
-                        onValueChange={(value) =>
-                          setPhoto({ ...photo, category: value })
-                        }
-                      >
-                        <SelectTrigger className="!text-paragraph">
-                          <SelectValue placeholder="Select Category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {categories.map((category) => (
-                            <SelectItem
-                              className="!text-paragraph"
-                              key={category._id}
-                              value={category._id}
-                            >
-                              {category.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        options={categoriesOptions}
+                        isMulti
+                        onChange={(selected) => {
+                          setPhoto({
+                            ...photo,
+                            category: selected.map(
+                              (category) =>
+                                categories.find(
+                                  (cat) => cat.name === category.value
+                                )._id
+                            ),
+                          });
+                        }}
+                      />
                     </div>
                     <div>
                       <Label className="!text-paragraph">
@@ -766,35 +739,41 @@ const ProfilePage = () => {
                         }}
                       />
                       <div className="mt-1">
-                        {categories
-                          ?.find((category) => category._id === photo.category)
-                          ?.tags?.map((tag) => {
-                            const isSelected = photo.keywords.includes(tag); // Check if tag is already selected
-                            return (
-                              <span
-                                key={tag}
-                                onClick={() => {
-                                  const updatedKeywords = isSelected
-                                    ? photo.keywords.filter(
-                                        (keyword) => keyword !== tag
-                                      ) // Remove tag if selected
-                                    : [...new Set([...photo.keywords, tag])]; // Add tag if not selected
-                                  setPhoto({
-                                    ...photo,
-                                    keywords: updatedKeywords,
-                                  });
-                                  setKeywordInput(updatedKeywords.join(", ")); // Update input display
-                                }}
-                                className={`text-xs px-2 py-1 rounded-full mr-2 cursor-pointer ${
-                                  isSelected
-                                    ? "bg-gray-300 text-black"
-                                    : "bg-primary text-white"
-                                }`}
-                              >
-                                {tag} {isSelected ? "×" : "+"}
-                              </span>
-                            );
-                          })}
+                        <div className="flex flex-wrap gap-2 max-w-full overflow-x-auto">
+                          {categories
+                            ?.filter((category) =>
+                              photo.category.includes(category._id)
+                            ) // Filter categories that are selected
+                            .flatMap((category) => category.tags) // Flatten all tags from selected categories
+                            .map((tag, index) => {
+                              const isSelected = photo.keywords.includes(tag,);
+                              return (
+                                <span
+                                  key={index}
+                                  onClick={() => {
+                                    const updatedKeywords = isSelected
+                                      ? photo.keywords.filter(
+                                          (keyword) => keyword !== tag
+                                        )
+                                      : [...new Set([...photo.keywords, tag])]; // Avoid duplicates
+
+                                    setPhoto({
+                                      ...photo,
+                                      keywords: updatedKeywords,
+                                    });
+                                    setKeywordInput(updatedKeywords.join(", "));
+                                  }}
+                                  className={`text-xs px-2 py-1 rounded-full mr-2 cursor-pointer whitespace-nowrap ${
+                                    isSelected
+                                      ? "bg-gray-300 text-black"
+                                      : "bg-primary text-white"
+                                  }`}
+                                >
+                                  {tag} {isSelected ? "×" : "+"}
+                                </span>
+                              );
+                            })}
+                        </div>
                       </div>
                     </div>
                     <div>

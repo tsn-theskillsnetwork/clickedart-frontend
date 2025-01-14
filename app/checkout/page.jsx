@@ -191,7 +191,7 @@ export default function CheckoutPage() {
               size: item.paperInfo.size,
             }
           : null,
-        subTotal: item.subTotal,
+        subTotal: (item.frameInfo?.price || 0) + (item.paperInfo?.price || 0),
         finalPrice: item.subTotal + (item.delivery || 0),
       })),
       gst: null,

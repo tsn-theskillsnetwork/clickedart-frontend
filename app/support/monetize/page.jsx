@@ -33,6 +33,8 @@ export default function BulkDownloadForm() {
   const [selectedFiles, setSelectedFiles] = useState({});
   const [uploadProgress, setUploadProgress] = useState({});
 
+  console.log("formData", formData);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 

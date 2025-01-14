@@ -36,10 +36,10 @@ const data = {
           title: "Photos",
           url: "/dashboard/photos",
         },
-        {
-          title: "Invoice",
-          url: "/dashboard/invoice",
-        },
+        // {
+        //   title: "Invoice",
+        //   url: "/dashboard/invoice",
+        // },
       ],
     },
   ],
@@ -82,7 +82,7 @@ export function AppSidebar({ currentUrl, ...props }) {
             asChild
             isActive={currentUrl === "/dashboard/settings"}
           >
-            <Link href="/dashboard/settings">Settings</Link>
+            {/* <Link href="/dashboard/settings">Settings</Link> */}
           </SidebarMenuButton>
           <SidebarMenuButton onClick={handleLogout}>
             <p>Logout</p>
