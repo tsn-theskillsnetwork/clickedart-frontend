@@ -133,7 +133,7 @@ const RegistrationForm = () => {
         return;
       }
 
-      if (e.target.files[0].size > 20 * 1000 * 1024) {
+      if (event.target.files[0].size > 20 * 1000 * 1024) {
         toast.error("File with maximum size of 20MB is allowed");
         return false;
       }
@@ -466,6 +466,9 @@ const RegistrationForm = () => {
                   onChange={handleInputChange}
                   required
                 />
+                {errors.username && (
+                  <p className="text-red-500 text-sm">{errors.username}</p>
+                )}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full ">
                 <div>
@@ -498,6 +501,9 @@ const RegistrationForm = () => {
                     required
                   />
                 </div>
+                {errors.lastName && (
+                  <p className="text-red-500 text-sm">{errors.lastName}</p>
+                )}
               </div>
 
               <div>
@@ -543,9 +549,6 @@ const RegistrationForm = () => {
                     />
                   )}
                 </div>
-                {errors.password && (
-                  <p className="text-red-500 text-sm">{errors.password}</p>
-                )}
               </div>
               <div>
                 <Label>
@@ -595,6 +598,10 @@ const RegistrationForm = () => {
                 />
               </div>
 
+              {errors.mobile && (
+                <p className="text-red-500 text-sm">{errors.mobile}</p>
+              )}
+
               <div>
                 <Label>WhatsApp</Label>
                 <Input
@@ -605,6 +612,9 @@ const RegistrationForm = () => {
                   placeholder="WhatsApp Number"
                 />
               </div>
+              {errors.whatsapp && (
+                <p className="text-red-500 text-sm">{errors.whatsapp}</p>
+              )}
 
               <div>
                 <Label>Bio (Max Length: 100 Words)</Label>
@@ -615,6 +625,9 @@ const RegistrationForm = () => {
                   placeholder="Tell us about yourself..."
                 />
               </div>
+              {errors.bio && (
+                <p className="text-red-500 text-sm">{errors.bio}</p>
+              )}
 
               <div className="py-2 my-2 border-y">
                 <p className="text-heading-06 font-semibold">Address</p>
@@ -649,6 +662,10 @@ const RegistrationForm = () => {
                         ))}
                       </SelectContent>
                     </Select>
+
+                    {errors.country && (
+                      <p className="text-red-500 text-sm">{errors.country}</p>
+                    )}
                   </div>
                   <div>
                     <Label>
@@ -685,6 +702,10 @@ const RegistrationForm = () => {
                           ))}
                       </SelectContent>
                     </Select>
+                    {errors.state && (
+                      <p className="text-red-500 text-sm">{errors.state}</p>
+                    )}
+
                   </div>
                   <div>
                     <Label>
@@ -715,6 +736,9 @@ const RegistrationForm = () => {
                           ))}
                       </SelectContent>
                     </Select>
+                    {errors.city && (
+                      <p className="text-red-500 text-sm">{errors.city}</p>
+                    )}
                   </div>
                   <div>
                     <Label>Address</Label>
@@ -766,6 +790,9 @@ const RegistrationForm = () => {
                         });
                       }}
                     />
+                    {errors.pincode && (
+                      <p className="text-red-500 text-sm">{errors.pincode}</p>
+                    )}
                   </div>
                   <div>
                     <Label>Area</Label>
