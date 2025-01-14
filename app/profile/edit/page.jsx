@@ -665,28 +665,7 @@ const ProfileEditPage = () => {
                 </>
               ) : (
                 <div className="max-w-md mx-auto rounded-lg overflow-hidden md:max-w-xl">
-                  <div className="md:flex">
-                    <div className="w-full p-3">
-                      <div className="relative h-48 rounded-lg border-2 border-blue-500 bg-gray-50 flex justify-center items-center shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
-                        <div className="absolute flex flex-col items-center">
-                          <ImageIcon className="w-12 h-12 text-blue-500" />
-                          <span className="block text-gray-500 font-semibold">
-                            Drag &amp; drop your files here
-                          </span>
-                          <span className="block text-gray-400 font-normal mt-1">
-                            or click to upload
-                          </span>
-                        </div>
-                        <input
-                          name=""
-                          onChange={handleImageChange}
-                          accept="image/*"
-                          className="h-full w-full opacity-0 cursor-pointer"
-                          type="file"
-                        />
-                      </div>
-                    </div>
-                  </div>
+                  
                 </div>
               )}
               {cropperImage && (
@@ -938,7 +917,7 @@ const ProfileEditPage = () => {
               <Input
                 type="date"
                 name="dob"
-                value={new Date(formData.dob).toISOString().split("T")[0] || ""}
+                value={formData.dob || ""}
                 onChange={handleInputChange}
               />
               {errors.dob && (
