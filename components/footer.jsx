@@ -1,13 +1,32 @@
 "use client";
 
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Button from "./button";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
+import axios from "axios";
 
 export default function Footer() {
+  const router = useRouter();
   const pathname = usePathname();
+  const [settings, setSettings] = useState({});
+
+  const fetchSettings = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/layout/get-layout-content`
+      );
+      console.log(res.data);
+      setSettings(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
   if (pathname.startsWith("/dashboard")) return null;
   return (
     <div className={`bg-primary-100 min-h-96 px-10 sm:px-24 z-50`}>
@@ -18,12 +37,15 @@ export default function Footer() {
               <Image
                 width={192}
                 height={48}
-                src="/assets/Logo.png"
+                onClick={() => {
+                  router.push("/");
+                }}
+                src={settings?.logo || "/assets/Logo.png"}
                 alt="ClickedArt.com"
                 className="w-full h-auto"
               />
-              <p className="mt-5">+919087979899</p>
-              <p>Address</p>
+              <p className="mt-5">{settings?.footerDetails?.phone}</p>
+              <p>{settings?.footerDetails?.address}</p>
               <div className="flex gap-4 text-sm underline underline-offset-1">
                 <Link href="#">Terms of Use</Link>
                 <Link href="#">Privacy Policy</Link>
@@ -64,7 +86,10 @@ export default function Footer() {
             </div>
             <div className="flex flex-col gap-2">
               <p className="font-semibold text-lg">Support</p>
-              <Link href="/support/bulk-download" className="mt-3 text-sm font-medium">
+              <Link
+                href="/support/bulk-download"
+                className="mt-3 text-sm font-medium"
+              >
                 Bulk Download
               </Link>
               <Link href="#" className="text-sm font-medium">

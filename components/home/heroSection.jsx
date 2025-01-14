@@ -6,14 +6,7 @@ import { ChevronRight, Search } from "lucide-react";
 import { Icon } from "@iconify/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-
-// Image data
-const images = [
-  { url: "/assets/hero/bg1.jpg", alt: "bg1" },
-  { url: "/assets/hero/bg2.jpg", alt: "bg2" },
-  { url: "/assets/hero/bg3.jpg", alt: "bg3" },
-  { url: "/assets/hero/bg4.jpg", alt: "bg4" },
-];
+import axios from "axios";
 
 const taglines = [
   "Where Creativity Meets Marketplace",
@@ -28,22 +21,42 @@ export default function HeroSection() {
   const [currentImage, setCurrentImage] = useState(0);
   const [search, setSearch] = useState("");
   const [searchType, setSearchType] = useState("images");
+  const [settings, setSettings] = useState({});
+
+  const fetchSettings = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/layout/get-layout-content`
+      );
+      console.log(res.data);
+      setSettings(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const heroPhotos = settings?.heroSectionPhotos || []; // Dynamic images array
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImage((currentImage) =>
+        currentImage === heroPhotos.length - 1 ? 0 : currentImage + 1
+      );
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [heroPhotos.length]);
 
   const handleSearch = () => {
     router.push(`/search?search=${search}&type=${searchType}`);
   };
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImage((currentImage) =>
-        currentImage === images.length - 1 ? 0 : currentImage + 1
-      );
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <div className="relative h-[70vh] sm:h-[80vh] md:h-[90vh] lg:h-[100vh] xl:h-[110vh] overflow-hidden">
+      {/* Background Section */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-black opacity-30 z-10"></div>
         <AnimatePresence mode="popLayout">
@@ -56,16 +69,22 @@ export default function HeroSection() {
             transition={{ duration: 0.5 }}
           >
             <Image
-              src={images[currentImage].url}
-              alt={images[currentImage].alt}
+              src={
+                heroPhotos[currentImage] ||
+                "/assets/hero/default-bg.jpg" // Fallback background
+              }
+              alt="hero-image"
               fill
               priority
+              loading="eager"
+              quality={80}
               className="object-cover"
             />
           </motion.div>
         </AnimatePresence>
       </div>
 
+      {/* Content Section */}
       <div className="absolute inset-0 z-20 flex flex-col mt-20 sm:mt-20 items-center text-white">
         <h1 className="text-heading-03 md:text-heading-02 lg:text-heading-01 2xl:text-heading-lg font-semibold">
           ClickedArt
@@ -75,8 +94,6 @@ export default function HeroSection() {
             <AnimatePresence mode="popLayout">
               <motion.div
                 key={currentImage}
-                src={images[currentImage].url}
-                alt={images[currentImage].alt}
                 initial={{ y: 50 }}
                 animate={{ y: 0 }}
                 exit={{ y: -50 }}
@@ -84,14 +101,15 @@ export default function HeroSection() {
                 transition={{ duration: 0.5, ease: "easeInOut" }}
               >
                 <p className="text-md sm:text-xl md:text-paragraph lg:text-heading-06 xl:text-heading-05 font-semibold">
-                  {taglines[currentImage]}
+                  {taglines[currentImage % taglines.length]} {/* Loop taglines */}
                 </p>
               </motion.div>
             </AnimatePresence>
           </div>
         </div>
+
+        {/* Search Input */}
         <div className="mt-[1%] flex flex-row bg-white text-black group rounded-lg items-center gap-4 w-11/12 md:w-4/5 lg:w-2/3 xl:w-1/2 focus-within:outline focus-within:outline-blue-500">
-          {/* Search Input */}
           <div className="h-full aspect-[1/1] flex justify-center items-center">
             <Search size={40} color="black" className="mx-auto" />
           </div>
@@ -101,26 +119,20 @@ export default function HeroSection() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            className="active:border-none active:outline-none focus:outline-none focus:border-none py-4 text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-semibold my-1 w-full"
+            className="py-4 text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-semibold my-1 w-full"
           />
-
-          <div className="relative">
-            <select
-              value={searchType}
-              onChange={(e) => setSearchType(e.target.value)}
-              className="bg-white border-l-2 active:border-none active:outline-none focus:border-none text-black py-3 px-4 font-semibold text-sm sm:text-base md:text-lg lg:text-xl focus:outline-none focus:ring-0 "
-            >
-              <option value="images">Images</option>
-              <option value="categories">Categories</option>
-              {/* <option value="photographers">Photographers</option> */}
-            </select>
-          </div>
-          {/* Search Button */}
+          <select
+            value={searchType}
+            onChange={(e) => setSearchType(e.target.value)}
+            className="bg-white border-l-2 text-black py-3 px-4 font-semibold text-sm sm:text-base md:text-lg lg:text-xl"
+          >
+            <option value="images">Images</option>
+            <option value="categories">Categories</option>
+          </select>
           <button
             onClick={handleSearch}
-            className="bg-accent-200 h-full aspect-[1/1] text-white rounded-r-lg relative"
+            className="bg-accent-200 h-full aspect-[1/1] text-white rounded-r-lg"
           >
-            <p className="sr-only">Search</p>
             <Icon
               icon="mdi:image-search"
               className="mx-auto"
@@ -128,67 +140,27 @@ export default function HeroSection() {
             />
           </button>
         </div>
-
-        <div className="mt-[2%] w-full flex flex-col gap-2 items-center md:flex-row justify-around">
-          <button
-            onClick={() => router.push("/images")}
-            className="border-2 bg-gradient-to-tr from-transparent to-transparent hover:from-black border-white rounded-2xl px-2 py-2 sm:px-4 sm:py-2 sm:pl-5 w-52 md:w-72 group transition-all duration-200 ease-linear"
-          >
-            <div className="flex flex-row gap-2 items-center">
-              <div className="flex items-center justify-center h-5 w-5 md:h-10  md:w-10">
-                <div className="rounded-full bg-white flex outline-offset-2 outline outline-1 group-hover:outline-none outline-white items-center justify-center w-1 h-1 group-hover:w-10 group-hover:h-10 transition-all duration-200">
-                  <ChevronRight
-                    size={30}
-                    className="text-zinc-500 opacity-0 group-hover:opacity-100"
-                  />
-                </div>
-              </div>
-              {/* The text with the outline effect */}
-              <p className="relative text-white text-sm md:text-base">
-                Browse the collection
-                <span className="absolute bottom-0 right-0 h-[1.5px] bg-white w-10 group-hover:w-full transition-all duration-200 ease-in-out"></span>
-              </p>
-            </div>
-          </button>
-          <button
-            onClick={() => router.push("/signin/photographer")}
-            className="border-2 bg-gradient-to-tr from-transparent to-transparent hover:from-black border-white rounded-2xl px-2 py-2 sm:px-4 sm:py-2 sm:pl-5 w-52 md:w-72 group transition-all duration-200 ease-linear"
-          >
-            <div className="flex flex-row gap-2 items-center">
-              <div className="flex items-center justify-center h-5 w-5 md:h-10 md:w-10">
-                <div className="rounded-full bg-white flex outline-offset-2 outline outline-1 group-hover:outline-none outline-white items-center justify-center w-1 h-1 group-hover:w-10 group-hover:h-10 transition-all duration-200">
-                  <ChevronRight
-                    size={30}
-                    className="text-zinc-500 opacity-0 group-hover:opacity-100"
-                  />
-                </div>
-              </div>
-              <p className="relative text-white text-sm md:text-base">
-                Sell your photos
-                <span className="absolute bottom-0 right-0 h-[1.5px] bg-white w-10 group-hover:w-full transition-all duration-200 ease-in-out"></span>
-              </p>
-            </div>
-          </button>
-        </div>
       </div>
-      <div>
-        <div className="absolute inset-x-0 mx-auto bottom-3 sm:bottom-5 px-2 left-0 w-[90vw] z-40 flex justify-around gap-2 items-end">
-          {images.map((image, index) => (
-            <div key={index}>
-              <Image
-                src={image.url}
-                alt={image.alt}
-                width={300}
-                height={300}
-                loading="lazy"
-                onClick={() => setCurrentImage(index)}
-                className={`object-cover border-2 sm:border-4 w-[90%] transition-all duration-500 cursor-pointer ease-in-out ${
-                  currentImage === index ? "aspect-[6/7]" : "aspect-[7/4]"
-                }`}
-              />
-            </div>
-          ))}
-        </div>
+
+      {/* Thumbnail Navigation */}
+      <div className="absolute inset-x-0 mx-auto bottom-3 sm:bottom-5 px-2 left-0 w-[90vw] z-40 flex justify-around gap-2 items-end">
+        {heroPhotos.map((image, index) => (
+          <div key={index}>
+            <Image
+              src={image || "/assets/hero/default-bg.jpg"} // Fallback background
+              alt={`Thumbnail ${index}`}
+              width={300}
+              height={300}
+              quality={40}
+              priority
+              loading="eager"
+              onClick={() => setCurrentImage(index)}
+              className={`object-cover border-2 sm:border-4 w-[90%] transition-all duration-500 cursor-pointer ease-in-out ${
+                currentImage === index ? "aspect-[6/7]" : "aspect-[7/4]"
+              }`}
+            />
+          </div>
+        ))}
       </div>
     </div>
   );
