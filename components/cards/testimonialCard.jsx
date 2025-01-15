@@ -9,24 +9,32 @@ export default function TestimonialCard({ avatar, name, stars, comment }) {
         <Image
           width={80}
           height={80}
-          src={avatar}
-          alt={name}
+          src={avatar || "/assets/default.jpg"}  // Fallback to default image
+          alt={name || "User Avatar"}  // Provide an alt text if name is not available
           className="rounded-full w-20 h-20 object-cover object-top border-2 border-white shadow-zinc-400 shadow-lg"
         />
       </div>
-      <div className="">{comment}</div>
+      <div className="text-center">{comment}</div>
       <div className="flex flex-col justify-center items-center">
         <div className="flex flex-row">
+          {/* Full stars */}
           {Array.from({ length: stars }).map((_, index) => (
-            <Star className=" fill-yellow-300 text-yellow-300" key={index} />
+            <Star
+              className="fill-yellow-300 text-yellow-300"
+              key={index}
+              aria-hidden="true"  // To prevent screen readers from announcing each star
+            />
           ))}
+          {/* Empty stars */}
           {Array.from({ length: 5 - stars }).map((_, index) => (
-            <Star className=" fill-yellow-100 text-yellow-100" key={index} />
+            <Star
+              className="fill-yellow-100 text-yellow-100"
+              key={index}
+              aria-hidden="true"
+            />
           ))}
         </div>
-        <div className="text-secondary-200 text-heading-06 font-semibold">
-          {name}
-        </div>
+        <div className="text-secondary-200 text-heading-06 font-semibold">{name}</div>
       </div>
     </div>
   );

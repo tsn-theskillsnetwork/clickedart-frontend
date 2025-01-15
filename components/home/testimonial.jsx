@@ -1,10 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import TestimonialCard from "../cards/testimonialCard";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import { ChevronLeft } from "lucide-react";
+import axios from "axios";
 
 export default function Testimonial() {
   const [sliderRef, slider] = useKeenSlider({
@@ -22,6 +23,8 @@ export default function Testimonial() {
     },
   });
 
+  const [testimonials, setTestimonials] = useState([]);
+
   const handleNavigation = (direction) => {
     if (direction === "left") {
       slider.current?.prev();
@@ -30,40 +33,22 @@ export default function Testimonial() {
     }
   };
 
-  const testimonials = [
-    {
-      avatar:
-        "/assets/images/avatar1.jpg",
-      name: "John Doe",
-      stars: 5,
-      comment:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam at justo ut arcu semper venenatis. Nulla facilisi. Nulla facilisi. Nulla facilisi.",
-    },
-    {
-      avatar:
-        "/assets/images/avatar2.jpg",
-      name: "Jane Doe",
-      stars: 4,
-      comment:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam at justo ut arcu semper venenatis. Nulla facilisi. Nulla facilisi. Nulla facilisi.",
-    },
-    {
-      avatar:
-        "/assets/images/avatar3.jpg",
-      name: "John Smith",
-      stars: 5,
-      comment:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam at justo ut arcu semper venenatis. Nulla facilisi. Nulla facilisi. Nulla facilisi.",
-    },
-    {
-      avatar:
-        "/assets/images/avatar4.jpg",
-      name: "Jane Smith",
-      stars: 4,
-      comment:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam at justo ut arcu semper venenatis. Nulla facilisi. Nulla facilisi. Nulla facilisi.",
-    },
-  ];
+  const fetchSettings = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/layout/get-layout-content`
+      );
+      console.log(res.data);
+      setTestimonials(res.data.testimonials);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
   return (
     <div className="flex flex-col items-center">
       <div className="flex flex-col items-center justify-center text-center sm:w-1/2">
@@ -71,7 +56,7 @@ export default function Testimonial() {
           Trusted by Our Community, Loved by You
         </div>
         <div className="text-heading-06 text-primary font-semibold">
-          Discover why our community chooses us – real stories from people who
+          Discover why our community chooses us - real stories from people who
           trust and love our products
         </div>
       </div>
@@ -80,10 +65,10 @@ export default function Testimonial() {
         {testimonials.map((testimonial, index) => (
           <div key={index} className="keen-slider__slide p-6">
             <TestimonialCard
-              avatar={testimonial.avatar}
+              avatar={testimonial.image}
               name={testimonial.name}
               stars={testimonial.stars}
-              comment={testimonial.comment}
+              comment={testimonial.message}
             />
           </div>
         ))}

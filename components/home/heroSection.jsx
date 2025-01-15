@@ -6,14 +6,15 @@ import { ChevronRight, Search } from "lucide-react";
 import { Icon } from "@iconify/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
-// Image data
-const images = [
-  { url: "/assets/hero/bg1.jpg", alt: "bg1" },
-  { url: "/assets/hero/bg2.jpg", alt: "bg2" },
-  { url: "/assets/hero/bg3.jpg", alt: "bg3" },
-  { url: "/assets/hero/bg4.jpg", alt: "bg4" },
-];
+// // Image data
+// const images = [
+//   { url: "/assets/hero/bg1.jpg", alt: "bg1" },
+//   { url: "/assets/hero/bg2.jpg", alt: "bg2" },
+//   { url: "/assets/hero/bg3.jpg", alt: "bg3" },
+//   { url: "/assets/hero/bg4.jpg", alt: "bg4" },
+// ];
 
 const taglines = [
   "Where Creativity Meets Marketplace",
@@ -28,19 +29,37 @@ export default function HeroSection() {
   const [currentImage, setCurrentImage] = useState(0);
   const [search, setSearch] = useState("");
   const [searchType, setSearchType] = useState("images");
+  const [settings, setSettings] = useState({});
+
+  const fetchSettings = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/layout/get-layout-content`
+      );
+      setSettings(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
 
   const handleSearch = () => {
     router.push(`/search?search=${search}&type=${searchType}`);
   };
 
+  const heroPhotos = settings?.heroSectionPhotos || []; // Dynamic images array
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImage((currentImage) =>
-        currentImage === images.length - 1 ? 0 : currentImage + 1
+        currentImage === heroPhotos.length - 1 ? 0 : currentImage + 1
       );
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [heroPhotos.length]);
 
   return (
     <div className="relative h-[70vh] sm:h-[80vh] md:h-[90vh] lg:h-[100vh] xl:h-[110vh] overflow-hidden">
@@ -56,10 +75,13 @@ export default function HeroSection() {
             transition={{ duration: 0.5 }}
           >
             <Image
-              src={images[currentImage].url}
-              alt={images[currentImage].alt}
+              src={heroPhotos[currentImage] ||
+                "/assets/hero/default-bg.jpg"}
+              alt={"hero-image"}
               fill
               priority
+              loading="eager"
+              quality={80}
               className="object-cover"
             />
           </motion.div>
@@ -75,8 +97,6 @@ export default function HeroSection() {
             <AnimatePresence mode="popLayout">
               <motion.div
                 key={currentImage}
-                src={images[currentImage].url}
-                alt={images[currentImage].alt}
                 initial={{ y: 50 }}
                 animate={{ y: 0 }}
                 exit={{ y: -50 }}
@@ -173,14 +193,15 @@ export default function HeroSection() {
       </div>
       <div>
         <div className="absolute inset-x-0 mx-auto bottom-3 sm:bottom-5 px-2 left-0 w-[90vw] z-40 flex justify-around gap-2 items-end">
-          {images.map((image, index) => (
+        {heroPhotos.map((image, index) => (
             <div key={index}>
               <Image
-                src={image.url}
-                alt={image.alt}
+                src={image || "/assets/hero/default-bg.jpg"}
+                alt={`Thumbnail ${index}`}
                 width={300}
                 height={300}
-                loading="lazy"
+                loading="eager"
+                quality={50}
                 onClick={() => setCurrentImage(index)}
                 className={`object-cover border-2 sm:border-4 w-[90%] transition-all duration-500 cursor-pointer ease-in-out ${
                   currentImage === index ? "aspect-[6/7]" : "aspect-[7/4]"

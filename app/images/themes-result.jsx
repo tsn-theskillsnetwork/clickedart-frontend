@@ -101,26 +101,28 @@ export default function ThemesResultPage() {
   }, [themeValue, sortValue, searchValue]);
 
   const sortedImages = [...images]
-    .filter((image) => {
-      if (theme === "all") return true;
-      return image.category.name.toLowerCase() === theme.toLowerCase();
-    })
-    .filter((image) => {
-      if (!searchValue) return true;
-      return (
-        image.title?.toLowerCase().includes(searchValue.toLowerCase()) ||
-        image.description?.toLowerCase().includes(searchValue.toLowerCase()) ||
-        image.keywords?.some((keyword) =>
-          keyword.toLowerCase().includes(searchValue.toLowerCase())
-        )
-      );
-    })
-    .sort((a, b) => {
-      if (sort === "price") return a.price - b.price;
-      if (sort === "rating") return b.rating - a.rating;
-      if (sort === "popularity") return b.downloadCount - a.downloadCount;
-      return new Date(b.date) - new Date(a.date);
-    });
+  .filter((image) => {
+    if (theme === "all") return true;
+    // Check if the theme matches the name of any category in the category array
+    return image.category.some((cat) => cat.name.toLowerCase() === theme.toLowerCase());
+  })
+  .filter((image) => {
+    if (!searchValue) return true;
+    return (
+      image.title?.toLowerCase().includes(searchValue.toLowerCase()) ||
+      image.description?.toLowerCase().includes(searchValue.toLowerCase()) ||
+      image.keywords?.some((keyword) =>
+        keyword.toLowerCase().includes(searchValue.toLowerCase())
+      )
+    );
+  })
+  .sort((a, b) => {
+    if (sort === "price") return a.price - b.price;
+    if (sort === "rating") return b.rating - a.rating;
+    if (sort === "popularity") return b.downloadCount - a.downloadCount;
+    return new Date(b.date) - new Date(a.date);
+  });
+
 
   useEffect(() => {
     const fetchThemes = async () => {
@@ -367,11 +369,11 @@ export default function ThemesResultPage() {
                 <div className="flex flex-row gap-2 overflow-y-scroll no-scrollbar">
                   {image.keywords?.map((tag, index) => (
                     <span
-                    key={index}
-                    className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-700 bg-primary-400 bg-opacity-15 rounded-lg px-2 py-1"
-                  >
-                    {tag}
-                  </span>
+                      key={index}
+                      className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-700 bg-primary-400 bg-opacity-15 rounded-lg px-2 py-1"
+                    >
+                      {tag}
+                    </span>
                   ))}
                 </div>
                 {/* <h2 className="text-heading-06 font-medium">

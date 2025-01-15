@@ -170,15 +170,6 @@ export default function OrdersPage() {
                     <p className="text-paragraph font-semibold text-surface-500">
                       Total: {order.totalAmount}
                     </p>
-                    {order.isPaid === true ? (
-                      <p className="text-paragraph font-semibold text-green-600">
-                        Paid
-                      </p>
-                    ) : (
-                      <p className="text-paragraph font-semibold text-red-600">
-                        Not Paid
-                      </p>
-                    )}
                   </div>
                   <div className="sm:px-2 sm:w-1/5 flex flex-col items-start gap-2 border-b sm:border-b-0">
                     <div

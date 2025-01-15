@@ -48,6 +48,8 @@ const ProfilePage = () => {
   const [selectedCatelogue, setSelectedCatelogue] = useState([]);
   const [photos, setPhotos] = useState([]);
   const [catalogues, setCatalogues] = useState([]);
+  const [activePlan, setActivePlan] = useState("Basic");
+  const [limit, setLimit] = useState(1);
   const [newCatalogue, setNewCatalogue] = useState({
     name: "",
     description: "",
@@ -118,7 +120,6 @@ const ProfilePage = () => {
         }
       );
 
-      console.log("response", response.data);
       fetchCatalogues();
       toast.success("Catelogue Updated successfully!");
       setMessage("Catelogue Updated successfully!");
@@ -149,12 +150,37 @@ const ProfilePage = () => {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/photographeranalytics/get-photographer-analytics?photographer=${photographer._id}`
       );
-      console.log("Stats", res.data);
       setStats(res.data);
     } catch (error) {
       setError(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchActivePlan = async () => {
+    if (!photographer || !photographer._id) {
+      console.log("Photographer data is missing");
+      return;
+    }
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/get-user-active-subscription?photographer=${photographer._id}`
+      );
+      setActivePlan(res.data.subscription?.planId?.name?.toLowerCase());
+      if (res.data.subscription?.planId?.name?.toLowerCase() === "basic") {
+        setLimit(1);
+      } else if (
+        res.data.subscription?.planId?.name?.toLowerCase() === "intermediate"
+      ) {
+        setLimit(5);
+      } else if (
+        res.data.subscription?.planId?.name?.toLowerCase() === "premium"
+      ) {
+        setLimit(999999);
+      }
+    } catch (error) {
+      console.log(error.response ? error.response.data : error.message);
     }
   };
 
@@ -164,7 +190,6 @@ const ProfilePage = () => {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-images-by-photographer?photographer=${photographer._id}`
       );
-      console.log(res.data);
       setPhotos(res.data.photos);
     } catch (error) {
       setError(error);
@@ -178,7 +203,6 @@ const ProfilePage = () => {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/catalogue/get-catalogues-by-photographer?photographer=${photographer?._id}`
       );
-      console.log("res", res.data);
       setCatalogues(res.data.catalogues);
     } catch (err) {
       console.log(err);
@@ -191,22 +215,29 @@ const ProfilePage = () => {
     fetchStats();
     fetchPhotos();
     fetchCatalogues();
+    fetchActivePlan();
   }, [photographer]);
 
   return (
     <>
       {photographer || user ? (
         <div className="flex flex-col min-h-screen pb-20">
-          <div className="w-full">
-            <Image
-              src="/assets/hero/bg2.jpg"
-              alt="bg1"
-              width={1920}
-              height={800}
-              className="object-cover w-full h-40 lg:h-96"
-            />
-          </div>
-          <div className="relative flex flex-col items-center -mt-16 lg:-mt-28">
+          {photographer && (
+            <div className="w-full">
+              <Image
+                src={photographer.coverImage || "/assets/placeholder.webp"}
+                alt="bg1"
+                width={1920}
+                height={800}
+                className="object-cover w-full h-40 lg:h-96"
+              />
+            </div>
+          )}
+          <div
+            className={`relative flex flex-col items-center ${
+              photographer ? "-mt-16 lg:-mt-28" : "mt-8"
+            }`}
+          >
             <Image
               src={
                 photographer?.profileImage ||
@@ -230,18 +261,20 @@ const ProfilePage = () => {
             >
               <Pencil strokeWidth={2} className="size-4 lg:size-14" />
             </Link>
-            <div className="absolute top-12 lg:top-20 right-[15%] sm:right-[15%] lg:right-[23%] text-surface-500 bg-white rounded-full p-2 cursor-pointer shadow-[1px_1px_2px_rgba(0,0,0,0.25)]">
-              <Share2Icon
-                strokeWidth={2}
-                className="size-4 lg:size-14"
-                onClick={() => {
-                  navigator.clipboard.writeText(
-                    `${process.env.NEXT_PUBLIC_CLIENT}/photographer/${photographer._id}`
-                  );
-                  toast.success("Link copied to clipboard!");
-                }}
-              />
-            </div>
+            {photographer && (
+              <div className="absolute top-12 lg:top-20 right-[15%] sm:right-[15%] lg:right-[23%] text-surface-500 bg-white rounded-full p-2 cursor-pointer shadow-[1px_1px_2px_rgba(0,0,0,0.25)]">
+                <Share2Icon
+                  strokeWidth={2}
+                  className="size-4 lg:size-14"
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      `${process.env.NEXT_PUBLIC_CLIENT}/photographer/${photographer._id}`
+                    );
+                    toast.success("Link copied to clipboard!");
+                  }}
+                />
+              </div>
+            )}
             <p className="text-heading-06 lg:text-heading-01 font-semibold lg:font-medium">
               {(user || photographer)?.firstName +
                 " " +
@@ -353,7 +386,8 @@ const ProfilePage = () => {
                   Monetize your account to start earning from your photos
                 </p>
                 <Link href="/support/monetize">
-                  Click here to <span className="text-green-600">Monetize Now.</span>
+                  Click here to{" "}
+                  <span className="text-green-600">Monetize Now.</span>
                 </Link>
               </div>
             )}
@@ -430,17 +464,12 @@ const ProfilePage = () => {
                       <div className="absolute inset-0">
                         <div className="flex justify-between px-2 pt-2">
                           <div className="">
-                            {/* <div className="bg-white px-2 text-paragraph bg-opacity-75 w-fit transition-all duration-200 ease-linear cursor-default">
-                              <p>
+                            <div className="bg-white px-2 text-paragraph bg-opacity-75 w-fit transition-all duration-200 ease-linear cursor-default">
+                              {/* <p>
                                 {image.imageAnalytics?.downloads || 0} Downloads
-                              </p>
-                            </div> */}
+                              </p> */}
+                            </div>
                           </div>
-                          <div
-                            className={`${
-                              !image.isActive ? "bg-red-500" : "bg-transparent"
-                            } h-2 w-2 rounded-full shadow-[0_0_4px_rgba(0,0,0,0.6)]`}
-                          />
                         </div>
                       </div>
                       <div className="text-white absolute bottom-0 p-4 pt-6 bg-gradient-to-t from-black to-transparent inset-x-0 bg-opacity-50 opacity-0 group-hover:opacity-100 transition-all duration-200 ease-linear">
@@ -457,54 +486,70 @@ const ProfilePage = () => {
               ) : (
                 <div className="flex flex-col gap-10 py-10">
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <div className="w-full h-full flex flex-col aspect-[1/1] items-center justify-center shadow-[0_4px_10px_rgba(0,0,0,0.2)] bg-white cursor-pointer">
-                          <Plus className="w-20 h-20 text-surface-400" />
-                          <p className="text-surface-400 font-semibold">
-                            Create New Catelogue
-                          </p>
-                        </div>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                          <DialogTitle>Create Catelogue</DialogTitle>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                          <div>
-                            <Label>Name *</Label>
-                            <Input
-                              type="text"
-                              name="name"
-                              value={newCatalogue.name}
-                              onChange={handleInputChange}
-                              required
-                            />
+                    {catalogues.length >= limit ? (
+                      <div
+                        onClick={() => {
+                          toast.error(
+                            "Upgrade your plan to create more catalogues."
+                          );
+                        }}
+                        className="w-full h-full flex flex-col aspect-[1/1] items-center justify-center shadow-[0_4px_10px_rgba(0,0,0,0.2)] bg-white cursor-pointer"
+                      >
+                        <Plus className="w-20 h-20 text-surface-400" />
+                        <p className="text-surface-400 font-semibold">
+                          Create New Catelogue
+                        </p>
+                      </div>
+                    ) : (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <div className="w-full h-full flex flex-col aspect-[1/1] items-center justify-center shadow-[0_4px_10px_rgba(0,0,0,0.2)] bg-white cursor-pointer">
+                            <Plus className="w-20 h-20 text-surface-400" />
+                            <p className="text-surface-400 font-semibold">
+                              Create New Catelogue
+                            </p>
                           </div>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px]">
+                          <DialogHeader>
+                            <DialogTitle>Create Catelogue</DialogTitle>
+                          </DialogHeader>
+                          <div className="grid gap-4 py-4">
+                            <div>
+                              <Label>Name *</Label>
+                              <Input
+                                type="text"
+                                name="name"
+                                value={newCatalogue.name}
+                                onChange={handleInputChange}
+                                required
+                              />
+                            </div>
 
-                          <div>
-                            <Label>Description *</Label>
-                            <Input
-                              type="text"
-                              name="description"
-                              value={newCatalogue.description}
-                              onChange={handleInputChange}
-                              required
-                            />
+                            <div>
+                              <Label>Description *</Label>
+                              <Input
+                                type="text"
+                                name="description"
+                                value={newCatalogue.description}
+                                onChange={handleInputChange}
+                                required
+                              />
+                            </div>
                           </div>
-                        </div>
-                        <DialogFooter>
-                          <DialogClose asChild>
-                            <Button2
-                              size="sm"
-                              onClick={() => handleCreateCatelogue()}
-                            >
-                              Save changes
-                            </Button2>
-                          </DialogClose>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
+                          <DialogFooter>
+                            <DialogClose asChild>
+                              <Button2
+                                size="sm"
+                                onClick={() => handleCreateCatelogue()}
+                              >
+                                Save changes
+                              </Button2>
+                            </DialogClose>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    )}
 
                     {catalogues?.map((catalogue) => (
                       <div

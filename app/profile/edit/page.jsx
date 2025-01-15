@@ -23,6 +23,16 @@ import countries from "@/lib/address/countries.json";
 import states from "@/lib/address/states.json";
 import cities from "@/lib/address/cities.json";
 import Link from "next/link";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import Button2 from "@/components/button2";
 
 const ProfileEditPage = () => {
   const { user, token, photographer, setUser, setPhotographer } =
@@ -115,6 +125,34 @@ const ProfileEditPage = () => {
         setCropperImage(reader.result);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const uploadData = new FormData();
+    uploadData.append("image", file);
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/upload/uploadSingleImage`,
+        {
+          method: "POST",
+          body: uploadData,
+        }
+      );
+      const data = await res.text();
+      if (res.ok) {
+        setFormData((prev) => ({
+          ...prev,
+          coverImage: data,
+        }));
+        console.log("Cover Photo uploaded successfully", data);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -232,85 +270,193 @@ const ProfileEditPage = () => {
     <>
       <Toaster position="top-center" reverseOrder={false} />
       <div className="flex flex-col items-center justify-center group min-h-[80vh] mb-10">
-        <div className="w-full relative">
-          <Image
-            src="/assets/hero/bg2.jpg"
-            alt="bg1"
-            width={1920}
-            height={800}
-            className="object-cover w-full h-40 lg:h-96"
-          />
-          <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
-            <CameraIcon className="w-12 h-12 text-white mx-auto mt-20 lg:mt-40" />
-          </div>
-        </div>
-        <div className="relative flex flex-col items-center -mt-16 lg:-mt-28">
-          {cropperImage ? (
-            <Cropper
-              src={cropperImage}
-              style={{ height: 300, width: "100%" }}
-              initialAspectRatio={1}
-              aspectRatio={1}
-              guides={false}
-              ref={cropperRef}
-            />
-          ) : formData.profileImage ? (
-            <>
+        {photographer ? (
+          <>
+            <div className="w-full relative">
               <Image
-                src={formData.profileImage}
-                alt="Profile Image"
-                width={200}
-                height={200}
-                className="rounded-full object-cover aspect-[1/1] border-4 border-white"
+                src={formData.coverImage || "/assets/hero/bg2.jpg"}
+                alt="bg1"
+                width={1920}
+                height={800}
+                className="object-cover w-full h-40 lg:h-96"
               />
-              <button
-                type="button"
-                onClick={() => setFormData({ ...formData, profileImage: "" })}
-                className="text-red-500"
-              >
-                Remove
-              </button>
-            </>
-          ) : (
-            <div className="max-w-md mx-auto rounded-lg overflow-hidden md:max-w-xl">
-              <div className="md:flex">
-                <div className="w-full p-3">
-                  <div className="relative h-48 rounded-lg border-2 border-blue-500 bg-gray-50 flex justify-center items-center shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
-                    <div className="absolute flex flex-col items-center">
-                      <ImageIcon className="w-12 h-12 text-blue-500" />
-                      <span className="block text-gray-500 font-semibold">
-                        Drag &amp; drop your files here
-                      </span>
-                      <span className="block text-gray-400 font-normal mt-1">
-                        or click to upload
-                      </span>
+              <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-50 transition-opacity duration-300 ease-in-out">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <CameraIcon className="w-24 h-24 text-white mx-auto mt-20 lg:mt-40" />
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>Change Cover Photo</DialogTitle>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      {formData.coverImage && (
+                        <Image
+                          src={formData.coverImage}
+                          alt="Cover Image"
+                          width={800}
+                          height={600}
+                          className="object-contain border-4 border-white"
+                        />
+                      )}
+                      <Input
+                        name=""
+                        onChange={handleImageUpload}
+                        className="h-full w-full cursor-pointer"
+                        type="file"
+                      />
                     </div>
-                    <input
-                      name=""
-                      onChange={handleImageChange}
-                      className="h-full w-full opacity-0 cursor-pointer"
-                      type="file"
-                    />
-                  </div>
-                </div>
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <Button2>Save changes</Button2>
+                      </DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
-          )}
-          {cropperImage && (
-            <button
-              type="button"
-              onClick={handleCrop}
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Crop Image
-            </button>
-          )}
-        </div>
-        {uploadProgress > 0 && uploadProgress < 100 && (
-          <div>
-            <progress value={uploadProgress} max={100}></progress>
-            <span>{uploadProgress}%</span>
-          </div>
+            <div className="relative flex flex-col items-center -mt-16 lg:-mt-28">
+              {cropperImage ? (
+                <Cropper
+                  src={cropperImage}
+                  style={{ height: 300, width: "100%" }}
+                  initialAspectRatio={1}
+                  aspectRatio={1}
+                  guides={false}
+                  ref={cropperRef}
+                />
+              ) : formData.profileImage ? (
+                <>
+                  <Image
+                    src={formData.profileImage}
+                    alt="Profile Image"
+                    width={200}
+                    height={200}
+                    className="rounded-full object-cover aspect-[1/1] border-4 border-white"
+                  />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setFormData({ ...formData, profileImage: "" })
+                    }
+                    className="text-red-500"
+                  >
+                    Remove
+                  </button>
+                </>
+              ) : (
+                <div className="max-w-md mx-auto rounded-lg overflow-hidden md:max-w-xl">
+                  <div className="md:flex">
+                    <div className="w-full p-3">
+                      <div className="relative h-48 rounded-lg border-2 border-blue-500 bg-gray-50 flex justify-center items-center shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
+                        <div className="absolute flex flex-col items-center">
+                          <ImageIcon className="w-12 h-12 text-blue-500" />
+                          <span className="block text-gray-500 font-semibold">
+                            Drag &amp; drop your files here
+                          </span>
+                          <span className="block text-gray-400 font-normal mt-1">
+                            or click to upload
+                          </span>
+                        </div>
+                        <input
+                          name=""
+                          onChange={handleImageChange}
+                          className="h-full w-full opacity-0 cursor-pointer"
+                          type="file"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {cropperImage && (
+                <button
+                  type="button"
+                  onClick={handleCrop}
+                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                >
+                  Crop Image
+                </button>
+              )}
+            </div>
+            {uploadProgress > 0 && uploadProgress < 100 && (
+              <div>
+                <progress value={uploadProgress} max={100}></progress>
+                <span>{uploadProgress}%</span>
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <div className="relative flex flex-col items-center mt-2">
+              {cropperImage ? (
+                <Cropper
+                  src={cropperImage}
+                  style={{ height: 300, width: "100%" }}
+                  initialAspectRatio={1}
+                  aspectRatio={1}
+                  guides={false}
+                  ref={cropperRef}
+                />
+              ) : formData.image ? (
+                <>
+                  <Image
+                    src={formData.image}
+                    alt="Profile Image"
+                    width={200}
+                    height={200}
+                    className="rounded-full object-cover aspect-[1/1] border-4 border-white"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, image: "" })}
+                    className="text-red-500"
+                  >
+                    Remove
+                  </button>
+                </>
+              ) : (
+                <div className="max-w-md mx-auto rounded-lg overflow-hidden md:max-w-xl">
+                  <div className="md:flex">
+                    <div className="w-full p-3">
+                      <div className="relative h-48 rounded-lg border-2 border-blue-500 bg-gray-50 flex justify-center items-center shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
+                        <div className="absolute flex flex-col items-center">
+                          <ImageIcon className="w-12 h-12 text-blue-500" />
+                          <span className="block text-gray-500 font-semibold">
+                            Drag &amp; drop your files here
+                          </span>
+                          <span className="block text-gray-400 font-normal mt-1">
+                            or click to upload
+                          </span>
+                        </div>
+                        <input
+                          name=""
+                          onChange={handleImageChange}
+                          className="h-full w-full opacity-0 cursor-pointer"
+                          type="file"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {cropperImage && (
+                <button
+                  type="button"
+                  onClick={handleCrop}
+                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                >
+                  Crop Image
+                </button>
+              )}
+            </div>
+            {uploadProgress > 0 && uploadProgress < 100 && (
+              <div>
+                <progress value={uploadProgress} max={100}></progress>
+                <span>{uploadProgress}%</span>
+              </div>
+            )}
+          </>
         )}
 
         {photographer ? (
@@ -367,7 +513,7 @@ const ProfileEditPage = () => {
                 <div>
                   <Label>Country*</Label>
                   <Select
-                    defaultValue={formData.shippingAddress?.country}
+                    value={formData.shippingAddress?.country || ""}
                     onValueChange={(value) => {
                       const selectedCountry = countries[2].data.find(
                         (country) => country.name === value
@@ -382,10 +528,7 @@ const ProfileEditPage = () => {
                     }}
                   >
                     <SelectTrigger>
-                      <SelectValue
-                        placeholder="Select Country"
-                        value={formData.shippingAddress?.country || ""}
-                      />
+                      <SelectValue placeholder="Select Country" />
                     </SelectTrigger>
                     <SelectContent>
                       {countries[2].data.map((country) => (
@@ -398,61 +541,39 @@ const ProfileEditPage = () => {
                 </div>
                 <div>
                   <Label>State*</Label>
-                  <Select
-                    defaultValue={formData.shippingAddress?.state}
-                    onValueChange={(value) => {
+                  <Input
+                    type="text"
+                    name="shippingAddress.state"
+                    value={formData.shippingAddress?.state || ""}
+                    onChange={(e) => {
                       const selectedState = states[2].data.find(
-                        (state) => state.name === value
+                        (state) => state.name === e.target.value
                       );
                       setSelectedState(selectedState.id);
                       const newAddress = { ...formData.shippingAddress };
-                      newAddress.state = value;
+                      newAddress.state = e.target.value;
                       setFormData({
                         ...formData,
                         shippingAddress: newAddress,
                       });
                     }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select State" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {states[2].data
-                        .filter((state) => state.countryId === selectedCountry) // Filter states by selected country ID
-                        .map((state) => (
-                          <SelectItem key={state.id} value={state.name}>
-                            {state.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
+                  />
                 </div>
                 <div>
-                  <Label>City*</Label>
-                  <Select
-                    defaultValue={formData.shippingAddress?.city}
-                    onValueChange={(value) => {
+                  <Label>District*</Label>
+                  <Input
+                    type="text"
+                    name="shippingAddress.district"
+                    value={formData.shippingAddress?.city || ""}
+                    onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
-                      newAddress.city = value;
+                      newAddress.city = e.target.value;
                       setFormData({
                         ...formData,
                         shippingAddress: newAddress,
                       });
                     }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select City" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {cities[2].data
-                        .filter((city) => city.stateId === selectedState) // Filter cities by selected state ID
-                        .map((city) => (
-                          <SelectItem key={city.id} value={city.name}>
-                            {city.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
+                  />
                 </div>
                 <div>
                   <Label>Address</Label>
@@ -526,7 +647,11 @@ const ProfileEditPage = () => {
               <Input
                 type="date"
                 name="dob"
-                value={formData.dob || ""}
+                value={
+                  (formData.dob &&
+                    new Date(formData.dob).toISOString().split("T")[0]) ||
+                  ""
+                }
                 onChange={handleInputChange}
               />
               {errors.dob && (
@@ -634,77 +759,7 @@ const ProfileEditPage = () => {
             </h2>
             {message && <p className="text-green-500">{message}</p>}
             {error && <p className="text-red-500">{error}</p>}
-            <div className="flex flex-col items-center gap-4">
-              {cropperImage ? (
-                <Cropper
-                  src={cropperImage}
-                  style={{ height: 300, width: "100%" }}
-                  initialAspectRatio={1}
-                  aspectRatio={1}
-                  guides={false}
-                  ref={cropperRef}
-                />
-              ) : formData.image ? (
-                <>
-                  <Image
-                    src={formData.image}
-                    alt="Profile Image"
-                    width={200}
-                    height={200}
-                    className="rounded-full object-cover aspect-[1/1]"
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setFormData({ ...formData, profileImage: "" })
-                    }
-                    className="text-red-500"
-                  >
-                    Remove
-                  </button>
-                </>
-              ) : (
-                <div className="max-w-md mx-auto rounded-lg overflow-hidden md:max-w-xl">
-                  <div className="md:flex">
-                    <div className="w-full p-3">
-                      <div className="relative h-48 rounded-lg border-2 border-blue-500 bg-gray-50 flex justify-center items-center shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
-                        <div className="absolute flex flex-col items-center">
-                          <ImageIcon className="w-12 h-12 text-blue-500" />
-                          <span className="block text-gray-500 font-semibold">
-                            Drag &amp; drop your files here
-                          </span>
-                          <span className="block text-gray-400 font-normal mt-1">
-                            or click to upload
-                          </span>
-                        </div>
-                        <input
-                          name=""
-                          onChange={handleImageChange}
-                          accept="image/*"
-                          className="h-full w-full opacity-0 cursor-pointer"
-                          type="file"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-              {cropperImage && (
-                <button
-                  type="button"
-                  onClick={handleCrop}
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                >
-                  Crop Image
-                </button>
-              )}
-            </div>
-            {uploadProgress > 0 && uploadProgress < 100 && (
-              <div>
-                <progress value={uploadProgress} max={100}></progress>
-                <span>{uploadProgress}%</span>
-              </div>
-            )}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full ">
               <div>
                 <Label>
@@ -810,61 +865,39 @@ const ProfileEditPage = () => {
                 </div>
                 <div>
                   <Label>State*</Label>
-                  <Select
-                    defaultValue={formData.shippingAddress?.state}
-                    onValueChange={(value) => {
+                  <Input
+                    type="text"
+                    name="shippingAddress.state"
+                    value={formData.shippingAddress?.state || ""}
+                    onChange={(e) => {
                       const selectedState = states[2].data.find(
-                        (state) => state.name === value
+                        (state) => state.name === e.target.value
                       );
                       setSelectedState(selectedState.id);
                       const newAddress = { ...formData.shippingAddress };
-                      newAddress.state = value;
+                      newAddress.state = e.target.value;
                       setFormData({
                         ...formData,
                         shippingAddress: newAddress,
                       });
                     }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select State" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {states[2].data
-                        .filter((state) => state.countryId === selectedCountry) // Filter states by selected country ID
-                        .map((state) => (
-                          <SelectItem key={state.id} value={state.name}>
-                            {state.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
+                  />
                 </div>
                 <div>
-                  <Label>City*</Label>
-                  <Select
-                    defaultValue={formData.shippingAddress?.city}
-                    onValueChange={(value) => {
+                  <Label>District*</Label>
+                  <Input
+                    type="text"
+                    name="shippingAddress.city"
+                    value={formData.shippingAddress?.city || ""}
+                    onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
-                      newAddress.city = value;
+                      newAddress.city = e.target.value;
                       setFormData({
                         ...formData,
                         shippingAddress: newAddress,
                       });
                     }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select City" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {cities[2].data
-                        .filter((city) => city.stateId === selectedState) // Filter cities by selected state ID
-                        .map((city) => (
-                          <SelectItem key={city.id} value={city.name}>
-                            {city.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
+                  />
                 </div>
                 <div>
                   <Label>Address</Label>
@@ -938,7 +971,11 @@ const ProfileEditPage = () => {
               <Input
                 type="date"
                 name="dob"
-                value={new Date(formData.dob).toISOString().split("T")[0] || ""}
+                value={
+                  (formData.dob &&
+                    new Date(formData.dob).toISOString().split("T")[0]) ||
+                  ""
+                }
                 onChange={handleInputChange}
               />
               {errors.dob && (
@@ -946,7 +983,7 @@ const ProfileEditPage = () => {
               )}
             </div>
 
-            <div>
+            {/* <div>
               <Label>Interests</Label>
               <Input
                 type="text"
@@ -962,9 +999,9 @@ const ProfileEditPage = () => {
               {errors.interests && (
                 <p className="text-red-500 text-sm">{errors.interests}</p>
               )}
-            </div>
+            </div> */}
 
-            <div>
+            {/* <div>
               <Label>Connect Accounts</Label>
               <div className="flex flex-col gap-2">
                 {formData.connectedAccounts?.map((account, index) => (
@@ -1045,7 +1082,7 @@ const ProfileEditPage = () => {
                   <Trash size={16} />
                 </button>
               </div>
-            </div>
+            </div> */}
 
             <div className="flex flex-col items-center">
               <Button type="submit">Register</Button>

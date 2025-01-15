@@ -18,7 +18,6 @@ import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import toast from "react-hot-toast";
 import { fetchData } from "@/helpers/api";
-import RecommendedSection from "@/components/image/recommendedSection";
 import ImageSection from "@/components/image/imageSection";
 import axios from "axios";
 import useAuthStore from "@/authStore";
@@ -152,7 +151,7 @@ export default function ImagePage() {
       console.log(data);
       setImage(data.photo);
     } catch (error) {
-      console.error("Error fetching image data", error);
+      console.log("Error fetching image data", error);
       setError(error.message);
     } finally {
       setLoading(false);
@@ -244,7 +243,7 @@ export default function ImagePage() {
         toastShownRef.current = true;
         // toast.success("View count added!");
       } catch (error) {
-        console.error("Error adding view count", error);
+        console.log("Error adding view count", error);
       }
     };
     addViewCount();
@@ -643,7 +642,7 @@ export default function ImagePage() {
         </div>
       ) : (
         <>
-          {image && (
+          {image.length !== 0 ? (
             <div className={`px-5 lg:px-20`}>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-16 pt-10 bg-[#FBFBFB] -mt-2">
                 <div className="lg:col-span-2 flex flex-col gap-10">
@@ -776,7 +775,11 @@ export default function ImagePage() {
               </div>
               {/* Desktop Desc */}
               <div className="hidden lg:block">{descriptionSection}</div>
-              <RecommendedSection category={image.category?.name} id={id} />
+              {/* <RecommendedSection category={image.category} id={id} /> */}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center min-h-[50vh]">
+              <p>Image not Found</p>
             </div>
           )}
           <div className="lg:hidden w-full p-4 sticky bottom-0 z-20">
@@ -791,11 +794,11 @@ export default function ImagePage() {
           </div>
         </>
       )}
-      {error && (
+      {/* {error && (
         <div className="flex flex-col items-center justify-center min-h-[50vh]">
           <p>Error fetching image data</p>
         </div>
-      )}
+      )} */}
     </>
   );
 }

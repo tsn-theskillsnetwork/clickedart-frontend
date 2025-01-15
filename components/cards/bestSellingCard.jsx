@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
@@ -23,10 +23,12 @@ export default function BestSellingCard({ images }) {
   });
 
   const handleNavigation = (direction) => {
-    if (direction === "left") {
-      slider.current?.prev();
-    } else if (direction === "right") {
-      slider.current?.next();
+    if (slider.current) {
+      if (direction === "left") {
+        slider.current.prev();
+      } else if (direction === "right") {
+        slider.current.next();
+      }
     }
   };
 
@@ -52,34 +54,16 @@ export default function BestSellingCard({ images }) {
                 <Image
                   width={800}
                   height={800}
-                  src={image.src1}
+                  src={image.imageLinks.thumbnail}
                   alt={image.title}
-                  className="object-cover w-full aspect-[1/1] opacity-100 group-hover:opacity-0 transition-all duration-200 ease-linear"
+                  className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear"
                 />
-                <div className="absolute inset-0 bg-white object-contain w-full aspect-[1/1] opacity-0 group-hover:opacity-100 transition-all duration-200 ease-linear" />
-                <Image
-                  width={500}
-                  height={500}
-                  src={image.src2?.length > 0 ? image.src2 : image.src1}
-                  alt={image.title}
-                  className="absolute inset-0 object-contain w-full aspect-[1/1] opacity-0 group-hover:opacity-100 transition-all duration-200 ease-linear"
-                />
-                <div className="absolute inset-0">
-                  <div className="flex justify-between mx-4 mt-4">
-                    <div className="bg-white px-2 text-paragraph group-hover:opacity-0 bg-opacity-75 w-fit transition-all duration-200 ease-linear">
-                      <p>{image.downloadCount} Downloads</p>
-                    </div>
-                    <Heart
-                      size={28}
-                      className="text-white group-hover:text-zinc-400 transition-all duration-200 ease-linear"
-                    />
-                  </div>
-                </div>
               </div>
               <div className="text-neutral-600">
                 <h2 className="text-heading-06 font-bold">{image.title}</h2>
-                <p className="text-paragraph">{image.artist}</p>
-                <p className="text-paragraph">{image.size} MP</p>
+                <p className="text-paragraph">
+                  {image.photographer?.firstName + " " + image.photographer?.lastName}
+                </p>
               </div>
             </div>
           </div>

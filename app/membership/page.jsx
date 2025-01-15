@@ -17,7 +17,7 @@ export default function MembershipPage() {
   const { photographer, token } = useAuthStore();
   const [active, setActive] = useState(0);
   const [plans, setPlans] = useState([]);
-  const [userPlans, setUserPlans] = useState([]);
+  const [userPlan, setUserPlan] = useState("Basic");
   const [selectedPlan, setSelectedPlan] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -86,8 +86,6 @@ export default function MembershipPage() {
     [Razorpay, photographer]
   );
 
-  console.log("plan", userPlans);
-
   useEffect(() => {
     const fetchPlans = async () => {
       try {
@@ -102,33 +100,38 @@ export default function MembershipPage() {
       }
     };
 
-    const fetchPlan = async () => {
+    const fetchActivePlan = async () => {
       if (!photographer || !photographer._id) {
         console.log("Photographer data is missing");
         return;
       }
       try {
         const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/get-user-subscription?userId=${photographer._id}`
+          `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/get-user-active-subscription?photographer=${photographer._id}`
         );
-        console.log(res.data);
-
-        if (res.data.subscriptions) {
-          const modifiedPlans = res.data.subscriptions.map((subscription) => ({
-            name: subscription.planId?.name,
-            isActive: subscription.isActive,
-          }));
-
-          setUserPlans(modifiedPlans);
-        }
+        console.log(
+          "Active Subscription ",
+          res.data.subscription?.planId?.name
+        );
+        setUserPlan(res.data.subscription?.planId?.name);
       } catch (error) {
         console.log(error.response ? error.response.data : error.message);
       }
     };
 
     fetchPlans();
-    fetchPlan();
+    fetchActivePlan();
   }, [photographer] || []);
+
+  const handleTrial = async (planId, price, duration) => {
+    if (!photographer) return;
+    const confirm = window.confirm(
+      "Are you sure you want to start the free trial?"
+    );
+    if (confirm) {
+      handleSubscribe(planId, price, duration);
+    }
+  };
 
   const handleSubscribe = async (planId, price, duration) => {
     if (!photographer) return;
@@ -154,19 +157,14 @@ export default function MembershipPage() {
       console.error(error);
     }
   };
-
-  console.log("User Plans", userPlans);
-  console.log(
-    "Test",
-    userPlans.find((userplan) => userplan?.name === "Premium")
-  );
+  console.log(selectedPlanId, selectedPlanPrice, selectedPlanDuration);
 
   useEffect(() => {
     if (paymentStatus === true) {
       console.log(selectedPlanId, selectedPlanPrice, selectedPlanDuration);
       handleSubscribe(selectedPlanId, selectedPlanPrice, selectedPlanDuration);
     }
-  }, [paymentStatus]);
+  }, [selectedPlanDuration]);
 
   const faqs = [
     {
@@ -225,9 +223,16 @@ export default function MembershipPage() {
             Unlock exclusive features to showcase your creativity and boost your
             sales!
           </p>
-          <button className="bg-white text-primary text-xs mx-auto md:mx-0 sm:text-paragraph lg:text-heading-05 font-semibold rounded-lg py-2.5 px-3 mt-2">
-            Start with a free 3-month trial of the Advanced Plan
-          </button>
+          {userPlan !== "Premium" && (
+            <button
+              onClick={() =>
+                handleTrial("67853b3d25457a993c90b1a2", 0, "monthly")
+              }
+              className="bg-white text-primary text-xs mx-auto md:mx-0 sm:text-paragraph lg:text-heading-05 font-semibold rounded-lg py-2.5 px-3 mt-2"
+            >
+              Start with a free 1-month trial of the Premium Plan
+            </button>
+          )}
         </div>
       </div>
       <div className="flex flex-col gap-10 px-5 mt-8 sm:mt-12 md:mt-16 lg:mt-20">
@@ -273,13 +278,24 @@ export default function MembershipPage() {
                     }`}
                   >
                     {plan.cost.map((cost, index) => (
-                      <span
+                      <div
                         key={index}
-                        className="flex flex-col items-center gap-0 capitalize"
+                        className="flex flex-col items-center gap-0"
                       >
-                        <p>₹{cost.price}</p>
-                        <p className="-mt-4 text-heading-06">{cost.duration}</p>
-                      </span>
+                        {cost.price <= 0 ? (
+                          <p>Free</p>
+                        ) : (
+                          <span
+                            key={index}
+                            className="flex flex-col items-center gap-0 capitalize"
+                          >
+                            <p>₹{cost.price}</p>
+                            <p className="-mt-4 text-heading-06">
+                              {cost.duration}
+                            </p>
+                          </span>
+                        )}
+                      </div>
                     ))}
                   </div>
 
@@ -289,63 +305,77 @@ export default function MembershipPage() {
                     </p>
                     <div className="flex flex-col items-center gap-2">
                       <h3 className="text-lg font-semibold ">Advanced Tools</h3>
-                      <p className="">{plan.advancedTools}</p>
+                      <p className="text-center">{plan.advancedTools}</p>
                     </div>
                     <div className="flex flex-col items-center gap-2">
                       <h3 className="text-lg font-semibold ">
                         Catalogue Creation
                       </h3>
-                      <p className="">{plan.catalogCreation}</p>
+                      <p className="text-center">
+                        {plan.catalogCreation > 999
+                          ? "Unlimited"
+                          : plan.catalogCreation}
+                      </p>
                     </div>
                     <div className="flex flex-col items-center gap-2">
                       <h3 className="text-lg font-semibold ">Custom Pricing</h3>
-                      <p className="">{plan.customPricing ? "Yes" : "No"}</p>
+                      <p className="text-center">
+                        {plan.customPricing ? "Yes" : "No"}
+                      </p>
                     </div>
                     <div className="flex flex-col items-center gap-2">
                       <h3 className="text-lg font-semibold ">
                         Image Upload Limit
                       </h3>
-                      <p className="">{plan.imageUploadLimit}</p>
+                      <p className="text-center">
+                        {plan.imageUploadLimit > 999
+                          ? "Unlimited"
+                          : plan.imageUploadLimit}
+                      </p>
                     </div>
                     <div className="flex flex-col items-center gap-2">
                       <h3 className="text-lg font-semibold ">
                         Licensing Options
                       </h3>
-                      <p className="">{plan.licensingOptions}</p>
+                      <p className="text-center">{plan.licensingOptions}</p>
                     </div>
                     <div className="flex flex-col items-center gap-2">
                       <h3 className="text-lg font-semibold ">
                         Priority Support
                       </h3>
-                      <p className="">{plan.prioritySupport}</p>
+                      <p className="text-center">{plan.prioritySupport}</p>
                     </div>
                     <div className="flex flex-col items-center gap-2">
                       <h3 className="text-lg font-semibold ">
                         Promotional Tools
                       </h3>
-                      <p className="">{plan.promotionalTools}</p>
+                      <p className="text-center">{plan.promotionalTools}</p>
                     </div>
                     <div className="flex flex-col items-center gap-2">
                       <h3 className="text-lg font-semibold">Sales Reports</h3>
-                      <p className="">{plan.salesReports}</p>
+                      <p className="text-center">{plan.salesReports}</p>
                     </div>
                     <div className="flex flex-col items-center gap-2">
                       <h3 className="text-lg font-semibold ">
                         Social Media Auto Posting
                       </h3>
-                      <p className="">{plan.socialMediaAutoPosting}</p>
+                      <p className="text-center">
+                        {plan.socialMediaAutoPosting}
+                      </p>
                     </div>
                     <div className="flex flex-col items-center gap-2">
                       <h3 className="text-lg font-semibold ">
                         Social Media Integration
                       </h3>
-                      <p className="">{plan.socialMediaIntegration}</p>
+                      <p className="text-center">
+                        {plan.socialMediaIntegration}
+                      </p>
                     </div>
                     <div className="flex flex-col items-center gap-2">
                       <h3 className="text-lg font-semibold ">
                         Watermarking Tools
                       </h3>
-                      <p className="">{plan.watermarkingTools}</p>
+                      <p className="text-center">{plan.watermarkingTools}</p>
                     </div>
                   </div>
                 </div>
@@ -355,12 +385,9 @@ export default function MembershipPage() {
                     plan._id === active ? "scale-y-95" : "scale-y-100"
                   } transition-transform w-40 lg:w-60 duration-200 ease-linear`}
                 >
-                  {(userPlans.length === 0 ||
-                    (userPlans.some(
-                      (userPlan) =>
-                        userPlan?.name === plan.name && !userPlan.isActive
-                    ) &&
-                      plan.name !== "Basic")) &&
+                  {userPlan.length >= 0 &&
+                    userPlan !== "Basic" &&
+                    userPlan != plan.name &&
                     plan.name !== "Basic" && (
                       <div className="w-full">
                         {/* The button */}
@@ -555,12 +582,9 @@ export default function MembershipPage() {
                         {plan.watermarkingTools}
                       </p>
                     </div>
-                    {(userPlans.length === 0 ||
-                      (userPlans.some(
-                        (userPlan) =>
-                          userPlan?.name === plan.name && !userPlan.isActive
-                      ) &&
-                        plan.name !== "Basic")) &&
+                    {userPlan.length >= 0 &&
+                      userPlan !== "Basic" &&
+                      userPlan != plan.name &&
                       plan.name !== "Basic" && (
                         <button
                           onClick={() => setSelectedPlan(plan._id)}
@@ -635,17 +659,15 @@ export default function MembershipPage() {
               anytime!
             </h2>
             <p className="text-xs sm:text-sm md:text-paragraph lg:text-heading-06 xl:text-heading-04 font-semibold">
-              Enjoy professional tools with our Advanced Plan - free for 1
-              month!
+              Enjoy professional tools with our Premium Plan - free for 1 month!
             </p>
-            <div className="flex flex-col lg:flex-row gap-2 lg:gap-5 xl:gap-10 items-center justify-center w-full">
-              <button className=" bg-transparent border-2 border-[#F8F8F8] w-full text-[#F8F8F8] text-paragraph lg:text-paragraph xl:text-heading-06 font-semibold rounded-2xl py-4 px-6 mt-4">
-                Get Started for Free
-              </button>
-              <button className=" bg-[#F8F8F8] border-2 border-[#F8F8F8] text-primary text-paragraph lg:text-paragraph xl:text-heading-06 w-full font-semibold rounded-2xl py-4 px-6 mt-4">
-                Start Advanced Trial
-              </button>
-            </div>
+            {userPlan !== "Premium" && (
+              <div className="flex flex-col lg:flex-row gap-2 lg:gap-5 xl:gap-10 items-center justify-center w-full">
+                <button className=" bg-transparent border-2 border-[#F8F8F8] w-full text-[#F8F8F8] text-paragraph lg:text-paragraph xl:text-heading-06 font-semibold rounded-2xl py-4 px-6 mt-4">
+                  Get Started for Free
+                </button>
+              </div>
+            )}
           </div>
           <div className="aspect-[1/1] rounded-lg overflow-hidden w-full lg:w-[80%]">
             <Image
