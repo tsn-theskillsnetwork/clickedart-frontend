@@ -86,6 +86,8 @@ export default function CheckoutPage() {
         handler: async (res) => {
           try {
             const paymentId = res.razorpay_payment_id;
+            const paymentMethod = res.payment_method;
+            console.log("RESPONSE",paymentMethod);
             if (paymentId) {
               setrazorpay_payment_id(paymentId);
               setPaymentStatus(true);
@@ -199,7 +201,7 @@ export default function CheckoutPage() {
         finalPrice: item.subTotal + (item.delivery || 0),
       })),
       gst: null,
-      paymentMethod: "Credit Card",
+      paymentMethod: "Online",
       shippingAddress: {
         ...prev.shippingAddress,
         city: user?.shippingAddress?.city,

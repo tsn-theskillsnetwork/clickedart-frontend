@@ -17,6 +17,7 @@ import useAuthStore from "@/authStore";
 import useWishlistStore from "@/store/wishlist";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import Button from "@/components/button";
 
 export default function SearchResultPage() {
   const { user } = useAuthStore();
@@ -141,8 +142,13 @@ export default function SearchResultPage() {
 
   useEffect(() => {
     const fetchImages = async () => {
-      const type = typeValue === "photographers" ? "photographer" : typeValue === "categories" ? "category" : "images";
-      console.log(type)
+      const type =
+        typeValue === "photographers"
+          ? "photographer"
+          : typeValue === "categories"
+          ? "category"
+          : "images";
+      console.log(type);
       try {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_SERVER}/api/${type}/search-${type}?Query=${searchValue}`,
@@ -181,9 +187,32 @@ export default function SearchResultPage() {
       }
     };
 
-    if (searchValue === "") {
+    const fetchAllPhotographers = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/photographer/get-all-photographers`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await res.json();
+        setImages(data.photographers);
+        console.log(data.photographers);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    if (searchValue === "" && typeValue !== "photographers") {
       fetchAllImages();
-    } else fetchImages();
+    } else if (searchValue === "" && typeValue === "photographers") {
+      fetchAllPhotographers();
+    } else {
+      fetchImages();
+    }
   }, [searchValue]);
 
   // useEffect(() => {
@@ -207,45 +236,82 @@ export default function SearchResultPage() {
 
   return (
     <AnimatePresence mode="popLayout">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.3 }}
-        className="flex my-10 flex-col min-h-screen"
-      >
-        <div className="flex flex-col sm:flex-row px-20 justify-between gap-5">
-          <div className="flex flex-col">
-            <p className="font-semibold text-primary-dark text-paragraph">
-              Themes
-            </p>
-            <Select
-              className="w-36"
-              defaultValue={theme}
-              onValueChange={(value) => {
-                setTheme(value);
-                router.push(
-                  `/search?theme=${value}&sort=${sort}${
-                    search && `&search=${search}`
-                  }`
-                );
-              }}
-            >
-              <SelectTrigger className="!text-paragraph py-5 w-full sm:w-40 font-semibold shadow-sm bg-gray-200">
-                <SelectValue />
-                <p className="sr-only">Themes</p>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                {themes.map((theme, index) => (
-                  <SelectItem key={index} value={theme.name.toLowerCase()}>
-                    {theme.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+      {typeValue === "photographers" ? (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="flex my-10 flex-col min-h-screen"
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-44">
+            {images.map((image, index) => (
+              <div key={index} className="keen-slider__slide">
+                <div className="w-64 aspect-[4/5] flex flex-col mx-auto items-center justify-center gap-2 bg-white shadow-md shadow-zinc-400">
+                  <Image
+                    width={256}
+                    height={256}
+                    src={image.profileImage}
+                    alt={image.firstName}
+                    className=" object-cover object-top w-64 aspect-[1/1]"
+                  />
+                  <div className="flex flex-col items-center justify-center gap-2 pb-5">
+                    <p className="text-heading-04 font-semibold text-black">
+                      {`${image.firstName} ${image.lastName}`}
+                    </p>
+                    <p className="text-paragraph font-medium text-black lowercase">
+                      {`@${image.username}`}
+                    </p>
+                    <Link href={`/photographer/${image._id}`}>
+                      <Button size="lg">View Profile</Button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-          {/* <div className="pl-5 relative flex flex-row bg-white border border-primary-200 text-black group rounded-lg items-center gap-4 w-full focus-within:outline focus-within:outline-blue-500">
+          <div className="flex justify-center items-center mt-10"></div>
+        </motion.div>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="flex my-10 flex-col min-h-screen"
+        >
+          <div className="flex flex-col sm:flex-row px-20 justify-between gap-5">
+            <div className="flex flex-col">
+              <p className="font-semibold text-primary-dark text-paragraph">
+                Themes
+              </p>
+              <Select
+                className="w-36"
+                defaultValue={theme}
+                onValueChange={(value) => {
+                  setTheme(value);
+                  router.push(
+                    `/search?theme=${value}&sort=${sort}${
+                      search && `&search=${search}`
+                    }`
+                  );
+                }}
+              >
+                <SelectTrigger className="!text-paragraph py-5 w-full sm:w-40 font-semibold shadow-sm bg-gray-200">
+                  <SelectValue />
+                  <p className="sr-only">Themes</p>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  {themes.map((theme, index) => (
+                    <SelectItem key={index} value={theme.name.toLowerCase()}>
+                      {theme.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {/* <div className="pl-5 relative flex flex-row bg-white border border-primary-200 text-black group rounded-lg items-center gap-4 w-full focus-within:outline focus-within:outline-blue-500">
             <input
               type="text"
               placeholder="Search Themes"
@@ -264,88 +330,92 @@ export default function SearchResultPage() {
               </div>
             </button>
           </div> */}
-          <div className="flex flex-col sm:flex-row gap-5">
-            <div className="flex flex-col">
-              <p className="font-semibold text-primary-dark text-paragraph">
-                Filter by
-              </p>
-              <Select
-                className="w-36"
-                defaultValue={filter}
-                onValueChange={(value) => setFilter(value)}
-              >
-                <SelectTrigger className="!text-paragraph w-full sm:w-40 py-5 font-semibold shadow-sm bg-gray-200">
-                  <SelectValue />
-                  <p className="sr-only">Filter by</p>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="price">Price</SelectItem>
-                  <SelectItem value="rating">Rating</SelectItem>
-                  <SelectItem value="popularity">Popularity</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex flex-col">
-              <p className="font-semibold text-primary-dark text-paragraph">
-                Sort by
-              </p>
-              <Select
-                className="w-36"
-                defaultValue={sort}
-                onValueChange={(value) => {
-                  setSort(value);
-                  router.push(
-                    `/search?theme=${theme}&sort=${value}${
-                      search && `&search=${search}`
-                    }`
-                  );
-                }}
-              >
-                <SelectTrigger className="!text-paragraph w-full sm:w-40 py-5 font-semibold shadow-sm bg-gray-200">
-                  <SelectValue />
-                  <p className="sr-only">Sort by</p>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="price">Price</SelectItem>
-                  <SelectItem value="rating">Rating</SelectItem>
-                  <SelectItem value="popularity">Popularity</SelectItem>
-                  <SelectItem value="date">Date</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="flex flex-col sm:flex-row gap-5">
+              <div className="flex flex-col">
+                <p className="font-semibold text-primary-dark text-paragraph">
+                  Filter by
+                </p>
+                <Select
+                  className="w-36"
+                  defaultValue={filter}
+                  onValueChange={(value) => setFilter(value)}
+                >
+                  <SelectTrigger className="!text-paragraph w-full sm:w-40 py-5 font-semibold shadow-sm bg-gray-200">
+                    <SelectValue />
+                    <p className="sr-only">Filter by</p>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="price">Price</SelectItem>
+                    <SelectItem value="rating">Rating</SelectItem>
+                    <SelectItem value="popularity">Popularity</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-col">
+                <p className="font-semibold text-primary-dark text-paragraph">
+                  Sort by
+                </p>
+                <Select
+                  className="w-36"
+                  defaultValue={sort}
+                  onValueChange={(value) => {
+                    setSort(value);
+                    router.push(
+                      `/search?theme=${theme}&sort=${value}${
+                        search && `&search=${search}`
+                      }`
+                    );
+                  }}
+                >
+                  <SelectTrigger className="!text-paragraph w-full sm:w-40 py-5 font-semibold shadow-sm bg-gray-200">
+                    <SelectValue />
+                    <p className="sr-only">Sort by</p>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="price">Price</SelectItem>
+                    <SelectItem value="rating">Rating</SelectItem>
+                    <SelectItem value="popularity">Popularity</SelectItem>
+                    <SelectItem value="date">Date</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-44">
-          {sortedImages.map((image, index) => (
-            <div key={index}>
-              <div
-                onClick={() => {
-                  router.push(`/images/${image._id}`);
-                }}
-                className="relative group"
-              >
-                <Image
-                  width={800}
-                  height={800}
-                  priority
-                  src={image.imageLinks.thumbnail || image.imageLinks.original}
-                  alt={image.description}
-                  className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear opacity-50 blur-[4px] border border-primary-200"
-                />
-                <Image
-                  width={800}
-                  height={800}
-                  src={image.imageLinks.thumbnail || image.imageLinks.original}
-                  alt={image.description}
-                  className="absolute inset-0 object-contain w-full aspect-[1/1] transition-all duration-200 ease-linear drop-shadow-md"
-                />
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-44">
+            {sortedImages.map((image, index) => (
+              <div key={index}>
+                <div
+                  onClick={() => {
+                    router.push(`/images/${image._id}`);
+                  }}
+                  className="relative group"
+                >
+                  <Image
+                    width={800}
+                    height={800}
+                    priority
+                    src={
+                      image.imageLinks.thumbnail || image.imageLinks.original
+                    }
+                    alt={image.description}
+                    className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear opacity-50 blur-[4px] border border-primary-200"
+                  />
+                  <Image
+                    width={800}
+                    height={800}
+                    src={
+                      image.imageLinks.thumbnail || image.imageLinks.original
+                    }
+                    alt={image.description}
+                    className="absolute inset-0 object-contain w-full aspect-[1/1] transition-all duration-200 ease-linear drop-shadow-md"
+                  />
 
-                <div className="absolute inset-0">
-                  <div className="flex justify-between mx-4 mt-4">
-                    <div className="bg-white px-2 text-paragraph group-hover:opacity-0 bg-opacity-75 w-fit transition-all duration-200 ease-linear cursor-default">
-                      <p>{image.imageAnalytics?.downloads} Downloads</p>
-                    </div>
-                    {/* <Heart
+                  <div className="absolute inset-0">
+                    <div className="flex justify-between mx-4 mt-4">
+                      <div className="bg-white px-2 text-paragraph group-hover:opacity-0 bg-opacity-75 w-fit transition-all duration-200 ease-linear cursor-default">
+                        <p>{image.imageAnalytics?.downloads} Downloads</p>
+                      </div>
+                      {/* <Heart
                       size={28}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -365,66 +435,67 @@ export default function SearchResultPage() {
                           : "text-white group-hover:text-red-600"
                       }  transition-all duration-200 ease-linear cursor-pointer`}
                     /> */}
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="text-neutral-600">
-                <h2 className="text-heading-05 font-semibold">
-                  {image.title || "Untitled"}
-                </h2>
-                {searchValue ? (
-                  <Link
-                    href={`/photographer/${image.photographer?._id}`}
-                    className="font-medium"
-                  >
-                    {image.photographer?.firstName
-                      ? image.photographer?.firstName +
-                        " " +
-                        image.photographer?.lastName
-                      : image.photographer?.name}
-                  </Link>
-                ) : (
-                  <Link
-                    href={`/photographer/${image.photographer?._id}`}
-                    className="font-medium"
-                  >
-                    {image.photographer?.firstName
-                      ? image.photographer?.firstName +
-                        " " +
-                        image.photographer?.lastName
-                      : image.photographer?.name}
-                  </Link>
-                )}
-                <p className="font-medium text-surface-500">
-                  {image.category?.name}
-                </p>
-                <div className="flex flex-row gap-2 overflow-y-scroll no-scrollbar">
-                  {image.keywords?.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-700 bg-primary-400 bg-opacity-15 rounded-lg px-2 py-1"
+                <div className="text-neutral-600">
+                  <h2 className="text-heading-05 font-semibold">
+                    {image.title || "Untitled"}
+                  </h2>
+                  {searchValue ? (
+                    <Link
+                      href={`/photographer/${image.photographer?._id}`}
+                      className="font-medium"
                     >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                {/* <h2 className="text-heading-06 font-medium">
+                      {image.photographer?.firstName
+                        ? image.photographer?.firstName +
+                          " " +
+                          image.photographer?.lastName
+                        : image.photographer?.name}
+                    </Link>
+                  ) : (
+                    <Link
+                      href={`/photographer/${image.photographer?._id}`}
+                      className="font-medium"
+                    >
+                      {image.photographer?.firstName
+                        ? image.photographer?.firstName +
+                          " " +
+                          image.photographer?.lastName
+                        : image.photographer?.name}
+                    </Link>
+                  )}
+                  <p className="font-medium text-surface-500">
+                    {image.category?.name}
+                  </p>
+                  <div className="flex flex-row gap-2 overflow-y-scroll no-scrollbar">
+                    {image.keywords?.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-700 bg-primary-400 bg-opacity-15 rounded-lg px-2 py-1"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  {/* <h2 className="text-heading-06 font-medium">
                   {image.description}
                 </h2> */}
-                <p className="text-paragraph font-medium">
-                  {(
-                    (image.resolutions?.original?.height *
-                      image.resolutions?.original?.width) /
-                    1000000
-                  ).toFixed(1)}{" "}
-                  MP
-                </p>
+                  <p className="text-paragraph font-medium">
+                    {(
+                      (image.resolutions?.original?.height *
+                        image.resolutions?.original?.width) /
+                      1000000
+                    ).toFixed(1)}{" "}
+                    MP
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-        <div className="flex justify-center items-center mt-10"></div>
-      </motion.div>
+            ))}
+          </div>
+          <div className="flex justify-center items-center mt-10"></div>
+        </motion.div>
+      )}
     </AnimatePresence>
   );
 }

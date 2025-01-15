@@ -8,14 +8,6 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
-// // Image data
-// const images = [
-//   { url: "/assets/hero/bg1.jpg", alt: "bg1" },
-//   { url: "/assets/hero/bg2.jpg", alt: "bg2" },
-//   { url: "/assets/hero/bg3.jpg", alt: "bg3" },
-//   { url: "/assets/hero/bg4.jpg", alt: "bg4" },
-// ];
-
 const taglines = [
   "Where Creativity Meets Marketplace",
   "Marketplace for the Visionaries",
@@ -132,7 +124,7 @@ export default function HeroSection() {
             >
               <option value="images">Images</option>
               <option value="categories">Categories</option>
-              {/* <option value="photographers">Photographers</option> */}
+              <option value="photographers">Photographers</option>
             </select>
           </div>
           {/* Search Button */}

@@ -61,7 +61,7 @@ export default function BlogPage() {
             {successStories.slice(0, blogLength).map((post, index) => (
               <Link
                 key={index}
-                href={`/blog/${post.slug}`}
+                href={`/blog/${post._id}`}
                 className="flex flex-col gap-4"
               >
                 <Image
@@ -118,7 +118,7 @@ export default function BlogPage() {
         {blogPosts.slice(0, blogLength).map((post, index) => (
           <Link
             key={index}
-            href={`/blog/${post.slug}`}
+            href={`/blog/${post._id}`}
             className="flex flex-col gap-4"
           >
             <Image
