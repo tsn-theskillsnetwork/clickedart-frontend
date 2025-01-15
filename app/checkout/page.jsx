@@ -89,6 +89,10 @@ export default function CheckoutPage() {
             if (paymentId) {
               setrazorpay_payment_id(paymentId);
               setPaymentStatus(true);
+              setOrderData((prev) => ({
+                ...prev,
+                invoiceId: paymentId,
+              }));
             }
           } catch (error) {
             setUploadVisible(false);

@@ -25,6 +25,8 @@ import states from "@/lib/address/states.json";
 import cities from "@/lib/address/cities.json";
 import useAuthStore from "@/authStore";
 import Loader from "@/components/loader";
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 const RegistrationForm = () => {
   const { user, photographer, isHydrated } = useAuthStore();
@@ -655,18 +657,13 @@ const RegistrationForm = () => {
               </div>
             </div>
 
-            <div>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
               <Label>Date of Birth</Label>
-              <Input
-                type="date"
-                name="dob"
-                value={formData.dob || ""}
-                onChange={handleInputChange}
-              />
+              <DatePicker label="Date of Birth" onChange={(value) => setFormData({ ...formData, dob: value })} />
               {errors.dob && (
                 <p className="text-red-500 text-sm">{errors.dob}</p>
               )}
-            </div>
+            </LocalizationProvider>
 
             <div>
               <Label>Interests</Label>
