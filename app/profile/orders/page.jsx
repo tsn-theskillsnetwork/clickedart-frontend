@@ -3,22 +3,81 @@
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import useAuthStore from "@/authStore";
-import PrintOrders from "@/components/orders/prints";
-import DownloadOrders from "@/components/orders/downloads";
 import axios from "axios";
 import { Dot, Download } from "lucide-react";
 import Button from "@/components/button";
 import Button2 from "@/components/button2";
 import Link from "next/link";
+import toast from "react-hot-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function OrdersPage() {
   const { user } = useAuthStore();
-  const [selectedTab, setSelectedTab] = useState("downloads");
+  // const [selectedTab, setSelectedTab] = useState("downloads");
   const [orders, setOrders] = useState([]);
-  const [printOrders, setPrintOrders] = useState([]);
-  const [downloadOrders, setDownloadOrders] = useState([]);
+  const [orderSupport, setOrderSupport] = useState({
+    userInfo: {
+      user: "",
+      userType: "",
+    },
+    order: "",
+    issueType: "",
+    issueDescription: "",
+    preferredContactMethod: "",
+  });
 
-  console.log("orders", orders);
+  const validateOrderSupport = () => {
+    if (
+      orderSupport.issueType === "" ||
+      orderSupport.issueDescription === "" ||
+      orderSupport.preferredContactMethod === ""
+    ) {
+      toast.error("Please fill out all fields");
+      return false;
+    }
+    return true;
+  };
+
+  const handleOrderSupport = async (order) => {
+    const updatedOrderSupport = {
+      ...orderSupport,
+      order: order,
+    };
+    console.log("Updated Order:", updatedOrderSupport);
+
+    if (!validateOrderSupport()) return;
+
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/ordersupport/create-order-support-request`,
+        updatedOrderSupport
+      );
+      console.log(response.data);
+      toast.success("Order Support Requested");
+    } catch (error) {
+      console.log(error);
+      toast.error("Error requesting order support");
+    }
+  };
+
+  // console.log("orders", orders);
 
   useEffect(() => {
     if (!user) return;
@@ -27,41 +86,33 @@ export default function OrdersPage() {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/download/get-my-orders?userId=${user?._id}`
       );
-
       setOrders(response.data.orders);
     };
 
     fetchOrders();
   }, [user]);
 
+  useEffect(() => {
+    if (!user) return;
+    if (
+      orderSupport.userInfo.user === "" ||
+      orderSupport.userInfo.userType === ""
+    ) {
+      setOrderSupport((prev) => ({
+        ...prev,
+        userInfo: {
+          user: user?._id,
+          userType: user?.type,
+        },
+      }));
+    }
+  }, [user]);
+
   return (
     <div className="flex flex-col px-4 sm:px-8 md:px-12 lg:px-20 xl:px-32 gap-10 py-20">
       <h1 className="text-heading-03 font-semibold">Orders</h1>
-      {/* <div className="flex flex-row justify-start gap-4 font-semibold text-heading-06">
-        <motion.p
-          layout
-          className={`${
-            selectedTab === "downloads" &&
-            "underline underline-offset-2 decoration-primary"
-          } cursor-pointer`}
-          onClick={() => setSelectedTab("downloads")}
-        >
-          Downloads
-        </motion.p>
-        <motion.p
-          layout
-          className={`${
-            selectedTab === "print" &&
-            "underline underline-offset-2 decoration-primary"
-          } cursor-pointer`}
-          onClick={() => setSelectedTab("print")}
-        >
-          Print Orders
-        </motion.p>
-      </div> */}
       <AnimatePresence mode="popLayout">
         <motion.div
-          key={selectedTab}
           initial={{ opacity: 0 }}
           animate={{ opacity: 100 }}
           exit={{ opacity: 0 }}
@@ -189,21 +240,105 @@ export default function OrdersPage() {
                         {order.orderStatus}
                       </p>
                     </div>
-                    <Button
-                      onClick={() => {
-                        toast.success("Order Support Requested");
-                      }}
-                      size="sm"
-                    >
-                      Order Support
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger>
+                        <div className="bg-primary text-white font-medium p-2 rounded-md">
+                          Order Support
+                        </div>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Order Support Form</DialogTitle>
+                          <DialogDescription>
+                            Have an issue with your order? Please fill out the
+                            form.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <form
+                          className="flex flex-col gap-4"
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            handleOrderSupport(order._id);
+                          }}
+                        >
+                          <div>
+                            <Label>Issue Type</Label>
+                            <Select
+                              value={orderSupport.issueType}
+                              required
+                              onValueChange={(value) =>
+                                setOrderSupport((prev) => ({
+                                  ...prev,
+                                  issueType: value,
+                                }))
+                              }
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select Issue Type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Order not received">
+                                  Order Not Received
+                                </SelectItem>
+                                <SelectItem value="Wrong item received">
+                                  Wrong Item Received
+                                </SelectItem>
+                                <SelectItem value="Damaged Item">
+                                  Damaged Item
+                                </SelectItem>
+                                <SelectItem value="Payment issue">
+                                  Payment Issue
+                                </SelectItem>
+                                <SelectItem value="Request for cancellation or refund">
+                                  Request for Cancellation or Refund
+                                </SelectItem>
+                                <SelectItem value="Digital Download Issue">
+                                  Digital Download Issue
+                                </SelectItem>
+                                <SelectItem value="Other">Other</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <Textarea
+                            label="Issue Description"
+                            required
+                            value={orderSupport.issueDescription}
+                            onChange={(e) =>
+                              setOrderSupport((prev) => ({
+                                ...prev,
+                                issueDescription: e.target.value,
+                              }))
+                            }
+                          />
+                          <Label>Preferred Contact Method</Label>
+                          <Select
+                            required
+                            value={orderSupport.preferredContactMethod}
+                            onValueChange={(value) =>
+                              setOrderSupport((prev) => ({
+                                ...prev,
+                                preferredContactMethod: value,
+                              }))
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Preferred Contact Method" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Email">Email</SelectItem>
+                              <SelectItem value="Phone">Phone</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Button type="submit">Submit</Button>
+                        </form>
+                      </DialogContent>
+                    </Dialog>
                     {order.orderStatus === "completed" && (
                       <div className="flex flex-col gap-2">
                         {order.orderItems?.map((item, index) => (
                           <div key={index}>
                             {!item.paperInfo && (
                               <Link
-                                
                                 href={
                                   item.imageInfo?.image?.imageLinks[
                                     item.imageInfo?.resolution
