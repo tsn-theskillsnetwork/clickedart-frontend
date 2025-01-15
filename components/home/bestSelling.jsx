@@ -32,10 +32,8 @@ export default function BestSelling() {
       <h1 className="text-center font-bold text-heading-05 sm:text-heading-03 md:text-heading-02 text-accent-400 mb-10">
         Hot Right Now: Best Selling Artworks!
       </h1>
-      <div className="w-full">
-        <BestSellingCard
-          images={images}
-        />
+      <div className="w-full px-4 sm:px-8 md:px-12 lg:px-16 2xl:px-20">
+        <BestSellingCard images={images} />
       </div>
     </div>
   );

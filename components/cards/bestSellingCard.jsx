@@ -1,86 +1,71 @@
-"use client";
-
-import React, { useRef } from "react";
-import { useKeenSlider } from "keen-slider/react";
-import "keen-slider/keen-slider.min.css";
-import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
-import Image from "next/image";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useRef } from "react";
 
 export default function BestSellingCard({ images }) {
-  const [sliderRef, slider] = useKeenSlider({
-    slides: {
-      perView: 1,
-      spacing: 15,
-    },
-    breakpoints: {
-      "(min-width: 768px)": {
-        slides: { perView: 2, spacing: 15 },
-      },
-      "(min-width: 1024px)": {
-        slides: { perView: 3, spacing: 15 },
-      },
-    },
-  });
+  const sliderRef = useRef(null);
 
-  const handleNavigation = (direction) => {
-    if (slider.current) {
-      if (direction === "left") {
-        slider.current.prev();
-      } else if (direction === "right") {
-        slider.current.next();
-      }
-    }
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    responsive: [
+      { breakpoint: 1024, settings: { slidesToShow: 3 } },
+      { breakpoint: 768, settings: { slidesToShow: 2 } },
+      { breakpoint: 480, settings: { slidesToShow: 1 } },
+    ],
+  };
+
+  const handlePrev = () => {
+    sliderRef.current?.slickPrev();
+  };
+
+  const handleNext = () => {
+    sliderRef.current?.slickNext();
   };
 
   return (
-    <div className="flex flex-row justify-around gap-10 md:px-10 items-center w-full">
-      <div className="relative left-0 top-0 z-50 hidden sm:block">
+    <div className="relative">
+      {/* Navigation Buttons */}
+      <div className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10">
         <button
-          className="bg-zinc-200 rounded-full"
-          onClick={() => handleNavigation("left")}
+          onClick={handlePrev}
+          className="bg-gray-200 p-2 rounded-full shadow hover:bg-gray-300"
         >
-          <p className="sr-only">Best Selling Previous</p>
-          <ChevronLeft
-            className="text-zinc-500 pr-1 hover:text-white"
-            size={64}
-          />
+          <ChevronLeft size={32} className="text-gray-600" />
         </button>
       </div>
-      <div ref={sliderRef} className="keen-slider md:mx-10">
+      <div className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10">
+        <button
+          onClick={handleNext}
+          className="bg-gray-200 p-2 rounded-full shadow hover:bg-gray-300"
+        >
+          <ChevronRight size={32} className="text-gray-600" />
+        </button>
+      </div>
+
+      {/* Slider */}
+      <Slider ref={sliderRef} {...settings} className="px-10">
         {images.map((image, index) => (
-          <div key={index} className="keen-slider__slide">
-            <div className="group">
-              <div className="relative">
-                <Image
-                  width={800}
-                  height={800}
-                  src={image.imageLinks.thumbnail}
-                  alt={image.title}
-                  className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear"
-                />
-              </div>
-              <div className="text-neutral-600">
-                <h2 className="text-heading-06 font-bold">{image.title}</h2>
-                <p className="text-paragraph">
-                  {image.photographer?.firstName + " " + image.photographer?.lastName}
-                </p>
-              </div>
+          <div key={index} className="p-4">
+            <img
+              src={image.imageLinks.thumbnail}
+              alt={image.title}
+              className="object-cover w-full aspect-[1/1] rounded-lg"
+            />
+            <div className="text-neutral-600 mt-2">
+              <h2 className="font-bold text-lg">{image.title}</h2>
+              <p className="text-sm">
+                {image.photographer?.firstName} {image.photographer?.lastName}
+              </p>
             </div>
           </div>
         ))}
-      </div>
-      <div className="relative right-0 hidden sm:block">
-        <button
-          className="bg-zinc-200 rounded-full"
-          onClick={() => handleNavigation("right")}
-        >
-          <p className="sr-only">Best Selling Next</p>
-          <ChevronRight
-            size={64}
-            className="text-zinc-500 pl-1 hover:text-white"
-          />
-        </button>
-      </div>
+      </Slider>
     </div>
   );
 }
