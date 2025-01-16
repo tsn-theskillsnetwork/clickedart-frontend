@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import useCartStore from "@/store/cart";
 import axios from "axios";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -53,14 +54,6 @@ export default function CheckoutPage() {
   const [paymentStatus, setPaymentStatus] = useState();
   const [razorpay_payment_id, setrazorpay_payment_id] = useState();
 
-  const calculateSubtotal = () => {
-    return cartItems?.reduce((acc, item) => acc + item.subTotal, 0);
-  };
-
-  const handleRemoveFromCart = (itemId) => {
-    removeItemFromCart(itemId);
-  };
-
   const handlePayment = useCallback(
     async (finalAmount) => {
       if (!user) {
@@ -87,7 +80,7 @@ export default function CheckoutPage() {
           try {
             const paymentId = res.razorpay_payment_id;
             const paymentMethod = res.payment_method;
-            console.log("RESPONSE",paymentMethod);
+            console.log("RESPONSE", paymentMethod);
             if (paymentId) {
               setrazorpay_payment_id(paymentId);
               setPaymentStatus(true);
@@ -146,32 +139,56 @@ export default function CheckoutPage() {
     }
   };
 
+  const calculateGST = (amount) => +(amount * 0.18).toFixed(2); // 18% GST
+  const calculatePlatformCharge = (amount) => +(amount * 0.02).toFixed(2); // 2% Platform Charge
+  const calculateDiscount = (amount, discountPercentage, maxDiscount) =>
+    Math.min(amount * (discountPercentage / 100), maxDiscount);
+
+  const calculateNewTotal = (subtotal) => {
+    const gst = subtotal * 0.18; // 18% GST
+    const deliveryCharge = cartItems.reduce(
+      (total, item) => total + (item.delivery || 0),
+      0
+    );
+    setDeliveryCharges(deliveryCharge);
+
+    const discountedAmount = subtotal - (discount || 0); // Subtotal after discount
+    const finalAmountBeforePlatform = discountedAmount + gst;
+
+    const platformCharge = finalAmountBeforePlatform * 0.02; // 2% platform charge
+    setPlatformCharges(platformCharge.toFixed(2)); // Store rounded platform charge
+
+    // Total amount with all charges
+    return +(finalAmountBeforePlatform + platformCharge).toFixed(2); // Ensure result is rounded to 2 decimals
+  };
+
   useEffect(() => {
-    const calculateNewSubtotal = () => {
-      return cartItems.reduce((total, item) => total + item.subTotal, 0);
-    };
+    // Step 1: Calculate Total Raw Amount
+    const totalRawAmount = cartItems.reduce(
+      (total, item) =>
+        total +
+        (item.frameInfo?.price || 0) + // Frame price
+        (item.paperInfo?.price || 0) + // Paper price
+        (item.imageInfo?.price || 0), // Image price
+      0
+    );
 
-    const calculateNewTotal = (subtotal) => {
-      const gst = subtotal * 0.18; // 18% GST
-      const deliveryCharge = cartItems.reduce(
-        (total, item) => total + (item.delivery || 0),
-        0
-      );
-      setDeliveryCharges(deliveryCharge);
+    // Step 2: Calculate GST on Raw Total
+    const gst = calculateGST(totalRawAmount);
 
-      const discountedAmount = subtotal - (discount || 0); // Subtotal after discount
-      const finalAmountBeforePlatform = discountedAmount + gst;
+    // Step 3: Calculate Discount
+    const discountAmount = discount || 0;
 
-      const platformCharge = finalAmountBeforePlatform * 0.02; // 2% platform charge
-      setPlatformCharges(platformCharge.toFixed(2)); // Store rounded platform charge
+    // Step 4: Calculate Total After Discount and GST
+    const discountedTotal = totalRawAmount - discountAmount + gst;
 
-      // Total amount with all charges
-      return +(finalAmountBeforePlatform + platformCharge).toFixed(2); // Ensure result is rounded to 2 decimals
-    };
+    // Step 5: Calculate Platform Charges
+    const platformCharge = calculatePlatformCharge(discountedTotal);
 
-    const newSubtotal = calculateNewSubtotal();
-    const newTotal = calculateNewTotal(newSubtotal);
+    // Step 6: Final Amount
+    const finalAmount = discountedTotal + platformCharge;
 
+    // Update Order Data
     setOrderData((prev) => ({
       ...prev,
       userId: user?._id,
@@ -198,27 +215,18 @@ export default function CheckoutPage() {
             }
           : null,
         subTotal: (item.frameInfo?.price || 0) + (item.paperInfo?.price || 0),
-        finalPrice: item.subTotal + (item.delivery || 0),
+        finalPrice:
+          (item.frameInfo?.price || 0) +
+          (item.paperInfo?.price || 0) +
+          (item.imageInfo?.price || 0),
       })),
+      totalAmount: totalRawAmount, // Raw total before discounts, GST, etc.
+      finalAmount: finalAmount, // Final total with all charges
+      discount: discountAmount,
       gst: null,
-      paymentMethod: "Online",
-      shippingAddress: {
-        ...prev.shippingAddress,
-        city: user?.shippingAddress?.city,
-        address: user?.shippingAddress?.address,
-        state: user?.shippingAddress?.state,
-        country: user?.shippingAddress?.country || "India",
-        email: user?.email,
-        mobile: user?.mobile,
-        pincode: user?.shippingAddress?.pincode,
-      },
-      totalAmount: newSubtotal,
-      finalAmount: newTotal,
-      orderStatus: "pending",
-      invoiceId: "",
-      discount: 0,
+      platformCharges: platformCharge,
     }));
-  }, [user, cartItems]);
+  }, [user, cartItems, discount]);
 
   console.log("orderData", orderData);
 
@@ -248,30 +256,18 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (coupon && coupon.discountPercentage && coupon.maxDiscountAmount) {
-      const newDiscount = (
-        orderData.subTotal *
-        (coupon.discountPercentage / 100)
-      ).toFixed(2);
-      if (newDiscount < coupon.maxDiscountAmount) {
-        if (newDiscount > orderData.subTotal) {
-          setDiscount(orderData.subTotal);
-        } else {
-          setDiscount(newDiscount);
-        }
-      } else {
-        if (coupon.maxDiscountAmount > orderData.subTotal) {
-          setDiscount(orderData.subTotal);
-        } else {
-          setDiscount(coupon.maxDiscountAmount);
-        }
-      }
-
+      const discountAmount = Math.min(
+        orderData.totalAmount * (coupon.discountPercentage / 100),
+        coupon.maxDiscountAmount
+      );
+      setDiscount(discountAmount);
       setOrderData((prev) => ({
         ...prev,
-        totalAmount: prev.subTotal - discount + prev.subTotal * 0.18,
+        discount: discountAmount,
+        finalAmount: calculateNewTotal(orderData.totalAmount),
       }));
     }
-  }, [coupon, orderData.subTotal, discount, orderData.totalAmount]);
+  }, [coupon, orderData.totalAmount, discount, orderData.finalAmount]);
 
   useEffect(() => {
     if (paymentStatus === true) {
@@ -309,7 +305,6 @@ export default function CheckoutPage() {
           <form
             action={() => {
               handlePayment(orderData.finalAmount);
-              
             }}
             className="mx-auto max-w-screen-xl px-4 2xl:px-0"
           >
@@ -521,12 +516,14 @@ export default function CheckoutPage() {
                             href={`/images/${product._id}`}
                             passHref
                           >
-                            <img
+                            <Image
+                              height={100}
+                              width={100}
                               src={
                                 product.imageInfo?.thumbnail ||
                                 "/assets/images/img6.jpg"
                               }
-                              alt="Canvas Print 72x30"
+                              alt="product"
                             />
                           </Link>
                         </div>
@@ -604,7 +601,7 @@ export default function CheckoutPage() {
                     </dl>
                     <dl className="flex items-center justify-between gap-4 py-3">
                       <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
-                        Platform Charges
+                        Platform Gateway
                       </dt>
                       <dd className="text-base font-medium text-gray-900">
                         ₹{platformCharges}

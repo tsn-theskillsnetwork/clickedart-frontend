@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 export default function VerifyPage() {
   const type = useSearchParams().get("type");
   const emailadd = useSearchParams().get("email");
-  
+
   const [email, setEmail] = useState(emailadd || "");
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
@@ -108,6 +108,11 @@ export default function VerifyPage() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+          {emailadd && (
+            <p className="text-green-500 text-center mt-2">
+              OTP has been resent to your email.
+            </p>
+          )}
         </div>
 
         <div>
@@ -127,7 +132,7 @@ export default function VerifyPage() {
           </Button2>
 
           <button onClick={handleResendOTP} disabled={loading}>
-            {loading ? "Resending..." : "Send OTP"}
+            {loading ? "Sending..." : "Send OTP"}
           </button>
         </div>
 
