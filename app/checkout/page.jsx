@@ -139,56 +139,48 @@ export default function CheckoutPage() {
     }
   };
 
-  const calculateGST = (amount) => +(amount * 0.18).toFixed(2); // 18% GST
-  const calculatePlatformCharge = (amount) => +(amount * 0.02).toFixed(2); // 2% Platform Charge
+  const calculateGST = (amount) => +(amount * 0.18).toFixed(2);
+  const calculatePlatformCharge = (amount) => +(amount * 0.02).toFixed(2);
   const calculateDiscount = (amount, discountPercentage, maxDiscount) =>
     Math.min(amount * (discountPercentage / 100), maxDiscount);
 
   const calculateNewTotal = (subtotal) => {
-    const gst = subtotal * 0.18; // 18% GST
+    const gst = subtotal * 0.18;
     const deliveryCharge = cartItems.reduce(
       (total, item) => total + (item.delivery || 0),
       0
     );
     setDeliveryCharges(deliveryCharge);
 
-    const discountedAmount = subtotal - (discount || 0); // Subtotal after discount
+    const discountedAmount = subtotal - (discount || 0);
     const finalAmountBeforePlatform = discountedAmount + gst;
 
-    const platformCharge = finalAmountBeforePlatform * 0.02; // 2% platform charge
-    setPlatformCharges(platformCharge.toFixed(2)); // Store rounded platform charge
+    const platformCharge = finalAmountBeforePlatform * 0.02;
+    setPlatformCharges(platformCharge.toFixed(2));
 
-    // Total amount with all charges
-    return +(finalAmountBeforePlatform + platformCharge).toFixed(2); // Ensure result is rounded to 2 decimals
+    return +(finalAmountBeforePlatform + platformCharge).toFixed(2);
   };
 
   useEffect(() => {
-    // Step 1: Calculate Total Raw Amount
     const totalRawAmount = cartItems.reduce(
       (total, item) =>
         total +
-        (item.frameInfo?.price || 0) + // Frame price
-        (item.paperInfo?.price || 0) + // Paper price
-        (item.imageInfo?.price || 0), // Image price
+        (item.frameInfo?.price || 0) + 
+        (item.paperInfo?.price || 0) +
+        (item.imageInfo?.price || 0), 
       0
     );
 
-    // Step 2: Calculate GST on Raw Total
     const gst = calculateGST(totalRawAmount);
 
-    // Step 3: Calculate Discount
     const discountAmount = discount || 0;
 
-    // Step 4: Calculate Total After Discount and GST
     const discountedTotal = totalRawAmount - discountAmount + gst;
 
-    // Step 5: Calculate Platform Charges
     const platformCharge = calculatePlatformCharge(discountedTotal);
 
-    // Step 6: Final Amount
     const finalAmount = discountedTotal + platformCharge;
 
-    // Update Order Data
     setOrderData((prev) => ({
       ...prev,
       userId: user?._id,
@@ -220,8 +212,8 @@ export default function CheckoutPage() {
           (item.paperInfo?.price || 0) +
           (item.imageInfo?.price || 0),
       })),
-      totalAmount: totalRawAmount, // Raw total before discounts, GST, etc.
-      finalAmount: finalAmount, // Final total with all charges
+      totalAmount: totalRawAmount,
+      finalAmount: finalAmount,
       discount: discountAmount,
       gst: null,
       platformCharges: platformCharge,
