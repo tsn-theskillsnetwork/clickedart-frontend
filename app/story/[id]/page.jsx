@@ -64,7 +64,7 @@ export default function StoryPage() {
   return (
     <>
       {story ? (
-        <div className="min-h-screen mb-10 mt-5">
+        <div className="min-h-screen mb-10">
           <div className="flex flex-col sm:flex-row justify-center">
             <div className="flex flex-col gap-4 sm:w-3/5 px-4">
               <div className="flex flex-col">
@@ -140,7 +140,7 @@ export default function StoryPage() {
             <div className="flex flex-col mt-4 sm:mt-0 sm:w-1/5 px-4">
               <div className="flex flex-col gap-4 sm:pt-28">
                 <h5 className="text-heading-05 text-primary font-bold">
-                  About Photographer
+                  Inspired By
                 </h5>
                 <div className="flex flex-row items-center gap-2">
                   <img

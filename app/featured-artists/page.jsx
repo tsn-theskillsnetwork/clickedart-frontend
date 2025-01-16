@@ -2,45 +2,13 @@
 
 import Button from "@/components/button";
 import { Icon } from "@iconify/react";
-import React from "react";
-import { useKeenSlider } from "keen-slider/react";
-import "keen-slider/keen-slider.min.css";
-import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Heart } from "lucide-react";
 import Featured from "@/components/featuredArtists/featured";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import "./styles.css";
-
-const images = [
-  {
-    src1: "/assets/images/img3.jpg",
-    src2: "/assets/images2/img1.jpg",
-    title: "Artwork 1",
-    artist: "Artist 1",
-    downloadCount: 500,
-  },
-  {
-    src1: "/assets/images/img4.jpg",
-    src2: "/assets/images2/img2.jpg",
-    title: "Artwork 2",
-    artist: "Artist 2",
-    downloadCount: 450,
-  },
-  {
-    src1: "/assets/images/img5.jpg",
-    src2: "/assets/images2/img3.jpg",
-    title: "Artwork 3",
-    artist: "Artist 3",
-    downloadCount: 400,
-  },
-  {
-    src1: "/assets/images/img6.jpg",
-    src2: "/assets/images2/img1.jpg",
-    title: "Artwork 4",
-    artist: "Artist 4",
-    downloadCount: 350,
-  },
-];
+import axios from "axios";
 
 const artists = [
   {
@@ -191,28 +159,24 @@ const featuredArtwork = [
 ];
 
 export default function page() {
-  const [sliderRef, slider] = useKeenSlider({
-    slides: {
-      perView: 1,
-      spacing: 15,
-    },
-    breakpoints: {
-      "(min-width: 768px)": {
-        slides: { perView: 2, spacing: 30 },
-      },
-      "(min-width: 1024px)": {
-        slides: { perView: 3, spacing: 120 },
-      },
-    },
-  });
+  const [photographers, setPhotographers] = useState([]);
 
-  const handleNavigation = (direction) => {
-    if (direction === "left") {
-      slider.current?.prev();
-    } else if (direction === "right") {
-      slider.current?.next();
+  const fetchFeaturedArtists = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/photographer/get-featured-photographers`
+      );
+      setPhotographers(res.data.featuredPhotographer);
+      console.log(res.data.featuredPhotographer);
+    } catch (error) {
+      console.error("Failed to fetch featured artists:", error);
     }
-  };
+  }
+
+  useEffect(() => {
+    fetchFeaturedArtists();
+  }, []);
+
   return (
     <AnimatePresence mode="popLayout">
       <motion.div
@@ -222,10 +186,10 @@ export default function page() {
         transition={{ duration: 0.3 }}
         className="min-h-screen flex flex-col items-center"
       >
-        <h2 className="text-heading-04 sm:text-heading-03 md:text-heading-02 font-bold text-primary-400">
+        {/* <h2 className="text-heading-04 sm:text-heading-03 md:text-heading-02 font-bold text-primary-400">
           Artist of the Month
-        </h2>
-        <div className="relative flex flex-col items-center justify-center mt-4 w-full">
+        </h2> */}
+        {/* <div className="relative flex flex-col items-center justify-center mt-4 w-full">
           <div className="absolute inset-0 bg-black opacity-0 sm:opacity-15 z-0">
             <Image
               width={800}
@@ -364,8 +328,8 @@ export default function page() {
               />
             </button>
           </div>
-        </div>
-        <div className="w-full flex flex-col items-center bg-neutral-200 px-4 mt-5 sm:mt-20 mb-10 min-h-20">
+        </div> */}
+        <div className="w-full flex flex-col items-center bg-neutral-200 px-4 mb-10 min-h-20">
           <div className="text-center mt-20 mb-10">
             <h1 className="text-heading-03 sm:text-heading-01 font-bold text-primary">
               Featured Artists
@@ -374,9 +338,9 @@ export default function page() {
               Discover the Masters Behind the Magic
             </p>
           </div>
-          <div className="my-5">
-            <Featured artists={artists} />
-          </div>
+          {/* <div className="my-5"> */}
+          <Featured photographers={photographers} />
+          {/* </div> */}
         </div>
         <div className="w-full flex flex-col items-center my-10 min-h-20 px-4">
           <h2 className="text-heading-03 text-center sm:text-heading-02 font-bold text-primary">

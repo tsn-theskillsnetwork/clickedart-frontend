@@ -96,10 +96,66 @@ const RegistrationForm = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (name === "bio" && value.length > 100) {
-      return;
-    }
     setFormData({ ...formData, [name]: value ?? "" });
+  };
+
+  console.log(errors)
+
+  const checkUsernameAndEmailExists = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/photographer/checkUsernameAndEmailExists`,
+        {
+          username: formData.username,
+          email: formData.email,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      const data = response.data;
+
+      if (data.usernameExists) {
+        setErrors((prev) => ({
+          ...prev,
+          username: "Username already exists.",
+        }));
+      }
+
+      if (data.emailExists) {
+        setErrors((prev) => ({
+          ...prev,
+          email: "Email already exists.",
+        }));
+      }
+    } catch (err) {
+      if (err.response) {
+        if (err.response.status === 409) {
+          const data = err.response.data;
+
+          if (data.usernameExists) {
+            setErrors((prev) => ({
+              ...prev,
+              username: "Username already exists.",
+            }));
+            toast.error("Username already exists.");
+          }
+
+          if (data.emailExists) {
+            setErrors((prev) => ({
+              ...prev,
+              email: "Email already exists.",
+            }));
+            toast.error("Email already exists.");
+          }
+        } else {
+          console.error("Unexpected error:", err.response.data);
+        }
+      } else {
+        console.error("Network error or server not reachable:", err);
+      }
+    }
   };
 
   const handleImageChange = (e) => {
@@ -250,6 +306,7 @@ const RegistrationForm = () => {
 
   const handleNext = () => {
     const newErrors = validateForm1();
+    checkUsernameAndEmailExists();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -359,10 +416,10 @@ const RegistrationForm = () => {
 
     if ((user || photographer) && !toastShownRef.current) {
       toastShownRef.current = true;
-      toast(`Already Signed In as ${user ? "User" : "Photographer"}`, {
-        duration: 4000,
-        position: "top-center",
-      });
+      // toast(`Already Signed In as ${user ? "User" : "Photographer"}`, {
+      //   duration: 4000,
+      //   position: "top-center",
+      // });
       router.push("/");
     }
   }, [isHydrated, user, router]);
@@ -624,6 +681,13 @@ const RegistrationForm = () => {
                   onChange={handleInputChange}
                   placeholder="Tell us about yourself..."
                 />
+                <p
+                  className={`${
+                    formData.bio.length > 100 && "text-red-600 font-medium"
+                  } text-sm`}
+                >
+                  {formData.bio.length} / 100
+                </p>
               </div>
               {errors.bio && (
                 <p className="text-red-500 text-sm">{errors.bio}</p>
@@ -705,7 +769,6 @@ const RegistrationForm = () => {
                     {errors.state && (
                       <p className="text-red-500 text-sm">{errors.state}</p>
                     )}
-
                   </div>
                   <div>
                     <Label>

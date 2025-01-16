@@ -25,8 +25,8 @@ import states from "@/lib/address/states.json";
 import cities from "@/lib/address/cities.json";
 import useAuthStore from "@/authStore";
 import Loader from "@/components/loader";
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 const RegistrationForm = () => {
   const { user, photographer, isHydrated } = useAuthStore();
@@ -261,12 +261,18 @@ const RegistrationForm = () => {
       });
       router.push("/verify");
     } catch (err) {
-      console.error(err);
-      setError("Failed to register user.");
+      if (err.response) {
+        if (err.response.status === 409) {
+          const data = err.response.data;
+          toast.error(data.message);
+        } else {
+          console.error("Unexpected error:", err.response.data);
+        }
+      } else {
+        console.error("Network error or server not reachable:", err);
+      }
     }
   };
-
-  console.log(formData);
 
   const toastShownRef = useRef(false);
 
@@ -275,10 +281,10 @@ const RegistrationForm = () => {
 
     if ((user || photographer) && !toastShownRef.current) {
       toastShownRef.current = true;
-      toast(`Already Signed In as ${user ? "User" : "Photographer"}`, {
-        duration: 4000,
-        position: "top-center",
-      });
+      // toast(`Already Signed In as ${user ? "User" : "Photographer"}`, {
+      //   duration: 4000,
+      //   position: "top-center",
+      // });
       router.push("/");
     }
   }, [isHydrated, user, router]);
@@ -402,6 +408,9 @@ const RegistrationForm = () => {
                   required
                 />
               </div>
+              {errors.lastName && (
+                <p className="text-red-500 text-sm">{errors.lastName}</p>
+              )}
             </div>
 
             <div>
@@ -479,6 +488,9 @@ const RegistrationForm = () => {
                 placeholder="10-digit mobile number"
                 onChange={handleInputChange}
               />
+              {errors.mobile && (
+                <p className="text-red-500 text-sm">{errors.mobile}</p>
+              )}
             </div>
 
             <div>
@@ -490,6 +502,9 @@ const RegistrationForm = () => {
                 value={formData.whatsapp}
                 onChange={handleInputChange}
               />
+              {errors.whatsapp && (
+                <p className="text-red-500 text-sm">{errors.whatsapp}</p>
+              )}
             </div>
 
             <div className="py-2 my-2 border-y">
@@ -525,6 +540,9 @@ const RegistrationForm = () => {
                       ))}
                     </SelectContent>
                   </Select>
+                  {errors.country && (
+                    <p className="text-red-500 text-sm">{errors.country}</p>
+                  )}
                 </div>
                 <div>
                   <Label>
@@ -558,6 +576,9 @@ const RegistrationForm = () => {
                         ))}
                     </SelectContent>
                   </Select>
+                  {errors.state && (
+                    <p className="text-red-500 text-sm">{errors.state}</p>
+                  )}
                 </div>
                 <div>
                   <Label>
@@ -587,6 +608,9 @@ const RegistrationForm = () => {
                         ))}
                     </SelectContent>
                   </Select>
+                  {errors.city && (
+                    <p className="text-red-500 text-sm">{errors.city}</p>
+                  )}
                 </div>
                 <div>
                   <Label>Address</Label>
@@ -637,6 +661,9 @@ const RegistrationForm = () => {
                       });
                     }}
                   />
+                  {errors.pincode && (
+                    <p className="text-red-500 text-sm">{errors.pincode}</p>
+                  )}
                 </div>
                 <div>
                   <Label>Area</Label>
@@ -659,7 +686,10 @@ const RegistrationForm = () => {
 
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <Label>Date of Birth</Label>
-              <DatePicker label="Date of Birth" onChange={(value) => setFormData({ ...formData, dob: value })} />
+              <DatePicker
+                label="Date of Birth"
+                onChange={(value) => setFormData({ ...formData, dob: value })}
+              />
               {errors.dob && (
                 <p className="text-red-500 text-sm">{errors.dob}</p>
               )}
