@@ -54,7 +54,7 @@ export default function HeroSection() {
   }, [heroPhotos.length]);
 
   return (
-    <div className="relative h-[70vh] sm:h-[80vh] md:h-[90vh] lg:h-[100vh] xl:h-[110vh] overflow-hidden">
+    <div className="relative h-[70vh] sm:h-[80vh] md:h-[90vh] lg:h-[100vh] xl:h-[930px] overflow-hidden">
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-black opacity-30 z-10"></div>
         <AnimatePresence mode="popLayout">

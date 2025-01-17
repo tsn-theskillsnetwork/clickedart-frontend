@@ -80,7 +80,7 @@ const SignInPage = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[50vh] mt-5 mb-10">
-      {(user || photographer || !isHydrated) ? (
+      {user || photographer || !isHydrated ? (
         <div className="flex flex-col items-center justify-center min-h-[50vh]">
           <Loader />
         </div>
@@ -130,6 +130,12 @@ const SignInPage = () => {
           Don't have an account?{" "}
           <Link className="underline" href="/signup">
             Sign Up
+          </Link>
+        </p>
+        <p>
+          or {" "}
+          <Link className="underline" href="/signin/photographer">
+            Sign In as Photographer
           </Link>
         </p>
       </div>

@@ -99,7 +99,7 @@ const RegistrationForm = () => {
     setFormData({ ...formData, [name]: value ?? "" });
   };
 
-  console.log(errors)
+  console.log(errors);
 
   const checkUsernameAndEmailExists = async () => {
     try {
@@ -189,8 +189,13 @@ const RegistrationForm = () => {
         return;
       }
 
-      if (event.target.files[0].size > 20 * 1000 * 1024) {
-        toast.error("File with maximum size of 20MB is allowed");
+      if (event.target.files[0].size < 5 * 1000 * 1024) {
+        toast.error("File with minimum size of 5MB is allowed");
+        return false;
+      }
+
+      if (event.target.files[0].size > 100 * 1000 * 1024) {
+        toast.error("File with maximum size of 100MB is allowed");
         return false;
       }
 
@@ -512,6 +517,103 @@ const RegistrationForm = () => {
                 </div>
               )}
               <div>
+                <div>
+                  <Label>
+                    Email <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    placeholder="Email"
+                    required
+                  />
+                  {errors.email && (
+                    <p className="text-red-500 text-sm">{errors.email}</p>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full ">
+                  <div>
+                    <Label>
+                      First Name <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      type="text"
+                      name="firstName"
+                      value={formData.firstName}
+                      placeholder="First Name"
+                      onChange={handleInputChange}
+                      required
+                    />
+                    {errors.firstName && (
+                      <p className="text-red-500 text-sm">{errors.firstName}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <Label>
+                      Last Name <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      type="text"
+                      name="lastName"
+                      placeholder="Last Name"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  {errors.lastName && (
+                    <p className="text-red-500 text-sm">{errors.lastName}</p>
+                  )}
+                </div>
+
+                <div>
+                  <Label>
+                    Password <span className="text-red-500">*</span>
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      placeholder="At least 8 characters, 1 uppercase, 1 lowercase, 1 number and 1 special character"
+                      required
+                    />
+
+                    {showPassword ? (
+                      <EyeClosed
+                        size={16}
+                        onClick={() => setShowPassword((prev) => !prev)}
+                      />
+                    ) : (
+                      <Eye
+                        size={16}
+                        onClick={() => setShowPassword((prev) => !prev)}
+                      />
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <Label>
+                    Verify Password <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={verifyPassword}
+                    onChange={(e) => setVerifyPassword(e.target.value)}
+                    placeholder="Verify Password"
+                    required
+                  />
+                  {errors.password && (
+                    <p className="text-red-500 text-sm">{errors.password}</p>
+                  )}
+                </div>
+
                 <Label>
                   Username <span className="text-red-500">*</span>
                 </Label>
@@ -527,103 +629,6 @@ const RegistrationForm = () => {
                   <p className="text-red-500 text-sm">{errors.username}</p>
                 )}
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full ">
-                <div>
-                  <Label>
-                    First Name <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    type="text"
-                    name="firstName"
-                    value={formData.firstName}
-                    placeholder="First Name"
-                    onChange={handleInputChange}
-                    required
-                  />
-                  {errors.firstName && (
-                    <p className="text-red-500 text-sm">{errors.firstName}</p>
-                  )}
-                </div>
-
-                <div>
-                  <Label>
-                    Last Name <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    type="text"
-                    name="lastName"
-                    placeholder="Last Name"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                {errors.lastName && (
-                  <p className="text-red-500 text-sm">{errors.lastName}</p>
-                )}
-              </div>
-
-              <div>
-                <Label>
-                  Email <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  placeholder="Email"
-                  required
-                />
-                {errors.email && (
-                  <p className="text-red-500 text-sm">{errors.email}</p>
-                )}
-              </div>
-
-              <div>
-                <Label>
-                  Password <span className="text-red-500">*</span>
-                </Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    placeholder="At least 8 characters, 1 uppercase, 1 lowercase, 1 number and 1 special character"
-                    required
-                  />
-
-                  {showPassword ? (
-                    <EyeClosed
-                      size={16}
-                      onClick={() => setShowPassword((prev) => !prev)}
-                    />
-                  ) : (
-                    <Eye
-                      size={16}
-                      onClick={() => setShowPassword((prev) => !prev)}
-                    />
-                  )}
-                </div>
-              </div>
-              <div>
-                <Label>
-                  Verify Password <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={verifyPassword}
-                  onChange={(e) => setVerifyPassword(e.target.value)}
-                  placeholder="Verify Password"
-                  required
-                />
-                {errors.password && (
-                  <p className="text-red-500 text-sm">{errors.password}</p>
-                )}
-              </div>
-
               <div>
                 <Label>Account Type</Label>
                 <Select
@@ -1216,6 +1221,63 @@ const RegistrationForm = () => {
                   )}
                 </div>
               ))}
+              <div className="grid grid-cols grid-cols-3 gap-4 px-4">
+                <ul className="text-xs text-primary font-medium mt-1">
+                  <li className="text-xs mt-1">
+                    File size should be less than 5MB
+                  </li>
+                  <li className="text-xs mt-1">
+                    Ensure the resolution is at least 300 DPI for print-quality
+                    images.
+                  </li>
+                  <li className="text-xs mt-1">
+                    Minimum dimensions: 2000 x 3000 pixels (or equivalent aspect
+                    ratio).
+                  </li>
+                  <li className="text-xs mt-1">
+                    File size should not exceed 20 MB.
+                  </li>
+                </ul>
+                <ul className="text-xs text-primary font-medium mt-1">
+                  <li className="text-xs mt-1">
+                    Only upload original work; plagiarism or copyright
+                    infringement will result in account penalties.
+                  </li>
+                  <li className="text-xs mt-1">
+                    Avoid images with watermarks, logos, or text overlays.
+                  </li>
+                  <li className="text-xs mt-1">
+                    Ensure the photo does not contain offensive, explicit, or
+                    illegal content.
+                  </li>
+                  <li className="text-xs mt-1">
+                    Photos must align with ClickedArt's ethical standards,
+                    particularly for wildlife, cultural, and sensitive subjects.
+                  </li>
+                  <li className="text-xs mt-1">
+                    Ensure the uploaded photo is relevant to the categories
+                    you&apos;ve selected.
+                  </li>
+                </ul>
+                <ul className="text-xs text-primary font-medium mt-1">
+                  <li className="text-xs mt-1">
+                    Submit sharp, high-quality images free from excessive noise,
+                    blurriness, or pixelation.
+                  </li>
+                  <li className="text-xs mt-1">
+                    Post-process images tastefully; avoid over-saturation,
+                    extreme HDR, or unnatural effects.
+                  </li>
+                  <li className="text-xs mt-1">
+                    Composition should follow photography principles, such as
+                    the rule of thirds, framing, or leading lines.
+                  </li>
+                  <li className="text-xs mt-1">
+                    Ensure the photo has no distracting elements unless integral
+                    to the subject.
+                  </li>
+                </ul>
+              </div>
               {errors.bestPhotos && (
                 <p className="text-red-500 text-sm">{errors.bestPhotos}</p>
               )}

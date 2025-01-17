@@ -149,9 +149,9 @@ export default function CartPage() {
           >
             Checkout
           </Button>
-          <button className="font-semibold text-paragraph p-3 rounded-md text-surface-500 border border-surface-600 hover:bg-surface-200">
+          <Link href="/images" className="font-semibold text-paragraph p-3 rounded-md text-surface-500 border border-surface-600 hover:bg-surface-200">
             Continue Shopping
-          </button>
+          </Link>
           <button
             onClick={clearCart}
             className="font-semibold text-red-600 p-3 rounded-md border border-red-600 hover:bg-red-600 hover:text-white"

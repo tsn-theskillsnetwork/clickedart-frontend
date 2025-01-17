@@ -23,6 +23,7 @@ import axios from "axios";
 import useAuthStore from "@/authStore";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
+import RecommendedSection from "@/components/image/recommendedSection";
 
 export default function ImagePage() {
   const id = useParams().id;
@@ -106,7 +107,7 @@ export default function ImagePage() {
 
   const images = [
     {
-      src: image?.imageLinks?.original,
+      src: image?.imageLinks?.thumbnail,
     },
     {
       src: "https://plus.unsplash.com/premium_photo-1661780295073-98db12600af0?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
@@ -270,7 +271,7 @@ export default function ImagePage() {
   }, []);
 
   const descriptionSection = (
-    <div className="flex flex-col gap-2 mt-5 px-">
+    <div className="flex flex-col gap-2 mt-5 bg-zinc-100 rounded-md shadow-md px-4">
       <div className="flex flex-row gap-5 text-sm sm:text-paragraph md:text-heading-05 lg:text-heading-04 xl:text-heading-03 z-10">
         <motion.p
           layout
@@ -285,7 +286,7 @@ export default function ImagePage() {
         >
           Product Description
         </motion.p>
-        <motion.p
+        {/* <motion.p
           layout
           onClick={() => {
             setDesc(false);
@@ -297,21 +298,21 @@ export default function ImagePage() {
           } cursor-pointer`}
         >
           Comments
-        </motion.p>
+        </motion.p> */}
       </div>
       <hr className="border-surface-200 z-0 -translate-y-1" />
       <AnimatePresence mode="popLayout">
         <motion.div layout key={desc} className="flex flex-col gap-5">
-          {desc ? (
+          {desc && (
             <motion.div
               layout
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -50 }}
               transition={{ duration: 0.2 }}
-              className="text-xs sm:text-sm md:text-heading-06 lg:text-heading-05 font-medium text-surface-600"
+              className="text-xs sm:text-sm md:text-heading-06 lg:text-heading-05 font-medium text-surface-600 min-h-20 "
             >
-              {image.description}
+              {image.description || "..."}
               <div className="flex flex-wrap items-start justify-start gap-4">
                 {image.location && (
                   <div className="flex flex-row gap-2 items-center">
@@ -352,53 +353,6 @@ export default function ImagePage() {
                     <p>ISO: {image.cameraDetails?.settings?.iso}</p>
                   </div>
                 )}
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div
-              layout
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 50 }}
-              transition={{ duration: 0.2 }}
-              className="relative flex flex-col gap-5"
-            >
-              <div ref={sliderRef} className="keen-slider">
-                {papers?.map((image, index) => (
-                  <div key={index} className="keen-slider__slide">
-                    <div className=" flex flex-col gap-4">
-                      <div className="flex items-center gap-2">
-                        <Image
-                          src="/assets/images/avatar1.jpg"
-                          alt="profile"
-                          width={32}
-                          height={32}
-                          className=" w-8 h-8 object-cover rounded-full"
-                        />
-                        <div className="flex flex-col">
-                          <h5 className="text-sm md:text-base font-semibold text-surface-600">
-                            User 1
-                          </h5>
-                          <p className="text-xs md:text-sm text-surface-600">
-                            Verified Purchase
-                          </p>
-                        </div>
-                      </div>
-                      <p className="text-sm sm:text-base md:text-paragraph text-surface-800">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Architecto cum earum minus, recusandae quidem mollitia
-                        nesciunt voluptas, consequatur sunt doloribus odio iste.
-                        In labore laudantium
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="absolute left-0 -ml-6 top-1/2 opacity-50">
-                <ChevronLeft className="w-6 h-6 text-surface-600 animate-pulse" />
-              </div>
-              <div className="absolute -mr-6 right-0 top-1/2 opacity-50">
-                <ChevronRight className="w-6 h-6 text-surface-600 animate-pulse" />
               </div>
             </motion.div>
           )}
@@ -775,7 +729,7 @@ export default function ImagePage() {
               </div>
               {/* Desktop Desc */}
               <div className="hidden lg:block">{descriptionSection}</div>
-              {/* <RecommendedSection category={image.category} id={id} /> */}
+              <RecommendedSection category={image.category[0].name} id={id} />
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center min-h-[50vh]">

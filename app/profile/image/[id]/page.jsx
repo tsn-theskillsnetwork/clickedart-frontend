@@ -19,6 +19,7 @@ export default function ImageEdit() {
   const { photographer } = useAuthStore();
 
   const [photo, setPhoto] = useState();
+  const [updatedPhoto, setUpdatedPhoto] = useState();
   const [categories, setCategories] = useState([]);
   const [keywordInput, setKeywordInput] = useState("");
 
@@ -103,9 +104,11 @@ export default function ImageEdit() {
   };
 
   const categoriesOptions = categories.map((category) => ({
-    value: category.name,
+    value: category._id,
     label: category.name,
   }));
+
+  console.log("Photo:", updatedPhoto);
 
   const handlePriceChange = (e) => {
     const newValue = e.target.value;
@@ -148,7 +151,7 @@ export default function ImageEdit() {
           `${process.env.NEXT_PUBLIC_SERVER}/api/category/get`
         );
         setCategories(res.data.categories);
-        console.log(res.data.categories);
+        // console.log(res.data.categories);
       } catch (error) {
         console.log(error);
       }
@@ -160,6 +163,7 @@ export default function ImageEdit() {
           `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-image-by-id?id=${id}`
         );
         setPhoto(res.data.photo);
+        console.log(res.data.photo);
       } catch (error) {
         console.log(error);
       }
@@ -168,16 +172,34 @@ export default function ImageEdit() {
     fetchCategories();
     fetchPhoto();
   }, [photographer]);
+
+  useEffect(() => {
+    if (photo) {
+      setUpdatedPhoto((prev) => ({
+        ...prev,
+        title: photo.title,
+        price: photo.price.original,
+        category: photo.category,
+        description: photo.description,
+        keywords: photo.keywords,
+        story: photo.story,
+        cameraDetails: photo.cameraDetails,
+        location: photo.location,
+        imageLinks: photo.imageLinks,
+      }));
+    }
+  }, [photo]);
+
   return (
     <>
-      {photo ? (
-        <div className="flex flex-col gap-4 mt-20 w-full">
+      {updatedPhoto ? (
+        <div className="flex flex-col gap-4 mt-20 w-full px-10 pb-10">
           <p className="text-heading-04 text-center">
             Add essential information to make your photos stand out.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
             <img
-              src={photo.imageLinks?.thumbnail || "/assets/placeholder.webp"}
+              src={updatedPhoto.imageLinks?.thumbnail || "/assets/placeholder.webp"}
               className="w-full h-auto shadow-[3px_3px_10px_rgba(0,0,0,0.5)]"
               alt="Uploaded Image"
             />
@@ -187,9 +209,9 @@ export default function ImageEdit() {
                   <Label className="!text-paragraph">Title*</Label>
                   <Input
                     className="!text-paragraph"
-                    value={photo.title}
+                    value={updatedPhoto.title || ""}
                     onChange={(e) =>
-                      setPhoto({ ...photo, title: e.target.value })
+                      setUpdatedPhoto({ ...updatedPhoto, title: e.target.value })
                     }
                   />
                 </div>
@@ -199,7 +221,7 @@ export default function ImageEdit() {
                     className="!text-paragraph"
                     type="number"
                     required
-                    value={photo.price}
+                    value={updatedPhoto.price}
                     onChange={handlePriceChange}
                   />
                 </div>
@@ -209,14 +231,16 @@ export default function ImageEdit() {
                 <Select
                   options={categoriesOptions}
                   isMulti
+                  value={updatedPhoto.category.map((category) => ({
+                    value: category._id || category,
+                    label:
+                      category.name ||
+                      categoriesOptions.find((c) => c.value === category).label,
+                  }))}
                   onChange={(selected) => {
-                    setPhoto({
-                      ...photo,
-                      category: selected.map(
-                        (category) =>
-                          categories.find((cat) => cat.name === category.value)
-                            ._id
-                      ),
+                    setUpdatedPhoto({
+                      ...updatedPhoto,
+                      category: selected.map((category) => category.value),
                     });
                   }}
                 />
@@ -227,7 +251,7 @@ export default function ImageEdit() {
                 </Label>
                 <Textarea
                   className="!text-paragraph"
-                  value={photo.description}
+                  value={updatedPhoto.description || ""}
                   placeholder="Enter a description for your photo (Max 1000 characters)"
                   onChange={handleDescriptionChange}
                 />
@@ -237,12 +261,12 @@ export default function ImageEdit() {
                 <Input
                   className="!text-paragraph"
                   placeholder="Enter keywords separated by commas (Min 5)"
-                  value={keywordInput}
+                  value={updatedPhoto.keywords || keywordInput || ""}
                   onChange={(e) => {
                     const inputValue = e.target.value;
                     setKeywordInput(inputValue);
-                    setPhoto({
-                      ...photo,
+                    setUpdatedPhoto({
+                      ...updatedPhoto,
                       keywords: inputValue
                         .split(",")
                         .map((keyword) => keyword.trim())
@@ -254,23 +278,23 @@ export default function ImageEdit() {
                   <div className="flex flex-wrap gap-2 max-w-full overflow-x-auto">
                     {categories
                       ?.filter((category) =>
-                        photo.category.includes(category._id)
+                        updatedPhoto.category.includes(category._id)
                       ) // Filter categories that are selected
                       .flatMap((category) => category.tags) // Flatten all tags from selected categories
                       .map((tag, index) => {
-                        const isSelected = photo.keywords.includes(tag);
+                        const isSelected = updatedPhoto.keywords.includes(tag);
                         return (
                           <span
                             key={index}
                             onClick={() => {
                               const updatedKeywords = isSelected
-                                ? photo.keywords.filter(
+                                ? updatedPhoto.keywords.filter(
                                     (keyword) => keyword !== tag
                                   )
-                                : [...new Set([...photo.keywords, tag])]; // Avoid duplicates
+                                : [...new Set([...updatedPhoto.keywords, tag])]; // Avoid duplicates
 
-                              setPhoto({
-                                ...photo,
+                              setUpdatedPhoto({
+                                ...updatedPhoto,
                                 keywords: updatedKeywords,
                               });
                               setKeywordInput(updatedKeywords.join(", "));
@@ -292,9 +316,9 @@ export default function ImageEdit() {
                 <Label className="!text-paragraph">Story</Label>
                 <Textarea
                   className="!text-paragraph"
-                  value={photo.story}
+                  value={updatedPhoto.story || ""}
                   onChange={(e) =>
-                    setPhoto({ ...photo, story: e.target.value })
+                    setUpdatedPhoto({ ...updatedPhoto, story: e.target.value })
                   }
                 />
               </div>
@@ -304,12 +328,12 @@ export default function ImageEdit() {
                 <Label className="!text-paragraph">Camera</Label>
                 <Input
                   className="!text-paragraph"
-                  value={photo.cameraDetails.camera}
+                  value={updatedPhoto.cameraDetails.camera || ""}
                   onChange={(e) =>
-                    setPhoto({
-                      ...photo,
+                    setUpdatedPhoto({
+                      ...updatedPhoto,
                       cameraDetails: {
-                        ...photo.cameraDetails,
+                        ...updatedPhoto.cameraDetails,
                         camera: e.target.value,
                       },
                     })
@@ -320,12 +344,12 @@ export default function ImageEdit() {
                 <Label className="!text-paragraph">Lens</Label>
                 <Input
                   className="!text-paragraph"
-                  value={photo.cameraDetails.lens}
+                  value={updatedPhoto.cameraDetails.lens || ""}
                   onChange={(e) =>
-                    setPhoto({
-                      ...photo,
+                    setUpdatedPhoto({
+                      ...updatedPhoto,
                       cameraDetails: {
-                        ...photo.cameraDetails,
+                        ...updatedPhoto.cameraDetails,
                         lens: e.target.value,
                       },
                     })
@@ -337,14 +361,14 @@ export default function ImageEdit() {
                   <Label className="!text-paragraph">Focal Length</Label>
                   <Input
                     className="!text-paragraph"
-                    value={photo.cameraDetails.settings.focalLength}
+                    value={updatedPhoto.cameraDetails.settings.focalLength || ""}
                     onChange={(e) =>
-                      setPhoto({
-                        ...photo,
+                      setUpdatedPhoto({
+                        ...updatedPhoto,
                         cameraDetails: {
-                          ...photo.cameraDetails,
+                          ...updatedPhoto.cameraDetails,
                           settings: {
-                            ...photo.cameraDetails.settings,
+                            ...updatedPhoto.cameraDetails.settings,
                             focalLength: e.target.value,
                           },
                         },
@@ -356,14 +380,14 @@ export default function ImageEdit() {
                   <Label className="!text-paragraph">Aperture</Label>
                   <Input
                     className="!text-paragraph"
-                    value={photo.cameraDetails.settings.aperture}
+                    value={updatedPhoto.cameraDetails.settings.aperture || ""}
                     onChange={(e) =>
-                      setPhoto({
-                        ...photo,
+                      setUpdatedPhoto({
+                        ...updatedPhoto,
                         cameraDetails: {
-                          ...photo.cameraDetails,
+                          ...updatedPhoto.cameraDetails,
                           settings: {
-                            ...photo.cameraDetails.settings,
+                            ...updatedPhoto.cameraDetails.settings,
                             aperture: e.target.value,
                           },
                         },
@@ -377,14 +401,14 @@ export default function ImageEdit() {
                   <Label className="!text-paragraph">Shutter Speed</Label>
                   <Input
                     className="!text-paragraph"
-                    value={photo.cameraDetails.settings.shutterSpeed}
+                    value={updatedPhoto.cameraDetails.settings.shutterSpeed || ""}
                     onChange={(e) =>
-                      setPhoto({
-                        ...photo,
+                      setUpdatedPhoto({
+                        ...updatedPhoto,
                         cameraDetails: {
-                          ...photo.cameraDetails,
+                          ...updatedPhoto.cameraDetails,
                           settings: {
-                            ...photo.cameraDetails.settings,
+                            ...updatedPhoto.cameraDetails.settings,
                             shutterSpeed: e.target.value,
                           },
                         },
@@ -396,7 +420,7 @@ export default function ImageEdit() {
                   <Label className="!text-paragraph">ISO</Label>
                   <Input
                     className="!text-paragraph"
-                    value={photo.cameraDetails.settings.iso}
+                    value={photo.cameraDetails.settings.iso || ""}
                     onChange={(e) =>
                       setPhoto({
                         ...photo,
@@ -417,7 +441,7 @@ export default function ImageEdit() {
                 <Label className="!text-paragraph">Location</Label>
                 <Input
                   className="!text-paragraph"
-                  value={photo.location}
+                  value={photo.location || ""}
                   onChange={(e) =>
                     setPhoto({ ...photo, location: e.target.value })
                   }

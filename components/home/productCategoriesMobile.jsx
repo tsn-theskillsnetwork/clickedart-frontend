@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Button2 from "../button2";
+import Link from "next/link";
 
 export default function ProductCategoriesMobile() {
   const router = useRouter();
@@ -66,7 +68,7 @@ export default function ProductCategoriesMobile() {
           </motion.div>
         ))}
       </div>
-      <div className="flex mx-2 sm:mx-40 mt-2 sm:mt-5 gap-2 sm:gap-4 justify-end mb-16">
+      <div className="flex mx-2 sm:mx-40 mt-2 sm:mt-5 gap-2 sm:gap-4 justify-end">
         {themes.slice(3, 6).map((theme, index) => (
           <motion.div
             layout
@@ -99,6 +101,13 @@ export default function ProductCategoriesMobile() {
           </motion.div>
         ))}
       </div>
+      {themes.length > 6 && (
+        <Link className="mt-10 mb-20" href="/themes">
+          <Button2 className="text-accent-400 font-semibold text-heading-06 ">
+            View All Themes
+          </Button2>
+        </Link>
+      )}
     </div>
   );
 }

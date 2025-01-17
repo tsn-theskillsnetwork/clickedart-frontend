@@ -27,14 +27,14 @@ export default function Featured({ photographers }) {
       <Slider {...settings}>
         {photographers?.map((photographer, index) => (
           <div key={index} className="p-6">
-            <div className="w-64 aspect-[4/5] flex flex-col mx-auto items-center justify-center gap-2 bg-white shadow-md shadow-zinc-400">
+            <div className=" aspect-[4/5] flex flex-col mx-auto items-center justify-center gap-2 bg-white shadow-md shadow-zinc-400 rounded-md overflow-hidden hover:scale-105 transition-all duration-300 ease-in-out">
               <img
                 src={photographer.profileImage}
                 alt={photographer.firstName || `Slide ${index + 1}`}
-                className=" object-cover object-top w-64 aspect-[1/1]"
+                className=" object-cover object-top w-full aspect-[1/1]"
               />
-              <div className="flex flex-col items-center justify-center gap-2 pb-5">
-                <p className="text-heading-04 font-semibold text-black">
+              <div className="flex flex-col items-center justify-center gap-2 pb-5 px-2">
+                <p className="text-heading-04 font-semibold text-black text-center">
                   {`${photographer.firstName} ${photographer.lastName}`}
                 </p>
                 <Link

@@ -290,7 +290,6 @@ const ProfilePage = () => {
 
   const handleUpload = async (event) => {
     event.preventDefault();
-    console.log("handleUpload triggered");
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/images/add-image-in-vault`,
@@ -304,7 +303,9 @@ const ProfilePage = () => {
       );
       console.log(response.data);
       toast.success("Image uploaded successfully");
-      alert("Image uploaded successfully. Please check your profile.");
+      alert(
+        "Your photo has uploaded successfully and sent to Admin for Approval and may take 0-3 working days to reflect in your profile."
+      );
       router.push("/profile");
     } catch (error) {
       console.log(error);
@@ -645,7 +646,12 @@ const ProfilePage = () => {
                           setStep("2");
                           window.scrollTo(0, 160);
                         }}
-                        disabled={!imageUrl || (activePlan === "intermediate" && !customText) || (activePlan === "premium" && !watermark?.watermarkImage)}
+                        disabled={
+                          !imageUrl ||
+                          (activePlan === "intermediate" && !customText) ||
+                          (activePlan === "premium" &&
+                            !watermark?.watermarkImage)
+                        }
                         className="bg-primary text-white py-2 px-4 rounded-full disabled:opacity-50"
                       >
                         Proceed
@@ -746,7 +752,7 @@ const ProfilePage = () => {
                             ) // Filter categories that are selected
                             .flatMap((category) => category.tags) // Flatten all tags from selected categories
                             .map((tag, index) => {
-                              const isSelected = photo.keywords.includes(tag,);
+                              const isSelected = photo.keywords.includes(tag);
                               return (
                                 <span
                                   key={index}
