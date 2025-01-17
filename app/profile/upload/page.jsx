@@ -262,6 +262,7 @@ const ProfilePage = () => {
 
   const getResolutions = async () => {
     try {
+      setLoading(true);
       console.log("Plan type:", activePlan);
       if (photo.imageLinks.original) {
         return;
@@ -283,8 +284,11 @@ const ProfilePage = () => {
         imageLinks: data.urls,
         resolutions: data.resolutions,
       }));
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching resolutions:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -667,13 +671,20 @@ const ProfilePage = () => {
                   Add essential information to make your photos stand out.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
-                  <img
-                    src={
-                      photo.imageLinks?.thumbnail || "/assets/placeholder.webp"
-                    }
-                    className="w-full h-auto shadow-[3px_3px_10px_rgba(0,0,0,0.5)]"
-                    alt="Uploaded Image"
-                  />
+                  {photo.imageLinks?.thumbnail ? (
+                    <img
+                      src={
+                        photo.imageLinks?.thumbnail ||
+                        "/assets/placeholder.webp"
+                      }
+                      className="w-full h-auto shadow-[3px_3px_10px_rgba(0,0,0,0.5)]"
+                      alt="Uploaded Image"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center w-full aspect-[1/1] bg-surface-200 rounded-lg">
+                      <Loader />
+                    </div>
+                  )}
                   <form className="flex flex-col gap-4">
                     <div className="grid grid-cols-3 gap-4">
                       <div className="col-span-2">

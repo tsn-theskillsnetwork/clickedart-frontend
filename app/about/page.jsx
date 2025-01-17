@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 export default function AboutPage() {
@@ -18,9 +19,11 @@ export default function AboutPage() {
           We&apos;re a team of passionate photographers turning imagination into
           reality
         </p>
-        <button className="bg-white text-surface-500 px-5 py-2 rounded-md">
-          Connect with us!
-        </button>
+        <Link href="/contact">
+          <button className="bg-white text-surface-500 px-5 py-2 rounded-md">
+            Connect with us!
+          </button>
+        </Link>
       </div>
       <div className="px-20 mb-20">
         <h2 className="text-heading-02 font-semibold mt-10">

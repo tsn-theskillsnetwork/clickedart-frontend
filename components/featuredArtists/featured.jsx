@@ -16,6 +16,7 @@ export default function Featured({ photographers }) {
     speed: 500,
     slidesToShow: 4,
     slidesToScroll: 1,
+    // adaptiveHeight: true,
     responsive: [
       { breakpoint: 1200, settings: { slidesToShow: 4 } },
       { breakpoint: 1024, settings: { slidesToShow: 3 } },
@@ -28,8 +29,8 @@ export default function Featured({ photographers }) {
     <div className="w-full relative">
       <Slider {...settings}>
         {photographers?.map((photographer, index) => (
-          <div key={index} className="p-6">
-            <div className=" aspect-[4/5] flex flex-col mx-auto items-center justify-center gap-2 bg-white shadow-md shadow-zinc-400 rounded-md overflow-hidden hover:scale-105 transition-all duration-300 ease-in-out">
+          <div key={index} className="p-6 h-full">
+            <div className=" flex flex-col mx-auto items-center justify-center gap-2 bg-white shadow-md shadow-zinc-400 rounded-md overflow-hidden hover:scale-105 transition-all duration-300 ease-in-out">
               <img
                 onClick={() => router.push(`/photographer/${photographer._id}`)}
                 src={photographer.profileImage}

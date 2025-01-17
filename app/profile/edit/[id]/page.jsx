@@ -199,7 +199,9 @@ export default function ImageEdit() {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
             <img
-              src={updatedPhoto.imageLinks?.thumbnail || "/assets/placeholder.webp"}
+              src={
+                updatedPhoto.imageLinks?.thumbnail || "/assets/placeholder.webp"
+              }
               className="w-full h-auto shadow-[3px_3px_10px_rgba(0,0,0,0.5)]"
               alt="Uploaded Image"
             />
@@ -211,7 +213,10 @@ export default function ImageEdit() {
                     className="!text-paragraph"
                     value={updatedPhoto.title || ""}
                     onChange={(e) =>
-                      setUpdatedPhoto({ ...updatedPhoto, title: e.target.value })
+                      setUpdatedPhoto({
+                        ...updatedPhoto,
+                        title: e.target.value,
+                      })
                     }
                   />
                 </div>
@@ -361,7 +366,9 @@ export default function ImageEdit() {
                   <Label className="!text-paragraph">Focal Length</Label>
                   <Input
                     className="!text-paragraph"
-                    value={updatedPhoto.cameraDetails.settings.focalLength || ""}
+                    value={
+                      updatedPhoto.cameraDetails.settings.focalLength || ""
+                    }
                     onChange={(e) =>
                       setUpdatedPhoto({
                         ...updatedPhoto,
@@ -401,7 +408,9 @@ export default function ImageEdit() {
                   <Label className="!text-paragraph">Shutter Speed</Label>
                   <Input
                     className="!text-paragraph"
-                    value={updatedPhoto.cameraDetails.settings.shutterSpeed || ""}
+                    value={
+                      updatedPhoto.cameraDetails.settings.shutterSpeed || ""
+                    }
                     onChange={(e) =>
                       setUpdatedPhoto({
                         ...updatedPhoto,
