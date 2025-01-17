@@ -6,8 +6,10 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import axios from "axios";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Featured({ photographers }) {
+  const router = useRouter();
   const settings = {
     dots: true,
     infinite: false,
@@ -29,6 +31,7 @@ export default function Featured({ photographers }) {
           <div key={index} className="p-6">
             <div className=" aspect-[4/5] flex flex-col mx-auto items-center justify-center gap-2 bg-white shadow-md shadow-zinc-400 rounded-md overflow-hidden hover:scale-105 transition-all duration-300 ease-in-out">
               <img
+                onClick={() => router.push(`/photographer/${photographer._id}`)}
                 src={photographer.profileImage}
                 alt={photographer.firstName || `Slide ${index + 1}`}
                 className=" object-cover object-top w-full aspect-[1/1]"

@@ -152,6 +152,7 @@ export default function MembershipPage() {
         }
       );
       console.log("Worked");
+      toast.success("Subscription added successfully");
       console.log(response.data);
     } catch (error) {
       console.error(error);
@@ -226,7 +227,7 @@ export default function MembershipPage() {
           {userPlan !== "Premium" && (
             <button
               onClick={() =>
-                handleTrial("67853b3d25457a993c90b1a2", 0, "monthly")
+                handleTrial("67853b3d25457a993c90b1a1", 3999, "monthly")
               }
               className="bg-white text-primary text-xs mx-auto md:mx-0 sm:text-paragraph lg:text-heading-05 font-semibold rounded-lg py-2.5 px-3 mt-2"
             >
@@ -385,51 +386,48 @@ export default function MembershipPage() {
                     plan._id === active ? "scale-y-95" : "scale-y-100"
                   } transition-transform w-40 lg:w-60 duration-200 ease-linear`}
                 >
-                  {userPlan.length >= 0 &&
-                    userPlan !== "Basic" &&
-                    userPlan != plan.name &&
-                    plan.name !== "Basic" && (
-                      <div className="w-full">
-                        {/* The button */}
-                        <button
-                          onClick={() => setSelectedPlan(plan._id)}
+                  {userPlan != plan.name && plan.name !== "Basic" && (
+                    <div className="w-full">
+                      {/* The button */}
+                      <button
+                        onClick={() => setSelectedPlan(plan._id)}
+                        className={`${
+                          plan._id === active
+                            ? "bg-white text-primary"
+                            : "bg-primary text-white"
+                        } md:text-sm w-full lg:text-heading-06 xl:text-heading-05 font-medium rounded-lg py-4 px-6 mt-4`}
+                      >
+                        Choose Plan
+                      </button>
+                      {plan._id === selectedPlan && (
+                        <select
+                          placeholder="Select a plan"
+                          onChange={(e) => {
+                            if (e.target.value === "Select a plan") return;
+                            const duration = e.target.value;
+                            const price = plan.cost.find(
+                              (cost) => cost.duration === duration
+                            ).price;
+                            handlePayment(plan._id, price, duration);
+                          }}
                           className={`${
                             plan._id === active
                               ? "bg-white text-primary"
                               : "bg-primary text-white"
-                          } md:text-sm w-full lg:text-heading-06 xl:text-heading-05 font-medium rounded-lg py-4 px-6 mt-4`}
+                          } w-full border rounded-lg p-2 mt-2 text-sm`}
                         >
-                          Choose Plan
-                        </button>
-                        {plan._id === selectedPlan && (
-                          <select
-                            placeholder="Select a plan"
-                            onChange={(e) => {
-                              if (e.target.value === "Select a plan") return;
-                              const duration = e.target.value;
-                              const price = plan.cost.find(
-                                (cost) => cost.duration === duration
-                              ).price;
-                              handlePayment(plan._id, price, duration);
-                            }}
-                            className={`${
-                              plan._id === active
-                                ? "bg-white text-primary"
-                                : "bg-primary text-white"
-                            } w-full border rounded-lg p-2 mt-2 text-sm`}
-                          >
-                            <option className="">Select a plan</option>
-                            {plan.cost.map((cost) => (
-                              <option key={cost._id} value={cost.duration}>
-                                {cost.duration.charAt(0).toUpperCase() +
-                                  cost.duration.slice(1)}{" "}
-                                - ${cost.price}
-                              </option>
-                            ))}
-                          </select>
-                        )}
-                      </div>
-                    )}
+                          <option className="">Select a plan</option>
+                          {plan.cost.map((cost) => (
+                            <option key={cost._id} value={cost.duration}>
+                              {cost.duration.charAt(0).toUpperCase() +
+                                cost.duration.slice(1)}{" "}
+                              - ${cost.price}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             ))}
@@ -582,17 +580,14 @@ export default function MembershipPage() {
                         {plan.watermarkingTools}
                       </p>
                     </div>
-                    {userPlan.length >= 0 &&
-                      userPlan !== "Basic" &&
-                      userPlan != plan.name &&
-                      plan.name !== "Basic" && (
-                        <button
-                          onClick={() => setSelectedPlan(plan._id)}
-                          className={`bg-primary text-white md:text-sm w-full lg:text-heading-06 xl:text-heading-05 font-medium rounded-lg py-4 px-6 mt-4`}
-                        >
-                          Choose Plan
-                        </button>
-                      )}
+                    {userPlan != plan.name && plan.name !== "Basic" && (
+                      <button
+                        onClick={() => setSelectedPlan(plan._id)}
+                        className={`bg-primary text-white md:text-sm w-full lg:text-heading-06 xl:text-heading-05 font-medium rounded-lg py-4 px-6 mt-4`}
+                      >
+                        Choose Plan
+                      </button>
+                    )}
 
                     {plan._id === selectedPlan && (
                       <select
