@@ -1,12 +1,12 @@
 "use client";
 
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import useAuthStore from "@/authStore";
 import Image from "next/image";
 import Button from "@/components/button";
-import Link from "next/link";
 import Button2 from "@/components/button2";
-import { Pencil, Plus, TextIcon, UploadIcon } from "lucide-react";
+import Link from "next/link";
+import { Plus, TextIcon, UploadIcon } from "lucide-react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
@@ -113,7 +113,7 @@ const ProfilePage = () => {
   };
 
   const handleWatermarkImage = async (event) => {
-    const file = event.target.files[0]; // Get the first file from the input
+    const file = event.target.files[0];
 
     if (!file) {
       toast.error("No file selected for upload!");
