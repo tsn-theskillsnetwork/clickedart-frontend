@@ -62,7 +62,7 @@ export default function ImagePage() {
         title: image.title,
         photographer: image.photographer,
         resolution: selectedSize,
-        price: subTotal,
+        price: mode === "print" ? image.price?.original : image.price?.[selectedSize],
         thumbnail: image.imageLinks?.thumbnail || image.imageLinks?.original,
       },
       paperInfo: selectedPaper

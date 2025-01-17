@@ -16,7 +16,7 @@ import { useRazorpay } from "react-razorpay";
 
 export default function CheckoutPage() {
   const { user, token, isHydrated } = useAuthStore();
-  const { cartItems, removeItemFromCart, clearCart } = useCartStore();
+  const { cartItems, clearCart } = useCartStore();
   const router = useRouter();
   const [code, setCode] = useState("");
   const [coupon, setCoupon] = useState([]);
@@ -33,7 +33,6 @@ export default function CheckoutPage() {
     isPaid: false,
     paymentMethod: "",
     invoiceId: "",
-    totalAmount: 0,
     finalAmount: 0,
     discount: 0,
     shippingAddress: {
@@ -49,10 +48,60 @@ export default function CheckoutPage() {
     },
   });
 
+  const [items, setItems] = useState([]);
+
+  const [price, setPrice] = useState({});
+
   //razorpay
   const { Razorpay } = useRazorpay();
   const [paymentStatus, setPaymentStatus] = useState();
   const [razorpay_payment_id, setrazorpay_payment_id] = useState();
+
+  useEffect(() => {
+    const backendItems = cartItems.map((item) => ({
+      imageId: item.imageInfo.image,
+      paperId: item.paperInfo?.paper || null,
+      frameId: item.frameInfo?.frame || null,
+      width: item.mode === "print" ? item.paperInfo.size.width : null,
+      height: item.mode === "print" ? item.paperInfo.size.height : null,
+      resolution:
+        item.mode === "print" ? "original" : item.imageInfo.resolution,
+    }));
+
+    console.log("Mapped Items for Backend:", backendItems);
+    setItems(backendItems);
+  }, [cartItems]);
+
+  useEffect(() => {
+    if (items.length > 0) {
+      console.log("Items being sent:", items);
+      calculatePrice();
+    }
+  }, [items]);
+
+  console.log(cartItems);
+
+  const calculatePrice = async () => {
+    console.log("Items being sent:", items);
+
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/download/calculate-price`,
+        { items }
+      );
+
+      console.log("Price calculated successfully:", res.data);
+      setPrice(res.data);
+    } catch (error) {
+      console.error(
+        "Error calculating price:",
+        error.response?.data || error.message
+      );
+      alert("Failed to calculate price. Please try again.");
+    }
+  };
+
+  console.log("Price:", price);
 
   const handlePayment = useCallback(
     async (finalAmount) => {
@@ -67,7 +116,7 @@ export default function CheckoutPage() {
           userId: user._id,
         }
       );
-      console.log("result", result);
+      // console.log("result", result);
       const options = {
         key: result.data.result.notes.key,
         amount: result.data.result.amount,
@@ -80,7 +129,7 @@ export default function CheckoutPage() {
           try {
             const paymentId = res.razorpay_payment_id;
             const paymentMethod = res.payment_method;
-            console.log("RESPONSE", paymentMethod);
+            // console.log("RESPONSE", paymentMethod);
             if (paymentId) {
               setrazorpay_payment_id(paymentId);
               setPaymentStatus(true);
@@ -105,7 +154,7 @@ export default function CheckoutPage() {
         },
       };
 
-      console.log("options", options);
+      // console.log("options", options);
 
       const rzpay = new Razorpay(options);
       rzpay.open();
@@ -126,7 +175,7 @@ export default function CheckoutPage() {
         }
       );
 
-      console.log("Order created", res.data);
+      // console.log("Order created", res.data);
       clearCart();
       toast.success("Order placed successfully");
       router.push("/profile/orders");
@@ -139,56 +188,40 @@ export default function CheckoutPage() {
     }
   };
 
-  const calculateGST = (amount) => +(amount * 0.18).toFixed(2); // 18% GST
-  const calculatePlatformCharge = (amount) => +(amount * 0.02).toFixed(2); // 2% Platform Charge
-  const calculateDiscount = (amount, discountPercentage, maxDiscount) =>
-    Math.min(amount * (discountPercentage / 100), maxDiscount);
-
-  const calculateNewTotal = (subtotal) => {
-    const gst = subtotal * 0.18; // 18% GST
-    const deliveryCharge = cartItems.reduce(
-      (total, item) => total + (item.delivery || 0),
-      0
-    );
-    setDeliveryCharges(deliveryCharge);
-
-    const discountedAmount = subtotal - (discount || 0); // Subtotal after discount
-    const finalAmountBeforePlatform = discountedAmount + gst;
-
-    const platformCharge = finalAmountBeforePlatform * 0.02; // 2% platform charge
-    setPlatformCharges(platformCharge.toFixed(2)); // Store rounded platform charge
-
-    // Total amount with all charges
-    return +(finalAmountBeforePlatform + platformCharge).toFixed(2); // Ensure result is rounded to 2 decimals
-  };
-
   useEffect(() => {
-    // Step 1: Calculate Total Raw Amount
-    const totalRawAmount = cartItems.reduce(
-      (total, item) =>
-        total +
-        (item.frameInfo?.price || 0) + // Frame price
-        (item.paperInfo?.price || 0) + // Paper price
-        (item.imageInfo?.price || 0), // Image price
-      0
-    );
+    // Calculate raw amount (sum of item prices before applying discount)
+    const rawAmount = price?.totalFinalPrice || 0;
+    // Apply discount to the raw amount
+    const discountAmount = discount;
 
-    // Step 2: Calculate GST on Raw Total
-    const gst = calculateGST(totalRawAmount);
+    const amountAfterDiscount = rawAmount - discountAmount;
 
-    // Step 3: Calculate Discount
-    const discountAmount = discount || 0;
+    // Calculate delivery charges (₹1 per square inch of paper size)
+    const calculateDeliveryCharges = () => {
+      return cartItems.reduce((total, item) => {
+        if (item.paperInfo && item.paperInfo.size) {
+          const area = item.paperInfo.size.width * item.paperInfo.size.height;
+          setDeliveryCharges(area);
+          // return total + area;
+          return total;
+        }
+        return total;
+      }, 0);
+    };
 
-    // Step 4: Calculate Total After Discount and GST
-    const discountedTotal = totalRawAmount - discountAmount + gst;
+    const deliveryCharge = calculateDeliveryCharges();
 
-    // Step 5: Calculate Platform Charges
-    const platformCharge = calculatePlatformCharge(discountedTotal);
+    // Calculate GST (18% on the raw amount)
+    const gstAmount = amountAfterDiscount * 0.18; // 18% GST
 
-    // Step 6: Final Amount
-    const finalAmount = discountedTotal + platformCharge;
+    // Calculate platform fee
+    const platformFee = (amountAfterDiscount + gstAmount) * 0.02; // 2% platform fee
+    setPlatformCharges(platformFee);
+    // Final amount after adding GST, platform fee, and delivery charge
+    const finalAmount =
+      amountAfterDiscount + gstAmount + platformFee + deliveryCharge;
 
-    // Update Order Data
+    // Update the order data
     setOrderData((prev) => ({
       ...prev,
       userId: user?._id,
@@ -220,15 +253,31 @@ export default function CheckoutPage() {
           (item.paperInfo?.price || 0) +
           (item.imageInfo?.price || 0),
       })),
-      totalAmount: totalRawAmount, // Raw total before discounts, GST, etc.
-      finalAmount: finalAmount, // Final total with all charges
-      discount: discountAmount,
-      gst: null,
-      platformCharges: platformCharge,
+      shippingAddress: {
+        ...prev.shippingAddress,
+        city: user?.shippingAddress?.city,
+        address: user?.shippingAddress?.address,
+        state: user?.shippingAddress?.state,
+        country: user?.shippingAddress?.country || "India",
+        email: user?.email,
+        mobile: user?.mobile,
+        pincode: user?.shippingAddress?.pincode,
+      },
+      finalAmount: finalAmount.toFixed(2),
+      discount: discountAmount.toFixed(2),
+      isPaid: false,
+      gst: "",
     }));
-  }, [user, cartItems, discount]);
+    console.log("Raw Amount:", rawAmount);
+    console.log("Discount Applied:", discountAmount);
+    console.log("Amount After Discount:", amountAfterDiscount);
+    console.log("Delivery Charges:", deliveryCharge);
+    console.log("GST Amount:", gstAmount);
+    console.log("Platform Fee:", platformFee);
+    console.log("Final Amount:", finalAmount);
+  }, [user, cartItems, discount, coupon, price]);
 
-  console.log("orderData", orderData);
+  // console.log("orderData", orderData);
 
   const handleCoupon = async (event) => {
     event.preventDefault();
@@ -238,7 +287,7 @@ export default function CheckoutPage() {
         `${process.env.NEXT_PUBLIC_SERVER}/api/coupon/apply-coupon?code=${code}&userId=${user?._id}&type=user`
       );
 
-      console.log("Coupon applied", res.data);
+      // console.log("Coupon applied", res.data);
       toast.success("Coupon applied successfully");
       setCoupon(res.data.coupon);
       setOrderData((prev) => ({
@@ -247,7 +296,7 @@ export default function CheckoutPage() {
       }));
       setLoading(false);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       setError("Something went wrong while applying coupon", error);
       toast.error(error.response.data.message);
       setLoading(false);
@@ -257,15 +306,10 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (coupon && coupon.discountPercentage && coupon.maxDiscountAmount) {
       const discountAmount = Math.min(
-        orderData.totalAmount * (coupon.discountPercentage / 100),
+        price.totalFinalPrice * (coupon.discountPercentage / 100),
         coupon.maxDiscountAmount
       );
       setDiscount(discountAmount);
-      setOrderData((prev) => ({
-        ...prev,
-        discount: discountAmount,
-        finalAmount: calculateNewTotal(orderData.totalAmount),
-      }));
     }
   }, [coupon, orderData.totalAmount, discount, orderData.finalAmount]);
 
@@ -274,6 +318,8 @@ export default function CheckoutPage() {
       setOrderData((prev) => ({
         ...prev,
         invoiceId: razorpay_payment_id,
+        isPaid: true,
+        paymentMethod: "razorpay",
       }));
       createOrder();
     }
@@ -293,6 +339,8 @@ export default function CheckoutPage() {
       router.push("/signin");
     }
   }, [isHydrated, user, router]);
+
+  console.log("Order Data:", orderData);
 
   return (
     <div>
@@ -577,7 +625,7 @@ export default function CheckoutPage() {
                         Subtotal
                       </dt>
                       <dd className="text-base font-medium text-gray-900 dark:text-white">
-                        ₹{orderData.totalAmount}
+                        ₹{price?.totalFinalPrice}
                       </dd>
                     </dl>
                     <dl className="flex items-center justify-between gap-4 py-3">
@@ -585,7 +633,7 @@ export default function CheckoutPage() {
                         Savings
                       </dt>
                       <dd className="text-base font-medium text-green-500">
-                        {discount ? `- ₹${discount}` : "₹0"}
+                        {discount ? `- ₹${orderData?.discount}` : "₹0"}
                       </dd>
                     </dl>
                     <dl className="flex items-center justify-between gap-4 py-3">
@@ -604,7 +652,7 @@ export default function CheckoutPage() {
                         Platform Gateway
                       </dt>
                       <dd className="text-base font-medium text-gray-900">
-                        ₹{platformCharges}
+                        ₹{platformCharges.toFixed(2)}
                       </dd>
                     </dl>
                     <dl className="flex items-center justify-between gap-4 py-3">
@@ -612,7 +660,8 @@ export default function CheckoutPage() {
                         GST (18%)
                       </dt>
                       <dd className="text-base font-medium text-gray-900 dark:text-white">
-                        ₹{orderData.totalAmount * 0.18}
+                        ₹
+                        {((price.totalFinalPrice - discount) * 0.18).toFixed(2)}
                       </dd>
                     </dl>
                     <dl className="flex items-center justify-between gap-4 py-3">

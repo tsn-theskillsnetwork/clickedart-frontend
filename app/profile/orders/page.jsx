@@ -77,7 +77,7 @@ export default function OrdersPage() {
     }
   };
 
-  // console.log("orders", orders);
+  console.log("orders", orders);
 
   useEffect(() => {
     if (!user) return;
@@ -216,10 +216,10 @@ export default function OrdersPage() {
                       Invoice: {order.invoiceId}
                     </p>
                     <p className="text-base mt-5 font-semibold text-surface-500">
-                      Sub Total: {order.subTotal}
+                      Sub Total: {order.totalAmount}
                     </p>
                     <p className="text-paragraph font-semibold text-surface-500">
-                      Total: {order.totalAmount}
+                      Total: {order.finalAmount}
                     </p>
                   </div>
                   <div className="sm:px-2 sm:w-1/5 flex flex-col items-start gap-2 border-b sm:border-b-0">
