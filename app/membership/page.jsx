@@ -421,7 +421,7 @@ export default function MembershipPage() {
                             <option key={cost._id} value={cost.duration}>
                               {cost.duration.charAt(0).toUpperCase() +
                                 cost.duration.slice(1)}{" "}
-                              - ${cost.price}
+                              - ₹{cost.price}
                             </option>
                           ))}
                         </select>
@@ -611,7 +611,7 @@ export default function MembershipPage() {
                           <option key={cost._id} value={cost.duration}>
                             {cost.duration.charAt(0).toUpperCase() +
                               cost.duration.slice(1)}{" "}
-                            - ${cost.price}
+                            - ₹{cost.price}
                           </option>
                         ))}
                       </select>
