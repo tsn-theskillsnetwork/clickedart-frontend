@@ -115,7 +115,7 @@ export default function CartPage() {
       </div>
       <div className="flex flex-col sm:flex-row justify-between gap-10">
         <div className="flex flex-row items-center justify-center sm:justify-start sm:w-1/2 gap-2">
-          <Input
+          {/* <Input
             value={coupon}
             onChange={(e) => {
               setCoupon(e.target.value);
@@ -123,7 +123,7 @@ export default function CartPage() {
             className="w-1/2 h-10 !text-paragraph border-black"
             placeholder="Coupon Code"
           />
-          <Button className="font-medium">Apply Coupon</Button>
+          <Button className="font-medium">Apply Coupon</Button> */}
         </div>
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-4">

@@ -12,6 +12,12 @@ import { Input } from "@/components/ui/input";
 import Select from "react-select";
 import Button from "@/components/button";
 import Button2 from "@/components/button2";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { toast } from "react-toastify";
 
 export default function ImageEdit() {
   const { id } = useParams();

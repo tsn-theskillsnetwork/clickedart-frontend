@@ -12,7 +12,6 @@ import {
   Pencil,
   Plus,
   Share2Icon,
-  ShareIcon,
 } from "lucide-react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -217,6 +216,8 @@ const ProfilePage = () => {
     fetchCatalogues();
     fetchActivePlan();
   }, [photographer]);
+
+  console.log("photos", photos);
 
   return (
     <>
@@ -450,8 +451,8 @@ const ProfilePage = () => {
                     </div>
                   </Link>
                   {photos.map((image) => (
-                    <Link
-                      href={`/images/${image._id}`}
+                    <div
+                      // href={`/images/${image._id}`}
                       className="relative group shadow-[2px_2px_6px_rgba(0,0,0,0.4)]"
                       key={image._id}
                     >
@@ -467,26 +468,43 @@ const ProfilePage = () => {
                         className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear"
                       />
 
-                      <div className="absolute inset-0">
+                      {/* <div className="">
                         <div className="flex justify-between px-2 pt-2">
                           <div className="">
                             <div className="bg-white px-2 text-paragraph bg-opacity-75 w-fit transition-all duration-200 ease-linear cursor-default">
-                              {/* <p>
-                                {image.imageAnalytics?.downloads || 0} Downloads
-                              </p> */}
                             </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="text-white absolute bottom-0 p-4 pt-6 bg-gradient-to-t from-black to-transparent inset-x-0 bg-opacity-50 opacity-0 group-hover:opacity-100 transition-all duration-200 ease-linear">
+                        
+                      </div> */}
+
+                      <div className="text-black flex justify-between px-4">
                         <h2 className="text-heading-05 font-semibold">
                           {image.title || "Untitled"}
                         </h2>
-                        <p className="font-medium text-surface-200">
-                          {image.category?.name}
-                        </p>
+                        {Image.category?.map((category) => (
+                          <p className="font-medium text-surface-200">
+                            {category.name}
+                          </p>
+                        ))}
+                        <Popover>
+                          <PopoverTrigger>
+                            <EllipsisIcon className="w-6 h-6 text-black" />
+                          </PopoverTrigger>
+                          <PopoverContent className="w-min">
+                            <div className="flex flex-col items-center">
+                              <Button
+                                className="text-orange-500"
+                                variant="ghost"
+                                size="sm"
+                              >
+                                <div>EDIT</div>
+                              </Button>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
                       </div>
-                    </Link>
+                    </div>
                   ))}
                 </div>
               ) : (

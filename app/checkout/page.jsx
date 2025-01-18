@@ -81,6 +81,35 @@ export default function CheckoutPage() {
 
   console.log(cartItems);
 
+  const validateOrder = () => {
+    if (!user) {
+      toast.error("Please login as User to continue");
+      return false;
+    }
+
+    if (!orderData.shippingAddress.address) {
+      toast.error("Please enter your address");
+      return false;
+    }
+
+    if (!orderData.shippingAddress.city) {
+      toast.error("Please enter your city");
+      return false;
+    }
+
+    if (!orderData.shippingAddress.state) {
+      toast.error("Please enter your state");
+      return false;
+    }
+
+    if (!orderData.shippingAddress.mobileNumber) {
+      toast.error("Please enter your mobile number");
+      return false;
+    }
+
+    return true;
+  };
+
   const calculatePrice = async () => {
     console.log("Items being sent:", items);
 
@@ -109,6 +138,8 @@ export default function CheckoutPage() {
         toast.error("Please login as User to continue");
         return;
       }
+
+      if (!validateOrder()) return;
       const result = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/download/payment`,
         {
