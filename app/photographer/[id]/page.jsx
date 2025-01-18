@@ -130,9 +130,15 @@ export default function ProfilePage() {
                 {photographer.connectedAccounts?.length > 0
                   ? photographer.connectedAccounts.map((account, index) => (
                       <Link
-                        href={account.accountLink}
                         key={index}
-                        className="items-center"
+                        href={
+                          !account.accountLink.startsWith("https://")
+                            ? `https://${account.accountLink}`
+                            : account.accountLink
+                        }
+                        className="text-sm font-medium"
+                        target="_blank" // Opens in a new tab
+                        rel="noopener noreferrer" // For security
                       >
                         <Icon
                           icon={"entypo-social:" + account.accountName}

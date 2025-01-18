@@ -101,7 +101,7 @@ export default function BlogPage() {
                       </p>
                     </div>
                   </div>
-                  <p className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-600">
+                  <p className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-600 truncate">
                     {post.content.summary}
                   </p>
                 </div>
@@ -148,7 +148,7 @@ export default function BlogPage() {
                   </p>
                 </div>
               </div>
-              <p className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-600">
+              <p className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-600 truncate">
                 {post.content.summary}
               </p>
               <div className="flex gap-2 flex-wrap">

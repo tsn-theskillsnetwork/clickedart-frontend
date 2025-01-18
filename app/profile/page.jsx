@@ -478,15 +478,20 @@ const ProfilePage = () => {
                         
                       </div> */}
 
-                      <div className="text-black flex justify-between px-4">
-                        <h2 className="text-heading-05 font-semibold">
+                      <div className="text-black flex justify-between items-start px-4">
+                        <div className="text-heading-05 font-semibold">
                           {image.title || "Untitled"}
-                        </h2>
-                        {Image.category?.map((category) => (
-                          <p className="font-medium text-surface-200">
-                            {category.name}
-                          </p>
-                        ))}
+                          <div className="flex flex-wrap gap-1 mt-1 mb-2 truncate">
+                            {image.category?.map((category) => (
+                              <span
+                                key={category._id}
+                                className="font-medium text-sm text-surface-600 bg-surface-200 px-2 py-1 rounded-md mr-2"
+                              >
+                                {category.name}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
                         <Popover>
                           <PopoverTrigger>
                             <EllipsisIcon className="w-6 h-6 text-black" />
@@ -498,7 +503,7 @@ const ProfilePage = () => {
                                 variant="ghost"
                                 size="sm"
                               >
-                                <div>EDIT</div>
+                                <Link href={`/profile/edit/${image._id}`}>EDIT</Link>
                               </Button>
                             </div>
                           </PopoverContent>

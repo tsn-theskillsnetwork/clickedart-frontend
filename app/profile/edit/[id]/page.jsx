@@ -16,10 +16,21 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { toast } from "react-toastify";
+} from "@/components/ui/popover";
+import toast from "react-hot-toast";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import Link from "next/link";
 
 export default function ImageEdit() {
+  const { token } = useAuthStore();
   const { id } = useParams();
   const router = useRouter();
   const { photographer } = useAuthStore();
@@ -28,6 +39,11 @@ export default function ImageEdit() {
   const [updatedPhoto, setUpdatedPhoto] = useState();
   const [categories, setCategories] = useState([]);
   const [keywordInput, setKeywordInput] = useState("");
+  // const [progr, setProgr] = useState(0);
+  const [timeoutId, setTimeoutId] = useState(null);
+  // const [imageUrl, setImageUrl] = useState("");
+  // const [step, setStep] = useState("1");
+  const [activePlan, setActivePlan] = useState("basic");
 
   const handleDescriptionChange = (e) => {
     const newValue = e.target.value;
@@ -43,7 +59,7 @@ export default function ImageEdit() {
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/images/update-image-in-vault`,
-        photo,
+        updatedPhoto,
         {
           headers: {
             "Content-Type": "application/json",
@@ -53,7 +69,7 @@ export default function ImageEdit() {
       );
       console.log(response.data);
       toast.success("Image uploaded successfully");
-      alert("Image uploaded successfully. Please check your profile.");
+      alert("Image updated successfully. Please check your profile.");
       router.push("/profile");
     } catch (error) {
       console.log(error);
@@ -62,50 +78,72 @@ export default function ImageEdit() {
     }
   };
 
-  const handleChange = async (event) => {
+  // const handleChange = async (event) => {
+  //   try {
+  //     const file = event.target.files[0];
+
+  //     if (!file) {
+  //       console.error("No file selected");
+  //       return;
+  //     }
+
+  //     const s3 = new S3Client({
+  //       region: "ap-south-1",
+  //       credentials: {
+  //         accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
+  //         secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
+  //       },
+  //     });
+
+  //     const target = {
+  //       Bucket: "clickedart-bucket",
+  //       Key: `images/${file.name}`,
+  //       Body: file,
+  //     };
+
+  //     const upload = new Upload({
+  //       client: s3,
+  //       params: target,
+  //     });
+
+  //     upload.on("httpUploadProgress", (progress) => {
+  //       const percentCompleted = Math.round(
+  //         (progress.loaded / progress.total) * 100
+  //       );
+  //       setProgr(percentCompleted);
+  //       console.log(`Progress: ${percentCompleted}%`);
+  //     });
+
+  //     await upload.done().then((r) => console.log(r));
+  //     console.log("File uploaded successfully!");
+  //     const fileUrl = `https://${target.Bucket}.s3.ap-south-1.amazonaws.com/${target.Key}`;
+  //     setImageUrl(fileUrl);
+  //     setPhoto({ ...photo, imageLinks: {} });
+  //     console.log("File URL:", fileUrl);
+  //   } catch (error) {
+  //     console.error("Error uploading file:", error);
+  //   }
+  // };
+
+  const handleDelete = async () => {
     try {
-      const file = event.target.files[0];
-
-      if (!file) {
-        console.error("No file selected");
-        return;
-      }
-
-      const s3 = new S3Client({
-        region: "ap-south-1",
-        credentials: {
-          accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
-          secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
-        },
-      });
-
-      const target = {
-        Bucket: "clickedart-bucket",
-        Key: `images/${file.name}`,
-        Body: file,
-      };
-
-      const upload = new Upload({
-        client: s3,
-        params: target,
-      });
-
-      upload.on("httpUploadProgress", (progress) => {
-        const percentCompleted = Math.round(
-          (progress.loaded / progress.total) * 100
-        );
-        setProgr(percentCompleted);
-        console.log(`Progress: ${percentCompleted}%`);
-      });
-
-      await upload.done().then((r) => console.log(r));
-      console.log("File uploaded successfully!");
-      const fileUrl = `https://${target.Bucket}.s3.ap-south-1.amazonaws.com/${target.Key}`;
-      setImageUrl(fileUrl);
-      setPhoto({ ...photo, imageLinks: {} });
-      console.log("File URL:", fileUrl);
+      const response = await axios.delete(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/images/delete-image?id=${id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-auth-token": token,
+          },
+        }
+      );
+      console.log(response.data);
+      toast.success("Image deleted successfully");
+      alert("Image deleted successfully. Please check your profile.");
+      router.push("/profile");
     } catch (error) {
-      console.error("Error uploading file:", error);
+      console.log(error);
+      toast.error(error?.response?.data?.message);
+      toast.error("Error deleting image");
     }
   };
 
@@ -115,6 +153,7 @@ export default function ImageEdit() {
   }));
 
   console.log("Photo:", updatedPhoto);
+  console.log("Active Plan:", activePlan);
 
   const handlePriceChange = (e) => {
     const newValue = e.target.value;
@@ -127,7 +166,7 @@ export default function ImageEdit() {
         : activePlan === "intermediate"
         ? 3000
         : 2000;
-    setPhoto({ ...photo, price: newValue });
+    setUpdatedPhoto({ ...updatedPhoto, price: newValue });
 
     if (timeoutId) {
       clearTimeout(timeoutId);
@@ -137,12 +176,12 @@ export default function ImageEdit() {
       let validPrice = Number(newValue);
 
       if (validPrice >= minPrice && validPrice <= maxPrice) {
-        setPhoto({ ...photo, price: validPrice });
+        setUpdatedPhoto({ ...updatedPhoto, price: validPrice });
       } else if (validPrice < minPrice) {
-        setPhoto({ ...photo, price: minPrice });
+        setUpdatedPhoto({ ...updatedPhoto, price: minPrice });
         toast.error(`Minimum price should be ${minPrice}`);
       } else if (validPrice > maxPrice) {
-        setPhoto({ ...photo, price: maxPrice });
+        setUpdatedPhoto({ ...updatedPhoto, price: maxPrice });
         toast.error(`Maximum price should be ${maxPrice}`);
       }
     }, 1000);
@@ -175,14 +214,46 @@ export default function ImageEdit() {
       }
     };
 
+    const fetchActivePlan = async () => {
+      if (!photographer || !photographer._id) {
+        console.log("Photographer data is missing");
+        return;
+      }
+      try {
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/get-user-active-subscription?photographer=${photographer._id}`
+        );
+        console.log(
+          "Active Subscription ",
+          res.data.subscription?.planId?.name
+        );
+        setActivePlan(res.data.subscription?.planId?.name?.toLowerCase());
+        if (res.data.subscription?.planId?.name?.toLowerCase() === "basic") {
+          setLimit(10);
+        } else if (
+          res.data.subscription?.planId?.name?.toLowerCase() === "intermediate"
+        ) {
+          setLimit(50);
+        } else if (
+          res.data.subscription?.planId?.name?.toLowerCase() === "premium"
+        ) {
+          setLimit(999999);
+        }
+      } catch (error) {
+        console.log(error.response ? error.response.data : error.message);
+      }
+    };
+
     fetchCategories();
     fetchPhoto();
+    fetchActivePlan();
   }, [photographer]);
 
   useEffect(() => {
     if (photo) {
       setUpdatedPhoto((prev) => ({
         ...prev,
+        id: photo._id,
         title: photo.title,
         price: photo.price.original,
         category: photo.category,
@@ -192,6 +263,7 @@ export default function ImageEdit() {
         cameraDetails: photo.cameraDetails,
         location: photo.location,
         imageLinks: photo.imageLinks,
+        photographer: photo.photographer._id,
       }));
     }
   }, [photo]);
@@ -204,13 +276,42 @@ export default function ImageEdit() {
             Add essential information to make your photos stand out.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
-            <img
-              src={
-                updatedPhoto.imageLinks?.thumbnail || "/assets/placeholder.webp"
-              }
-              className="w-full h-auto shadow-[3px_3px_10px_rgba(0,0,0,0.5)]"
-              alt="Uploaded Image"
-            />
+            <div className="flex flex-col items-center gap-4">
+              <img
+                src={
+                  updatedPhoto.imageLinks?.thumbnail ||
+                  "/assets/placeholder.webp"
+                }
+                className="w-full h-auto shadow-[3px_3px_10px_rgba(0,0,0,0.5)]"
+                alt="Uploaded Image"
+              />
+              <Dialog>
+                <DialogTrigger>
+                  <div className="font-medium px-4 py-2 rounded-lg text-white shadow-[2px_2px_4px_rgba(0,0,0,0.4)] bg-red-600 hover:bg-red-500 hover:scale-105 transition-all duration-200 ease-in-out cursor-pointer">
+                    Delete
+                  </div>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Are you absolutely sure?</DialogTitle>
+                    <DialogDescription>
+                      This action cannot be undone. This will permanently delete
+                      your account and remove your data from our servers.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogClose asChild>
+                    <div
+                      onClick={() => {
+                        handleDelete();
+                      }}
+                      className="font-medium px-4 py-2 rounded-lg text-white shadow-[2px_2px_4px_rgba(0,0,0,0.4)] bg-red-600 hover:bg-red-500 transition-all duration-200 ease-in-out cursor-pointer"
+                    >
+                      Delete
+                    </div>
+                  </DialogClose>
+                </DialogContent>
+              </Dialog>
+            </div>
             <form className="flex flex-col gap-4">
               <div className="grid grid-cols-3 gap-4">
                 <div className="col-span-2">
@@ -463,7 +564,9 @@ export default function ImageEdit() {
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <Button onClick={() => setStep("1")}>Back</Button>
+                <Link href="/profile">
+                  <button className="w-full bg-primary h-full rounded-lg text-white font-semibold hover:bg-primary-dark">Back</button>
+                </Link>
                 <Button2 onClick={handleUpdate}>Update</Button2>
               </div>
             </form>
