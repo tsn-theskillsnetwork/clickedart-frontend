@@ -377,6 +377,15 @@ const ProfilePage = () => {
               </div>
             )}
 
+            {/* Active Plan Show */}
+            {photographer && (
+              <div className="flex flex-col items-center mt-4">
+                <p className="text-heading-05 font-semibold capitalize">
+                  Active Plan: {activePlan}
+                </p>
+              </div>
+            )}
+
             {photographer && (
               <div
                 className={`text-white ${
@@ -503,7 +512,9 @@ const ProfilePage = () => {
                                 variant="ghost"
                                 size="sm"
                               >
-                                <Link href={`/profile/edit/${image._id}`}>EDIT</Link>
+                                <Link href={`/profile/edit/${image._id}`}>
+                                  Edit
+                                </Link>
                               </Button>
                             </div>
                           </PopoverContent>
