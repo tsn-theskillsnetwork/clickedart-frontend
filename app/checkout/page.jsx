@@ -81,29 +81,37 @@ export default function CheckoutPage() {
 
   console.log(cartItems);
 
-  const validateOrder = () => {
+  const validateOrder = (orderData) => {
     if (!user) {
       toast.error("Please login as User to continue");
       return false;
     }
 
-    if (!orderData.shippingAddress.address) {
-      toast.error("Please enter your address");
+    const address = orderData?.shippingAddress?.address?.trim();
+    const city = orderData?.shippingAddress?.city?.trim();
+    const state = orderData?.shippingAddress?.state?.trim();
+    const mobile = orderData?.shippingAddress?.mobile;
+
+    if (!address) {
+      toast.error(
+        "Please enter your address",
+        orderData.shippingAddress?.address?.trim()
+      );
       return false;
     }
 
-    if (!orderData.shippingAddress.city) {
+    if (!city) {
       toast.error("Please enter your city");
       return false;
     }
 
-    if (!orderData.shippingAddress.state) {
+    if (!state) {
       toast.error("Please enter your state");
       return false;
     }
 
-    if (!orderData.shippingAddress.mobileNumber) {
-      toast.error("Please enter your mobile number");
+    if (!mobile || mobile.toString().length !== 10) {
+      toast.error("Please enter a valid 10-digit mobile number");
       return false;
     }
 
@@ -133,17 +141,18 @@ export default function CheckoutPage() {
   console.log("Price:", price);
 
   const handlePayment = useCallback(
-    async (finalAmount) => {
+    async (orderData) => {
       if (!user) {
         toast.error("Please login as User to continue");
         return;
       }
 
-      if (!validateOrder()) return;
+      console.log("Order Data:", orderData);
+      if (!validateOrder(orderData)) return;
       const result = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/download/payment`,
         {
-          total: finalAmount,
+          total: orderData.finalAmount,
           userId: user._id,
         }
       );
@@ -306,7 +315,7 @@ export default function CheckoutPage() {
     console.log("GST Amount:", gstAmount);
     console.log("Platform Fee:", platformFee);
     console.log("Final Amount:", finalAmount);
-  }, [user, cartItems, discount, coupon, price]);
+  }, [user, cartItems, discount, coupon, price] || []);
 
   // console.log("orderData", orderData);
 
@@ -371,8 +380,6 @@ export default function CheckoutPage() {
     }
   }, [isHydrated, user, router]);
 
-  console.log("Order Data:", orderData);
-
   return (
     <div>
       {loading || !isHydrated ? (
@@ -383,7 +390,7 @@ export default function CheckoutPage() {
         <section className="bg-white py-8 antialiased d md:py-16">
           <form
             action={() => {
-              handlePayment(orderData.finalAmount);
+              handlePayment(orderData);
             }}
             className="mx-auto max-w-screen-xl px-4 2xl:px-0"
           >
@@ -447,11 +454,7 @@ export default function CheckoutPage() {
                       <Input
                         type="text"
                         placeholder="City"
-                        value={
-                          orderData.shippingAddress.address ||
-                          user?.shippingAddress.address ||
-                          ""
-                        }
+                        value={orderData.shippingAddress.address || ""}
                         onChange={(e) =>
                           setOrderData((prev) => ({
                             ...prev,

@@ -12,6 +12,7 @@ import axios from "axios";
 import useAuthStore from "@/authStore";
 import { useRazorpay } from "react-razorpay";
 import toast from "react-hot-toast";
+import Swal from "sweetalert2";
 
 export default function MembershipPage() {
   const { photographer, token } = useAuthStore();
@@ -123,13 +124,16 @@ export default function MembershipPage() {
     fetchActivePlan();
   }, [photographer] || []);
 
-  const handleTrial = async (planId, price, duration) => {
+  const handleTrial = async (planId, duration) => {
     if (!photographer) return;
+    const cost = plans.find((plan) => plan._id === planId).cost.find(
+      (cost) => cost.duration === duration
+    ).price;
     const confirm = window.confirm(
       "Are you sure you want to start the free trial?"
     );
     if (confirm) {
-      handleSubscribe(planId, price, duration);
+      handleSubscribe(planId, cost, duration);
     }
   };
 
@@ -152,7 +156,11 @@ export default function MembershipPage() {
         }
       );
       console.log("Worked");
-      toast.success("Subscription added successfully");
+      Swal.fire({
+        icon: "success",
+        title: "Subscription Successful",
+        text: "You have successfully subscribed to the plan. It will be activated under 24 hours.",
+      });
       console.log(response.data);
     } catch (error) {
       console.error(error);
@@ -227,7 +235,7 @@ export default function MembershipPage() {
           {userPlan !== "Premium" && (
             <button
               onClick={() =>
-                handleTrial("67853b3d25457a993c90b1a1", 3999, "monthly")
+                handleTrial("67853b3d25457a993c90b1a1", "monthly")
               }
               className="bg-white text-primary text-xs mx-auto md:mx-0 sm:text-paragraph lg:text-heading-05 font-semibold rounded-lg py-2.5 px-3 mt-2"
             >
@@ -386,6 +394,15 @@ export default function MembershipPage() {
                     plan._id === active ? "scale-y-95" : "scale-y-100"
                   } transition-transform w-40 lg:w-60 duration-200 ease-linear`}
                 >
+                  {userPlan === plan.name && (
+                    <div className="w-full">
+                      <p
+                        className={`${plan._id === active ? "text-white border-white" : "text-primary border-primary"} md:text-sm w-full text-center border-2 lg:text-heading-06 xl:text-heading-05 font-medium rounded-lg py-4 px-6 mt-4`}
+                      >
+                        Current Plan
+                      </p>
+                    </div>
+                  )}
                   {userPlan != plan.name && plan.name !== "Basic" && (
                     <div className="w-full">
                       {/* The button */}
