@@ -63,13 +63,14 @@ export default function ThemesPage() {
         ))}
       </div>
       <div className="w-full flex justify-center items-center">
-        {}
-        <div
-          onClick={() => setPageSize((prev) => prev + 12)}
-          className="flex items-center justify-center px-4 rounded-lg mb-10 py-4 bg-primary text-white font-semibold text-heading-06 uppercase cursor-pointer hover:bg-primary-dark transition-all duration-300 ease-in-out"
-        >
-          View More <ChevronDown size={24} className="ml-2" />
-        </div>
+        {pageCount > page && (
+          <div
+            onClick={() => setPageSize((prev) => prev + 12)}
+            className="flex items-center justify-center px-4 rounded-lg mb-10 py-4 bg-primary text-white font-semibold text-heading-06 uppercase cursor-pointer hover:bg-primary-dark transition-all duration-300 ease-in-out"
+          >
+            View More <ChevronDown size={24} className="ml-2" />
+          </div>
+        )}
       </div>
     </div>
   );

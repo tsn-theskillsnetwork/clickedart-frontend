@@ -14,19 +14,34 @@ export default function BulkDownloadForm() {
   const { photographer, isHydrated } = useAuthStore();
 
   const [formData, setFormData] = useState({
-    photographerId: "",
+    photographer: "",
+    address: {
+      residentialAddress: "",
+      state: "",
+    },
     panPhoto: "",
     panNumber: "",
     country: "",
+    bankAccountName: "",
     bankAccNumber: "",
     ifsc: "",
     branch: "",
     passbookOrCancelledCheque: "",
+    isBusinessAccount: false,
     businessAccount: {
+      businessDetailsInfo: {
+        businessName: "",
+        natureOfBusiness: "",
+        businessAddress: "",
+      },
       gstCopy: "",
       firmPan: "",
+      firmPanPhoto: "",
       firmGstCertificate: "",
       gstNumber: "",
+      gstState: "",
+      gstType: "",
+      businessAddressProof: "",
     },
   });
 
@@ -37,23 +52,24 @@ export default function BulkDownloadForm() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
-    if (name.startsWith("businessAccount.")) {
-      const businessField = name.split(".")[1];
-      setFormData((prev) => ({
-        ...prev,
-        businessAccount: {
-          ...prev.businessAccount,
-          [businessField]: value,
-        },
-      }));
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-    }
+  
+    const updateNestedField = (path, value, obj) => {
+      const fields = path.split(".");
+      const field = fields.shift();
+  
+      if (fields.length === 0) {
+        return { ...obj, [field]: value };
+      }
+  
+      return {
+        ...obj,
+        [field]: updateNestedField(fields.join("."), value, obj[field] || {}),
+      };
+    };
+  
+    setFormData((prev) => updateNestedField(name, value, prev));
   };
+  
 
   const handleFileSelection = (e) => {
     const { name } = e.target;
@@ -197,6 +213,69 @@ export default function BulkDownloadForm() {
       <h1 className="text-4xl font-bold text-center">Monetization Form</h1>
       <form onSubmit={handleSubmit} className="w-full max-w-3xl mx-auto mt-10">
         <div className="flex flex-col space-y-4">
+          {/* Personal Details Section */}
+          <h2 className="text-xl font-medium pt-4">Personal Information</h2>
+          <Label htmlFor="fullName">Full Name</Label>
+          <div className="flex gap-2 items-center">
+            <Input
+              type="text"
+              id="photographer"
+              name="photographer"
+              value={
+                `${photographer?.firstName} ${photographer?.lastName}` || ""
+              }
+              disabled
+            />
+          </div>
+          <Label htmlFor="dob">Date of Birth</Label>
+          <div className="flex gap-2 items-center">
+            <Input
+              type="text"
+              id="dob"
+              name="dob"
+              value={photographer?.dob ? photographer.dob.split("T")[0] : ""}
+              disabled
+            />
+          </div>
+          <Label htmlFor="mobile">Contact Number</Label>
+          <div className="flex gap-2 items-center">
+            <Input
+              type="text"
+              id="mobile"
+              name="mobile"
+              value={photographer?.mobile || ""}
+              disabled
+            />
+          </div>
+          <Label htmlFor="email">Email</Label>
+          <div className="flex gap-2 items-center">
+            <Input
+              type="text"
+              id="email"
+              name="email"
+              value={photographer?.email || ""}
+              disabled
+            />
+          </div>
+          <h2 className="text-xl font-medium pt-4">Address Details</h2>
+          <Label htmlFor="address.residentialAddress">Residential Address</Label>
+          <Input
+            type="text"
+            id="address.residentialAddress"
+            value={formData.address.residentialAddress}
+            name="address.residentialAddress"
+            placeholder="Enter Residential Address"
+            onChange={handleInputChange}
+          />
+          <Label htmlFor="address.state">State</Label>
+          <Input
+            type="text"
+            id="address.state"
+            value={formData.address.state}
+            name="address.state"
+            placeholder="Enter State"
+            onChange={handleInputChange}
+          />
           {/* PAN Photo */}
           <Label htmlFor="panPhoto">PAN Photo</Label>
           <div className="flex gap-2 items-center">
