@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useRazorpay } from "react-razorpay";
+import Swal from "sweetalert2";
 
 export default function CheckoutPage() {
   const { user, token, isHydrated } = useAuthStore();
@@ -107,6 +108,11 @@ export default function CheckoutPage() {
 
     if (!state) {
       toast.error("Please enter your state");
+      return false;
+    }
+
+    if (!mobile) {
+      toast.error("Please enter your mobile number");
       return false;
     }
 
@@ -217,8 +223,17 @@ export default function CheckoutPage() {
 
       // console.log("Order created", res.data);
       clearCart();
-      toast.success("Order placed successfully");
-      router.push("/profile/orders");
+      Swal.fire({
+        title: "Order Placed Successfully",
+        text: "Your order has been placed successfully",
+        icon: "success",
+        confirmButtonText: "Go to Orders",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push("/profile/orders");
+        }
+      });
+      // router.push("/profile/orders");
       setLoading(false);
     } catch (error) {
       console.error("Error placing order:", error);
@@ -564,7 +579,16 @@ export default function CheckoutPage() {
                     </div>
                     <div>
                       <Label htmlFor="gst">GST number</Label>
-                      <Input type="text" value={orderData.gst || ""} disabled />
+                      <Input
+                        type="text"
+                        value={orderData.gst || ""}
+                        onChange={(e) =>
+                          setOrderData((prev) => ({
+                            ...prev,
+                            gst: e.target.value,
+                          }))
+                        }
+                      />
                     </div>
                   </div>
                 </div>

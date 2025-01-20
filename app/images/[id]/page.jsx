@@ -63,7 +63,10 @@ export default function ImagePage() {
         title: image.title,
         photographer: image.photographer,
         resolution: selectedSize,
-        price: mode === "print" ? image.price?.original : image.price?.[selectedSize],
+        price:
+          mode === "print"
+            ? image.price?.original
+            : image.price?.[selectedSize],
         thumbnail: image.imageLinks?.thumbnail || image.imageLinks?.original,
       },
       paperInfo: selectedPaper
@@ -231,6 +234,12 @@ export default function ImagePage() {
   // }, [id, token, viewCount]);
 
   const toastShownRef = useRef(false);
+
+  const handlePaperChange = (paper) => {
+    setSelectedSize(paper.customDimensions[0]);
+    setSelectedPaper(paper);
+    console.log("Selected Paper", selectedPaper);
+  };
 
   useEffect(() => {
     if (!isHydrated || toastShownRef.current) return;
@@ -408,6 +417,7 @@ export default function ImagePage() {
               className="w-36"
               onValueChange={(value) => {
                 setSelectedPaper(value);
+                handlePaperChange(value);
               }}
             >
               <SelectTrigger className="w-full font-medium !text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between">
@@ -428,6 +438,12 @@ export default function ImagePage() {
                 ))}
               </SelectContent>
             </Select>
+
+            <p className="-mb-8 font-medium">
+              {selectedSize
+                ? `${selectedSize?.width} x ${selectedSize?.height} in`
+                : "Select Size"}
+            </p>
 
             <Select
               className="w-36"
