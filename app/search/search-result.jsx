@@ -105,13 +105,17 @@ export default function SearchResultPage() {
     setSearch(searchValue);
   }, [themeValue, sortValue, searchValue]);
 
-  const sortedImages = [...images].sort((a, b) => {
-    if (sort === "price") return a.price?.original - b.price?.original;
-    if (sort === "rating") return b.rating - a.rating;
-    if (sort === "popularity")
-      return b.imageAnalytics?.views - a.imageAnalytics?.views;
-    return new Date(b.date) - new Date(a.date);
-  });
+  const sortedImages = [...images]
+    .filter((image) =>
+      theme === "all" ? true : image.category.some((cat) => cat.name === theme)
+    )
+    .sort((a, b) => {
+      if (sort === "price") return a.price?.original - b.price?.original;
+      if (sort === "rating") return b.rating - a.rating;
+      if (sort === "popularity")
+        return b.imageAnalytics?.views - a.imageAnalytics?.views;
+      return new Date(b.date) - new Date(a.date);
+    });
 
   useEffect(() => {
     const fetchThemes = async () => {
@@ -138,12 +142,7 @@ export default function SearchResultPage() {
 
   useEffect(() => {
     const fetchImages = async () => {
-      const type =
-        typeValue === "photographers"
-          ? "photographer"
-          : typeValue === "categories"
-          ? "category"
-          : "images";
+      const type = typeValue === "photographers" ? "photographer" : "images";
       console.log(type);
       try {
         const res = await fetch(
@@ -369,7 +368,7 @@ export default function SearchResultPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="price">Price</SelectItem>
-                    <SelectItem value="rating">Rating</SelectItem>
+                    {/* <SelectItem value="rating">Rating</SelectItem> */}
                     <SelectItem value="popularity">Popularity</SelectItem>
                     <SelectItem value="date">Date</SelectItem>
                   </SelectContent>
@@ -391,7 +390,7 @@ export default function SearchResultPage() {
                     height={800}
                     priority
                     src={
-                      image.imageLinks.thumbnail || image.imageLinks.original
+                      image.imageLinks.thumbnail || "/assets/placeholder.webp"
                     }
                     alt={image.description}
                     className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear opacity-50 blur-[4px] border border-primary-200"
@@ -400,7 +399,7 @@ export default function SearchResultPage() {
                     width={800}
                     height={800}
                     src={
-                      image.imageLinks.thumbnail || image.imageLinks.original
+                      image.imageLinks.thumbnail || "/assets/placeholder.webp"
                     }
                     alt={image.description}
                     className="absolute inset-0 object-contain w-full aspect-[1/1] transition-all duration-200 ease-linear drop-shadow-md"

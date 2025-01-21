@@ -12,6 +12,7 @@ import {
   ThumbsDown,
   ThumbsUp,
 } from "lucide-react";
+import Image from "next/image";
 
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
@@ -88,10 +89,28 @@ export default function StoryPage() {
                 alt="placeholder"
               />
 
-              <p className="text-lg text-justify">{story.description}</p>
+              <div
+                className="prose max-w-full"
+                dangerouslySetInnerHTML={{
+                  __html: story.description,
+                }}
+              />
+              {/* <p className="text-lg text-justify">{story.description}</p> */}
               <h5 className="text-heading-05 font-semibold text-primary-400">
                 Photo Details
               </h5>
+              <div className="grid grid-cols-2">
+                <Image
+                  src={story.inspiredBy?.imageLinks.thumbnail}
+                  alt="thumbnail"
+                  width={800}
+                  height={800}
+                  className="border-8 border-white shadow-md shadow-zinc-500"
+                />
+                <h2 className="text-heading-03 text-primary font-bold">
+                  {story.inspiredBy?.title}
+                </h2>
+              </div>
               <div className="flex flex-wrap items-start justify-start gap-4">
                 {story.inspiredBy?.location && (
                   <div className="flex flex-row gap-2 items-center">
