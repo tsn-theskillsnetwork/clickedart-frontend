@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Heart, Search, Tag } from "lucide-react";
+import { ChevronDown, Heart, Search, Tag } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -27,6 +27,7 @@ export default function ThemesResultPage() {
 
   const [images, setImages] = useState([]);
 
+  const page = searchParams.get("page") || 1;
   const sortValue = searchParams.get("sort") || "date";
   const themeValue = searchParams.get("theme") || "all";
   const searchValue = searchParams.get("search") || "";
@@ -36,6 +37,8 @@ export default function ThemesResultPage() {
   const [theme, setTheme] = useState(themeValue);
   const [sort, setSort] = useState(sortValue);
   const [search, setSearch] = useState("");
+  const [pageSize, setPageSize] = useState(12);
+  const [pageCount, setPageCount] = useState(1);
   // const [wishlist, setWishlist] = useState([]);
 
   const addImageToWishlist = async (imageId) => {
@@ -100,29 +103,13 @@ export default function ThemesResultPage() {
     setSearch(searchValue);
   }, [themeValue, sortValue, searchValue]);
 
-  const sortedImages = [...images]
-  .filter((image) => {
-    if (theme === "all") return true;
-    // Check if the theme matches the name of any category in the category array
-    return image.category.some((cat) => cat.name.toLowerCase() === theme.toLowerCase());
-  })
-  .filter((image) => {
-    if (!searchValue) return true;
-    return (
-      image.title?.toLowerCase().includes(searchValue.toLowerCase()) ||
-      image.description?.toLowerCase().includes(searchValue.toLowerCase()) ||
-      image.keywords?.some((keyword) =>
-        keyword.toLowerCase().includes(searchValue.toLowerCase())
-      )
-    );
-  })
-  .sort((a, b) => {
-    if (sort === "price") return a.price - b.price;
+  const sortedImages = [...images].sort((a, b) => {
+    if (sort === "price") return a.price?.original - b.price?.original;
     if (sort === "rating") return b.rating - a.rating;
-    if (sort === "popularity") return b.downloadCount - a.downloadCount;
+    if (sort === "popularity")
+      return b.imageAnalytics?.views - a.imageAnalytics?.views;
     return new Date(b.date) - new Date(a.date);
   });
-
 
   useEffect(() => {
     const fetchThemes = async () => {
@@ -144,10 +131,35 @@ export default function ThemesResultPage() {
       }
     };
 
+    fetchThemes();
+  }, []);
+
+  useEffect(() => {
     const fetchImages = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-all-images`,
+          `${process.env.NEXT_PUBLIC_SERVER}/api/category/search-category?Query=${themeValue}&pageNumber=${page}&pageSize=${pageSize}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await res.json();
+        console.log(data);
+        setImages(data.results);
+        setPageCount(data.pageCount);
+        console.log(data.results);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    const fetchAllImages = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-all-images?pageNumber=${page}&pageSize=${pageSize}`,
           {
             method: "GET",
             headers: {
@@ -157,15 +169,19 @@ export default function ThemesResultPage() {
         );
         const data = await res.json();
         setImages(data.photos);
+        setPageCount(data.pageCount);
         console.log(data.photos);
       } catch (error) {
         console.error(error);
       }
     };
 
-    fetchThemes();
-    fetchImages();
-  }, []);
+    if (!themeValue || themeValue === "all") {
+      fetchAllImages();
+    } else {
+      fetchImages();
+    }
+  }, [themeValue, pageSize, page]);
 
   // useEffect(() => {
   //   const fetchWishlist = async () => {
@@ -246,7 +262,7 @@ export default function ThemesResultPage() {
             </button>
           </div> */}
           <div className="flex flex-col sm:flex-row gap-5">
-            <div className="flex flex-col">
+            {/* <div className="flex flex-col">
               <p className="font-semibold text-primary-dark text-paragraph">
                 Filter by
               </p>
@@ -265,7 +281,7 @@ export default function ThemesResultPage() {
                   <SelectItem value="popularity">Popularity</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
             <div className="flex flex-col">
               <p className="font-semibold text-primary-dark text-paragraph">
                 Sort by
@@ -298,7 +314,7 @@ export default function ThemesResultPage() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-44">
           {sortedImages.map((image, index) => (
-            <div key={index}>
+            <div key={index} className="shadow-[0px_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out">
               <div
                 onClick={() => {
                   router.push(`/images/${image._id}`);
@@ -349,7 +365,7 @@ export default function ThemesResultPage() {
                   </div>
                 </div>
               </div>
-              <div className="text-neutral-600">
+              <div className="text-neutral-600 p-2">
                 <h2 className="text-heading-05 font-semibold">
                   {image.title || "Untitled"}
                 </h2>
@@ -366,7 +382,7 @@ export default function ThemesResultPage() {
                 <p className="font-medium text-surface-500">
                   {image.category?.name}
                 </p>
-                <div className="flex flex-row gap-2 overflow-y-scroll no-scrollbar">
+                {/* <div className="flex flex-row gap-2 overflow-y-scroll no-scrollbar">
                   {image.keywords?.map((tag, index) => (
                     <span
                       key={index}
@@ -375,23 +391,44 @@ export default function ThemesResultPage() {
                       {tag}
                     </span>
                   ))}
-                </div>
+                </div> */}
                 {/* <h2 className="text-heading-06 font-medium">
                   {image.description}
                 </h2> */}
+                <div className="flex justify-between">
+                  <p className="text-paragraph font-medium">
+                    {image.resolutions?.original?.width}{" "}
+                    <span className="font-bold">x</span>{" "}
+                    {image.resolutions?.original?.height} px
+                  </p>
+                  <p className="text-paragraph font-bold">
+                    ₹{image.price?.original}
+                  </p>
+                </div>
                 <p className="text-paragraph font-medium">
+                  (
                   {(
                     (image.resolutions?.original?.height *
                       image.resolutions?.original?.width) /
                     1000000
                   ).toFixed(1)}{" "}
-                  MP
+                  MP)
                 </p>
               </div>
             </div>
           ))}
         </div>
-        <div className="flex justify-center items-center mt-10"></div>
+        <div className="w-full flex justify-center items-center mt-10">
+          {pageCount > page && (
+            <div
+              onClick={() => setPageSize((prev) => prev + 12)}
+              className="flex items-center justify-center px-4 rounded-lg mb-10 py-4 bg-primary text-white font-semibold text-heading-06 uppercase cursor-pointer hover:bg-primary-dark transition-all duration-300 ease-in-out"
+            >
+              View More <ChevronDown size={24} className="ml-2" />
+            </div>
+          )}
+        </div>
+        {/* <div className="flex justify-center items-center mt-10"></div> */}
       </motion.div>
     </AnimatePresence>
   );

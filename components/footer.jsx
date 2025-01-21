@@ -6,26 +6,28 @@ import Button from "./button";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import axios from "axios";
+import useLayoutStore from "@/store/layout";
 
 export default function Footer() {
   const router = useRouter();
   const pathname = usePathname();
-  const [settings, setSettings] = useState({});
+  // const [settings, setSettings] = useState({});
+  const { layout } = useLayoutStore();
 
-  const fetchSettings = async () => {
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/layout/get-layout-content`
-      );
-      setSettings(res.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const fetchSettings = async () => {
+  //   try {
+  //     const res = await axios.get(
+  //       `${process.env.NEXT_PUBLIC_SERVER}/api/layout/get-layout-content`
+  //     );
+  //     setSettings(res.data);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
-  useEffect(() => {
-    fetchSettings();
-  }, []);
+  // useEffect(() => {
+  //   fetchSettings();
+  // }, []);
   if (pathname.startsWith("/dashboard")) return null;
   return (
     <div className={`bg-primary-100 min-h-96 px-10 sm:px-24 z-50`}>
@@ -39,12 +41,12 @@ export default function Footer() {
                 onClick={() => {
                   router.push("/");
                 }}
-                src={settings?.logo || "/assets/Logo.png"}
+                src={layout?.logo || "/assets/Logo.png"}
                 alt="ClickedArt.com"
                 className="w-full h-auto"
               />
-              <p className="mt-5">{settings?.footerDetails?.phone}</p>
-              <p>{settings?.footerDetails?.address}</p>
+              <p className="mt-5">{layout?.footerDetails?.phone}</p>
+              <p>{layout?.footerDetails?.address}</p>
               <div className="flex gap-4 text-sm underline underline-offset-1">
                 <Link href="#">Terms of Use</Link>
                 <Link href="#">Privacy Policy</Link>

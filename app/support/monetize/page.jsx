@@ -8,6 +8,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/loader";
+import Link from "next/link";
 
 export default function BulkDownloadForm() {
   const router = useRouter();
@@ -15,14 +16,17 @@ export default function BulkDownloadForm() {
 
   const [formData, setFormData] = useState({
     photographer: "",
+    t_c: false,
     address: {
       residentialAddress: "",
       state: "",
     },
     panPhoto: "",
+    governmentIdProof: "",
     panNumber: "",
     country: "",
     bankAccountName: "",
+    bankName: "",
     bankAccNumber: "",
     ifsc: "",
     branch: "",
@@ -50,26 +54,27 @@ export default function BulkDownloadForm() {
 
   console.log("formData", formData);
 
+  
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-  
+
     const updateNestedField = (path, value, obj) => {
       const fields = path.split(".");
       const field = fields.shift();
-  
+
       if (fields.length === 0) {
         return { ...obj, [field]: value };
       }
-  
+
       return {
         ...obj,
         [field]: updateNestedField(fields.join("."), value, obj[field] || {}),
       };
     };
-  
+
     setFormData((prev) => updateNestedField(name, value, prev));
   };
-  
 
   const handleFileSelection = (e) => {
     const { name } = e.target;
@@ -258,189 +263,399 @@ export default function BulkDownloadForm() {
             />
           </div>
           <h2 className="text-xl font-medium pt-4">Address Details</h2>
-          <Label htmlFor="address.residentialAddress">Residential Address</Label>
-          <Input
-            type="text"
-            id="address.residentialAddress"
-            value={formData.address.residentialAddress}
-            name="address.residentialAddress"
-            placeholder="Enter Residential Address"
-            onChange={handleInputChange}
-          />
-          <Label htmlFor="address.state">State</Label>
-          <Input
-            type="text"
-            id="address.state"
-            value={formData.address.state}
-            name="address.state"
-            placeholder="Enter State"
-            onChange={handleInputChange}
-          />
-          {/* PAN Photo */}
-          <Label htmlFor="panPhoto">PAN Photo</Label>
-          <div className="flex gap-2 items-center">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="address.residentialAddress">
+              Residential Address
+            </Label>
             <Input
-              type="file"
-              id="panPhoto"
-              name="panPhoto"
-              accept=".pdf, .jpg, .jpeg, .png"
-              onChange={handleFileSelection}
+              type="text"
+              id="address.residentialAddress"
+              value={formData.address.residentialAddress}
+              name="address.residentialAddress"
+              required
+              placeholder="Enter Residential Address"
+              onChange={handleInputChange}
             />
-            {!formData.panPhoto && (
-              <button
-                type="button"
-                className="bg-blue-500 text-white p-2 rounded-md"
-                onClick={() => handleFileUpload("panPhoto")}
-              >
-                Upload
-              </button>
-            )}
           </div>
 
-          {/* PAN Number */}
-          <Label htmlFor="panNumber">PAN Number</Label>
-          <Input
-            type="text"
-            id="panNumber"
-            name="panNumber"
-            placeholder="Enter PAN Number"
-            onChange={handleInputChange}
-          />
+          <Label htmlFor="address.state">State</Label>
+          <div className="flex flex-col gap-2">
+            <Input
+              type="text"
+              id="address.state"
+              value={formData.address.state}
+              name="address.state"
+              placeholder="Enter State"
+              required
+              onChange={handleInputChange}
+            />
+          </div>
 
           {/* Country */}
           <Label htmlFor="country">Country</Label>
-          <Input
-            type="text"
-            id="country"
-            name="country"
-            placeholder="Enter Country"
-            onChange={handleInputChange}
-          />
+          <div className="flex flex-col gap-2">
+            <Input
+              type="text"
+              id="country"
+              name="country"
+              required
+              placeholder="Enter Country"
+              onChange={handleInputChange}
+            />
+          </div>
 
           {/* Bank Account Details */}
+          <h2 className="text-xl font-medium pt-4">Bank Account Details</h2>
+          <Label htmlFor="bankAccountName">Bank Account Name</Label>
+          <div className="flex flex-col gap-2">
+            <Input
+              type="text"
+              id="bankAccountName"
+              name="bankAccountName"
+              required
+              placeholder="Enter Bank Account Name"
+              onChange={handleInputChange}
+            />
+          </div>
           <Label htmlFor="bankAccNumber">Bank Account Number</Label>
-          <Input
-            type="text"
-            id="bankAccNumber"
-            name="bankAccNumber"
-            placeholder="Enter Bank Account Number"
-            onChange={handleInputChange}
-          />
-
+          <div className="flex flex-col gap-2">
+            <Input
+              type="text"
+              id="bankAccNumber"
+              required
+              name="bankAccNumber"
+              placeholder="Enter Bank Account Number"
+              onChange={handleInputChange}
+            />
+          </div>
           <Label htmlFor="ifsc">IFSC</Label>
-          <Input
-            type="text"
-            id="ifsc"
-            name="ifsc"
-            placeholder="Enter IFSC"
-            onChange={handleInputChange}
-          />
-
+          <div className="flex flex-col gap-2">
+            <Input
+              type="text"
+              id="ifsc"
+              name="ifsc"
+              required
+              placeholder="Enter IFSC"
+              onChange={handleInputChange}
+            />
+          </div>
+          <Label htmlFor="bankName">Bank Name</Label>
+          <div className="flex flex-col gap-2">
+            <Input
+              type="text"
+              id="bankName"
+              name="bankName"
+              required
+              placeholder="Enter Bank Name"
+              onChange={handleInputChange}
+            />
+          </div>
           <Label htmlFor="branch">Branch</Label>
-          <Input
-            type="text"
-            id="branch"
-            name="branch"
-            placeholder="Enter Branch"
-            onChange={handleInputChange}
-          />
+          <div className="flex flex-col gap-2">
+            <Input
+              type="text"
+              id="branch"
+              required
+              name="branch"
+              placeholder="Enter Branch"
+              onChange={handleInputChange}
+            />
+          </div>
 
+          {/* Pan Details */}
+          <h2 className="text-xl font-medium pt-4">PAN Details</h2>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="panNumber">PAN Number</Label>
+            <Input
+              type="text"
+              id="panNumber"
+              name="panNumber"
+              required
+              placeholder="Enter PAN Number"
+              onChange={handleInputChange}
+            />
+          </div>
+
+          {/* Supporting Documents */}
+          <h2 className="text-xl font-medium pt-4">Supporting Documents</h2>
+          <Label htmlFor="panPhoto">Copy of PAN Card</Label>
+          <span className="text-xs italic font-medium">
+            (Required for TDS deduction as per Indian tax laws)
+          </span>
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-2 items-center">
+              <Input
+                type="file"
+                id="panPhoto"
+                name="panPhoto"
+                required
+                accept=".pdf, .jpg, .jpeg, .png"
+                onChange={handleFileSelection}
+              />
+              {!formData.panPhoto && (
+                <button
+                  type="button"
+                  className="bg-blue-500 text-white p-2 rounded-md"
+                  onClick={() => handleFileUpload("panPhoto")}
+                >
+                  Upload
+                </button>
+              )}
+            </div>
+          </div>
+          <Label htmlFor="governmentIdProof">
+            Copy of Aadhar Card or any Valid Govt. Issued ID
+          </Label>
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-2 items-center">
+              <Input
+                type="file"
+                id="governmentIdProof"
+                required
+                name="governmentIdProof"
+                accept=".pdf, .jpg, .jpeg, .png"
+                onChange={handleFileSelection}
+              />
+              {!formData.governmentIdProof && (
+                <button
+                  type="button"
+                  className="bg-blue-500 text-white p-2 rounded-md"
+                  onClick={() => handleFileUpload("governmentIdProof")}
+                >
+                  Upload
+                </button>
+              )}
+            </div>
+          </div>
           <Label htmlFor="passbookOrCancelledCheque">
             Passbook or Cancelled Cheque
           </Label>
-          <div className="flex gap-2 items-center">
-            <Input
-              type="file"
-              id="passbookOrCancelledCheque"
-              name="passbookOrCancelledCheque"
-              accept=".pdf, .jpg, .jpeg, .png"
-              onChange={handleFileSelection}
-            />
-            {!formData.passbookOrCancelledCheque && (
-              <button
-                type="button"
-                className="bg-blue-500 text-white p-2 rounded-md"
-                onClick={() => handleFileUpload("passbookOrCancelledCheque")}
-              >
-                Upload
-              </button>
-            )}
-          </div>
-          {/* Business Account Section */}
-          <h2 className="text-xl font-medium pt-4">
-            Business Account (Optional)
-          </h2>
-          <Label htmlFor="businessAccount.gstCopy">GST Copy</Label>
-          <div className="flex gap-2 items-center">
-            <Input
-              type="file"
-              id="gstCopy"
-              name="businessAccount.gstCopy"
-              accept=".pdf, .jpg, .jpeg, .png"
-              onChange={handleFileSelection}
-            />
-            {!formData.businessAccount.gstCopy && (
-              <button
-                type="button"
-                className="bg-blue-500 text-white p-2 rounded-md"
-                onClick={() => handleFileUpload("businessAccount.gstCopy")}
-              >
-                Upload
-              </button>
-            )}
+          <span className="text-xs italic font-medium">
+            (For Bank Account Verification)
+          </span>
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-2 items-center">
+              <Input
+                type="file"
+                id="passbookOrCancelledCheque"
+                name="passbookOrCancelledCheque"
+                required
+                accept=".pdf, .jpg, .jpeg, .png"
+                onChange={handleFileSelection}
+              />
+              {!formData.passbookOrCancelledCheque && (
+                <button
+                  type="button"
+                  className="bg-blue-500 text-white p-2 rounded-md"
+                  onClick={() => handleFileUpload("passbookOrCancelledCheque")}
+                >
+                  Upload
+                </button>
+              )}
+            </div>
           </div>
 
-          <Label htmlFor="businessAccount.firmPan">Firm PAN</Label>
-          <div className="flex gap-2 items-center">
-            <Input
-              type="file"
-              id="firmPan"
-              name="businessAccount.firmPan"
-              accept=".pdf, .jpg, .jpeg, .png"
-              onChange={handleFileSelection}
+          {/* Switch for Business Account */}
+          <div className="flex items-center gap-2">
+            <Label htmlFor="isBusinessAccount">Business Account</Label>
+            <input
+              type="checkbox"
+              id="isBusinessAccount"
+              name="isBusinessAccount"
+              checked={formData.isBusinessAccount}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  isBusinessAccount: e.target.checked,
+                }))
+              }
             />
-            {!formData.businessAccount.firmPan && (
-              <button
-                type="button"
-                className="bg-blue-500 text-white p-2 rounded-md"
-                onClick={() => handleFileUpload("businessAccount.firmPan")}
-              >
-                Upload
-              </button>
-            )}
+            <span className="font-medium">
+              {formData.isBusinessAccount ? "Yes" : "No"}
+            </span>
           </div>
-          <Label htmlFor="businessAccount.firmGstCertificate">
-            Firm GST Certificate
-          </Label>
-          <div className="flex gap-2 items-center">
-            <Input
-              type="file"
-              id="firmGstCertificate"
-              name="businessAccount.firmGstCertificate"
-              accept=".pdf, .jpg, .jpeg, .png"
-              onChange={handleFileSelection}
-            />
-            {!formData.businessAccount.firmGstCertificate && (
-              <button
-                type="button"
-                className="bg-blue-500 text-white p-2 rounded-md"
-                onClick={() =>
-                  handleFileUpload("businessAccount.firmGstCertificate")
-                }
-              >
-                Upload
-              </button>
-            )}
-          </div>
+          {formData.isBusinessAccount && (
+            <div>
+              {/* Business Account Section */}
+              <h2 className="text-xl font-medium pt-4">Business Information</h2>
+              <Label htmlFor="businessAccount.businessDetailsInfo.businessName">
+                Business Name
+              </Label>
+              <div className="flex flex-col gap-2">
+                <Input
+                  type="text"
+                  id="businessAccount.businessDetailsInfo.businessName"
+                  name="businessAccount.businessDetailsInfo.businessName"
+                  placeholder="Enter Business Name"
+                  onChange={handleInputChange}
+                />
+              </div>
+              <Label htmlFor="businessAccount.businessDetailsInfo.natureOfBusiness">
+                Nature of Business
+              </Label>
+              <div className="flex flex-col gap-2">
+                <Input
+                  type="text"
+                  id="businessAccount.businessDetailsInfo.natureOfBusiness"
+                  name="businessAccount.businessDetailsInfo.natureOfBusiness"
+                  placeholder="Enter Nature of Business"
+                  onChange={handleInputChange}
+                />
+              </div>
+              <Label htmlFor="businessAccount.businessDetailsInfo.businessAddress">
+                Business Address
+              </Label>
+              <Input
+                type="text"
+                id="businessAccount.businessDetailsInfo.businessAddress"
+                name="businessAccount.businessDetailsInfo.businessAddress"
+                placeholder="Enter Business Address"
+                onChange={handleInputChange}
+              />
+              <hr className="mt-4 -mb-2" />
+              <h2 className="text-xl font-medium pt-4">GST Details</h2>
+              <Label htmlFor="businessAccount.gstNumber">GST Number</Label>
+              <Input
+                type="text"
+                id="gstNumber"
+                name="businessAccount.gstNumber"
+                placeholder="Enter GST Number"
+                onChange={handleInputChange}
+              />
+              <Label htmlFor="businessAccount.gstState">GST State</Label>
+              <Input
+                type="text"
+                id="gstState"
+                name="businessAccount.gstState"
+                placeholder="Enter GST State"
+                onChange={handleInputChange}
+              />
 
-          <Label htmlFor="businessAccount.gstNumber">GST Number</Label>
-          <Input
-            type="text"
-            id="gstNumber"
-            name="businessAccount.gstNumber"
-            placeholder="Enter GST Number"
-            onChange={handleInputChange}
-          />
+              <Label htmlFor="businessAccount.gstType">GST Type</Label>
+              <Input
+                type="text"
+                id="gstType"
+                name="businessAccount.gstType"
+                placeholder="Enter GST Type"
+                onChange={handleInputChange}
+              />
+              <hr className="mt-4 -mb-2" />
+              <h2 className="text-xl font-medium pt-4">Documents</h2>
+              <Label htmlFor="businessAccount.gstCopy">GST Copy</Label>
+              <div className="flex gap-2 items-center">
+                <Input
+                  type="file"
+                  id="gstCopy"
+                  name="businessAccount.gstCopy"
+                  accept=".pdf, .jpg, .jpeg, .png"
+                  onChange={handleFileSelection}
+                />
+                {!formData.businessAccount.gstCopy && (
+                  <button
+                    type="button"
+                    className="bg-blue-500 text-white p-2 rounded-md"
+                    onClick={() => handleFileUpload("businessAccount.gstCopy")}
+                  >
+                    Upload
+                  </button>
+                )}
+              </div>
+
+              <Label htmlFor="businessAccount.firmPan">Firm PAN</Label>
+              <div className="flex gap-2 items-center">
+                <Input
+                  type="file"
+                  id="firmPan"
+                  name="businessAccount.firmPan"
+                  accept=".pdf, .jpg, .jpeg, .png"
+                  onChange={handleFileSelection}
+                />
+                {!formData.businessAccount.firmPan && (
+                  <button
+                    type="button"
+                    className="bg-blue-500 text-white p-2 rounded-md"
+                    onClick={() => handleFileUpload("businessAccount.firmPan")}
+                  >
+                    Upload
+                  </button>
+                )}
+              </div>
+              <Label htmlFor="businessAccount.firmGstCertificate">
+                Firm GST Certificate
+              </Label>
+              <div className="flex gap-2 items-center">
+                <Input
+                  type="file"
+                  id="firmGstCertificate"
+                  name="businessAccount.firmGstCertificate"
+                  accept=".pdf, .jpg, .jpeg, .png"
+                  onChange={handleFileSelection}
+                />
+                {!formData.businessAccount.firmGstCertificate && (
+                  <button
+                    type="button"
+                    className="bg-blue-500 text-white p-2 rounded-md"
+                    onClick={() =>
+                      handleFileUpload("businessAccount.firmGstCertificate")
+                    }
+                  >
+                    Upload
+                  </button>
+                )}
+              </div>
+
+              <Label htmlFor="businessAccount.businessAddressProof">
+                Business Address Proof
+              </Label>
+              <div className="flex gap-2 items-center">
+                <Input
+                  type="file"
+                  id="businessAddressProof"
+                  name="businessAccount.businessAddressProof"
+                  accept=".pdf, .jpg, .jpeg, .png"
+                  onChange={handleFileSelection}
+                />
+                {!formData.businessAccount.businessAddressProof && (
+                  <button
+                    type="button"
+                    className="bg-blue-500 text-white p-2 rounded-md"
+                    onClick={() =>
+                      handleFileUpload("businessAccount.businessAddressProof")
+                    }
+                  >
+                    Upload
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Terms and Conditions */}
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="t_c"
+              name="t_c"
+              checked={formData.t_c}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  t_c: e.target.checked,
+                }))
+              }
+            />
+            <Label htmlFor="t_c">
+              I agree to the{" "}
+              <Link
+                href="/terms"
+                target="_blank"
+                rel="noreferrer"
+                className="text-blue-500"
+              >
+                Terms and Conditions
+              </Link>
+            </Label>
+          </div>
 
           {/* Submit Button */}
           <div className="flex justify-center">

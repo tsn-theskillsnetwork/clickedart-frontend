@@ -263,8 +263,11 @@ const ProfilePage = () => {
   const getResolutions = async () => {
     try {
       setLoading(true);
+      toast.loading("Fetching resolutions...");
       console.log("Plan type:", activePlan);
       if (photo.imageLinks.original) {
+        setStep("2");
+        window.scrollTo(0, 160);
         return;
       }
       const response = await axios.post(
@@ -285,10 +288,14 @@ const ProfilePage = () => {
         resolutions: data.resolutions,
       }));
       setLoading(false);
+      setStep("2");
+      window.scrollTo(0, 160);
     } catch (error) {
       console.error("Error fetching resolutions:", error);
+      toast.error("Server error. Please try again later.");
     } finally {
       setLoading(false);
+      toast.dismiss();
     }
   };
 
@@ -478,7 +485,7 @@ const ProfilePage = () => {
                 ) : (
                   <>
                     {imageUrl ? (
-                      <img src={imageUrl} alt="Uploaded Image" />
+                      <img src={imageUrl} alt="Uploaded Image" className="max-h-[80vh] mx-auto" />
                     ) : (
                       <div className="w-full mx-auto rounded-lg overflow-hidden">
                         <div className="md:flex">
@@ -647,8 +654,6 @@ const ProfilePage = () => {
                       <button
                         onClick={() => {
                           getResolutions();
-                          setStep("2");
-                          window.scrollTo(0, 160);
                         }}
                         disabled={
                           !imageUrl ||

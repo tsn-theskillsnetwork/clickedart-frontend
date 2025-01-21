@@ -17,7 +17,7 @@ import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
-export default function StoryPage() {
+export default function BlogPage() {
   const { id } = useParams();
   const pathname = usePathname();
 
@@ -57,8 +57,6 @@ export default function StoryPage() {
     }
   };
 
-  console.log(blog);
-
   return (
     <>
       {blog ? (
@@ -78,8 +76,12 @@ export default function StoryPage() {
                 className="w-4/5 border-8 border-white shadow-md shadow-zinc-500 mx-auto"
                 alt="placeholder"
               />
-
-              <p className="text-lg text-justify">{blog.content.body}</p>
+              <div className="prose max-w-full"
+                dangerouslySetInnerHTML={{
+                  __html: blog.content.body,
+                }}
+              />
+              {/* <p className="text-lg text-justify">{blog.content.body}</p> */}
             </div>
             <div className="flex flex-col mt-4 sm:mt-0 sm:w-1/5 px-4">
               <div className="flex flex-col gap-4 sm:pt-28">
@@ -88,12 +90,10 @@ export default function StoryPage() {
                 </h5>
                 <div className="flex flex-row items-center gap-2">
                   <p className="font-semibold text-md text-primary">
-                  {blog.authorInfo?.authorType}
+                    {blog.authorInfo?.authorType}
                   </p>
                 </div>
-                <p className="text-justify">
-                  Type: {blog.type}
-                </p>
+                <p className="text-justify">Type: {blog.type}</p>
               </div>
             </div>
           </div>

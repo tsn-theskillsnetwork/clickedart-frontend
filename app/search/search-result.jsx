@@ -105,17 +105,13 @@ export default function SearchResultPage() {
     setSearch(searchValue);
   }, [themeValue, sortValue, searchValue]);
 
-  const sortedImages = [...images]
-    .filter((image) => {
-      if (theme === "all") return true;
-      return image.category?.name?.toLowerCase() === theme.toLowerCase();
-    })
-    .sort((a, b) => {
-      if (sort === "price") return a.price?.original - b.price?.original;
-      if (sort === "rating") return b.rating - a.rating;
-      if (sort === "popularity") return b.downloadCount - a.downloadCount;
-      return new Date(b.createdAt) - new Date(a.createdAt);
-    });
+  const sortedImages = [...images].sort((a, b) => {
+    if (sort === "price") return a.price?.original - b.price?.original;
+    if (sort === "rating") return b.rating - a.rating;
+    if (sort === "popularity")
+      return b.imageAnalytics?.views - a.imageAnalytics?.views;
+    return new Date(b.date) - new Date(a.date);
+  });
 
   useEffect(() => {
     const fetchThemes = async () => {
@@ -331,7 +327,7 @@ export default function SearchResultPage() {
             </button>
           </div> */}
             <div className="flex flex-col sm:flex-row gap-5">
-              <div className="flex flex-col">
+              {/* <div className="flex flex-col">
                 <p className="font-semibold text-primary-dark text-paragraph">
                   Filter by
                 </p>
@@ -350,7 +346,7 @@ export default function SearchResultPage() {
                     <SelectItem value="popularity">Popularity</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
+              </div> */}
               <div className="flex flex-col">
                 <p className="font-semibold text-primary-dark text-paragraph">
                   Sort by

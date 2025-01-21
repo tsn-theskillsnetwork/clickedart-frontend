@@ -377,7 +377,7 @@ export default function CheckoutPage() {
         paymentMethod: "razorpay",
       }));
       createOrder();
-    }
+    } 
   }, [paymentStatus]);
 
   const toastShownRef = useRef(false);

@@ -1,30 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import TestimonialCard from "../cards/testimonialCard";
-import axios from "axios";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import useLayoutStore from "@/store/layout";
 
 export default function Testimonial() {
-  const [testimonials, setTestimonials] = useState([]);
-
-  const fetchSettings = async () => {
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/layout/get-layout-content`
-      );
-      setTestimonials(res.data.testimonials);
-    } catch (error) {
-      console.error("Failed to fetch testimonials:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchSettings();
-  }, []);
+  const { layout } = useLayoutStore();
 
   const settings = {
     dots: true,
@@ -55,7 +39,7 @@ export default function Testimonial() {
       {/* Slider Section */}
       <div className="w-full relative">
         <Slider {...settings}>
-          {testimonials.map((testimonial, index) => (
+          {layout?.testimonials.map((testimonial, index) => (
             <div key={index} className="p-6">
               <TestimonialCard
                 avatar={testimonial.image}

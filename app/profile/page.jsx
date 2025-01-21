@@ -469,12 +469,16 @@ const ProfilePage = () => {
                         width={800}
                         height={800}
                         priority
+                        onContextMenu={(e) => e.preventDefault()}
                         src={
                           image.imageLinks.original ||
                           image.imageLinks.thumbnail
                         }
                         alt={image.description}
-                        className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear"
+                        onClick={() => {
+                          router.push(`/images/${image._id}`);
+                        }}
+                        className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear cursor-pointer"
                       />
 
                       {/* <div className="">

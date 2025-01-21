@@ -6,7 +6,7 @@ import { ChevronRight, Search } from "lucide-react";
 import { Icon } from "@iconify/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import useLayoutStore from "@/store/layout";
 
 const taglines = [
   "Where Creativity Meets Marketplace",
@@ -17,32 +17,17 @@ const taglines = [
 
 export default function HeroSection() {
   const router = useRouter();
+  const { layout } = useLayoutStore();
 
   const [currentImage, setCurrentImage] = useState(0);
   const [search, setSearch] = useState("");
   const [searchType, setSearchType] = useState("images");
-  const [settings, setSettings] = useState({});
-
-  const fetchSettings = async () => {
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/layout/get-layout-content`
-      );
-      setSettings(res.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    fetchSettings();
-  }, []);
 
   const handleSearch = () => {
     router.push(`/search?search=${search}&type=${searchType}`);
   };
 
-  const heroPhotos = settings?.heroSectionPhotos || []; // Dynamic images array
+  const heroPhotos = layout?.heroSectionPhotos || []; // Dynamic images array
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -68,7 +53,7 @@ export default function HeroSection() {
           >
             <Image
               src={heroPhotos[currentImage] ||
-                "/assets/hero/default-bg.jpg"}
+                "/assets/Hahnemuhle Museum Etching.png"}
               alt={"hero-image"}
               fill
               priority
@@ -188,7 +173,7 @@ export default function HeroSection() {
         {heroPhotos.map((image, index) => (
             <div key={index}>
               <Image
-                src={image || "/assets/hero/default-bg.jpg"}
+                src={image || "/assets/placeholder.webp"}
                 alt={`Thumbnail ${index}`}
                 width={300}
                 height={300}

@@ -3,6 +3,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef } from "react";
+import Link from "next/link";
 
 export default function BestSellingCard({ images }) {
   const sliderRef = useRef(null);
@@ -51,7 +52,7 @@ export default function BestSellingCard({ images }) {
       {/* Slider */}
       <Slider ref={sliderRef} {...settings} className="px-10">
         {images.map((image, index) => (
-          <div key={index} className="p-4">
+          <Link href={`/images/${image._id}`} key={index} className="p-4">
             <img
               src={image.imageLinks.thumbnail}
               alt={image.title}
@@ -63,7 +64,7 @@ export default function BestSellingCard({ images }) {
                 {image.photographer?.firstName} {image.photographer?.lastName}
               </p>
             </div>
-          </div>
+          </Link>
         ))}
       </Slider>
     </div>
