@@ -8,6 +8,19 @@ module.exports = {
   ],
   theme: {
     extend: {
+      typography: (theme) => ({
+        DEFAULT: {
+          css: {
+            p: {
+              margin: '0', // Remove margin from paragraphs
+            },
+            ul: {
+              margin: '0', // Remove margin from unordered lists
+            },
+            // Add or override other styles as needed
+          },
+        },
+      }),
       fontFamily: {},
       fontSize: {
         "heading-xl": "82px",

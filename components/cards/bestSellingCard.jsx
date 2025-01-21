@@ -52,7 +52,7 @@ export default function BestSellingCard({ images }) {
       {/* Slider */}
       <Slider ref={sliderRef} {...settings} className="px-10">
         {images.map((image, index) => (
-          <Link href={`/images/${image._id}`} key={index} className="p-4">
+          <Link href={`/images/${image._id}`} key={index} className="p-4 capitalize">
             <img
               src={image.imageLinks.thumbnail}
               alt={image.title}
