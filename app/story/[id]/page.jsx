@@ -90,7 +90,7 @@ export default function StoryPage() {
               />
 
               <div
-                className="prose max-w-full"
+                className="prose max-w-full space-y-0"
                 dangerouslySetInnerHTML={{
                   __html: story.description,
                 }}

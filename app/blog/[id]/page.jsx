@@ -76,7 +76,7 @@ export default function BlogPage() {
                 className="w-4/5 border-8 border-white shadow-md shadow-zinc-500 mx-auto"
                 alt="placeholder"
               />
-              <div className="prose max-w-full"
+              <div className="prose max-w-full space-y-0"
                 dangerouslySetInnerHTML={{
                   __html: blog.content.body,
                 }}
