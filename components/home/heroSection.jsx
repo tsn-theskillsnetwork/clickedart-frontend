@@ -52,8 +52,10 @@ export default function HeroSection() {
             transition={{ duration: 0.5 }}
           >
             <Image
-              src={heroPhotos[currentImage] ||
-                "/assets/Hahnemuhle Museum Etching.png"}
+              src={
+                heroPhotos[currentImage] ||
+                "/assets/Hahnemuhle Museum Etching.png"
+              }
               alt={"hero-image"}
               fill
               priority
@@ -87,10 +89,9 @@ export default function HeroSection() {
             </AnimatePresence>
           </div>
         </div>
-        <div className="mt-[1%] flex flex-row bg-white text-black group rounded-lg items-center gap-4 w-11/12 md:w-4/5 lg:w-2/3 xl:w-1/2 focus-within:outline focus-within:outline-blue-500">
-          {/* Search Input */}
-          <div className="h-full aspect-[1/1] flex justify-center items-center">
-            <Search size={40} color="black" className="mx-auto" />
+        <div className="mt-4 flex flex-row bg-white text-black group rounded-lg items-center gap-2 w-11/12 md:w-4/5 lg:w-2/3 xl:w-1/2 focus-within:outline focus-within:outline-blue-500 mx-auto">
+          <div className="h-full aspect-[1/1] flex justify-center items-center shrink-0">
+            <Search size={30} color="black" className="mx-auto" />
           </div>
           <input
             type="text"
@@ -98,30 +99,29 @@ export default function HeroSection() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            className="active:border-none active:outline-none focus:outline-none focus:border-none py-4 text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-semibold my-1 w-full"
+            className="py-3 text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-semibold w-full focus:outline-none"
           />
 
-          <div className="relative">
+          <div className="relative shrink-0">
             <select
               value={searchType}
               onChange={(e) => setSearchType(e.target.value)}
-              className="bg-white border-l-2 active:border-none active:outline-none focus:border-none text-black py-3 px-4 font-semibold text-sm sm:text-base md:text-lg lg:text-xl focus:outline-none focus:ring-0 "
+              className="bg-white border-l-2 active:border-none active:outline-none focus:ring-0 text-black py-2 px-0 w-20 sm:w-40 md:w-full font-semibold text-sm sm:text-base md:text-lg lg:text-xl rounded-md"
             >
               <option value="images">Images</option>
               <option value="categories">Categories</option>
               <option value="photographers">Photographers</option>
             </select>
           </div>
-          {/* Search Button */}
           <button
             onClick={handleSearch}
-            className="bg-accent-200 h-full aspect-[1/1] text-white rounded-r-lg relative"
+            className="bg-accent-200 h-full aspect-[1/1] text-white rounded-r-lg flex justify-center items-center shrink-0"
           >
             <p className="sr-only">Search</p>
             <Icon
               icon="mdi:image-search"
               className="mx-auto"
-              style={{ fontSize: "2.5rem" }}
+              style={{ fontSize: "2rem" }}
             />
           </button>
         </div>
@@ -170,7 +170,7 @@ export default function HeroSection() {
       </div>
       <div>
         <div className="absolute inset-x-0 mx-auto bottom-3 sm:bottom-5 px-2 left-0 w-[90vw] z-40 flex justify-around gap-2 items-end">
-        {heroPhotos.map((image, index) => (
+          {heroPhotos.map((image, index) => (
             <div key={index}>
               <Image
                 src={image || "/assets/placeholder.webp"}

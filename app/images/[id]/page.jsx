@@ -265,7 +265,7 @@ export default function ImagePage() {
   }, []);
 
   const descriptionSection = (
-    <div className="flex flex-col gap-2 mt-5 bg-zinc-100 rounded-md shadow-md px-4">
+    <div className="flex flex-col gap-2 mt-5 bg-zinc-100 pb-5 rounded-md shadow-md px-4">
       <div className="flex flex-row gap-5 text-sm sm:text-paragraph md:text-heading-05 lg:text-heading-04 xl:text-heading-03 z-10">
         <motion.p
           layout
@@ -274,11 +274,11 @@ export default function ImagePage() {
           }}
           className={`font-medium ${
             desc
-              ? "text-black font-semibold underline decoration-2 underline-offset-8"
+              ? "text-black font-semibold underline decoration-2 underline-offset-[10px]"
               : "text-surface-600"
           } cursor-pointer`}
         >
-          Product Description
+          Image Description
         </motion.p>
         {/* <motion.p
           layout

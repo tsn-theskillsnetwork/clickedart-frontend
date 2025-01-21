@@ -8,9 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-export default function StoryPageComponent({
-    story,
-}) {
+export default function StoryPageComponent({ story }) {
   const handleShare = async () => {
     const currentUrl = window.location.origin + pathname;
 
@@ -64,7 +62,7 @@ export default function StoryPageComponent({
               />
               {/* <p className="text-lg text-justify">{story.description}</p> */}
               <h5 className="text-heading-05 font-semibold text-primary-400">
-                Photo Details
+                Inspired By
               </h5>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <Link
@@ -78,12 +76,12 @@ export default function StoryPageComponent({
                     height={800}
                     className="border-8 border-white shadow-md shadow-zinc-500"
                   />
-                  <h2 className="text-heading-06 text-primary font-bold">
-                    {story.inspiredBy?.title}
-                  </h2>
                 </Link>
 
                 <div className="flex flex-col items-start justify-start gap-4">
+                  <h2 className="text-heading-05 text-primary font-bold">
+                    {story.inspiredBy?.title}
+                  </h2>
                   {story.inspiredBy?.location && (
                     <div className="flex flex-row gap-2 items-center">
                       <Icon icon="ic:round-location-on" />
@@ -137,7 +135,7 @@ export default function StoryPageComponent({
             <div className="flex flex-col mt-4 sm:mt-0 sm:w-1/5 px-4">
               <div className="flex flex-col gap-4 sm:pt-28">
                 <h5 className="text-heading-05 text-primary font-bold">
-                  Inspired By
+                  Clicked By
                 </h5>
                 <div className="flex flex-row items-center gap-2">
                   <Image

@@ -217,7 +217,7 @@ export default function Navbar() {
       </div>
 
       {/* Desktop Menu */}
-      <div className="hidden lg:flex flex-row gap-0">
+      <div className="hidden lg:flex flex-row gap-2">
         {menuItems.map((item, index) => (
           <Link key={index} href={item.url}>
             <p
@@ -267,6 +267,22 @@ export default function Navbar() {
               </p>
             </Link>
           ))}
+          <Link href="/blog">
+            <p className="text-lg font-semibold text-black cursor-pointer">
+              Blog
+            </p>
+          </Link>
+          <Link href="/story">
+            <p className="text-lg font-semibold text-black cursor-pointer">
+              Story
+            </p>
+          </Link>
+          <Link href="/contact">
+            <p className="text-lg font-semibold text-black cursor-pointer">
+              Contact Us
+            </p>
+          </Link>
+
           {user || photographer ? (
             <>
               <Link href="/profile">
