@@ -3,10 +3,12 @@
 import Button from "@/components/button";
 import Loader from "@/components/loader";
 import { Share } from "lucide-react";
-
+import { usePathname } from "next/navigation";
 import React from "react";
 
 export default function BlogPageComponent({ blog }) {
+  const pathname = usePathname();
+
   const handleShare = async () => {
     const currentUrl = window.location.origin + pathname;
 
@@ -78,7 +80,7 @@ export default function BlogPageComponent({ blog }) {
         </div>
       ) : (
         <div className="flex justify-center items-center h-screen">
-          {loading ? <Loader /> : <p>No Story Found</p>}
+          <Loader />
         </div>
       )}
     </>

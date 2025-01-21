@@ -428,7 +428,6 @@ export default function ThemesResultPage() {
             </div>
           )}
         </div>
-        {/* <div className="flex justify-center items-center mt-10"></div> */}
       </motion.div>
     </AnimatePresence>
   );

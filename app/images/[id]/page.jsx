@@ -132,12 +132,6 @@ export default function ImagePage() {
     },
   });
 
-  console.log("Image", image);
-  console.log("Papers", papers);
-  console.log("Frames", frames);
-  console.log("Selected Paper", selectedPaper);
-  console.log("Selected Size", selectedSize);
-  console.log("Selected Frame", selectedFrame);
 
   const fetchImage = async () => {
     try {
@@ -148,11 +142,9 @@ export default function ImagePage() {
           method: "GET",
         }
       );
-      console.log(response);
       if (!response.ok) throw new Error("Failed to fetch image");
 
       const data = await response.json();
-      console.log(data);
       setImage(data.photo);
     } catch (error) {
       console.log("Error fetching image data", error);
@@ -161,13 +153,6 @@ export default function ImagePage() {
       setLoading(false);
     }
   };
-
-  console.log(
-    "frame price",
-    (selectedSize?.width + selectedSize?.height) *
-      2 *
-      selectedFrame?.basePricePerLinearInch
-  );
 
   const handleMockup = () => {
     setSelected(1);
@@ -238,7 +223,6 @@ export default function ImagePage() {
   const handlePaperChange = (paper) => {
     setSelectedSize(paper.customDimensions[0]);
     setSelectedPaper(paper);
-    console.log("Selected Paper", selectedPaper);
   };
 
   useEffect(() => {

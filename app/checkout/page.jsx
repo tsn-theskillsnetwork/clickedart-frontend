@@ -69,18 +69,15 @@ export default function CheckoutPage() {
         item.mode === "print" ? "original" : item.imageInfo.resolution,
     }));
 
-    console.log("Mapped Items for Backend:", backendItems);
     setItems(backendItems);
   }, [cartItems]);
 
   useEffect(() => {
     if (items.length > 0) {
-      console.log("Items being sent:", items);
       calculatePrice();
     }
   }, [items]);
 
-  console.log(cartItems);
 
   const validateOrder = (orderData) => {
     if (!user) {
@@ -125,7 +122,6 @@ export default function CheckoutPage() {
   };
 
   const calculatePrice = async () => {
-    console.log("Items being sent:", items);
 
     try {
       const res = await axios.post(
@@ -133,7 +129,6 @@ export default function CheckoutPage() {
         { items }
       );
 
-      console.log("Price calculated successfully:", res.data);
       setPrice(res.data);
     } catch (error) {
       console.error(
@@ -144,8 +139,6 @@ export default function CheckoutPage() {
     }
   };
 
-  console.log("Price:", price);
-
   const handlePayment = useCallback(
     async (orderData) => {
       if (!user) {
@@ -153,8 +146,8 @@ export default function CheckoutPage() {
         return;
       }
 
-      console.log("Order Data:", orderData);
       if (!validateOrder(orderData)) return;
+      console.log("Test:", orderData.finalAmount, user._id);
       const result = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/download/payment`,
         {
@@ -162,7 +155,6 @@ export default function CheckoutPage() {
           userId: user._id,
         }
       );
-      // console.log("result", result);
       const options = {
         key: result.data.result.notes.key,
         amount: result.data.result.amount,
@@ -174,8 +166,6 @@ export default function CheckoutPage() {
         handler: async (res) => {
           try {
             const paymentId = res.razorpay_payment_id;
-            const paymentMethod = res.payment_method;
-            // console.log("RESPONSE", paymentMethod);
             if (paymentId) {
               setrazorpay_payment_id(paymentId);
               setPaymentStatus(true);
@@ -200,8 +190,6 @@ export default function CheckoutPage() {
         },
       };
 
-      // console.log("options", options);
-
       const rzpay = new Razorpay(options);
       rzpay.open();
     },
@@ -221,7 +209,6 @@ export default function CheckoutPage() {
         }
       );
 
-      // console.log("Order created", res.data);
       clearCart();
       Swal.fire({
         title: "Order Placed Successfully",
@@ -323,16 +310,7 @@ export default function CheckoutPage() {
       isPaid: false,
       gst: "",
     }));
-    console.log("Raw Amount:", rawAmount);
-    console.log("Discount Applied:", discountAmount);
-    console.log("Amount After Discount:", amountAfterDiscount);
-    console.log("Delivery Charges:", deliveryCharge);
-    console.log("GST Amount:", gstAmount);
-    console.log("Platform Fee:", platformFee);
-    console.log("Final Amount:", finalAmount);
   }, [user, cartItems, discount, coupon, price] || []);
-
-  // console.log("orderData", orderData);
 
   const handleCoupon = async (event) => {
     event.preventDefault();
@@ -342,7 +320,6 @@ export default function CheckoutPage() {
         `${process.env.NEXT_PUBLIC_SERVER}/api/coupon/apply-coupon?code=${code}&userId=${user?._id}&type=user`
       );
 
-      // console.log("Coupon applied", res.data);
       toast.success("Coupon applied successfully");
       setCoupon(res.data.coupon);
       setOrderData((prev) => ({
@@ -351,7 +328,6 @@ export default function CheckoutPage() {
       }));
       setLoading(false);
     } catch (error) {
-      // console.log(error);
       setError("Something went wrong while applying coupon", error);
       toast.error(error.response.data.message);
       setLoading(false);

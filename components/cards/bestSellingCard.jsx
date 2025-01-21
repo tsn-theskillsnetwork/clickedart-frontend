@@ -4,12 +4,13 @@ import "slick-carousel/slick/slick-theme.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function BestSellingCard({ images }) {
   const sliderRef = useRef(null);
 
   const settings = {
-    dots: true,
+    dots: false,
     infinite: true,
     speed: 500,
     slidesToShow: 3,
@@ -53,7 +54,9 @@ export default function BestSellingCard({ images }) {
       <Slider ref={sliderRef} {...settings} className="px-10">
         {images.map((image, index) => (
           <Link href={`/images/${image._id}`} key={index} className="p-4 capitalize">
-            <img
+            <Image
+              width={800}
+              height={800}
               src={image.imageLinks.thumbnail}
               alt={image.title}
               className="object-cover w-full aspect-[1/1] rounded-lg"

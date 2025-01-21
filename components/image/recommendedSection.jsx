@@ -18,12 +18,6 @@ export default function RecommendedSection({ category, id }) {
         );
 
         setImages(response.data.results);
-        console.log(
-          "test",
-          response.data.results.filter(
-            (image) => image.isActive && image.photographer
-          )
-        );
       } catch (error) {
         console.log(error);
       }

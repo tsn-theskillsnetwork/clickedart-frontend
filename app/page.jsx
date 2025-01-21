@@ -11,8 +11,27 @@ import Testimonial from "@/components/home/testimonial";
 import DiscoverMobile from "@/components/home/discoverMobile";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 
 export default function Home() {
+  const [stories, setStories] = useState([]);
+
+  const fetchStories = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/story/get-all-story`
+      );
+      console.log("STORY", res.data);
+      setStories(res.data.stories);
+    } catch (error) {
+      console.log("Failed to fetch stories:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchStories();
+  }, []);
   return (
     <AnimatePresence mode="popLayout">
       <motion.div
@@ -49,10 +68,10 @@ export default function Home() {
           <BestSelling />
         </div>
         <div className="hidden sm:block px-4 my-20">
-          <Discover />
+          <Discover stories={stories} />
         </div>
         <div className="block sm:hidden px-6 my-20">
-          <DiscoverMobile />
+          <DiscoverMobile stories={stories} />
         </div>
         <div className="px-4">
           <Testimonial />

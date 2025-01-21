@@ -1,65 +1,13 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Image from "next/image";
 import Button from "../button";
-import axios from "axios";
 import Link from "next/link";
 
-const images = [
-  {
-    src: "/assets/images/img3.jpg",
-    title: "Artwork 1",
-    artist: "Photographer",
-  },
-  {
-    src: "/assets/images/img5.jpg",
-    title: "Artwork 2",
-    artist: "Photographer",
-  },
-  {
-    src: "/assets/images/img2.jpg",
-    title: "Artwork 3",
-    artist: "Photographer",
-  },
-  {
-    src: "/assets/hero/bg2.jpg",
-    title: "Artwork 4",
-    artist: "Photographer",
-  },
-  {
-    src: "/assets/images/img1.jpg",
-    title: "Artwork 5",
-    artist: "Photographer",
-  },
-  {
-    src: "/assets/images/img6.jpg",
-    title: "Artwork 6",
-    artist: "Photographer",
-  },
-];
-
-export default function Discover() {
-  const [stories, setStories] = useState([]);
-
-  const fetchStories = async () => {
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/story/get-all-story`
-      );
-      console.log("STORY",res.data)
-      setStories(res.data.stories);
-    } catch (error) {
-      console.error("Failed to fetch stories:", error);
-    }
-  }
-
-  useEffect(() => {
-    fetchStories();
-  }, []);
-
+export default function Discover({ stories }) {
   const settings = {
     dots: true,
     infinite: false,
