@@ -178,7 +178,10 @@ export default function Navbar() {
       </Link>
 
       {/* Mobile Logo (buttons) */}
-      <Link href={"/"} className="lg:hidden w-full flex flex-row gap-2 items-center justify-between">
+      <Link
+        href={"/"}
+        className="lg:hidden w-full flex flex-row gap-2 items-center justify-between"
+      >
         {scrollLocation > 50 || pathname !== "/" ? (
           <Image
             src="/assets/Logo.png"
@@ -295,13 +298,6 @@ export default function Navbar() {
       )}
 
       <div className="hidden lg:flex flex-row gap-2 xl:gap-10">
-        <MessageSquare
-          className={`${
-            scrollLocation > 50 || pathname !== "/"
-              ? "text-surface-600"
-              : "text-white"
-          } cursor-pointer`}
-        />
         <Dialog>
           <DialogTrigger>
             <Search
@@ -345,14 +341,16 @@ export default function Navbar() {
                     <User2
                       className={`${
                         scrollLocation > 50 || pathname !== "/"
-                          ? "text-surface-600"
+                          ? `${user ? "text-surface-600" : "text-blue-500"}`
                           : "text-white"
                       } cursor-pointer`}
                     />
                   </Link>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p className="text-white font-medium">Profile</p>
+                  <p className="text-white font-medium">
+                    {photographer ? "Photographer Profile" : "User Profile"}
+                  </p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
