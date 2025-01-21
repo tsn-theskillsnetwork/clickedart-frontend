@@ -132,7 +132,6 @@ export default function ImagePage() {
     },
   });
 
-
   const fetchImage = async () => {
     try {
       setLoading(true);
@@ -178,7 +177,7 @@ export default function ImagePage() {
           ? width * height * selectedFrame.basePricePerLinearInch
           : 0;
 
-        const imagePrice = image.price?.original || 0;
+        const imagePrice = 0;
         const selectedSizePrice = selectedSize?.price || 0;
 
         return (
@@ -261,6 +260,8 @@ export default function ImagePage() {
       setError
     );
     setSubTotal(image.price?.original);
+
+    handleDigital();
   }, []);
 
   const descriptionSection = (
@@ -372,9 +373,7 @@ export default function ImagePage() {
         <p
           onClick={() => {
             setMode("digital");
-            setSelectedPaper(null);
-            setSelectedSize(null);
-            setSelectedFrame(null);
+            handleDigital();
           }}
           className={`text-base md:text-paragraph lg:text-base xl:text-heading-06 drop-shadow-md z-10 font-bold ${
             mode === "print" ? "text-surface-500" : "text-zinc-100"
@@ -423,14 +422,15 @@ export default function ImagePage() {
               </SelectContent>
             </Select>
 
-            <p className="-mb-8 font-medium">
+            {/* <p className="-mb-8 font-medium">
               {selectedSize
                 ? `${selectedSize?.width} x ${selectedSize?.height} in`
                 : "Select Size"}
-            </p>
+            </p> */}
 
             <Select
               className="w-36"
+              value={selectedSize}
               onValueChange={(value) => {
                 setSelectedSize(value);
               }}
@@ -439,10 +439,7 @@ export default function ImagePage() {
                 <SelectValue
                   placeholder={
                     selectedSize
-                      ? selectedSize?.width +
-                        " x " +
-                        selectedSize?.height +
-                        " in"
+                      ? `${selectedSize?.width} x ${selectedSize?.height} in`
                       : "Select Size"
                   }
                 />
@@ -492,12 +489,13 @@ export default function ImagePage() {
           <>
             <Select
               className="w-36"
+              value={selectedSize}
               onValueChange={(value) => {
                 setSelectedSize(value);
               }}
             >
               <SelectTrigger className="w-full font-medium !text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between capitalize">
-                <SelectValue placeholder={selectedSize || "Select Size"} />
+                <SelectValue placeholder={"Select Size"} />
                 <p className="sr-only">Size</p>
               </SelectTrigger>
               <SelectContent>

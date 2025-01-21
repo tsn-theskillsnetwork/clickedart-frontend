@@ -261,7 +261,7 @@ export default function CheckoutPage() {
     setPlatformCharges(platformFee);
     // Final amount after adding GST, platform fee, and delivery charge
     const finalAmount =
-      amountAfterDiscount + gstAmount + platformFee + deliveryCharge;
+      amountAfterDiscount + gstAmount + 0 + deliveryCharge;
 
     // Update the order data
     setOrderData((prev) => ({
@@ -515,7 +515,7 @@ export default function CheckoutPage() {
                     </div>
                     <div>
                       <div className="mb-2 flex items-center gap-2">
-                        <Label htmlFor="landmark">Landmark*</Label>
+                        <Label htmlFor="landmark">Landmark</Label>
                       </div>
                       <Input
                         type="text"
@@ -539,13 +539,14 @@ export default function CheckoutPage() {
                           <Input
                             type="text"
                             placeholder="Phone"
-                            value={orderData.shippingAddress.mobileNumber || ""}
+                            required
+                            value={orderData.shippingAddress.mobile || ""}
                             onChange={(e) =>
                               setOrderData((prev) => ({
                                 ...prev,
                                 shippingAddress: {
                                   ...prev.shippingAddress,
-                                  mobileNumber: e.target.value,
+                                  mobile: e.target.value,
                                 },
                               }))
                             }
@@ -685,8 +686,11 @@ export default function CheckoutPage() {
                       <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
                         Platform Gateway
                       </dt>
-                      <dd className="text-base font-medium text-gray-900">
+                      <dd className="text-base font-medium text-green-500">
+                        <span className="line-through mr-2 text-black">
                         ₹{platformCharges.toFixed(2)}
+                        </span>
+                        ₹0
                       </dd>
                     </dl>
                     <dl className="flex items-center justify-between gap-4 py-3">
