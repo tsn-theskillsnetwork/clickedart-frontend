@@ -7,6 +7,8 @@ import { Icon } from "@iconify/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import useLayoutStore from "@/store/layout";
+import useAuthStore from "@/authStore";
+import Swal from "sweetalert2";
 
 const taglines = [
   "Where Creativity Meets Marketplace",
@@ -18,6 +20,7 @@ const taglines = [
 export default function HeroSection() {
   const router = useRouter();
   const { layout } = useLayoutStore();
+  const { photographer, user } = useAuthStore();
 
   const [currentImage, setCurrentImage] = useState(0);
   const [search, setSearch] = useState("");
@@ -148,7 +151,11 @@ export default function HeroSection() {
             </div>
           </button>
           <button
-            onClick={() => router.push("/signin/photographer")}
+            onClick={() => {
+              if (photographer) router.push("/profile");
+              else if (user) Swal.fire("Please sign in as a Photographer to sell your photos");
+              else router.push("/signin/photographer");
+            }}
             className="border-2 bg-gradient-to-tr from-transparent to-transparent hover:from-black border-white rounded-2xl px-2 py-2 sm:px-4 sm:py-2 sm:pl-5 w-52 md:w-72 group transition-all duration-200 ease-linear"
           >
             <div className="flex flex-row gap-2 items-center">

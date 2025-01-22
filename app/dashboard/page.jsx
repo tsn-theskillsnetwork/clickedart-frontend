@@ -139,12 +139,12 @@ export default function DashboardPage() {
               {/* Existing NumberCards */}
               <NumberCard
                 title="Total Downloads"
-                number={String(stats?.downloads) || "0"}
+                number={String(stats?.downloads || "0") || "0"}
                 color="blue"
               />
               <NumberCard
                 title="Total Sales"
-                number={String(stats?.totalSales) || "0"}
+                number={String(stats?.totalSales || "0") || "0"}
               />
               <div className="rounded-xl bg-muted/50 shadow-md px-2 flex flex-col items-center gap-4 py-4">
                 <h4 className="text-heading-06 sm:text-heading-05 md:text-heading-04">
@@ -161,26 +161,26 @@ export default function DashboardPage() {
               </div>
               <NumberCard
                 title="Total Royalty Amount"
-                number={String(stats?.totalRoyaltyAmount) || "0"}
+                number={String(stats?.totalRoyaltyAmount || "0") || "0"}
                 color="green"
               />
               <NumberCard
                 title="Total Paid Amount"
-                number={String(stats?.totalPaidAmount) || "0"}
+                number={String(stats?.totalPaidAmount || "0") || "0"}
                 color="green"
               />
               <NumberCard
                 title="Total Print Cut Amount"
-                number={String(stats?.totalPrintCutAmount) || "0"}
+                number={String(stats?.totalPrintCutAmount || "0") || "0"}
                 color="green"
               />
               <NumberCard
                 title="Uploaded Photos"
-                number={String(stats?.totalUploadingImgCount) || "0"}
+                number={String(stats?.totalUploadingImgCount || "0") || "0"}
               />
               <NumberCard
                 title="Pending Photos"
-                number={String(stats?.pendingImagesCount) || "0"}
+                number={String(stats?.pendingImagesCount || "0") || "0"}
                 color="red"
               />
             </div>

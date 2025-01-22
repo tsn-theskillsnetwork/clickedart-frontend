@@ -80,8 +80,14 @@ export default function OrdersPage() {
       console.log(response.data);
       toast.success("Order Support Requested");
     } catch (error) {
-      console.log(error);
-      toast.error("Error requesting order support");
+      if (
+        error.response.data.message === "Support already exist on this order"
+      ) {
+        toast.error("Order Support already exist on this order");
+      } else {
+        console.log(error);
+        toast.error("Error requesting order support");
+      }
     }
   };
 
@@ -99,7 +105,7 @@ export default function OrdersPage() {
         setPageCount(response.data.pageCount);
       } catch (error) {
         console.log(error);
-        toast.error("Error fetching orders");
+        setOrders([]);
       } finally {
         setLoading(false);
       }
@@ -169,6 +175,8 @@ export default function OrdersPage() {
                               {!item.paperInfo && (
                                 <Link
                                   href={
+                                    item.imageInfo?.image?.imageLinks &&
+                                    item.imageInfo?.resolution &&
                                     item.imageInfo?.image?.imageLinks[
                                       item.imageInfo?.resolution
                                     ]
@@ -306,9 +314,9 @@ export default function OrdersPage() {
                           </DialogHeader>
                           <form
                             className="flex flex-col gap-4"
-                            onSubmit={(e) => {
+                            onSubmit={async (e) => {
                               e.preventDefault();
-                              handleOrderSupport(order._id);
+                              await handleOrderSupport(order._id);
                             }}
                           >
                             <div>

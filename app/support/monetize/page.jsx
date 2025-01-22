@@ -13,7 +13,7 @@ import Link from "next/link";
 export default function BulkDownloadForm() {
   const router = useRouter();
   const { photographer, isHydrated } = useAuthStore();
-
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     photographer: "",
     t_c: false,
@@ -54,7 +54,85 @@ export default function BulkDownloadForm() {
 
   console.log("formData", formData);
 
-  
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.address.residentialAddress) {
+      newErrors.address = "Residential Address is required";
+    }
+    if (!formData.address.state) {
+      newErrors.state = "State is required";
+    }
+    if (!formData.panPhoto) {
+      newErrors.panPhoto = "PAN Photo is required";
+    }
+    if (!formData.governmentIdProof) {
+      newErrors.governmentIdProof = "Government ID Proof is required";
+    }
+    if (!formData.panNumber) {
+      newErrors.panNumber = "PAN Number is required";
+    }
+    if (!formData.country) {
+      newErrors.country = "Country is required";
+    }
+    if (!formData.bankAccountName) {
+      newErrors.bankAccountName = "Bank Account Name is required";
+    }
+    if (!formData.bankName) {
+      newErrors.bankName = "Bank Name is required";
+    }
+    if (!formData.bankAccNumber) {
+      newErrors.bankAccNumber = "Bank Account Number is required";
+    }
+    if (!formData.ifsc) {
+      newErrors.ifsc = "IFSC is required";
+    }
+    if (!formData.branch) {
+      newErrors.branch = "Branch is required";
+    }
+    if (!formData.passbookOrCancelledCheque) {
+      newErrors.passbookOrCancelledCheque =
+        "Passbook or Cancelled Cheque is required";
+    }
+    if (!formData.panNumber) {
+      newErrors.panNumber = "PAN Number is required";
+    }
+    if (formData.isBusinessAccount) {
+      if (!formData.businessAccount.businessDetailsInfo.businessName) {
+        newErrors.businessName = "Business Name is required";
+      }
+      if (!formData.businessAccount.businessDetailsInfo.natureOfBusiness) {
+        newErrors.natureOfBusiness = "Nature of Business is required";
+      }
+      if (!formData.businessAccount.businessDetailsInfo.businessAddress) {
+        newErrors.businessAddress = "Business Address is required";
+      }
+      // if (!formData.businessAccount.gstCopy) {
+      //   newErrors.gstCopy = "GST Copy is required";
+      // }
+      if (!formData.businessAccount.firmPan) {
+        newErrors.firmPan = "Firm PAN is required";
+      }
+      // if (!formData.businessAccount.firmGstCertificate) {
+      //   newErrors.firmGstCertificate = "Firm GST Certificate is required";
+      // }
+      // if (!formData.businessAccount.gstNumber) {
+      //   newErrors.gstNumber = "GST Number is required";
+      // }
+      // if (!formData.businessAccount.gstState) {
+      //   newErrors.gstState = "GST State is required";
+      // }
+      // if (!formData.businessAccount.gstType) {
+      //   newErrors.gstType = "GST Type is required";
+      // }
+      // if (!formData.businessAccount.businessAddressProof) {
+      //   newErrors.businessAddressProof = "Business Address Proof is required";
+      // }
+    }
+    if (!formData.t_c) {
+      newErrors.t_c = "Please agree to the Terms and Conditions";
+    }
+    return newErrors;
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -174,6 +252,13 @@ export default function BulkDownloadForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      console.log("errors", errors);
+      setErrors(errors);
+      return;
+    }
+
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/monetization/create-monetization`,
@@ -262,10 +347,14 @@ export default function BulkDownloadForm() {
               disabled
             />
           </div>
-          <h2 className="text-xl font-medium pt-4">Address Details</h2>
+          <h2 className="text-xl font-medium pt-4">
+            Address Details{" "}
+            <span className="text-red-600 font-semibold">*</span>
+          </h2>
           <div className="flex flex-col gap-2">
             <Label htmlFor="address.residentialAddress">
-              Residential Address
+              Residential Address{" "}
+              <span className="text-red-600 font-semibold">*</span>
             </Label>
             <Input
               type="text"
@@ -276,9 +365,14 @@ export default function BulkDownloadForm() {
               placeholder="Enter Residential Address"
               onChange={handleInputChange}
             />
+            {errors.address && (
+              <span className="text-red-500">{errors.address}</span>
+            )}
           </div>
 
-          <Label htmlFor="address.state">State</Label>
+          <Label htmlFor="address.state">
+            State <span className="text-red-600 font-semibold">*</span>
+          </Label>
           <div className="flex flex-col gap-2">
             <Input
               type="text"
@@ -289,10 +383,15 @@ export default function BulkDownloadForm() {
               required
               onChange={handleInputChange}
             />
+            {errors.state && (
+              <span className="text-red-500">{errors.state}</span>
+            )}
           </div>
 
           {/* Country */}
-          <Label htmlFor="country">Country</Label>
+          <Label htmlFor="country">
+            Country <span className="text-red-600 font-semibold">*</span>
+          </Label>
           <div className="flex flex-col gap-2">
             <Input
               type="text"
@@ -302,11 +401,20 @@ export default function BulkDownloadForm() {
               placeholder="Enter Country"
               onChange={handleInputChange}
             />
+            {errors.country && (
+              <span className="text-red-500">{errors.country}</span>
+            )}
           </div>
 
           {/* Bank Account Details */}
-          <h2 className="text-xl font-medium pt-4">Bank Account Details</h2>
-          <Label htmlFor="bankAccountName">Bank Account Name</Label>
+          <h2 className="text-xl font-medium pt-4">
+            Bank Account Details{" "}
+            <span className="text-red-600 font-semibold">*</span>
+          </h2>
+          <Label htmlFor="bankAccountName">
+            Bank Account Holder Name{" "}
+            <span className="text-red-600 font-semibold">*</span>
+          </Label>
           <div className="flex flex-col gap-2">
             <Input
               type="text"
@@ -316,8 +424,14 @@ export default function BulkDownloadForm() {
               placeholder="Enter Bank Account Name"
               onChange={handleInputChange}
             />
+            {errors.bankAccountName && (
+              <span className="text-red-500">{errors.bankAccountName}</span>
+            )}
           </div>
-          <Label htmlFor="bankAccNumber">Bank Account Number</Label>
+          <Label htmlFor="bankAccNumber">
+            Bank Account Number{" "}
+            <span className="text-red-600 font-semibold">*</span>
+          </Label>
           <div className="flex flex-col gap-2">
             <Input
               type="text"
@@ -327,8 +441,13 @@ export default function BulkDownloadForm() {
               placeholder="Enter Bank Account Number"
               onChange={handleInputChange}
             />
+            {errors.bankAccNumber && (
+              <span className="text-red-500">{errors.bankAccNumber}</span>
+            )}
           </div>
-          <Label htmlFor="ifsc">IFSC</Label>
+          <Label htmlFor="ifsc">
+            IFSC <span className="text-red-600 font-semibold">*</span>
+          </Label>
           <div className="flex flex-col gap-2">
             <Input
               type="text"
@@ -338,8 +457,11 @@ export default function BulkDownloadForm() {
               placeholder="Enter IFSC"
               onChange={handleInputChange}
             />
+            {errors.ifsc && <span className="text-red-500">{errors.ifsc}</span>}
           </div>
-          <Label htmlFor="bankName">Bank Name</Label>
+          <Label htmlFor="bankName">
+            Bank Name <span className="text-red-600 font-semibold">*</span>
+          </Label>
           <div className="flex flex-col gap-2">
             <Input
               type="text"
@@ -349,8 +471,13 @@ export default function BulkDownloadForm() {
               placeholder="Enter Bank Name"
               onChange={handleInputChange}
             />
+            {errors.bankName && (
+              <span className="text-red-500">{errors.bankName}</span>
+            )}
           </div>
-          <Label htmlFor="branch">Branch</Label>
+          <Label htmlFor="branch">
+            Branch <span className="text-red-600 font-semibold">*</span>
+          </Label>
           <div className="flex flex-col gap-2">
             <Input
               type="text"
@@ -360,12 +487,19 @@ export default function BulkDownloadForm() {
               placeholder="Enter Branch"
               onChange={handleInputChange}
             />
+            {errors.branch && (
+              <span className="text-red-500">{errors.branch}</span>
+            )}
           </div>
 
           {/* Pan Details */}
-          <h2 className="text-xl font-medium pt-4">PAN Details</h2>
+          <h2 className="text-xl font-medium pt-4">
+            PAN Details <span className="text-red-600 font-semibold">*</span>
+          </h2>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="panNumber">PAN Number</Label>
+            <Label htmlFor="panNumber">
+              PAN Number <span className="text-red-600 font-semibold">*</span>
+            </Label>
             <Input
               type="text"
               id="panNumber"
@@ -374,11 +508,20 @@ export default function BulkDownloadForm() {
               placeholder="Enter PAN Number"
               onChange={handleInputChange}
             />
+            {errors.panNumber && (
+              <span className="text-red-500">{errors.panNumber}</span>
+            )}
           </div>
 
           {/* Supporting Documents */}
-          <h2 className="text-xl font-medium pt-4">Supporting Documents</h2>
-          <Label htmlFor="panPhoto">Copy of PAN Card</Label>
+          <h2 className="text-xl font-medium pt-4">
+            Supporting Documents{" "}
+            <span className="text-red-600 font-semibold">*</span>
+          </h2>
+          <Label htmlFor="panPhoto">
+            Copy of PAN Card{" "}
+            <span className="text-red-600 font-semibold">*</span>
+          </Label>
           <span className="text-xs italic font-medium">
             (Required for TDS deduction as per Indian tax laws)
           </span>
@@ -402,9 +545,13 @@ export default function BulkDownloadForm() {
                 </button>
               )}
             </div>
+            {errors.panPhoto && (
+              <span className="text-red-500">{errors.panPhoto}</span>
+            )}
           </div>
           <Label htmlFor="governmentIdProof">
-            Copy of Aadhar Card or any Valid Govt. Issued ID
+            Copy of Aadhar Card or any Valid Govt. Issued ID{" "}
+            <span className="text-red-600 font-semibold">*</span>
           </Label>
           <div className="flex flex-col gap-2">
             <div className="flex gap-2 items-center">
@@ -426,9 +573,13 @@ export default function BulkDownloadForm() {
                 </button>
               )}
             </div>
+            {errors.governmentIdProof && (
+              <span className="text-red-500">{errors.governmentIdProof}</span>
+            )}
           </div>
           <Label htmlFor="passbookOrCancelledCheque">
-            Passbook or Cancelled Cheque
+            Passbook or Cancelled Cheque{" "}
+            <span className="text-red-600 font-semibold">*</span>
           </Label>
           <span className="text-xs italic font-medium">
             (For Bank Account Verification)
@@ -453,6 +604,11 @@ export default function BulkDownloadForm() {
                 </button>
               )}
             </div>
+            {errors.passbookOrCancelledCheque && (
+              <span className="text-red-500">
+                {errors.passbookOrCancelledCheque}
+              </span>
+            )}
           </div>
 
           {/* Switch for Business Account */}
@@ -477,9 +633,13 @@ export default function BulkDownloadForm() {
           {formData.isBusinessAccount && (
             <div>
               {/* Business Account Section */}
-              <h2 className="text-xl font-medium pt-4">Business Information</h2>
+              <h2 className="text-xl font-medium pt-4">
+                Business Information{" "}
+                <span className="text-red-600 font-semibold">*</span>
+              </h2>
               <Label htmlFor="businessAccount.businessDetailsInfo.businessName">
-                Business Name
+                Business Name{" "}
+                <span className="text-red-600 font-semibold">*</span>
               </Label>
               <div className="flex flex-col gap-2">
                 <Input
@@ -489,9 +649,13 @@ export default function BulkDownloadForm() {
                   placeholder="Enter Business Name"
                   onChange={handleInputChange}
                 />
+                {errors.businessName && (
+                  <span className="text-red-500">{errors.businessName}</span>
+                )}
               </div>
               <Label htmlFor="businessAccount.businessDetailsInfo.natureOfBusiness">
-                Nature of Business
+                Nature of Business{" "}
+                <span className="text-red-600 font-semibold">*</span>
               </Label>
               <div className="flex flex-col gap-2">
                 <Input
@@ -501,130 +665,187 @@ export default function BulkDownloadForm() {
                   placeholder="Enter Nature of Business"
                   onChange={handleInputChange}
                 />
+                {errors.natureOfBusiness && (
+                  <span className="text-red-500">
+                    {errors.natureOfBusiness}
+                  </span>
+                )}
               </div>
               <Label htmlFor="businessAccount.businessDetailsInfo.businessAddress">
-                Business Address
+                Business Address{" "}
+                <span className="text-red-600 font-semibold">*</span>
               </Label>
-              <Input
-                type="text"
-                id="businessAccount.businessDetailsInfo.businessAddress"
-                name="businessAccount.businessDetailsInfo.businessAddress"
-                placeholder="Enter Business Address"
-                onChange={handleInputChange}
-              />
-              <hr className="mt-4 -mb-2" />
-              <h2 className="text-xl font-medium pt-4">GST Details</h2>
-              <Label htmlFor="businessAccount.gstNumber">GST Number</Label>
-              <Input
-                type="text"
-                id="gstNumber"
-                name="businessAccount.gstNumber"
-                placeholder="Enter GST Number"
-                onChange={handleInputChange}
-              />
-              <Label htmlFor="businessAccount.gstState">GST State</Label>
-              <Input
-                type="text"
-                id="gstState"
-                name="businessAccount.gstState"
-                placeholder="Enter GST State"
-                onChange={handleInputChange}
-              />
-
-              <Label htmlFor="businessAccount.gstType">GST Type</Label>
-              <Input
-                type="text"
-                id="gstType"
-                name="businessAccount.gstType"
-                placeholder="Enter GST Type"
-                onChange={handleInputChange}
-              />
-              <hr className="mt-4 -mb-2" />
-              <h2 className="text-xl font-medium pt-4">Documents</h2>
-              <Label htmlFor="businessAccount.gstCopy">GST Copy</Label>
-              <div className="flex gap-2 items-center">
+              <div className="flex flex-col gap-2">
                 <Input
-                  type="file"
-                  id="gstCopy"
-                  name="businessAccount.gstCopy"
-                  accept=".pdf, .jpg, .jpeg, .png"
-                  onChange={handleFileSelection}
+                  type="text"
+                  id="businessAccount.businessDetailsInfo.businessAddress"
+                  name="businessAccount.businessDetailsInfo.businessAddress"
+                  placeholder="Enter Business Address"
+                  onChange={handleInputChange}
                 />
-                {!formData.businessAccount.gstCopy && (
-                  <button
-                    type="button"
-                    className="bg-blue-500 text-white p-2 rounded-md"
-                    onClick={() => handleFileUpload("businessAccount.gstCopy")}
-                  >
-                    Upload
-                  </button>
+                {errors.businessAddress && (
+                  <span className="text-red-500">{errors.businessAddress}</span>
                 )}
               </div>
 
-              <Label htmlFor="businessAccount.firmPan">Firm PAN</Label>
-              <div className="flex gap-2 items-center">
+              <hr className="mt-4 -mb-2" />
+              <h2 className="text-xl font-medium pt-4">GST Details</h2>
+              <Label htmlFor="businessAccount.gstNumber">GST Number</Label>
+              <div className="flex flex-col gap-2">
                 <Input
-                  type="file"
-                  id="firmPan"
-                  name="businessAccount.firmPan"
-                  accept=".pdf, .jpg, .jpeg, .png"
-                  onChange={handleFileSelection}
+                  type="text"
+                  id="gstNumber"
+                  name="businessAccount.gstNumber"
+                  placeholder="Enter GST Number"
+                  onChange={handleInputChange}
                 />
-                {!formData.businessAccount.firmPan && (
-                  <button
-                    type="button"
-                    className="bg-blue-500 text-white p-2 rounded-md"
-                    onClick={() => handleFileUpload("businessAccount.firmPan")}
-                  >
-                    Upload
-                  </button>
+                {errors.gstNumber && (
+                  <span className="text-red-500">{errors.gstNumber}</span>
+                )}
+              </div>
+              <Label htmlFor="businessAccount.gstState">GST State</Label>
+              <div className="flex flex-col gap-2">
+                <Input
+                  type="text"
+                  id="gstState"
+                  name="businessAccount.gstState"
+                  placeholder="Enter GST State"
+                  onChange={handleInputChange}
+                />
+                {errors.gstState && (
+                  <span className="text-red-500">{errors.gstState}</span>
+                )}
+              </div>
+
+              <Label htmlFor="businessAccount.gstType">GST Type</Label>
+              <div className="flex flex-col gap-2">
+                <Input
+                  type="text"
+                  id="gstType"
+                  name="businessAccount.gstType"
+                  placeholder="Enter GST Type"
+                  onChange={handleInputChange}
+                />
+                {errors.gstType && (
+                  <span className="text-red-500">{errors.gstType}</span>
+                )}
+              </div>
+              <hr className="mt-4 -mb-2" />
+              <h2 className="text-xl font-medium pt-4">Documents</h2>
+              <Label htmlFor="businessAccount.gstCopy">GST Copy</Label>
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2 items-center">
+                  <Input
+                    type="file"
+                    id="gstCopy"
+                    name="businessAccount.gstCopy"
+                    accept=".pdf, .jpg, .jpeg, .png"
+                    onChange={handleFileSelection}
+                  />
+                  {!formData.businessAccount.gstCopy && (
+                    <button
+                      type="button"
+                      className="bg-blue-500 text-white p-2 rounded-md"
+                      onClick={() =>
+                        handleFileUpload("businessAccount.gstCopy")
+                      }
+                    >
+                      Upload
+                    </button>
+                  )}
+                </div>
+                {errors.gstCopy && (
+                  <span className="text-red-500">{errors.gstCopy}</span>
+                )}
+              </div>
+
+              <Label htmlFor="businessAccount.firmPan">
+                Firm PAN <span className="text-red-600 font-semibold">*</span>
+              </Label>
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2 items-center">
+                  <Input
+                    type="file"
+                    id="firmPan"
+                    name="businessAccount.firmPan"
+                    accept=".pdf, .jpg, .jpeg, .png"
+                    onChange={handleFileSelection}
+                  />
+                  {!formData.businessAccount.firmPan && (
+                    <button
+                      type="button"
+                      className="bg-blue-500 text-white p-2 rounded-md"
+                      onClick={() =>
+                        handleFileUpload("businessAccount.firmPan")
+                      }
+                    >
+                      Upload
+                    </button>
+                  )}
+                </div>
+                {errors.firmPan && (
+                  <span className="text-red-500">{errors.firmPan}</span>
                 )}
               </div>
               <Label htmlFor="businessAccount.firmGstCertificate">
                 Firm GST Certificate
               </Label>
-              <div className="flex gap-2 items-center">
-                <Input
-                  type="file"
-                  id="firmGstCertificate"
-                  name="businessAccount.firmGstCertificate"
-                  accept=".pdf, .jpg, .jpeg, .png"
-                  onChange={handleFileSelection}
-                />
-                {!formData.businessAccount.firmGstCertificate && (
-                  <button
-                    type="button"
-                    className="bg-blue-500 text-white p-2 rounded-md"
-                    onClick={() =>
-                      handleFileUpload("businessAccount.firmGstCertificate")
-                    }
-                  >
-                    Upload
-                  </button>
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2 items-center">
+                  <Input
+                    type="file"
+                    id="firmGstCertificate"
+                    name="businessAccount.firmGstCertificate"
+                    accept=".pdf, .jpg, .jpeg, .png"
+                    onChange={handleFileSelection}
+                  />
+                  {!formData.businessAccount.firmGstCertificate && (
+                    <button
+                      type="button"
+                      className="bg-blue-500 text-white p-2 rounded-md"
+                      onClick={() =>
+                        handleFileUpload("businessAccount.firmGstCertificate")
+                      }
+                    >
+                      Upload
+                    </button>
+                  )}
+                </div>
+                {errors.firmGstCertificate && (
+                  <span className="text-red-500">
+                    {errors.firmGstCertificate}
+                  </span>
                 )}
               </div>
 
               <Label htmlFor="businessAccount.businessAddressProof">
                 Business Address Proof
               </Label>
-              <div className="flex gap-2 items-center">
-                <Input
-                  type="file"
-                  id="businessAddressProof"
-                  name="businessAccount.businessAddressProof"
-                  accept=".pdf, .jpg, .jpeg, .png"
-                  onChange={handleFileSelection}
-                />
-                {!formData.businessAccount.businessAddressProof && (
-                  <button
-                    type="button"
-                    className="bg-blue-500 text-white p-2 rounded-md"
-                    onClick={() =>
-                      handleFileUpload("businessAccount.businessAddressProof")
-                    }
-                  >
-                    Upload
-                  </button>
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2 items-center">
+                  <Input
+                    type="file"
+                    id="businessAddressProof"
+                    name="businessAccount.businessAddressProof"
+                    accept=".pdf, .jpg, .jpeg, .png"
+                    onChange={handleFileSelection}
+                  />
+                  {!formData.businessAccount.businessAddressProof && (
+                    <button
+                      type="button"
+                      className="bg-blue-500 text-white p-2 rounded-md"
+                      onClick={() =>
+                        handleFileUpload("businessAccount.businessAddressProof")
+                      }
+                    >
+                      Upload
+                    </button>
+                  )}
+                </div>
+                {errors.businessAddressProof && (
+                  <span className="text-red-500">
+                    {errors.businessAddressProof}
+                  </span>
                 )}
               </div>
             </div>
@@ -653,9 +874,11 @@ export default function BulkDownloadForm() {
                 className="text-blue-500"
               >
                 Terms and Conditions
-              </Link>
+              </Link>{" "}
+              <span className="text-red-600 font-semibold">*</span>
             </Label>
           </div>
+          {errors.t_c && <span className="text-red-500">{errors.t_c}</span>}
 
           {/* Submit Button */}
           <div className="flex justify-center">

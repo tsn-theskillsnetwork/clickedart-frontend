@@ -70,10 +70,6 @@ const SignInPage = () => {
 
     if ((user || photographer) && !toastShownRef.current) {
       toastShownRef.current = true;
-      toast(`Already Signed In as ${user ? "User" : "Photographer"}`, {
-        duration: 4000,
-        position: "top-center",
-      });
       router.push("/");
     }
   }, [isHydrated, user, router]);
