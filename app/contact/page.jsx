@@ -1,8 +1,13 @@
+"use client"
+
+import useLayoutStore from "@/store/layout";
 import { Mail, MapPin, Phone } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 
 export default function ContactPage() {
+  const { layout } = useLayoutStore();
+  console.log(layout);
   return (
     <div className="flex flex-col items-center px-4 my-20 h-screen">
       <div className="relative flex flex-col w-full md:w-5/6 overflow-hidden rounded-lg">
@@ -35,7 +40,7 @@ export default function ContactPage() {
             </h5>
           </div>
           <h5 className="xl:text-heading-06 md:text-paragraph 2xl:text-heading-05 font-bold">
-            +91 9189089895
+            +91 {layout?.footerDetails?.phone}
           </h5>
         </div>
         <div className="flex flex-col gap-2 px-4 md:px-5 py-6 shadow-[0_5px_10px_rgba(0,0,0,0.15)] rounded-lg bg-white">
@@ -46,7 +51,7 @@ export default function ContactPage() {
             </h5>
           </div>
           <h5 className="xl:text-heading-06 md:text-paragraph 2xl:text-heading-05 font-bold">
-            ClickedART@GMAIL.COM
+            {layout?.footerDetails?.email}
           </h5>
         </div>
         <div className="flex flex-col gap-2 px-4 md:px-5 py-6 shadow-[0_5px_10px_rgba(0,0,0,0.15)] rounded-lg bg-white">
@@ -57,7 +62,7 @@ export default function ContactPage() {
             </h5>
           </div>
           <h5 className="xl:text-heading-06 md:text-paragraph 2xl:text-heading-05 font-bold">
-            Lorem ipsum
+            {layout?.footerDetails?.address}
           </h5>
         </div>
       </div>

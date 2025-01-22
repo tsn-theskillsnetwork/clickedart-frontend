@@ -8,7 +8,7 @@ export default function BestSelling() {
     const fetchImages = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-all-images`,
+          `${process.env.NEXT_PUBLIC_SERVER}/api/images/best-seller-photos`,
           {
             method: "GET",
             headers: {
@@ -17,8 +17,8 @@ export default function BestSelling() {
           }
         );
         const data = await res.json();
-        setImages(data.photos);
-        console.log(data.photos);
+        setImages(data.bestSellers);
+        console.log(data.bestSellers);
       } catch (error) {
         console.error(error);
       }

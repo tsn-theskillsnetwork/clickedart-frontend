@@ -6,9 +6,11 @@ import { Icon } from "@iconify/react";
 import { Share } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import React from "react";
 
 export default function StoryPageComponent({ story }) {
+  const pathname = usePathname();
   const handleShare = async () => {
     const currentUrl = window.location.origin + pathname;
 

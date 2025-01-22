@@ -54,18 +54,21 @@ export default function BestSellingCard({ images }) {
       {/* Slider */}
       <Slider ref={sliderRef} {...settings} className="px-10">
         {images.map((image, index) => (
-          <Link href={`/images/${image._id}`} key={index} className="p-4 capitalize">
+          <Link href={`/images/${image._id}`} key={index} className="p-4 capitalize relative">
             <Image
               width={800}
               height={800}
-              src={image.imageLinks.thumbnail}
-              alt={image.title}
+              src={image.image.imageLinks.thumbnail}
+              alt={image.image.title}
               className="object-cover w-full aspect-[1/1] rounded-lg"
             />
+            <p className="absolute top-10 left-10 bg-white bg-opacity-70 px-2 py-1 rounded-lg">
+              {image.downloadCount || 0} Downloads
+            </p>
             <div className="text-neutral-600 mt-2">
-              <h2 className="font-bold text-lg">{image.title}</h2>
+              <h2 className="font-bold text-lg">{image.image.title}</h2>
               <p className="text-sm">
-                {image.photographer?.firstName} {image.photographer?.lastName}
+                {image.photographerDetails?.firstName} {image.photographerDetails?.lastName}
               </p>
             </div>
           </Link>
