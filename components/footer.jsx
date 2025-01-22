@@ -11,23 +11,8 @@ import useLayoutStore from "@/store/layout";
 export default function Footer() {
   const router = useRouter();
   const pathname = usePathname();
-  // const [settings, setSettings] = useState({});
   const { layout } = useLayoutStore();
 
-  // const fetchSettings = async () => {
-  //   try {
-  //     const res = await axios.get(
-  //       `${process.env.NEXT_PUBLIC_SERVER}/api/layout/get-layout-content`
-  //     );
-  //     setSettings(res.data);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchSettings();
-  // }, []);
   if (pathname.startsWith("/dashboard")) return null;
   return (
     <div className={`bg-primary-100 min-h-96 px-10 sm:px-24 z-50`}>
@@ -72,16 +57,16 @@ export default function Footer() {
             </div>
             <div className="flex flex-col gap-2">
               <p className="font-semibold text-lg">Explore</p>
-              <Link href="#" className="mt-3 text-sm font-medium">
+              <Link href="/" className="mt-3 text-sm font-medium">
                 Home
               </Link>
-              <Link href="#" className="text-sm font-medium">
-                Catalog
+              <Link href="/images" className="text-sm font-medium">
+                Images
               </Link>
-              <Link href="#" className="text-sm font-medium">
+              <Link href="/about" className="text-sm font-medium">
                 About us
               </Link>
-              <Link href="#" className="text-sm font-medium">
+              <Link href="/contact" className="text-sm font-medium">
                 Contact us
               </Link>
             </div>
