@@ -179,7 +179,7 @@ export default function OrdersPage() {
                                     item.imageInfo?.resolution &&
                                     item.imageInfo?.image?.imageLinks[
                                       item.imageInfo?.resolution
-                                    ]
+                                    ] || "/profile/orders"
                                   }
                                 >
                                   <Button2
