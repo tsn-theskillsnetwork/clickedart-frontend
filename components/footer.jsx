@@ -13,6 +13,8 @@ export default function Footer() {
   const pathname = usePathname();
   const { layout } = useLayoutStore();
 
+  console.log(layout);
+
   if (pathname.startsWith("/dashboard")) return null;
   return (
     <div className={`bg-primary-100 min-h-96 px-10 sm:px-24 z-50`}>
@@ -39,21 +41,29 @@ export default function Footer() {
             </div>
             <div className="flex flex-col gap-2">
               <p className="font-semibold text-lg">Follow us</p>
-              <Link href="#" className="mt-3 text-sm font-medium">
+              {/* <Link href="#" className="mt-3 text-sm font-medium">
                 Facebook
-              </Link>
-              <Link href="#" className="text-sm font-medium">
-                Instagram
-              </Link>
-              <Link href="#" className="text-sm font-medium">
-                Youtube
-              </Link>
-              <Link href="#" className="text-sm font-medium">
-                LinkedIn
-              </Link>
-              <Link href="#" className="text-sm font-medium">
-                Twitter
-              </Link>
+              </Link> */}
+              {layout &&
+                layout.footerDetails?.footerlinks?.map((link, index) => {
+                  const formattedLink =
+                    link.accountLink?.startsWith("http://") ||
+                    link.accountLink?.startsWith("https://")
+                      ? link.accountLink
+                      : `https://${link.accountLink}`;
+
+                  return (
+                    <Link
+                      key={index}
+                      href={formattedLink || "/"}
+                      className="text-sm font-medium"
+                      target="_blank" // Optional: Opens the link in a new tab
+                      rel="noopener noreferrer" // Security best practice for external links
+                    >
+                      {link.accountName}
+                    </Link>
+                  );
+                })}
             </div>
             <div className="flex flex-col gap-2">
               <p className="font-semibold text-lg">Explore</p>
