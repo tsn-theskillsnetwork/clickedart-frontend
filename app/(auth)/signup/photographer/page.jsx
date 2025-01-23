@@ -189,8 +189,8 @@ const RegistrationForm = () => {
         return;
       }
 
-      if (event.target.files[0].size < 5 * 1000 * 1024) {
-        toast.error("File with minimum size of 5MB is allowed");
+      if (event.target.files[0].size < 4 * 1000 * 1024) {
+        toast.error("File with minimum size of 4MB is allowed");
         return false;
       }
 
