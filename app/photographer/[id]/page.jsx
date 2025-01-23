@@ -26,10 +26,9 @@ export default function ProfilePage() {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/photographer/get-photographer-by-id?photographerId=${id}`
       );
-      console.log(response.data);
       setPhotographer(response.data.photographer);
     } catch (error) {
-      console.error("Error fetching Photographer data", error);
+      console.log("Error fetching Photographer data", error);
     } finally {
       setLoading(false);
     }
@@ -56,7 +55,6 @@ export default function ProfilePage() {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/photographeranalytics/get-photographer-analytics?photographer=${id}`
       );
-      console.log("Stats", res.data);
       setStats(res.data);
     } catch (error) {
       setError(error);
@@ -70,14 +68,11 @@ export default function ProfilePage() {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/catalogue/get-catalogues-by-photographer?photographer=${id}`
       );
-      console.log("res", res.data);
       setCatalogues(res.data.catalogues);
     } catch (err) {
       console.log(err);
     }
   };
-
-  console.log(photographer);
 
   useEffect(() => {
     fetchPhotoggrapher();
@@ -222,52 +217,45 @@ export default function ProfilePage() {
             {selectedTab === "photos" ? (
               <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
                 {photos.map((image) => (
-                  <Link
-                    href={`/images/${image._id}`}
+                  <div
+                    // href={`/images/${image._id}`}
                     className="relative group shadow-[2px_2px_6px_rgba(0,0,0,0.4)]"
                     key={image._id}
                   >
                     <Image
-                      width={1080}
-                      height={1080}
+                      width={800}
+                      height={800}
                       priority
+                      onContextMenu={(e) => e.preventDefault()}
                       src={
-                        image.imageLinks.thumbnail ||
-                        image.imageLinks.small ||
-                        image.imageLinks.medium ||
-                        image.imageLinks.original
+                        image.imageLinks.original || image.imageLinks.thumbnail
                       }
                       alt={image.description}
-                      className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear"
+                      onClick={() => {
+                        router.push(`/images/${image._id}`);
+                      }}
+                      className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear cursor-pointer"
                     />
 
-                    <div className="absolute inset-0">
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 ease-linear">
                       <div className="flex justify-between px-2 pt-2">
                         <div className="">
-                          {/* <div className="bg-white px-2 text-paragraph bg-opacity-75 w-fit transition-all duration-200 ease-linear cursor-default">
-                              <p>
-                                {image.imageAnalytics?.downloads || 0} Downloads
-                              </p>
-                            </div> */}
+                          <div className="bg-white px-2 text-paragraph bg-opacity-75 w-fit transition-all duration-200 ease-linear cursor-default">
+
+                          </div>
                         </div>
-                        {/* <div
-                          className={`${
-                            image.exclusiveLicenseStatus != "approved"
-                              ? "bg-red-500"
-                              : "bg-transparent"
-                          } h-2 w-2 rounded-full shadow-[0_0_4px_rgba(0,0,0,0.6)]`}
-                        /> */}
                       </div>
                     </div>
-                    <div className="text-white absolute bottom-0 p-4 pt-6 bg-gradient-to-t from-black to-transparent inset-x-0 bg-opacity-50 opacity-0 group-hover:opacity-100 transition-all duration-200 ease-linear">
-                      <h2 className="text-heading-05 font-semibold">
+
+                    <div className="text-black flex justify-between items-start px-4">
+                      <div className="text-heading-05 font-semibold capitalize">
                         {image.title || "Untitled"}
-                      </h2>
-                      <p className="font-medium text-surface-200">
-                        {image.category?.name}
-                      </p>
+                        <p className="text-base font-medium text-surface-500">
+                          {image.category?.map((cat) => cat.name).join(", ")}
+                        </p>
+                      </div>
                     </div>
-                  </Link>
+                  </div>
                 ))}
               </div>
             ) : (

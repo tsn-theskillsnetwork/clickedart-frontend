@@ -9,6 +9,9 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import "./styles.css";
 import axios from "axios";
+import Swal from "sweetalert2";
+import useAuthStore from "@/authStore";
+import { useRouter } from "next/navigation";
 
 const artists = [
   {
@@ -159,6 +162,8 @@ const featuredArtwork = [
 ];
 
 export default function page() {
+  const { user, photographer } = useAuthStore();
+  const router = useRouter();
   const [photographers, setPhotographers] = useState([]);
 
   const fetchFeaturedArtists = async () => {
@@ -171,7 +176,7 @@ export default function page() {
     } catch (error) {
       console.error("Failed to fetch featured artists:", error);
     }
-  }
+  };
 
   useEffect(() => {
     fetchFeaturedArtists();
@@ -408,7 +413,17 @@ export default function page() {
                 tools, and enjoy secure payments.
               </p>
               <div className="mt-10">
-                <button className="bg-white text-primary rounded-lg font-semibold p-2 sm:p-4 text-heading-06 sm:text-heading-05 hover:bg-primary hover:text-white transition-all duration-200 ease-linear active:bg-primary-200 active:text-white">
+                <button
+                  onClick={() => {
+                    if (photographer) router.push("/profile");
+                    else if (user)
+                      Swal.fire(
+                        "Please sign in as a Photographer to sell your photos"
+                      );
+                    else router.push("/signin/photographer");
+                  }}
+                  className="bg-white text-primary rounded-lg font-semibold p-2 sm:p-4 text-heading-06 sm:text-heading-05 hover:bg-primary hover:text-white transition-all duration-200 ease-linear active:bg-primary-200 active:text-white"
+                >
                   Sell Your Artwork
                 </button>
               </div>

@@ -7,8 +7,11 @@ import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import axios from "axios";
 import useLayoutStore from "@/store/layout";
+import Swal from "sweetalert2";
+import useAuthStore from "@/authStore";
 
 export default function Footer() {
+  const { user, photographer } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
   const { layout } = useLayoutStore();
@@ -109,11 +112,23 @@ export default function Footer() {
               <p className="mt-3 text-sm font-medium">
                 Turn Your Passion into Profit — Join Our Community of Creators
               </p>
-              <Link href="/signup/photographer">
-                <Button size="base" variant="filled" state="default">
+              <div>
+                <Button
+                  onClick={() => {
+                    if (photographer) router.push("/profile");
+                    else if (user)
+                      Swal.fire(
+                        "Please sign in as a Photographer to sell your photos"
+                      );
+                    else router.push("/signup/photographer");
+                  }}
+                  size="base"
+                  variant="filled"
+                  state="default"
+                >
                   <p className="font-normal">Start Selling Now</p>
                 </Button>
-              </Link>
+              </div>
             </div>
           </div>
         </div>

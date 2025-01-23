@@ -492,18 +492,11 @@ const ProfilePage = () => {
                       </div> */}
 
                       <div className="text-black flex justify-between items-start px-4">
-                        <div className="text-heading-05 font-semibold">
+                        <div className="text-heading-05 font-semibold capitalize">
                           {image.title || "Untitled"}
-                          <div className="flex flex-wrap gap-1 mt-1 mb-2 truncate">
-                            {image.category?.map((category) => (
-                              <span
-                                key={category._id}
-                                className="font-medium text-sm text-surface-600 bg-surface-200 px-2 py-1 rounded-md mr-2"
-                              >
-                                {category.name}
-                              </span>
-                            ))}
-                          </div>
+                          <p className="text-base font-medium text-surface-500">
+                            {image.category?.map((cat) => cat.name).join(", ")}
+                          </p>
                         </div>
                         <Popover>
                           <PopoverTrigger>
