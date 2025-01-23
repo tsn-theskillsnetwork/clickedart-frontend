@@ -103,7 +103,7 @@ export default function VerifyPage() {
           />
           {emailadd && (
             <p className="text-green-500 text-center mt-2">
-              OTP has been resent to your email.
+              OTP has been sent to your email. If you don't see it in your inbox, check your spam folder.
             </p>
           )}
         </div>
@@ -132,7 +132,7 @@ export default function VerifyPage() {
         {error && <p className="text-red-500 text-center mt-2">{error}</p>}
         {otpResent && (
           <p className="text-green-500 text-center mt-2">
-            OTP has been resent to your email.
+            OTP has been resent to your email. If you don't see it in your inbox, check your spam folder.
           </p>
         )}
       </div>

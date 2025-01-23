@@ -260,7 +260,7 @@ const RegistrationForm = () => {
       newErrors.email = "Enter a valid email address.";
     if (!formData.password) newErrors.password = "Password is required.";
     if (formData.password !== verifyPassword)
-      newErrors.password = "Passwords do not match.";
+      newErrors.verifyPassword = "Passwords do not match.";
     if (formData.password.length < 8)
       newErrors.password = "Password must be at least 8 characters.";
     if (
@@ -624,6 +624,11 @@ const RegistrationForm = () => {
                   />
                   {errors.password && (
                     <p className="text-red-500 text-sm">{errors.password}</p>
+                  )}
+                  {errors.verifyPassword && (
+                    <p className="text-red-500 text-sm">
+                      {errors.verifyPassword}
+                    </p>
                   )}
                 </div>
 
