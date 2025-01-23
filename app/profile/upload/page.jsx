@@ -232,6 +232,16 @@ const ProfilePage = () => {
         return;
       }
 
+      if (event.target.files[0].size < 4 * 1000 * 1024) {
+        toast.error("File with minimum size of 4MB is allowed");
+        return false;
+      }
+
+      if (event.target.files[0].size > 100 * 1000 * 1024) {
+        toast.error("File with maximum size of 100MB is allowed");
+        return false;
+      }
+
       const s3 = new S3Client({
         region: "ap-south-1",
         credentials: {

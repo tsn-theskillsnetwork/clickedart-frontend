@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import React, { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
+import axios from "axios";
 
 export default function VerifyPage() {
   const type = useSearchParams().get("type");
@@ -60,26 +61,18 @@ export default function VerifyPage() {
     setError("");
 
     try {
-      const response = await fetch(
+      const response = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/user/resent-otp`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
-        }
+        { email }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to resend OTP. Please try again.");
-      }
-
       setOtpResent(true);
+      toast.success("OTP has been resent to your email.");
       setLoading(false);
       setError("");
     } catch (error) {
       setError(error.message);
+      console.log(error);
       setLoading(false);
     }
   };
