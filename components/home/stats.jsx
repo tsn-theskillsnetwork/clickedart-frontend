@@ -2,7 +2,6 @@
 
 import React from "react";
 import CountUp from "react-countup";
-import { motion } from "framer-motion";
 import Image from "next/image";
 import useLayoutStore from "@/store/layout";
 
@@ -103,7 +102,7 @@ export default function Stats() {
                 }
               </h2>
               <p className="text-xs md:text-md text-center">
-                Products Available
+                Images Available
               </p>
             </div>
             <div className="flex flex-col justify-center items-center">

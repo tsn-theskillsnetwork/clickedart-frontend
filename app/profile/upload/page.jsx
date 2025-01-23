@@ -28,6 +28,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import Swal from "sweetalert2";
 
 const ProfilePage = () => {
   const router = useRouter();
@@ -41,9 +42,9 @@ const ProfilePage = () => {
   const [step, setStep] = useState("1");
   const [activePlan, setActivePlan] = useState("basic");
   const [isCustomText, setIsCustomText] = useState(false);
-  const [customText, setCustomText] = useState("");
+  const [customText, setCustomText] = useState("ClickedArt");
   const [imageUrl, setImageUrl] = useState("");
-  const [watermark, setWatermark] = useState([]);
+  const [watermark, setWatermark] = useState(null);
   const [newWatermark, setNewWatermark] = useState("");
   const [limit, setLimit] = useState(10);
   const [photosLength, setPhotosLength] = useState(0);
@@ -74,7 +75,7 @@ const ProfilePage = () => {
   });
 
   // console.log("Active Plan:", activePlan);
-  console.log("CATEGORY", categories);
+  // console.log("CATEGORY", categories);
   const [timeoutId, setTimeoutId] = useState(null);
   const [keywordInput, setKeywordInput] = useState(photo.keywords.join(", "));
 
@@ -145,7 +146,16 @@ const ProfilePage = () => {
 
       const data = res.data;
       console.log("Image uploaded successfully:", data);
-      setNewWatermark(data);
+
+      const res2 = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/upload/upload-watermark-image`,
+        {
+          imageUrl: data,
+        }
+      );
+
+      console.log("Watermark uploaded successfully:", res2.data);
+      setNewWatermark(res2.data.url);
 
       toast.success("File uploaded successfully!", { id: toastId });
     } catch (error) {
@@ -203,7 +213,7 @@ const ProfilePage = () => {
     }
   }, [activePlan]);
 
-  console.log(photo);
+  // console.log(photo);
 
   const handleDescriptionChange = (e) => {
     const newValue = e.target.value;
@@ -270,14 +280,26 @@ const ProfilePage = () => {
         window.scrollTo(0, 160);
         return;
       }
+      console.log("wtermark:", watermark);
+      console.log("photographer:", photographer?._id);
+      console.log("imageUrl:", imageUrl);
+      console.log("plan:", activePlan);
+      console.log(
+        "isCustomText:",
+        activePlan === "basic" || watermark ? false : true
+      );
+      console.log(
+        "customText:",
+        watermark || activePlan === "basic" ? "" : customText
+      );
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/upload/handle-photos-with-watermark-and-resolutions-options`,
         {
           photographer: photographer?._id,
           imageUrl,
           plan: activePlan,
-          isCustomText: activePlan === "intermediate" ? true : false,
-          customText,
+          isCustomText: activePlan === "basic" || watermark ? "false" : "true",
+          customText: watermark || activePlan === "basic" ? "" : customText,
         }
       );
       const data = response.data;
@@ -313,11 +335,14 @@ const ProfilePage = () => {
         }
       );
       console.log(response.data);
-      toast.success("Image uploaded successfully");
-      alert(
-        "Your photo has uploaded successfully and sent to Admin for Approval and may take 0-3 working days to reflect in your profile."
-      );
-      router.push("/profile");
+      Swal.fire({
+        title: "Success!",
+        text: "Your photo has uploaded successfully and sent to Admin for Approval and may take 0-3 working days to reflect in your profile.",
+        icon: "success",
+        confirmButtonText: "OK",
+      }).then(() => {
+        router.push("/profile");
+      });
     } catch (error) {
       console.log(error);
       toast.error(error?.response?.data?.message);
@@ -329,12 +354,12 @@ const ProfilePage = () => {
 
   useEffect(() => {
     fetchData(
-      `${process.env.NEXT_PUBLIC_SERVER}/api/category/get`,
+      `${process.env.NEXT_PUBLIC_SERVER}/api/category/get?pageSize=1000`,
       "categories",
       setCategories
     );
     fetchData(
-      `${process.env.NEXT_PUBLIC_SERVER}/api/license/get-all-license`,
+      `${process.env.NEXT_PUBLIC_SERVER}/api/license/get-all-license?pageSize=1000`,
       "licenses",
       setLicenses
     );
@@ -394,7 +419,7 @@ const ProfilePage = () => {
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-images-by-photographer?photographer=${photographer._id}`
         );
-        console.log(res.data);
+        // console.log(res.data);
         setPhotosLength(res.data.photos?.length);
       } catch (error) {
         setError(error);
@@ -485,7 +510,11 @@ const ProfilePage = () => {
                 ) : (
                   <>
                     {imageUrl ? (
-                      <img src={imageUrl} alt="Uploaded Image" className="max-h-[80vh] mx-auto" />
+                      <img
+                        src={imageUrl}
+                        alt="Uploaded Image"
+                        className="max-h-[80vh] mx-auto"
+                      />
                     ) : (
                       <div className="w-full mx-auto rounded-lg overflow-hidden">
                         <div className="md:flex">
@@ -584,7 +613,7 @@ const ProfilePage = () => {
                         </span>
                       </div>
                     </div>
-                    {activePlan === "intermediate" && (
+                    {activePlan !== "basic" && !watermark && (
                       <div>
                         <Label className="!text-paragraph">
                           Custom Text Watermark
@@ -597,7 +626,7 @@ const ProfilePage = () => {
                       </div>
                     )}
                     {activePlan === "premium" && (
-                      <div>
+                      <div className="mt-5">
                         <Label className="!text-paragraph">
                           Custom Watermark
                         </Label>
@@ -620,7 +649,7 @@ const ProfilePage = () => {
                         ) : (
                           <Dialog>
                             <DialogTrigger asChild>
-                              <p className="text-black font-medium cursor-pointer">
+                              <p className="font-medium cursor-pointer text-blue-600">
                                 Add Watermark
                               </p>
                             </DialogTrigger>
@@ -650,6 +679,7 @@ const ProfilePage = () => {
                         )}
                       </div>
                     )}
+                    
                     <div className="flex justify-center">
                       <button
                         onClick={() => {
@@ -659,7 +689,8 @@ const ProfilePage = () => {
                           !imageUrl ||
                           (activePlan === "intermediate" && !customText) ||
                           (activePlan === "premium" &&
-                            !watermark?.watermarkImage)
+                            !watermark?.watermarkImage &&
+                            !customText)
                         }
                         className="bg-primary text-white py-2 px-4 rounded-full disabled:opacity-50"
                       >

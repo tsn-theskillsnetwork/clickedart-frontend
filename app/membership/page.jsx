@@ -129,13 +129,29 @@ export default function MembershipPage() {
     const cost = plans.find((plan) => plan._id === planId).cost.find(
       (cost) => cost.duration === duration
     ).price;
-    const confirm = window.confirm(
-      "Are you sure you want to start the free trial?"
-    );
-    if (confirm) {
-      handleSubscribe(planId, cost, duration);
-    }
+    Swal.fire({
+      title: "Free Trial",
+      text: "Are you sure you want to start the free trial?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleSubscribe(planId, cost, duration);
+      }
+    });
   };
+
+  //   const confirm = window.confirm(
+  //     "Are you sure you want to start the free trial?"
+  //   );
+  //   if (confirm) {
+  //     handleSubscribe(planId, cost, duration);
+  //   }
+  // };
 
   const handleSubscribe = async (planId, price, duration) => {
     if (!photographer) return;

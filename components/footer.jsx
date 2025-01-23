@@ -33,7 +33,7 @@ export default function Footer() {
                 className="w-full h-auto"
               />
               <p className="mt-5">{layout?.footerDetails?.phone}</p>
-              <p>{layout?.footerDetails?.address}</p>
+              <p>{layout?.footerDetails?.email}</p>
               <div className="flex gap-4 text-sm underline underline-offset-1">
                 <Link href="#">Terms of Use</Link>
                 <Link href="#">Privacy Policy</Link>
@@ -88,7 +88,7 @@ export default function Footer() {
               >
                 Bulk Download
               </Link>
-              <Link href="#" className="text-sm font-medium">
+              <Link href="/support/custom-enquiry" className="text-sm font-medium">
                 Custom Enquiry
               </Link>
               <Link href="/verify" className="text-sm font-medium">
