@@ -574,7 +574,7 @@ export default function ImageEdit() {
         </div>
       ) : (
         <div className="flex justify-center items-center h-screen">
-          <Loader />
+          {photo ? <Loader /> : "Not found"}
         </div>
       )}
     </>

@@ -112,7 +112,7 @@ export default function HeroSection() {
               className="bg-white border-l-2 active:border-none active:outline-none focus:ring-0 text-black py-2 px-0 w-20 sm:w-40 md:w-full font-semibold text-sm sm:text-base md:text-lg lg:text-xl rounded-md"
             >
               <option value="images">Images</option>
-              <option value="categories">Categories</option>
+              {/* <option value="categories">Categories</option> */}
               <option value="photographers">Photographers</option>
             </select>
           </div>

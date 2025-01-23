@@ -422,6 +422,10 @@ export default function ImagePage() {
               </SelectContent>
             </Select>
 
+            <Link href="/support/printing-guide" className="text-blue-600 -mt-8">
+                Printing Guide
+            </Link>
+
             {/* <p className="-mb-8 font-medium">
               {selectedSize
                 ? `${selectedSize?.width} x ${selectedSize?.height} in`
@@ -701,7 +705,7 @@ export default function ImagePage() {
                   </div>
                   {/* Mobile Desc */}
                   <div className="lg:hidden">{descriptionSection}</div>
-                  {image.photographer?.isMonetized && (
+                  {
                     <>
                       <div className="flex justify-center mt-10 lg:hidden">
                         {buySectionActive && (
@@ -719,10 +723,10 @@ export default function ImagePage() {
                         )}
                       </div>
                     </>
-                  )}
-                  {image.photographer?.isMonetized && (
+                  }
+                  {/* {image.photographer?.isMonetized && ( */}
                     <div className="hidden lg:block">{buySection}</div>
-                  )}
+                  {/* )} */}
                 </div>
               </div>
               {/* Desktop Desc */}

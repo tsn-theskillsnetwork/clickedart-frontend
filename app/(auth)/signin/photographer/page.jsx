@@ -112,6 +112,16 @@ const SignInPage = () => {
                 onChange={handleInputChange}
                 required
               />
+              <p className="text-sm text-right">
+                <Link
+                  className="text-blue-500"
+                  href={`/reset-pass?type=photographer${
+                    formData.email ? `&email=${formData.email}` : ""
+                  }`}
+                >
+                  Forgot Password?
+                </Link>
+              </p>
             </div>
             <div className="mx-auto">
               {message && <p className="text-green-500">{message}</p>}

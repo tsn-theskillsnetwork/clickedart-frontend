@@ -38,8 +38,8 @@ export default function Footer() {
               <p className="mt-5">{layout?.footerDetails?.phone}</p>
               <p>{layout?.footerDetails?.email}</p>
               <div className="flex gap-4 text-sm underline underline-offset-1">
-                <Link href="#">Terms of Use</Link>
-                <Link href="#">Privacy Policy</Link>
+                <Link href="/terms">Terms and Conditions</Link>
+                <Link href="/privacy-policy">Privacy Policy</Link>
               </div>
             </div>
             <div className="flex flex-col gap-2">

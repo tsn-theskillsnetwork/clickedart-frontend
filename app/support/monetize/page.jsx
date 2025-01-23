@@ -22,7 +22,7 @@ export default function BulkDownloadForm() {
       state: "",
     },
     panPhoto: "",
-    governmentIdProof: "",
+    // governmentIdProof: "",
     panNumber: "",
     country: "",
     bankAccountName: "",
@@ -65,9 +65,9 @@ export default function BulkDownloadForm() {
     if (!formData.panPhoto) {
       newErrors.panPhoto = "PAN Photo is required";
     }
-    if (!formData.governmentIdProof) {
-      newErrors.governmentIdProof = "Government ID Proof is required";
-    }
+    // if (!formData.governmentIdProof) {
+    //   newErrors.governmentIdProof = "Government ID Proof is required";
+    // }
     if (!formData.panNumber) {
       newErrors.panNumber = "PAN Number is required";
     }
@@ -549,7 +549,7 @@ export default function BulkDownloadForm() {
               <span className="text-red-500">{errors.panPhoto}</span>
             )}
           </div>
-          <Label htmlFor="governmentIdProof">
+          {/* <Label htmlFor="governmentIdProof">
             Copy of Aadhar Card or any Valid Govt. Issued ID{" "}
             <span className="text-red-600 font-semibold">*</span>
           </Label>
@@ -576,7 +576,7 @@ export default function BulkDownloadForm() {
             {errors.governmentIdProof && (
               <span className="text-red-500">{errors.governmentIdProof}</span>
             )}
-          </div>
+          </div> */}
           <Label htmlFor="passbookOrCancelledCheque">
             Passbook or Cancelled Cheque{" "}
             <span className="text-red-600 font-semibold">*</span>

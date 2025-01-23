@@ -191,43 +191,6 @@ export default function MembershipPage() {
     }
   }, [selectedPlanDuration]);
 
-  const faqs = [
-    {
-      question: "How can I manage my billing?",
-      answer:
-        "Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum  Lorem ipsum Lorem ipsum",
-    },
-    {
-      question: "What payment methods do you accept?",
-      answer:
-        "Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum  Lorem ipsum Lorem ipsum",
-    },
-    {
-      question: "Do you offer any discounted plans?",
-      answer:
-        "Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum  Lorem ipsum Lorem ipsum",
-    },
-    {
-      question: "How does our pricing work?",
-      answer:
-        "Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum  Lorem ipsum Lorem ipsum",
-    },
-    {
-      question: "Does Venture offer plans to nonprofits and NGOs?",
-      answer:
-        "Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum  Lorem ipsum Lorem ipsum",
-    },
-    {
-      question: "What if I change my mind?",
-      answer:
-        "Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum  Lorem ipsum Lorem ipsum",
-    },
-    {
-      question: "Can I change my plan?",
-      answer:
-        "Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum  Lorem ipsum Lorem ipsum",
-    },
-  ];
   return (
     <div className="flex flex-col -mt-4 overflow-x-hidden">
       <div className="relative flex flex-col py-10 sm:py-16 md:py-20 lg:py-24 xl:py-28 2xl:py-32">
@@ -651,31 +614,6 @@ export default function MembershipPage() {
                     )}
                   </div>
                 ))}
-          </div>
-          <div className="flex flex-col my-20 w-full items-center">
-            <h1 className="text-heading-06 sm:text-heading-04 md:text-heading-03 lg:text-heading-02 xl:text-heading-01 font-bold mb-5 mx-auto">
-              Frequently Asked Questions
-            </h1>
-            <Accordion
-              className="flex flex-col gap-5"
-              type="single"
-              collapsible
-            >
-              {faqs.map((faq, index) => (
-                <AccordionItem
-                  key={index}
-                  value={`item-${index}`}
-                  className="w-full sm:w-[90vw] md:w-[80vw] lg:w-[70vw] xl:w-[60vw] border px-4 rounded-xl"
-                >
-                  <AccordionTrigger className="sm:!text-heading-06 md:!text-heading-05 lg:!text-heading-04 font-semibold">
-                    {faq.question}
-                  </AccordionTrigger>
-                  <AccordionContent className="!text-xs sm:!text-sm md:!text-paragraph lg:!text-heading-06">
-                    {faq.answer}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
           </div>
         </div>
       </div>

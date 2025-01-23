@@ -467,6 +467,17 @@ const ProfileEditPage = () => {
             {/* <h2 className="text-heading-04 font-medium text-center">
               Profile Update
             </h2> */}
+            <div className="mx-auto">
+              <Button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  router.push("/profile/change-password");
+                }}
+              >
+                Change Password
+              </Button>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full ">
               <div>
                 <Label>
@@ -744,22 +755,32 @@ const ProfileEditPage = () => {
 
             {message && <p className="text-green-500">{message}</p>}
             {error && <p className="text-red-500">{error}</p>}
-
-            <Button type="submit" variant="primary" fullWidth>
-              Update Profile
-            </Button>
+            <div className="flex flex-col items-center">
+              <Button2 type="submit">Update</Button2>
+            </div>
           </form>
         ) : user ? (
           <form
             onSubmit={handleSubmit}
             className="flex flex-col w-full md:w-1/2 px-5 gap-4 mt-5"
           >
-            <h2 className="text-heading-04 font-medium text-center">
+            {/* <h2 className="text-heading-04 font-medium text-center">
               User Registration
-            </h2>
+            </h2> */}
             {message && <p className="text-green-500">{message}</p>}
             {error && <p className="text-red-500">{error}</p>}
 
+            <div className="mx-auto">
+              <Button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  router.push("/profile/change-password");
+                }}
+              >
+                Change Password
+              </Button>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full ">
               <div>
                 <Label>
@@ -1085,7 +1106,7 @@ const ProfileEditPage = () => {
             </div> */}
 
             <div className="flex flex-col items-center">
-              <Button type="submit">Register</Button>
+              <Button2 type="submit">Update</Button2>
             </div>
           </form>
         ) : (

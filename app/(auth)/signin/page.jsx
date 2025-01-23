@@ -112,6 +112,16 @@ const SignInPage = () => {
                 onChange={handleInputChange}
                 required
               />
+              <p className="text-sm text-right">
+                <Link
+                  className="text-blue-500"
+                  href={`/reset-pass?type=user${
+                    formData.email ? `&email=${formData.email}` : ""
+                  }`}
+                >
+                  Forgot Password?
+                </Link>
+              </p>
             </div>
 
             <div className="flex flex-col items-center">
@@ -129,7 +139,7 @@ const SignInPage = () => {
           </Link>
         </p>
         <p>
-          or {" "}
+          or{" "}
           <Link className="underline" href="/signin/photographer">
             Sign In as Photographer
           </Link>

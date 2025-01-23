@@ -23,15 +23,12 @@ export default function Stats() {
         <div className="h-full bg-black bg-opacity-20 py-10 md:py-10">
           <div className="px-5 sm:px-36 lg:w-1/2 w-full">
             <h1 className="text-heading-05 sm:text-heading-03 md:text-heading-02 font-bold text-white">
-              ClickedArt
+              {layout?.footerDetails?.content?.title || "Welcome to ClickedArt"}
             </h1>
             <div className="md:w-5/6 md:mt-4">
               <p className="text-white text-sm sm:text-md md:text-base">
-                Welcome to ClickedArt.com, a vibrant platform built for
-                photographers and visual content enthusiasts! We empower
-                talented photographers across India to showcase their
-                creativity, connect with a wider audience, and monetize their
-                artistry seamlessly.
+                {layout?.footerDetails?.content?.body ||
+                  "We provide high quality images for your projects. Download images for free and use them in your projects. We provide upto 800 Megapixel resolution images for free."}
               </p>
             </div>
           </div>
@@ -62,9 +59,7 @@ export default function Stats() {
                   />
                 }
               </h2>
-              <p className="text-xs md:text-md text-center">
-                Images Available
-              </p>
+              <p className="text-xs md:text-md text-center">Images Available</p>
             </div>
             <div className="flex flex-col justify-center items-center">
               <h2 className="text-heading-06 md:text-heading-03">

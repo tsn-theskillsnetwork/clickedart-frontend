@@ -7,8 +7,11 @@ import Button from "@/components/button";
 import Link from "next/link";
 import Button2 from "@/components/button2";
 import {
+  ArrowUpCircle,
+  ArrowUpCircleIcon,
   EllipsisIcon,
   IndianRupeeIcon,
+  MoveUp,
   Pencil,
   Plus,
   Share2Icon,
@@ -380,9 +383,17 @@ const ProfilePage = () => {
             {/* Active Plan Show */}
             {photographer && (
               <div className="flex flex-col items-center mt-4">
-                <p className="text-heading-05 font-semibold capitalize">
-                  Active Plan: {activePlan}
-                </p>
+                <div className="text-heading-05 font-semibold capitalize flex gap-4 items-center">
+                  Active Plan: {activePlan}{" "}
+                  {activePlan.toLowerCase() !== "premium" && (
+                    <Link href="/membership">
+                      <div className="flex gap-2 items-center">
+                        <span className="text-primary">Upgrade</span>
+                        <ArrowUpCircleIcon strokeWidth={3} className="text-primary" />
+                      </div>
+                    </Link>
+                  )}
+                </div>
               </div>
             )}
 
