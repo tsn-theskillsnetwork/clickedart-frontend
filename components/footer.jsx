@@ -44,26 +44,28 @@ export default function Footer() {
               {/* <Link href="#" className="mt-3 text-sm font-medium">
                 Facebook
               </Link> */}
-              {layout &&
-                layout.footerDetails?.footerlinks?.map((link, index) => {
-                  const formattedLink =
-                    link.accountLink?.startsWith("http://") ||
-                    link.accountLink?.startsWith("https://")
-                      ? link.accountLink
-                      : `https://${link.accountLink}`;
+              <div className="mt-3 flex flex-col gap-2">
+                {layout &&
+                  layout.footerDetails?.footerlinks?.map((link, index) => {
+                    const formattedLink =
+                      link.accountLink?.startsWith("http://") ||
+                      link.accountLink?.startsWith("https://")
+                        ? link.accountLink
+                        : `https://${link.accountLink}`;
 
-                  return (
-                    <Link
-                      key={index}
-                      href={formattedLink || "/"}
-                      className="text-sm font-medium"
-                      target="_blank" // Optional: Opens the link in a new tab
-                      rel="noopener noreferrer" // Security best practice for external links
-                    >
-                      {link.accountName}
-                    </Link>
-                  );
-                })}
+                    return (
+                      <Link
+                        key={index}
+                        href={formattedLink || "/"}
+                        className="text-sm font-medium"
+                        target="_blank" // Optional: Opens the link in a new tab
+                        rel="noopener noreferrer" // Security best practice for external links
+                      >
+                        {link.accountName}
+                      </Link>
+                    );
+                  })}
+              </div>
             </div>
             <div className="flex flex-col gap-2">
               <p className="font-semibold text-lg">Explore</p>
@@ -88,7 +90,10 @@ export default function Footer() {
               >
                 Bulk Download
               </Link>
-              <Link href="/support/custom-enquiry" className="text-sm font-medium">
+              <Link
+                href="/support/custom-enquiry"
+                className="text-sm font-medium"
+              >
                 Custom Enquiry
               </Link>
               <Link href="/verify" className="text-sm font-medium">
