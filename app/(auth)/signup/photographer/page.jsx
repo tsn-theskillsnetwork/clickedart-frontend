@@ -270,6 +270,7 @@ const RegistrationForm = () => {
     )
       newErrors.password =
         "Password must contain at least 8 characters, including one uppercase, one lowercase, one number and one special character.";
+    if (!formData.mobile) newErrors.mobile = "Mobile number is required.";
     if (formData.mobile && isNaN(formData.mobile))
       newErrors.mobile = "Mobile number must be a number.";
     if (formData.whatsapp && isNaN(formData.whatsapp))
@@ -294,6 +295,14 @@ const RegistrationForm = () => {
         "Photography styles must be comma-separated.";
     if (formData.connectedAccounts.length < 1)
       newErrors.connectedAccounts = "Please add at least one account.";
+    if (formData.connectedAccounts.length > 0) {
+      for (let i = 0; i < formData.connectedAccounts.length; i++) {
+        if (!formData.connectedAccounts[i].accountName)
+          newErrors.connectedAccounts = "Account name is required.";
+        if (!formData.connectedAccounts[i].accountLink)
+          newErrors.connectedAccounts = "Account link is required.";
+      }
+    }
     return newErrors;
   };
 
@@ -311,6 +320,10 @@ const RegistrationForm = () => {
 
   const handleNext = () => {
     const newErrors = validateForm1();
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
     checkUsernameAndEmailExists();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -564,10 +577,10 @@ const RegistrationForm = () => {
                       onChange={handleInputChange}
                       required
                     />
+                    {errors.lastName && (
+                      <p className="text-red-500 text-sm">{errors.lastName}</p>
+                    )}
                   </div>
-                  {errors.lastName && (
-                    <p className="text-red-500 text-sm">{errors.lastName}</p>
-                  )}
                 </div>
 
                 <div>
@@ -650,14 +663,20 @@ const RegistrationForm = () => {
               </div>
 
               <div>
-                <Label>Mobile</Label>
+                <Label>
+                  Mobile <span className="text-red-500">*</span>
+                </Label>
                 <Input
                   type="tel"
                   name="mobile"
+                  required
                   value={formData.mobile}
                   onChange={handleInputChange}
                   placeholder="Mobile Number"
                 />
+                {errors.mobile && (
+                  <p className="text-red-500 text-sm">{errors.mobile}</p>
+                )}
               </div>
 
               {errors.mobile && (
