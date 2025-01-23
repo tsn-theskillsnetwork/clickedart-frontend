@@ -20,7 +20,7 @@ export default function Stats() {
           alt=""
           className="absolute inset-0 w-full h-full object-cover -z-50 opacity-90 xl:object-[center_-10rem]"
         />
-        <div className="h-full bg-white bg-opacity-15 py-10 md:py-10">
+        <div className="h-full bg-black bg-opacity-20 py-10 md:py-10">
           <div className="px-5 sm:px-36 lg:w-1/2 w-full">
             <h1 className="text-heading-05 sm:text-heading-03 md:text-heading-02 font-bold text-white">
               ClickedArt
@@ -34,45 +34,6 @@ export default function Stats() {
                 artistry seamlessly.
               </p>
             </div>
-            {/* <div className="flex flex-row gap-2 mt-2 md:mt-10">
-              <div className="flex flex-row">
-                <Image
-                  width={50}
-                  height={50}
-                  className="border-2 border-white rounded-full w-8 h-8 object-cover object-top"
-                  src="/assets/images/avatar1.jpg"
-                  alt="avatar"
-                />
-                <Image
-                  width={50}
-                  height={50}
-                  className="border-2 border-white rounded-full w-8 h-8 object-cover object-top -ml-1"
-                  src="/assets/images/avatar2.jpg"
-                  alt="avatar"
-                />
-                <Image
-                  width={50}
-                  height={50}
-                  className="border-2 border-white rounded-full w-8 h-8 object-cover object-top -ml-1"
-                  src="/assets/images/avatar3.jpg"
-                  alt="avatar"
-                />
-              </div>
-              <div className="text-white">
-                <p className="text-md sm:text-paragraph">
-                  {
-                    <CountUp
-                      enableScrollSpy={true}
-                      scrollSpyOnce={true}
-                      end={100}
-                      suffix="K+"
-                      duration={5}
-                    />
-                  }
-                </p>
-                <p className="text-sm sm:text-md">Happy Clients</p>
-              </div>
-            </div> */}
           </div>
           <div className="mt-5 md:mt-16 flex flex-row md:py-8 px-5 md:px-20 text-white w-full md:w-8/12 backdrop-blur-md md:rounded-3xl justify-around mx-auto">
             <div className="flex flex-col justify-center items-center">
