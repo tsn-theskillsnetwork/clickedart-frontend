@@ -62,7 +62,7 @@ export default function VerifyPage() {
 
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/user/resent-otp`,
+        `${process.env.NEXT_PUBLIC_SERVER}/api/${userType}/resent-otp`,
         { email }
       );
 
