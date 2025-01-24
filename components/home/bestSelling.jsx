@@ -18,9 +18,8 @@ export default function BestSelling() {
         );
         const data = await res.json();
         setImages(data.bestSellers);
-        console.log(data.bestSellers);
       } catch (error) {
-        console.error(error);
+        console.log(error);
       }
     };
 

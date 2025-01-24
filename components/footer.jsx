@@ -16,8 +16,6 @@ export default function Footer() {
   const pathname = usePathname();
   const { layout } = useLayoutStore();
 
-  console.log(layout);
-
   if (pathname.startsWith("/dashboard")) return null;
   return (
     <div className={`bg-primary-100 min-h-96 px-10 sm:px-24 z-50`}>

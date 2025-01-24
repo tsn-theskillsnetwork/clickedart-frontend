@@ -1,8 +1,11 @@
 "use client";
 
 import Button from "@/components/button";
+import Button2 from "@/components/button2";
 import Loader from "@/components/loader";
 import { Share } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 
@@ -24,12 +27,14 @@ export default function BlogPageComponent({ blog }) {
     }
   };
 
+  console.log(blog);
+
   return (
     <>
       {blog ? (
         <div className="min-h-screen mb-10 mt-5">
           <div className="flex flex-col sm:flex-row justify-center">
-            <div className="flex flex-col gap-4 sm:w-3/5 px-4">
+            <div className="flex flex-col gap-4 sm:w-8/12 px-4">
               <div className="flex flex-col">
                 <h2 className="text-heading-02 text-primary font-bold">
                   {blog.content.title}
@@ -54,15 +59,59 @@ export default function BlogPageComponent({ blog }) {
             <div className="flex flex-col mt-4 sm:mt-0 sm:w-1/5 px-4">
               <div className="flex flex-col gap-4 sm:pt-28">
                 <h5 className="text-heading-05 text-primary font-bold">
-                  {blog.authorInfo?.author?.name}
+                  {blog.authorInfo?.authorType === "Photographer" ? (
+                    <Link
+                      href={`/photographer/${blog.authorInfo?.author?._id}`}
+                      passHref
+                    >
+                      {`${blog.authorInfo?.author?.firstName || ""} ${
+                        blog.authorInfo?.author?.lastName || ""
+                      }`}
+                    </Link>
+                  ) : (
+                    "Admin"
+                  )}
                 </h5>
-                <div className="flex flex-row items-center gap-2">
+                {/* <div className="flex flex-row items-center gap-2">
                   <p className="font-semibold text-md text-primary">
                     {blog.authorInfo?.authorType}
                   </p>
-                </div>
-                <p className="text-justify">Type: {blog.type}</p>
+                </div> */}
+                <p className="text-justify capitalize">
+                  Type:{" "}
+                  {blog.blogType === "successstory" ? "Success Story" : "Blog"}
+                </p>
               </div>
+              {blog.blogType === "successstory" && (
+                <div className="flex flex-col gap-2 py-4">
+                  <h5 className="text-heading-05 text-primary font-bold">
+                    Photographer Details
+                  </h5>
+                  <div className="flex flex-row sm:flex-col xl:flex-row items-center gap-4">
+                    <Image
+                      src={blog.photographer?.profileImage}
+                      alt="Photographer"
+                      width={100}
+                      height={100}
+                      className="rounded-full"
+                    />
+                    <div>
+                      <h5 className="text-heading-06 text-primary font-bold">
+                        {blog.photographer?.firstName}{" "}
+                        {blog.photographer?.lastName}
+                      </h5>
+                      <p className="text-paragraph text-primary font-medium">
+                        Achievements: {blog.achievements.join(", ")}
+                      </p>
+                    </div>
+                  </div>
+                  <Link href={`/photographer/${blog.photographer?._id}`}>
+                    <Button2 size="base" variant="filled">
+                      View Profile
+                    </Button2>
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
           <div className="flex flex-col sm:w-4/5 mx-auto px-4 mt-5 justify-start items-start">

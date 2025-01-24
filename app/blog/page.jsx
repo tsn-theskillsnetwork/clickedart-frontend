@@ -59,37 +59,39 @@ export default function BlogPage() {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-10 mb-20">
             {successStories.slice(0, blogLength).map((post, index) => (
-              <Link
-                key={index}
-                href={`/blog/${post._id}`}
-                className="flex flex-col gap-4"
-              >
-                <Image
-                  src={post.coverImage[0] || "/assets/default.jpg"}
-                  alt={post.content.title || "Blog Post"}
-                  width={600}
-                  height={400}
-                  className="w-full aspect-[16/9] rounded-lg object-cover"
-                />
-
-                <div className="flex gap-2 flex-wrap">
-                  {post.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-700 bg-primary-400 bg-opacity-15 rounded-lg px-2 py-1"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <div className="flex flex-col gap-2">
+              <div key={index} className="flex flex-col gap-4">
+                <Link
+                  className="flex flex-col gap-4"
+                  href={`/blog/${post._id}`}
+                  passHref
+                >
+                  <Image
+                    src={post.coverImage[0] || "/assets/default.jpg"}
+                    alt={post.content.title || "Blog Post"}
+                    width={600}
+                    height={400}
+                    className="w-full aspect-[16/9] rounded-lg object-cover"
+                  />
                   <h5 className="text-heading-06 sm:text-heading-05 lg:text-heading-04 font-semibold">
                     {post.content.title}
                   </h5>
+                </Link>
+                <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2">
                     <div className="flex gap-2 text-sm md:text-base text-surface-500">
                       <p className="font-bold border-r-2 border-[#7777778f] pr-2">
-                        {post.authorInfo.author.name}
+                        {post.authorInfo?.authorType === "Photographer" ? (
+                          <Link
+                            href={`/photographer/${post.authorInfo?.author?._id}`}
+                            passHref
+                          >
+                            {`${post.authorInfo?.author?.firstName || ""} ${
+                              post.authorInfo?.author?.lastName || ""
+                            }`}
+                          </Link>
+                        ) : (
+                          "Admin"
+                        )}
                       </p>
                       <p className="">
                         {" "}
@@ -104,8 +106,21 @@ export default function BlogPage() {
                   <p className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-600 truncate">
                     {post.content.summary}
                   </p>
+                  <div className="flex gap-2 flex-wrap items-center">
+                    {post.tags.slice(0, 3).map((tag, index) => (
+                      <span
+                        key={index}
+                        className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-700 bg-primary-400 bg-opacity-15 rounded-lg px-2 py-1"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                    <span className="text-sm text-gray-600 font-semibold">
+                      {post.tags.length > 3 && `+${post.tags.length - 3} more`}
+                    </span>
+                  </div>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         </>
@@ -116,27 +131,44 @@ export default function BlogPage() {
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-10 mb-20">
         {blogPosts.slice(0, blogLength).map((post, index) => (
-          <Link
+          <div
             key={index}
             href={`/blog/${post._id}`}
             className="flex flex-col gap-4"
           >
-            <Image
-              src={post.coverImage[0] || "/assets/default.jpg"}
-              alt={post.content.title || "Blog Post"}
-              width={600}
-              height={400}
-              className="w-full aspect-[16/9] rounded-lg object-cover"
-            />
+            <Link
+              className="flex flex-col gap-4"
+              href={`/blog/${post._id}`}
+              passHref
+            >
+              <Image
+                src={post.coverImage[0] || "/assets/default.jpg"}
+                alt={post.content.title || "Blog Post"}
+                width={600}
+                height={400}
+                className="w-full aspect-[16/9] rounded-lg object-cover"
+              />
 
-            <div className="flex flex-col gap-2">
               <h5 className="text-heading-06 sm:text-heading-05 lg:text-heading-04 font-semibold">
                 {post.content.title}
               </h5>
+            </Link>
+            <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <div className="flex gap-2 text-sm md:text-base text-surface-500">
                   <p className="font-bold border-r-2 border-[#7777778f] pr-2">
-                    {post.authorInfo.author.name}
+                    {post.authorInfo?.authorType === "Photographer" ? (
+                      <Link
+                        href={`/photographer/${post.authorInfo?.author?._id}`}
+                        passHref
+                      >
+                        {`${post.authorInfo?.author?.firstName || ""} ${
+                          post.authorInfo?.author?.lastName || ""
+                        }`}
+                      </Link>
+                    ) : (
+                      "Admin"
+                    )}
                   </p>
                   <p className="">
                     {" "}
@@ -151,7 +183,7 @@ export default function BlogPage() {
               <p className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-600 truncate">
                 {post.content.summary}
               </p>
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex gap-2 flex-wrap items-center">
                 {post.tags.slice(0, 3).map((tag, index) => (
                   <span
                     key={index}
@@ -160,9 +192,12 @@ export default function BlogPage() {
                     {tag}
                   </span>
                 ))}
-              </div>  
+                <span className="text-sm text-gray-600 font-semibold">
+                  {post.tags.length > 3 && `+${post.tags.length - 3} more`}
+                </span>
+              </div>
             </div>
-          </Link>
+          </div>
         ))}
       </div>
       <div className="flex justify-center mb-10">
