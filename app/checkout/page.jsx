@@ -78,7 +78,6 @@ export default function CheckoutPage() {
     }
   }, [items]);
 
-
   const validateOrder = (orderData) => {
     if (!user) {
       toast.error("Please login as User to continue");
@@ -122,7 +121,6 @@ export default function CheckoutPage() {
   };
 
   const calculatePrice = async () => {
-
     try {
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/download/calculate-price`,
@@ -260,8 +258,7 @@ export default function CheckoutPage() {
     const platformFee = (amountAfterDiscount + gstAmount) * 0.02; // 2% platform fee
     setPlatformCharges(platformFee);
     // Final amount after adding GST, platform fee, and delivery charge
-    const finalAmount =
-      amountAfterDiscount + gstAmount + 0 + deliveryCharge;
+    const finalAmount = amountAfterDiscount + gstAmount + 0 + deliveryCharge;
 
     // Update the order data
     setOrderData((prev) => ({
@@ -290,10 +287,9 @@ export default function CheckoutPage() {
             }
           : null,
         subTotal: (item.frameInfo?.price || 0) + (item.paperInfo?.price || 0),
-        finalPrice:
-          (item.frameInfo?.price || 0) +
-          (item.paperInfo?.price || 0) +
-          (item.imageInfo?.price || 0),
+        finalPrice: item.paperInfo?.price
+          ? (item.frameInfo?.price || 0) + (item.paperInfo?.price || 0)
+          : item.imageInfo.price,
       })),
       shippingAddress: {
         ...prev.shippingAddress,
@@ -311,6 +307,8 @@ export default function CheckoutPage() {
       gst: "",
     }));
   }, [user, cartItems, discount, coupon, price] || []);
+
+  console.log("Order Data:", orderData);
 
   const handleCoupon = async (event) => {
     event.preventDefault();
@@ -353,7 +351,7 @@ export default function CheckoutPage() {
         paymentMethod: "razorpay",
       }));
       createOrder();
-    } 
+    }
   }, [paymentStatus]);
 
   const toastShownRef = useRef(false);
@@ -688,7 +686,7 @@ export default function CheckoutPage() {
                       </dt>
                       <dd className="text-base font-medium text-green-500">
                         <span className="line-through mr-2 text-black">
-                        ₹{platformCharges.toFixed(2)}
+                          ₹{platformCharges.toFixed(2)}
                         </span>
                         ₹0
                       </dd>
