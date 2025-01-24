@@ -270,7 +270,7 @@ export default function CheckoutPage() {
           photographer: item.imageInfo.photographer?._id,
           resolution:
             item.mode === "print" ? "original" : item.imageInfo.resolution,
-          price: item.imageInfo.price,
+          price: item.paperInfo?.price ? 0 : item.imageInfo.price,
         },
         frameInfo: item.frameInfo
           ? {
