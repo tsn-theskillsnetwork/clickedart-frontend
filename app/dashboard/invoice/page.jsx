@@ -1,3 +1,5 @@
+"use client";
+
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -14,452 +16,41 @@ import {
 import Link from "next/link";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
+import { useEffect, useState } from "react";
+import useAuthStore from "@/authStore";
+import axios from "axios";
 
-async function getData() {
-  // Fetch data from your API here.
-  return [
-    {
-      _id: "1",
-      invoiceNo: "001",
-      name: "Bhanu",
-      email: "bhanu@mail.com",
-      phone: "7000000012",
-      address: "123, Address, Lucknow",
-      pincode: "226028",
-      status: "unpaid",
-      amount: 3976.6,
-      date: "2024-11-25",
-      dueDate: "2024-12-01",
-      gst: "18",
-      items: [
-        {
-          name: "Item 1",
-          description: "",
-          quantity: "1",
-          price: "1000",
-          discount: "5",
-        },
-        {
-          name: "Item 2",
-          description: "",
-          quantity: "2",
-          price: "500",
-          discount: "5",
-        },
-        {
-          name: "Item 3",
-          quantity: "1",
-          price: "1500",
-          discount: "2",
-        },
-      ],
-    },
-    {
-      _id: "1",
-      invoiceNo: "001",
-      name: "Bhanu",
-      email: "bhanu@mail.com",
-      phone: "7000000012",
-      address: "123, Address, Lucknow",
-      pincode: "226028",
-      status: "paid",
-      amount: 3976.6,
-      date: "2024-11-25",
-      dueDate: "2024-12-01",
-      gst: "18",
-      items: [
-        {
-          name: "Item 1",
-          description: "",
-          quantity: "1",
-          price: "1000",
-          discount: "5",
-        },
-        {
-          name: "Item 2",
-          description: "",
-          quantity: "2",
-          price: "500",
-          discount: "5",
-        },
-        {
-          name: "Item 3",
-          quantity: "1",
-          price: "1500",
-          discount: "2",
-        },
-      ],
-    },
-    {
-      _id: "1",
-      invoiceNo: "001",
-      name: "Bhanu",
-      email: "bhanu@mail.com",
-      phone: "7000000012",
-      address: "123, Address, Lucknow",
-      pincode: "226028",
-      status: "unpaid",
-      amount: 3976.6,
-      date: "2024-11-25",
-      dueDate: "2024-12-01",
-      gst: "18",
-      items: [
-        {
-          name: "Item 1",
-          description: "",
-          quantity: "1",
-          price: "1000",
-          discount: "5",
-        },
-        {
-          name: "Item 2",
-          description: "",
-          quantity: "2",
-          price: "500",
-          discount: "5",
-        },
-        {
-          name: "Item 3",
-          quantity: "1",
-          price: "1500",
-          discount: "2",
-        },
-      ],
-    },
-    {
-      _id: "1",
-      invoiceNo: "001",
-      name: "Bhanu",
-      email: "bhanu@mail.com",
-      phone: "7000000012",
-      address: "123, Address, Lucknow",
-      pincode: "226028",
-      status: "unpaid",
-      amount: 3976.6,
-      date: "2024-11-25",
-      dueDate: "2024-12-01",
-      gst: "18",
-      items: [
-        {
-          name: "Item 1",
-          description: "",
-          quantity: "1",
-          price: "1000",
-          discount: "5",
-        },
-        {
-          name: "Item 2",
-          description: "",
-          quantity: "2",
-          price: "500",
-          discount: "5",
-        },
-        {
-          name: "Item 3",
-          quantity: "1",
-          price: "1500",
-          discount: "2",
-        },
-      ],
-    },
-    {
-      _id: "1",
-      invoiceNo: "001",
-      name: "Bhanu",
-      email: "bhanu@mail.com",
-      phone: "7000000012",
-      address: "123, Address, Lucknow",
-      pincode: "226028",
-      status: "unpaid",
-      amount: 3976.6,
-      date: "2024-11-25",
-      dueDate: "2024-12-01",
-      gst: "18",
-      items: [
-        {
-          name: "Item 1",
-          description: "",
-          quantity: "1",
-          price: "1000",
-          discount: "5",
-        },
-        {
-          name: "Item 2",
-          description: "",
-          quantity: "2",
-          price: "500",
-          discount: "5",
-        },
-        {
-          name: "Item 3",
-          quantity: "1",
-          price: "1500",
-          discount: "2",
-        },
-      ],
-    },
-    {
-      _id: "1",
-      invoiceNo: "001",
-      name: "Bhanu",
-      email: "bhanu@mail.com",
-      phone: "7000000012",
-      address: "123, Address, Lucknow",
-      pincode: "226028",
-      status: "unpaid",
-      amount: 3976.6,
-      date: "2024-11-25",
-      dueDate: "2024-12-01",
-      gst: "18",
-      items: [
-        {
-          name: "Item 1",
-          description: "",
-          quantity: "1",
-          price: "1000",
-          discount: "5",
-        },
-        {
-          name: "Item 2",
-          description: "",
-          quantity: "2",
-          price: "500",
-          discount: "5",
-        },
-        {
-          name: "Item 3",
-          quantity: "1",
-          price: "1500",
-          discount: "2",
-        },
-      ],
-    },
-    {
-      _id: "1",
-      invoiceNo: "001",
-      name: "Bhanu",
-      email: "bhanu@mail.com",
-      phone: "7000000012",
-      address: "123, Address, Lucknow",
-      pincode: "226028",
-      status: "unpaid",
-      amount: 3976.6,
-      date: "2024-11-25",
-      dueDate: "2024-12-01",
-      gst: "18",
-      items: [
-        {
-          name: "Item 1",
-          description: "",
-          quantity: "1",
-          price: "1000",
-          discount: "5",
-        },
-        {
-          name: "Item 2",
-          description: "",
-          quantity: "2",
-          price: "500",
-          discount: "5",
-        },
-        {
-          name: "Item 3",
-          quantity: "1",
-          price: "1500",
-          discount: "2",
-        },
-      ],
-    },
-    {
-      _id: "1",
-      invoiceNo: "001",
-      name: "Bhanu",
-      email: "bhanu@mail.com",
-      phone: "7000000012",
-      address: "123, Address, Lucknow",
-      pincode: "226028",
-      status: "unpaid",
-      amount: 3976.6,
-      date: "2024-11-25",
-      dueDate: "2024-12-01",
-      gst: "18",
-      items: [
-        {
-          name: "Item 1",
-          description: "",
-          quantity: "1",
-          price: "1000",
-          discount: "5",
-        },
-        {
-          name: "Item 2",
-          description: "",
-          quantity: "2",
-          price: "500",
-          discount: "5",
-        },
-        {
-          name: "Item 3",
-          quantity: "1",
-          price: "1500",
-          discount: "2",
-        },
-      ],
-    },
-    {
-      _id: "1",
-      invoiceNo: "001",
-      name: "Bhanu",
-      email: "bhanu@mail.com",
-      phone: "7000000012",
-      address: "123, Address, Lucknow",
-      pincode: "226028",
-      status: "unpaid",
-      amount: 3976.6,
-      date: "2024-11-25",
-      dueDate: "2024-12-01",
-      gst: "18",
-      items: [
-        {
-          name: "Item 1",
-          description: "",
-          quantity: "1",
-          price: "1000",
-          discount: "5",
-        },
-        {
-          name: "Item 2",
-          description: "",
-          quantity: "2",
-          price: "500",
-          discount: "5",
-        },
-        {
-          name: "Item 3",
-          quantity: "1",
-          price: "1500",
-          discount: "2",
-        },
-      ],
-    },
-    {
-      _id: "1",
-      invoiceNo: "001",
-      name: "Bhanu",
-      email: "bhanu@mail.com",
-      phone: "7000000012",
-      address: "123, Address, Lucknow",
-      pincode: "226028",
-      status: "unpaid",
-      amount: 3976.6,
-      date: "2024-11-25",
-      dueDate: "2024-12-01",
-      gst: "18",
-      items: [
-        {
-          name: "Item 1",
-          description: "",
-          quantity: "1",
-          price: "1000",
-          discount: "5",
-        },
-        {
-          name: "Item 2",
-          description: "",
-          quantity: "2",
-          price: "500",
-          discount: "5",
-        },
-        {
-          name: "Item 3",
-          quantity: "1",
-          price: "1500",
-          discount: "2",
-        },
-      ],
-    },
-    {
-      _id: "1",
-      invoiceNo: "001",
-      name: "Bhanu",
-      email: "bhanu@mail.com",
-      phone: "7000000012",
-      address: "123, Address, Lucknow",
-      pincode: "226028",
-      status: "unpaid",
-      amount: 3976.6,
-      date: "2024-11-25",
-      dueDate: "2024-12-01",
-      gst: "18",
-      items: [
-        {
-          name: "Item 1",
-          description: "",
-          quantity: "1",
-          price: "1000",
-          discount: "5",
-        },
-        {
-          name: "Item 2",
-          description: "",
-          quantity: "2",
-          price: "500",
-          discount: "5",
-        },
-        {
-          name: "Item 3",
-          quantity: "1",
-          price: "1500",
-          discount: "2",
-        },
-      ],
-    },
-    {
-      _id: "1",
-      invoiceNo: "001",
-      name: "Bhanu",
-      email: "bhanu@mail.com",
-      phone: "7000000012",
-      address: "123, Address, Lucknow",
-      pincode: "226028",
-      status: "unpaid",
-      amount: 3976.6,
-      date: "2024-11-25",
-      dueDate: "2024-12-02",
-      gst: "18",
-      items: [
-        {
-          name: "Item 1",
-          description: "",
-          quantity: "1",
-          price: "1000",
-          discount: "5",
-        },
-        {
-          name: "Item 2",
-          description: "",
-          quantity: "2",
-          price: "500",
-          discount: "5",
-        },
-        {
-          name: "Item 3",
-          quantity: "1",
-          price: "1500",
-          discount: "2",
-        },
-      ],
-    },
-  ];
-}
+// export const metadata = {
+//   title: "Invoice",
+//   description: "View and manage invoices",
+// };
 
-export const metadata = {
-  title: "Invoice",
-  description: "View and manage invoices",
-};
+export default function Page() {
+  const { photographer } = useAuthStore();
 
-export default async function Page() {
-  const data = await getData();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [stats, setStats] = useState([]);
+
+  const fetchStats = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/photographeranalytics/get-photographer-analytics?photographer=${photographer._id}`
+      );
+      setStats(res.data.payoutHistory);
+      setLoading(false);
+      console.log(res.data);
+    } catch (error) {
+      setError(error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (photographer) fetchStats();
+  }, [photographer]);
+
   return (
     <SidebarProvider>
       <AppSidebar currentUrl={"/dashboard/invoice"} />
@@ -492,7 +83,7 @@ export default async function Page() {
           </div>
           <div className="min-h-[100vh] flex-1 rounded-xl md:min-h-min">
             <div className="container mx-auto py-10">
-              <DataTable columns={columns} data={data} />
+              <DataTable columns={columns} data={stats} />
             </div>
           </div>
         </div>

@@ -36,10 +36,10 @@ const data = {
           title: "Photos",
           url: "/dashboard/photos",
         },
-        // {
-        //   title: "Invoice",
-        //   url: "/dashboard/invoice",
-        // },
+        {
+          title: "Invoice",
+          url: "/dashboard/invoice",
+        },
       ],
     },
   ],
@@ -59,7 +59,7 @@ export function AppSidebar({ currentUrl, ...props }) {
           <SidebarGroup key={group.title}>
             <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu>
+              <SidebarMenu className="!font-semibold">
                 {group.items.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton

@@ -16,7 +16,8 @@ export default function Footer() {
   const pathname = usePathname();
   const { layout } = useLayoutStore();
 
-  if (pathname.startsWith("/dashboard")) return null;
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/invoice"))
+    return null;
   return (
     <div className={`bg-primary-100 min-h-96 px-10 sm:px-24 z-50`}>
       <div className="pt-20 pb-10">

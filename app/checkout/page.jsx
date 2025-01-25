@@ -194,7 +194,7 @@ export default function CheckoutPage() {
     [Razorpay, user]
   );
 
-  const createOrder = async () => {
+  const createOrder = async (orderData) => {
     try {
       setLoading(true);
       const res = await axios.post(
@@ -344,13 +344,19 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (paymentStatus === true) {
-      setOrderData((prev) => ({
-        ...prev,
+      const NewOrderData = {
+        ...orderData,
         invoiceId: razorpay_payment_id,
         isPaid: true,
         paymentMethod: "razorpay",
-      }));
-      createOrder();
+        orderStatus: orderData.orderItems.some(
+          (item) => item.paperInfo !== null
+        )
+          ? "pending"
+          : "completed",
+      };
+
+      createOrder(NewOrderData);
     }
   }, [paymentStatus]);
 

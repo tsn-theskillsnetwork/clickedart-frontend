@@ -37,10 +37,10 @@ export const columns = [
     enableHiding: false,
   },
   {
-    accessorKey: "status",
+    accessorKey: "paymentStatus",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.getValue("status");
+      const status = row.getValue("paymentStatus");
       const color = status === "paid" ? "text-green-600" : "text-red-500";
       return (
         <div className={`${color} capitalize font-semibold`}>
@@ -49,66 +49,56 @@ export const columns = [
       );
     },
   },
+  // {
+  //   accessorKey: "name",
+  //   header: "Name",
+  // },
+  // {
+  //   accessorKey: "email",
+  //   header: "Email",
+  // },
+  // {
+  //   accessorKey: "phone",
+  //   header: "Phone",
+  // },
   {
-    accessorKey: "name",
-    header: "Name",
-  },
-  {
-    accessorKey: "email",
+    accessorKey: "startDate",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Email
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "phone",
-    header: "Phone",
-  },
-  {
-    accessorKey: "date",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Date
+          From
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => {
-      const date = new Date(row.getValue("date"));
+      const date = new Date(row.getValue("startDate"));
       return <div>{date.toDateString()}</div>;
     },
   },
   {
-    accessorKey: "dueDate",
+    accessorKey: "endDate",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Due Date
+          To
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => {
-      const date = new Date(row.getValue("dueDate"));
+      const date = new Date(row.getValue("endDate"));
       return <div>{date.toDateString()}</div>;
     },
   },
   {
-    accessorKey: "amount",
+    accessorKey: "totalAmountPayable",
     header: ({ column }) => {
       return (
         <Button
@@ -121,7 +111,7 @@ export const columns = [
       );
     },
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"));
+      const amount = parseFloat(row.getValue("totalAmountPayable"));
       const formatted = new Intl.NumberFormat("en-IN", {
         style: "currency",
         currency: "INR",
@@ -130,7 +120,7 @@ export const columns = [
     },
   },
   {
-    accessorKey: "_id",
+    accessorKey: "invoiceId",
     header: "Invoice ID",
   },
   {
@@ -150,14 +140,15 @@ export const columns = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
+              onClick={() => navigator.clipboard.writeText(payment.invoiceId)}
             >
               Copy Invoice ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/invoice/${payment.id}`}>
+            <a target="_blank" rel="noopener noreferrer"
+             href={`/invoice/${payment._id}`}>
               <DropdownMenuItem>View Invoice details</DropdownMenuItem>
-            </Link>
+            </a>
           </DropdownMenuContent>
         </DropdownMenu>
       );
