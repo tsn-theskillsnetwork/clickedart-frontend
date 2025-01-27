@@ -565,7 +565,7 @@ const ProfilePage = () => {
                           aspect ratio).
                         </li>
                         <li className="text-xs mt-1">
-                          File size should not exceed 20 MB.
+                          File size should not exceed 100 MB.
                         </li>
                       </ul>
                       <ul className="text-xs text-primary font-medium mt-1">
@@ -721,7 +721,7 @@ const ProfilePage = () => {
                     <img
                       src={
                         photo.imageLinks?.thumbnail ||
-                        "/assets/placeholder.webp"
+                        "/assets/placeholders/broken-image.png"
                       }
                       className="w-full h-auto shadow-[3px_3px_10px_rgba(0,0,0,0.5)]"
                       alt="Uploaded Image"

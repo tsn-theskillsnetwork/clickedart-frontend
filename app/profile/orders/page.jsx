@@ -166,7 +166,7 @@ export default function OrdersPage() {
                             <img
                               src={
                                 item.imageInfo?.image?.imageLinks?.thumbnail ||
-                                "/assets/placeholder.webp"
+                                "/assets/placeholders/broken-image.png"
                               }
                               className=""
                               alt="Canvas Print 72x30"

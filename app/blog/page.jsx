@@ -66,7 +66,7 @@ export default function BlogPage() {
                   passHref
                 >
                   <Image
-                    src={post.coverImage[0] || "/assets/default.jpg"}
+                    src={post.coverImage[0] || "/assets/placeholders/profile.jpg"}
                     alt={post.content.title || "Blog Post"}
                     width={600}
                     height={400}
@@ -142,7 +142,7 @@ export default function BlogPage() {
               passHref
             >
               <Image
-                src={post.coverImage[0] || "/assets/default.jpg"}
+                src={post.coverImage[0] || "/assets/placeholders/profile.jpg"}
                 alt={post.content.title || "Blog Post"}
                 width={600}
                 height={400}

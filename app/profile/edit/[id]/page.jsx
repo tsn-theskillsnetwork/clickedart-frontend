@@ -280,7 +280,7 @@ export default function ImageEdit() {
               <img
                 src={
                   updatedPhoto.imageLinks?.thumbnail ||
-                  "/assets/placeholder.webp"
+                  "/assets/placeholders/broken-image.png"
                 }
                 className="w-full h-auto shadow-[3px_3px_10px_rgba(0,0,0,0.5)]"
                 alt="Uploaded Image"

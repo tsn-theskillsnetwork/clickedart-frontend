@@ -53,7 +53,7 @@ export default function BlogPage() {
             className="flex flex-col gap-4"
           >
             <Image
-              src={post.media_url || "/assets/default.jpg"}
+              src={post.media_url || "/assets/placeholders/profile.jpg"}
               alt={post.title || "Blog Post"}
               width={600}
               height={400}

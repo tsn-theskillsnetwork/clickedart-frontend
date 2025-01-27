@@ -9,8 +9,8 @@ export default function InvoiceDetailsPage({ data, monetizationData }) {
           <div className="flex flex-row justify-between items-center gap-2">
             <div className="flex flex-col gap-2 mb-2">
               <h4 className="text-heading-04 font-semibold text-red-500">
-                {monetizationData?.photographer?.firstName || ""}{" "}
-                {monetizationData?.photographer?.lastName || ""}
+                {data?.photographer?.firstName || ""}{" "}
+                {data?.photographer?.lastName || ""}
               </h4>
               <div>
                 <p className="text-base">
@@ -29,9 +29,7 @@ export default function InvoiceDetailsPage({ data, monetizationData }) {
                     className=" h-4 w-4 text-black fill-white"
                   />
                 </div>
-                <p className="text-base">
-                  {monetizationData?.photographer?.mobile || ""}
-                </p>
+                <p className="text-base">{data?.photographer?.mobile || ""}</p>
               </div>
               <div className="flex items-center gap-2">
                 <div className="bg-black rounded-full h-6 w-6 flex items-center justify-center">
@@ -40,9 +38,7 @@ export default function InvoiceDetailsPage({ data, monetizationData }) {
                     className=" h-4 w-4 text-black fill-white"
                   />
                 </div>
-                <p className="text-base">
-                  {monetizationData?.photographer?.email || ""}
-                </p>
+                <p className="text-base">{data?.photographer?.email || ""}</p>
               </div>
             </div>
 
@@ -101,18 +97,18 @@ export default function InvoiceDetailsPage({ data, monetizationData }) {
               </thead>
               <tbody>
                 {data.orderDetails.map((item, index) => (
-                  <tr key={index}>
-                    <td className="text-center">{item.image?.title}</td>
-                    <td className="text-center">
+                  <tr className="" key={index}>
+                    <td className="text-center p-2">{item.image?.title}</td>
+                    <td className="text-center p-2">
                       {item.printcutAmount > 0 ? "Print" : "Digital"}
                     </td>
-                    <td className="text-center">
+                    <td className="text-center p-2">
                       {item.royaltyAmount || item.printcutAmount}
                     </td>
-                    <td className="text-center">1</td>
+                    <td className="text-center p-2">1</td>
                     <td>
-                      <p className="text-center">
-                        {item.royaltyWithGST || item.printcutAmount}
+                      <p className="text-center p-2">
+                        {item.royaltyAmount || item.printcutAmount}
                       </p>
                     </td>
                   </tr>
@@ -127,14 +123,40 @@ export default function InvoiceDetailsPage({ data, monetizationData }) {
                 )}
               </p>
             </div>
-            <div className="w-1/2">
-              <p className="text-base mt-4 bg-[#ECB2B1] text-black font-semibold px-4 py-2">
-                PAYMENT METHOD
-              </p>
-              <p>
-                <span className="font-semibold">Bank Name:</span>{" "}
-                {monetizationData?.businessAccount?.bankName}
-              </p>
+            <div className="grid grid-cols-2 gap-2 mt-4">
+              <div>
+                <p className="text-base mt-4 bg-[#ECB2B1] text-black font-semibold px-4 py-2">
+                  PAYMENT METHOD
+                </p>
+                <p>
+                  <span className="font-semibold">Bank Name:</span>{" "}
+                  {monetizationData?.bankName}
+                </p>
+                <p>
+                  <span className="font-semibold">Account Number:</span>{" "}
+                  {monetizationData?.bankAccNumber}
+                </p>
+                <p>
+                  <span className="font-semibold">IFSC Code:</span>{" "}
+                  {monetizationData?.ifsc}
+                </p>
+                <p className="text-base mt-4 bg-[#ECB2B1] text-black font-semibold px-4 py-2">
+                  INVOICE PERIOD
+                </p>
+                <p>
+                  <span className="font-semibold">FROM:</span>{" "}
+                  {data.startDate.split("T")[0]}
+                </p>
+                <p>
+                  <span className="font-semibold">TO:</span>{" "}
+                  {data.endDate.split("T")[0]}
+                </p>
+              </div>
+              <div className="h-full w-full flex items-end">
+                <p className="text-paragraph text-center border-t border-black mx-auto mt-4 font-semibold px-4 py-2">
+                  AUTHORISED SIGN
+                </p>
+              </div>
             </div>
           </div>
         </div>

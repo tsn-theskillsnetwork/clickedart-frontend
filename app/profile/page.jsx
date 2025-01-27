@@ -229,7 +229,7 @@ const ProfilePage = () => {
           {photographer && (
             <div className="w-full">
               <Image
-                src={photographer.coverImage || "/assets/placeholder.webp"}
+                src={photographer.coverImage || "/assets/placeholders/broken-image.png"}
                 alt="bg1"
                 width={1920}
                 height={800}
@@ -246,7 +246,7 @@ const ProfilePage = () => {
               src={
                 photographer?.profileImage ||
                 user?.image ||
-                "/assets/default.jpg"
+                "/assets/placeholders/profile.jpg"
               }
               alt="avatar"
               width={150}

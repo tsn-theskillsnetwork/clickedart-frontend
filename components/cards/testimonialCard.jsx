@@ -9,7 +9,7 @@ export default function TestimonialCard({ avatar, name, stars, comment }) {
         <Image
           width={80}
           height={80}
-          src={avatar || "/assets/default.jpg"}  // Fallback to default image
+          src={avatar || "/assets/placeholders/profile.jpg"}  // Fallback to default image
           alt={name || "User Avatar"}  // Provide an alt text if name is not available
           className="rounded-full w-20 h-20 object-cover object-top border-2 border-white shadow-zinc-400 shadow-lg"
         />

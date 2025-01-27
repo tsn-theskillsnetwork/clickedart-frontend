@@ -18,9 +18,11 @@ const getMonetizationData = async (photographerId) => {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_SERVER}/api/monetization/getMonetizationByPhotographerId?photographerId=${photographerId}`
     );
+    console.log("monetization", response.data);
     return response.data;
   } catch (error) {
-    throw new Error("Failed to fetch blog data");
+    console.log("error", error);
+    throw new Error("Failed to fetch monetization data");
   }
 };
 
@@ -53,12 +55,16 @@ export default async function BlogPage({ params }) {
   try {
     const data = await getInvoiceData(id);
     console.log(data);
-    photographerId = data.photographer;
-    const monetizationData = await getMonetizationData(photographerId);
-    console.log(monetizationData);
+    photographerId = data.photographer?._id;
+    let monetizationData = null;
+    try {
+      monetizationData = await getMonetizationData(photographerId);
+    } catch (error) {
+      console.log("error", error);
+    }
 
     return (
-      <InvoiceDetailsPage data={data} monetizationData={monetizationData || null} />
+      <InvoiceDetailsPage data={data} monetizationData={monetizationData ? monetizationData : null} />
     );
   } catch (error) {
     return (

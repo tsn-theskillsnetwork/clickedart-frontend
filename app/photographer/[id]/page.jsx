@@ -40,7 +40,7 @@ export default function ProfilePage() {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-images-by-photographer?photographer=${id}`
       );
-      console.log(res.data);
+      // console.log(res.data);
       setPhotos(res.data.photos);
     } catch (error) {
       setError(error);
@@ -96,7 +96,7 @@ export default function ProfilePage() {
           </div>
           <div className="relative flex flex-col items-center -mt-16 lg:-mt-28">
             <Image
-              src={photographer?.profileImage || "/assets/default.jpg"}
+              src={photographer?.profileImage || "/assets/placeholders/profile.jpg"}
               alt="avatar"
               width={150}
               height={150}
@@ -222,22 +222,22 @@ export default function ProfilePage() {
                     className="relative group shadow-[2px_2px_6px_rgba(0,0,0,0.4)]"
                     key={image._id}
                   >
-                    <Image
-                      width={800}
-                      height={800}
-                      priority
-                      onContextMenu={(e) => e.preventDefault()}
-                      src={
-                        image.imageLinks.original || image.imageLinks.thumbnail
-                      }
-                      alt={image.description}
-                      onClick={() => {
-                        router.push(`/images/${image._id}`);
-                      }}
-                      className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear cursor-pointer"
-                    />
+                    <Link href={`/images/${image._id}`}>
+                      <Image
+                        width={800}
+                        height={800}
+                        priority
+                        onContextMenu={(e) => e.preventDefault()}
+                        src={image.imageLinks.thumbnail || "/assets/placeholders/broken-image.png"}
+                        alt={image.description}
+                        // onClick={() => {
+                        //   router.push(`/images/${image._id}`);
+                        // }}
+                        className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear"
+                      />
+                    </Link>
 
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 ease-linear">
+                    {/* <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 ease-linear">
                       <div className="flex justify-between px-2 pt-2">
                         <div className="">
                           <div className="bg-white px-2 text-paragraph bg-opacity-75 w-fit transition-all duration-200 ease-linear cursor-default">
@@ -245,7 +245,7 @@ export default function ProfilePage() {
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </div> */}
 
                     <div className="text-black flex justify-between items-start px-4">
                       <div className="text-heading-05 font-semibold capitalize">

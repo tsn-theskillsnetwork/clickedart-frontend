@@ -8,6 +8,7 @@ import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { Heart } from "lucide-react";
+import Link from "next/link";
 
 export default function WishlistPage() {
   const { user } = useAuthStore();
@@ -50,7 +51,6 @@ export default function WishlistPage() {
       );
 
       const data = await res.json();
-      console.log(data);
 
       if (!res.ok) {
         toast.error("Error removing image from wishlist");
@@ -79,12 +79,7 @@ export default function WishlistPage() {
           >
             <img
               className="w-full aspect-[1/1] mb-4 object-cover rounded-sm"
-              src={
-                item.imageLinks?.small ||
-                item.imageLinks?.medium ||
-                item.imageLinks?.original ||
-                "/assets/images/img6.jpg"
-              }
+              src={item.imageLinks?.thumbnail || "/assets/placeholders/broken-image.png"}
               alt={item.title}
             />
             <Heart
@@ -99,8 +94,12 @@ export default function WishlistPage() {
                 <h5 className="text-heading-06 text-surface-600 font-semibold">
                   {item.title || "Untitled"}
                 </h5>
+                {/* <p className="text-sm font-medium text-surface-500">
+                  {item.photographer?.firstName || "Unknown"}{" "} {item.photographer?.lastName || ""}
+                </p> */}
                 <p className="text-sm font-medium text-surface-500">
-                  {item.photographer?.name || "Artist name"}
+                  {item.resolutions?.original?.height} x{" "}
+                  {item.resolutions?.original?.width} px
                 </p>
                 <p className="text-sm font-medium text-surface-500">
                   {(
@@ -114,20 +113,13 @@ export default function WishlistPage() {
                   ₹{item.price.original}
                 </p>
               </div>
-              <button
-                onClick={() => {
-                  isItemInCart(item._id)
-                    ? onRemoveFromCart(item._id)
-                    : onAddToCart(item);
-                }}
-                className={`font-medium  text-surface-600 px-2 p-3 rounded-md transition-all duration-200 hover:shadow ${
-                  isItemInCart(item._id)
-                    ? "text-black border border-surface-600 hover:bg-surface-200"
-                    : "bg-primary text-white border-none hover:bg-primary-dark"
-                }`}
+              <Link
+                className={`flex justify-center font-medium px-2 p-3 rounded-md transition-all duration-200 hover:shadow bg-primary text-white border-none hover:bg-primary-dark"
+                  }`}
+                href={`/images/${item._id}`}
               >
-                {isItemInCart(item._id) ? "Remove" : "Move to Bag"}
-              </button>
+                <button>View</button>
+              </Link>
             </div>
             {/* <div className="flex gap-4 mx-auto">
               <button

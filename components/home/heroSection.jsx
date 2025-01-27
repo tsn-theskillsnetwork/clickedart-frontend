@@ -180,7 +180,7 @@ export default function HeroSection() {
           {heroPhotos.map((image, index) => (
             <div key={index}>
               <Image
-                src={image || "/assets/placeholder.webp"}
+                src={image || "/assets/placeholders/broken-image.png"}
                 alt={`Thumbnail ${index}`}
                 width={300}
                 height={300}

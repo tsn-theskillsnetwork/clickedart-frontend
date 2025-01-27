@@ -325,14 +325,14 @@ export default function ThemesResultPage() {
                   width={800}
                   height={800}
                   priority
-                  src={image.imageLinks.thumbnail || "/assets/placeholder.webp"}
+                  src={image.imageLinks.thumbnail || "/assets/placeholders/image.webp"}
                   alt={image.description}
                   className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear opacity-50 blur-[4px] border border-primary-200"
                 />
                 <Image
                   width={800}
                   height={800}
-                  src={image.imageLinks.thumbnail || "/assets/placeholder.webp"}
+                  src={image.imageLinks.thumbnail || "/assets/placeholders/image.webp"}
                   alt={image.description}
                   className="absolute inset-0 object-contain w-full aspect-[1/1] transition-all duration-200 ease-linear drop-shadow-md"
                 />
