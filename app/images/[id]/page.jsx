@@ -12,6 +12,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight, Heart, ShoppingCart } from "lucide-react";
 import useCartStore from "@/store/cart";
 import { useKeenSlider } from "keen-slider/react";
@@ -24,6 +33,8 @@ import useAuthStore from "@/authStore";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
 import RecommendedSection from "@/components/image/recommendedSection";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 export default function ImagePage() {
   const id = useParams().id;
@@ -46,6 +57,10 @@ export default function ImagePage() {
   const [buySectionActive, setBuySectionActive] = useState(false);
   const [subTotal, setSubTotal] = useState(image.price?.original || 0);
   const [inCart, setInCart] = useState(false);
+  const [customSize, setCustomSize] = useState({
+    width: 0,
+    height: 0,
+  });
 
   const onAddToCart = () => {
     if (mode === "print" && !selectedPaper) {
@@ -113,7 +128,7 @@ export default function ImagePage() {
       src: image?.imageLinks?.thumbnail,
     },
     {
-      src: "https://plus.unsplash.com/premium_photo-1661780295073-98db12600af0?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      src: "/assets/placeholders/Sofa Room Logo Mockup.jpg",
     },
   ];
 
@@ -131,7 +146,8 @@ export default function ImagePage() {
       },
     },
   });
-
+  console.log(selectedSize);
+  console.log(selectedPaper);
   const fetchImage = async () => {
     try {
       setLoading(true);
@@ -221,6 +237,10 @@ export default function ImagePage() {
 
   const handlePaperChange = (paper) => {
     setSelectedSize(paper.customDimensions[0]);
+    setCustomSize({
+      width: 0,
+      height: 0,
+    });
     setSelectedPaper(paper);
   };
 
@@ -422,45 +442,129 @@ export default function ImagePage() {
               </SelectContent>
             </Select>
 
-            <Link href="/support/printing-guide" className="text-blue-600 -mt-8">
-                Printing Guide
-            </Link>
+            <a
+              href="/support/printing-guide"
+              target="_blank"
+              className="text-blue-600 -mt-8"
+            >
+              Printing Guide
+            </a>
 
             {/* <p className="-mb-8 font-medium">
               {selectedSize
                 ? `${selectedSize?.width} x ${selectedSize?.height} in`
                 : "Select Size"}
             </p> */}
-
-            <Select
-              className="w-36"
-              value={selectedSize}
-              onValueChange={(value) => {
-                setSelectedSize(value);
-              }}
-            >
-              <SelectTrigger className="w-full font-medium !text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between">
-                <SelectValue
-                  placeholder={
-                    selectedSize
-                      ? `${selectedSize?.width} x ${selectedSize?.height} in`
-                      : "Select Size"
-                  }
-                />
-                <p className="sr-only">Size</p>
-              </SelectTrigger>
-              <SelectContent>
-                {selectedPaper?.customDimensions.map((size) => (
-                  <SelectItem
+            <div>
+              <Select
+                className="w-36"
+                value={JSON.stringify(selectedSize)} // Serialized value
+                onValueChange={(value) => {
+                  setSelectedSize(JSON.parse(value)); // Deserialize value on change
+                }}
+              >
+                <SelectTrigger className="w-full font-medium !text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between">
+                  {/* Manually display selectedSize */}
+                  <span>
+                    {selectedSize?.width && selectedSize?.height
+                      ? `${selectedSize.width} x ${selectedSize.height} in`
+                      : "Select Size"}
+                  </span>
+                  <p className="sr-only">Size</p>
+                </SelectTrigger>
+                <SelectContent>
+                  {selectedPaper?.customDimensions.map((size) => (
+                    <SelectItem
+                      className="!text-paragraph"
+                      key={size._id}
+                      value={JSON.stringify(size)} // Serialize options
+                    >
+                      {size.width} x {size.height} in
+                    </SelectItem>
+                  ))}
+                  {/* <SelectItem
                     className="!text-paragraph"
-                    key={size._id}
-                    value={size}
+                    value={JSON.stringify(customSize)}
                   >
-                    {size.width} x {size.height} in
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                    {customSize.width} x {customSize.height} in
+                  </SelectItem> */}
+                </SelectContent>
+              </Select>
+
+              <Dialog>
+                <DialogTrigger className="w-full pl-2 !text-paragraph rounded-lg h-12 flex items-center justify-between">
+                  Custom Size
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Select Custom Size</DialogTitle>
+                    <div className="flex flex-col gap-4">
+                      <div className="space-y-2">
+                        <Label>
+                          Width (max.{" "}
+                          {
+                            selectedPaper?.customDimensions[
+                              selectedPaper?.customDimensions.length - 1
+                            ]?.width
+                          }{" "}
+                          in)
+                        </Label>
+                        <Input
+                          type="number"
+                          placeholder="Width"
+                          value={customSize.width || ""}
+                          onChange={(e) => {
+                            const inputValue = Number(e.target.value);
+                            const maxWidth =
+                              selectedPaper?.customDimensions[
+                                selectedPaper?.customDimensions.length - 1
+                              ]?.width || Infinity;
+                            setCustomSize({
+                              ...customSize,
+                              width: Math.min(inputValue, maxWidth),
+                            });
+                          }}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Height (max. 80 in)</Label>
+                        <Input
+                          type="number"
+                          placeholder="Height"
+                          value={customSize.height || ""}
+                          onChange={(e) => {
+                            const inputValue = Number(e.target.value);
+                            setCustomSize({
+                              ...customSize,
+                              height: Math.min(inputValue, 80),
+                            });
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </DialogHeader>
+                  <DialogClose
+                    onClick={() => {
+                      if(customSize.width < 12 || customSize.height < 12) {
+                        toast.error("Minimum size is 12 x 12 inches");
+                        return;
+                      }
+                      const newSize = {
+                        width: customSize.width,
+                        height: customSize.height,
+                        price:
+                          selectedPaper.basePricePerSquareInch *
+                          customSize.width *
+                          customSize.height,
+                      };
+                      setSelectedSize(newSize); // Update selected size
+                    }}
+                  >
+                    Save
+                  </DialogClose>
+                </DialogContent>
+              </Dialog>
+            </div>
 
             <Select
               className="w-36"
@@ -584,7 +688,7 @@ export default function ImagePage() {
       : 0;
 
   const clampedHeight =
-    selectedPaper && selectedSize ? 20 + dynamicHeight * (35 - 20) : 100;
+    selectedPaper && selectedSize ? 22 + dynamicHeight * (35 - 22) : 100;
 
   const height = clampedHeight + "%";
 
@@ -609,23 +713,13 @@ export default function ImagePage() {
                         aspectRatio:
                           selectedPaper &&
                           selectedSize &&
-                          `${
-                            image.resolutions?.original?.height >
-                            image.resolutions?.original?.width
-                              ? selectedSize.width
-                              : selectedSize.height
-                          }/${
-                            image.resolutions?.original?.height >
-                            image.resolutions?.original?.width
-                              ? selectedSize.height
-                              : selectedSize.width
-                          }`,
+                          `${selectedSize.width}/${selectedSize.height}`,
                         height: selectedSize ? height : "100%",
                       }}
                       className={`${
                         selectedPaper &&
                         selectedSize &&
-                        `mt-[4%] w-auto mx-auto`
+                        `mt-[4%] w-auto -ml-[10%]`
                       } absolute inset-y-0 z-10 shadow-[2px_2px_6px_rgba(0,0,0,0.7)]`}
                     >
                       <ImageSection
@@ -642,7 +736,7 @@ export default function ImagePage() {
                         exit={{ opacity: 0 }}
                       >
                         <Image
-                          src="https://plus.unsplash.com/premium_photo-1661780295073-98db12600af0?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                          src="/assets/placeholders/Sofa Room Logo Mockup.jpg"
                           alt="mockup"
                           priority
                           width={800}
@@ -725,7 +819,7 @@ export default function ImagePage() {
                     </>
                   }
                   {/* {image.photographer?.isMonetized && ( */}
-                    <div className="hidden lg:block">{buySection}</div>
+                  <div className="hidden lg:block">{buySection}</div>
                   {/* )} */}
                 </div>
               </div>
