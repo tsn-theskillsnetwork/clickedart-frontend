@@ -148,7 +148,7 @@ export default function Navbar() {
     user && fetchWishlist(user?._id);
   }, [user]);
 
-  if (pathname.startsWith("/dashboard") || pathname.startsWith("/invoice") || pathname.startsWith("/bill"))
+  if (pathname.startsWith("/invoice") || pathname.startsWith("/bill"))
     return null;
 
   return (
