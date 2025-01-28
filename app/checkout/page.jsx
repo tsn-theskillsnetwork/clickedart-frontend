@@ -349,11 +349,7 @@ export default function CheckoutPage() {
         invoiceId: razorpay_payment_id,
         isPaid: true,
         paymentMethod: "razorpay",
-        orderStatus: orderData.orderItems.some(
-          (item) => item.paperInfo !== null
-        )
-          ? "pending"
-          : "completed",
+        orderStatus: "completed",
       };
 
       createOrder(NewOrderData);

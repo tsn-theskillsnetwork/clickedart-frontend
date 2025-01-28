@@ -309,7 +309,7 @@ const ProfilePage = () => {
           imageUrl,
           plan: activePlan,
           isCustomText: activePlan === "basic" || watermark ? "false" : "true",
-          customText: watermark || activePlan === "basic" ? "" : customText,
+          customText: watermark || activePlan === "basic" ? "" : customText || "ClickedArt",
         }
       );
       const data = response.data;

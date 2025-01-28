@@ -1,76 +1,68 @@
+"use client";
+
 import axios from "axios";
 import InvoiceDetailsPage from "./invoice";
 import Loader from "@/components/loader";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-const getInvoiceData = async (id) => {
-  try {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER}/api/invoice/get-invoice-by-id?id=${id}`
-    );
-    return response.data.invoice;
-  } catch (error) {
-    throw new Error("Failed to fetch blog data");
-  }
-};
+export default function InvoicePage() {
+  const { id } = useParams();
 
-const getMonetizationData = async (photographerId) => {
-  try {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER}/api/monetization/getMonetizationByPhotographerId?photographerId=${photographerId}`
-    );
-    console.log("monetization", response.data);
-    return response.data;
-  } catch (error) {
-    console.log("error", error);
-    throw new Error("Failed to fetch monetization data");
-  }
-};
+  const [data, setData] = useState(null);
+  const [monetizationData, setMonetizationData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-export async function generateMetadata({ params }) {
-  const { id } = await params;
-
-  try {
-    const data = await getInvoiceData(id);
-    return {
-      title: data.invoiceId,
-      description: "Invoice - " + data.invoiceId,
-      openGraph: {
-        title: "Invoice - " + data.invoiceId,
-        description: "Invoice - " + data.invoiceId,
-        url: `${process.env.NEXT_PUBLIC_URL}/invoice/${id}`,
-      },
-    };
-  } catch (error) {
-    return {
-      title: "Invoice Not Found",
-      description: "No Invoice found with the given ID.",
-    };
-  }
-}
-
-export default async function BlogPage({ params }) {
-  const { id } = await params;
-  let photographerId = null;
-
-  try {
-    const data = await getInvoiceData(id);
-    console.log(data);
-    photographerId = data.photographer?._id;
-    let monetizationData = null;
+  const getInvoiceData = async (id) => {
     try {
-      monetizationData = await getMonetizationData(photographerId);
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/invoice/get-invoice-by-id?id=${id}`
+      );
+      console.log("invoice", response.data.invoice);
+      setData(response.data.invoice);
+
+      if (response.data.invoice.photographer?._id) {
+        getMonetizationData(response.data.invoice.photographer._id);
+      }
+    } catch (error) {
+      console.log("error", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getMonetizationData = async (photographerId) => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/monetization/getMonetizationByPhotographerId?photographerId=${photographerId}`
+      );
+      console.log("monetization", response.data);
+      setMonetizationData(response.data);
     } catch (error) {
       console.log("error", error);
     }
+  };
 
-    return (
-      <InvoiceDetailsPage data={data} monetizationData={monetizationData ? monetizationData : null} />
-    );
-  } catch (error) {
-    return (
-      <div className="flex justify-center items-center min-h-96">
-        <p className="text-2xl">Invoice Not Found</p>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (id) {
+      getInvoiceData(id);
+    }
+  }, [id]);
+
+  return (
+    <>
+      {data && !loading ? (
+        <>
+          <InvoiceDetailsPage
+            data={data}
+            monetizationData={monetizationData ? monetizationData : null}
+          />
+        </>
+      ) : (
+        <div className="flex justify-center items-center h-screen">
+          {loading ? <Loader /> : <p>Invoice not Found</p>}
+        </div>
+      )}
+    </>
+  );
 }

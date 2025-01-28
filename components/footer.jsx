@@ -16,7 +16,7 @@ export default function Footer() {
   const pathname = usePathname();
   const { layout } = useLayoutStore();
 
-  if (pathname.startsWith("/dashboard") || pathname.startsWith("/invoice"))
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/invoice") || pathname.startsWith("/bill"))
     return null;
   return (
     <div className={`bg-primary-100 min-h-96 px-10 sm:px-24 z-50`}>
@@ -106,7 +106,7 @@ export default function Footer() {
           <div className="flex max-w-[28%] sm:mr-20">
             <div className="flex flex-col gap-2 items-start">
               <p className="font-semibold text-lg">
-                Sell your photography on ClickedArt!
+                Sell your photograph on ClickedArt!
               </p>
               <p className="mt-3 text-sm font-medium">
                 Turn Your Passion into Profit — Join Our Community of Creators
@@ -135,7 +135,7 @@ export default function Footer() {
       <hr className="border-surface-300" />
       <div className="h-2"></div>
       <p className="text-sm font-medium">
-        ©2024 ClickedArt® is a registered trademark.
+        ©2025 ClickedArt® is a registered trademark.
       </p>
     </div>
   );

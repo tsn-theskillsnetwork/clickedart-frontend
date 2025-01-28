@@ -3,168 +3,20 @@
 import Button from "@/components/button";
 import { Icon } from "@iconify/react";
 import React, { useEffect, useState } from "react";
-import { Heart } from "lucide-react";
 import Featured from "@/components/featuredArtists/featured";
 import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
 import "./styles.css";
 import axios from "axios";
 import Swal from "sweetalert2";
 import useAuthStore from "@/authStore";
 import { useRouter } from "next/navigation";
-
-const artists = [
-  {
-    name: "Artist 1",
-    image: "/assets/images/avatar1.jpg",
-    profile: "/artist/1",
-  },
-  {
-    name: "Artist 2",
-    image: "/assets/images/avatar2.jpg",
-    profile: "artist/2",
-  },
-  {
-    name: "Artist 3",
-    image: "/assets/images/avatar3.jpg",
-    profile: "artist/3",
-  },
-  {
-    name: "Artist 4",
-    image: "/assets/images/avatar4.jpg",
-    profile: "artist/4",
-  },
-  {
-    name: "Artist 5",
-    image: "/assets/images/avatar1.jpg",
-    profile: "artist/5",
-  },
-  {
-    name: "Artist 6",
-    image: "/assets/images/avatar2.jpg",
-    profile: "artist/6",
-  },
-];
-
-const featuredArtwork = [
-  {
-    title: "Artwork 1",
-    artist: "Artist 1",
-    src: "/assets/hero/bg2.jpg",
-    size: 100,
-    downloadCount: 100,
-  },
-  {
-    title: "Artwork 2",
-    artist: "Artist 2",
-    src: "/assets/hero/bg2.jpg",
-    size: 200,
-    downloadCount: 200,
-  },
-  {
-    title: "Artwork 3",
-    artist: "Artist 3",
-    src: "/assets/hero/bg2.jpg",
-    size: 300,
-    downloadCount: 300,
-  },
-  {
-    title: "Artwork 4",
-    artist: "Artist 4",
-    src: "/assets/hero/bg2.jpg",
-    size: 400,
-    downloadCount: 400,
-  },
-  {
-    title: "Artwork 5",
-    artist: "Artist 5",
-    src: "/assets/hero/bg2.jpg",
-    size: 500,
-    downloadCount: 500,
-  },
-  {
-    title: "Artwork 6",
-    artist: "Artist 6",
-    src: "/assets/hero/bg2.jpg",
-    size: 600,
-    downloadCount: 100,
-  },
-  {
-    title: "Artwork 7",
-    artist: "Artist 7",
-    src: "/assets/hero/bg2.jpg",
-    size: 700,
-    downloadCount: 100,
-  },
-  {
-    title: "Artwork 8",
-    artist: "Artist 8",
-    src: "/assets/hero/bg2.jpg",
-    size: 800,
-    downloadCount: 100,
-  },
-  {
-    title: "Artwork 1",
-    artist: "Artist 1",
-    src: "/assets/hero/bg2.jpg",
-    size: 100,
-    downloadCount: 100,
-  },
-  {
-    title: "Artwork 2",
-    artist: "Artist 2",
-    src: "/assets/hero/bg2.jpg",
-    size: 200,
-    downloadCount: 100,
-  },
-  {
-    title: "Artwork 3",
-    artist: "Artist 3",
-    src: "/assets/hero/bg2.jpg",
-    size: 300,
-    downloadCount: 100,
-  },
-  {
-    title: "Artwork 4",
-    artist: "Artist 4",
-    src: "/assets/hero/bg2.jpg",
-    size: 400,
-    downloadCount: 100,
-  },
-  {
-    title: "Artwork 5",
-    artist: "Artist 5",
-    src: "/assets/hero/bg2.jpg",
-    size: 500,
-    downloadCount: 100,
-  },
-  {
-    title: "Artwork 6",
-    artist: "Artist 6",
-    src: "/assets/hero/bg2.jpg",
-    size: 600,
-    downloadCount: 100,
-  },
-  {
-    title: "Artwork 7",
-    artist: "Artist 7",
-    src: "/assets/hero/bg2.jpg",
-    size: 700,
-    downloadCount: 200,
-  },
-  {
-    title: "Artwork 8",
-    artist: "Artist 8",
-    src: "/assets/hero/bg2.jpg",
-    size: 800,
-    downloadCount: 100,
-  },
-];
+import Link from "next/link";
 
 export default function page() {
   const { user, photographer } = useAuthStore();
   const router = useRouter();
   const [photographers, setPhotographers] = useState([]);
+  const [images, setImages] = useState([]);
 
   const fetchFeaturedArtists = async () => {
     try {
@@ -172,7 +24,18 @@ export default function page() {
         `${process.env.NEXT_PUBLIC_SERVER}/api/photographer/get-featured-photographers`
       );
       setPhotographers(res.data.featuredPhotographer);
-      console.log(res.data.featuredPhotographer);
+    } catch (error) {
+      console.error("Failed to fetch featured artists:", error);
+    }
+  };
+
+  const fetchFeaturedArtwork = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-featured-artwork`
+      );
+      setImages(res.data.featuredArtwork);
+      console.log(res.data);
     } catch (error) {
       console.error("Failed to fetch featured artists:", error);
     }
@@ -180,21 +43,15 @@ export default function page() {
 
   useEffect(() => {
     fetchFeaturedArtists();
+    fetchFeaturedArtwork();
   }, []);
 
   return (
-    <AnimatePresence mode="popLayout">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.3 }}
-        className="min-h-screen flex flex-col items-center"
-      >
-        {/* <h2 className="text-heading-04 sm:text-heading-03 md:text-heading-02 font-bold text-primary-400">
+    <div>
+      {/* <h2 className="text-heading-04 sm:text-heading-03 md:text-heading-02 font-bold text-primary-400">
           Artist of the Month
         </h2> */}
-        {/* <div className="relative flex flex-col items-center justify-center mt-4 w-full">
+      {/* <div className="relative flex flex-col items-center justify-center mt-4 w-full">
           <div className="absolute inset-0 bg-black opacity-0 sm:opacity-15 z-0">
             <Image
               width={800}
@@ -334,103 +191,138 @@ export default function page() {
             </button>
           </div>
         </div> */}
-        <div className="w-full flex flex-col items-center bg-neutral-200 px-4 mb-10 min-h-20">
-          <div className="text-center mt-20 mb-10">
-            <h1 className="text-heading-03 sm:text-heading-01 font-bold text-primary">
-              Featured Artists
-            </h1>
-            <p className="text-paragraph sm:text-heading-04 text-primary font-semibold">
-              Discover the Masters Behind the Magic
-            </p>
-          </div>
-          {/* <div className="my-5"> */}
-          <Featured photographers={photographers} />
-          {/* </div> */}
+      <div className="w-full flex flex-col items-center bg-neutral-200 px-4 mb-10 min-h-20">
+        <div className="text-center mt-20 mb-10">
+          <h1 className="text-heading-03 sm:text-heading-01 font-bold text-primary">
+            Featured Artists
+          </h1>
+          <p className="text-paragraph sm:text-heading-04 text-primary font-semibold">
+            Discover the Masters Behind the Magic
+          </p>
         </div>
-        <div className="w-full flex flex-col items-center my-10 min-h-20 px-4">
-          <h2 className="text-heading-03 text-center sm:text-heading-02 font-bold text-primary">
-            Featured Artwork Showcase
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-10 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-60">
-            {featuredArtwork.map((image, index) => (
-              <div key={index}>
-                <div className="relative group">
-                  <Image
-                    width={400}
-                    height={400}
-                    src={image.src}
-                    alt={image.title}
-                    className="object-cover w-full aspect-[1/1] opacity-100 group-hover:opacity-0 transition-all duration-200 ease-linear"
-                  />
-                  <Image
-                    width={800}
-                    height={800}
-                    src={image.src}
-                    alt={image.title}
-                    className="absolute inset-0 object-contain w-full aspect-[1/1] opacity-0 group-hover:opacity-100 transition-all duration-200 ease-linear"
-                  />
-                  <div className="absolute inset-0">
-                    <div className="flex justify-between mx-4 mt-4">
-                      <div className="bg-white px-2 text-paragraph group-hover:opacity-0 bg-opacity-75 w-fit transition-all duration-200 ease-linear">
-                        <p>{image.downloadCount} Downloads</p>
-                      </div>
-                      <Heart
-                        size={28}
-                        className="text-white group-hover:text-zinc-400 transition-all duration-200 ease-linear"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="text-neutral-600">
-                  <h2 className="text-heading-06 font-bold">{image.title}</h2>
-                  <p className="text-paragraph">{image.artist}</p>
-                  <p className="text-paragraph">{image.size} MP</p>
-                </div>
+        {/* <div className="my-5"> */}
+        <Featured photographers={photographers} />
+        {/* </div> */}
+      </div>
+      <div className="w-full flex flex-col items-center my-10 min-h-20 px-4">
+        <h2 className="text-heading-03 text-center sm:text-heading-02 font-bold text-primary">
+          Featured Artwork Showcase
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-10 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-60">
+          {images.map((image, index) => (
+            <div
+              key={index}
+              className="shadow-[0px_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out"
+            >
+              <div
+                onClick={() => {
+                  router.push(`/images/${image._id}`);
+                }}
+                className="relative group"
+              >
+                <Image
+                  width={800}
+                  height={800}
+                  priority
+                  src={
+                    image.imageLinks.thumbnail ||
+                    "/assets/placeholders/image.webp"
+                  }
+                  alt={image.description}
+                  className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear opacity-50 blur-[4px] border border-primary-200"
+                />
+                <Image
+                  width={800}
+                  height={800}
+                  src={
+                    image.imageLinks.thumbnail ||
+                    "/assets/placeholders/image.webp"
+                  }
+                  alt={image.description}
+                  className="absolute inset-0 object-contain w-full aspect-[1/1] transition-all duration-200 ease-linear drop-shadow-md"
+                />
               </div>
-            ))}
-          </div>
-        </div>
-        <div className="w-full relative">
-          <Image
-            width={1600}
-            height={900}
-            src="https://images.pexels.com/photos/268533/pexels-photo-268533.jpeg"
-            alt=""
-            className="w-full h-96 sm:h-[35vh] md:h-[40vh] xl:h-[80vh] object-cover object-center"
-          />
-          <div className="absolute flex flex-col md:justify-start justify-center inset-0 bg-white bg-opacity-25">
-            <div className="md:pt-10 flex flex-col gap-4 text-start sm:text-start px-10 sm:px-28 lg:w-3/4">
-              <h1 className="text-heading-05 sm:text-heading-04 md:text-heading-03 xl:text-heading-lg font-bold text-white">
-                Sell with Us
-              </h1>
-              <p className="text-paragraph sm:text-heading-06 md:text-heading-05 xl:text-heading-04 text-white font-medium">
-                Are you an artist looking to showcase your work and sell it on
-                our platform?
-              </p>
-              <p className="sm:text-paragraph md:text-heading-06 xl:text-heading-05 text-white">
-                Turn your passion into profit with ClickedART. Join our platform
-                to showcase your art to a global audience, access powerful
-                tools, and enjoy secure payments.
-              </p>
-              <div className="mt-10">
-                <button
-                  onClick={() => {
-                    if (photographer) router.push("/profile");
-                    else if (user)
-                      Swal.fire(
-                        "Please sign in as a Photographer to sell your photos"
-                      );
-                    else router.push("/signin/photographer");
-                  }}
-                  className="bg-white text-primary rounded-lg font-semibold p-2 sm:p-4 text-heading-06 sm:text-heading-05 hover:bg-primary hover:text-white transition-all duration-200 ease-linear active:bg-primary-200 active:text-white"
+              <div className="text-neutral-600 p-2">
+                <h2 className="text-heading-05 font-semibold">
+                  {image.title || "Untitled"}
+                </h2>
+                <Link
+                  href={`/photographer/${image.photographer?._id}`}
+                  className="font-medium"
                 >
-                  Sell Your Artwork
-                </button>
+                  {image.photographer?.firstName
+                    ? image.photographer?.firstName +
+                      " " +
+                      image.photographer?.lastName
+                    : image.photographer?.name}
+                </Link>
+                <p className="font-medium text-surface-500">
+                  {image.category?.name}
+                </p>
+                <div className="flex justify-between">
+                  <p className="text-paragraph font-medium">
+                    {image.resolutions?.original?.width}{" "}
+                    <span className="font-bold">x</span>{" "}
+                    {image.resolutions?.original?.height} px
+                  </p>
+                  <p className="text-paragraph font-bold">
+                    ₹{image.price?.original}
+                  </p>
+                </div>
+                <p className="text-paragraph font-medium">
+                  (
+                  {(
+                    (image.resolutions?.original?.height *
+                      image.resolutions?.original?.width) /
+                    1000000
+                  ).toFixed(1)}{" "}
+                  MP)
+                </p>
               </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="w-full relative">
+        <Image
+          width={1600}
+          height={900}
+          src="https://images.pexels.com/photos/268533/pexels-photo-268533.jpeg"
+          alt=""
+          className="w-full h-96 sm:h-[35vh] md:h-[40vh] xl:h-[80vh] object-cover object-center"
+        />
+        <div className="absolute flex flex-col md:justify-start justify-center inset-0 bg-white bg-opacity-25">
+          <div className="md:pt-10 flex flex-col gap-4 text-start sm:text-start px-10 sm:px-28 lg:w-3/4">
+            <h1 className="text-heading-05 sm:text-heading-04 md:text-heading-03 xl:text-heading-lg font-bold text-white">
+              Sell with Us
+            </h1>
+            <p className="text-paragraph sm:text-heading-06 md:text-heading-05 xl:text-heading-04 text-white font-medium">
+              Are you an artist looking to showcase your work and sell it on our
+              platform?
+            </p>
+            <p className="sm:text-paragraph md:text-heading-06 xl:text-heading-05 text-white">
+              Turn your passion into profit with ClickedART. Join our platform
+              to showcase your art to a global audience, access powerful tools,
+              and enjoy secure payments.
+            </p>
+            <div className="mt-10">
+              <button
+                onClick={() => {
+                  if (photographer) router.push("/profile");
+                  else if (user)
+                    Swal.fire(
+                      "Please sign in as a Photographer to sell your photos"
+                    );
+                  else router.push("/signin/photographer");
+                }}
+                className="bg-white text-primary rounded-lg font-semibold p-2 sm:p-4 text-heading-06 sm:text-heading-05 hover:bg-primary hover:text-white transition-all duration-200 ease-linear active:bg-primary-200 active:text-white"
+              >
+                Sell Your Artwork
+              </button>
             </div>
           </div>
         </div>
-      </motion.div>
-    </AnimatePresence>
+      </div>
+    </div>
   );
 }

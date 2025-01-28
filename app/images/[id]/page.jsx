@@ -545,7 +545,7 @@ export default function ImagePage() {
                   </DialogHeader>
                   <DialogClose
                     onClick={() => {
-                      if(customSize.width < 12 || customSize.height < 12) {
+                      if (customSize.width < 12 || customSize.height < 12) {
                         toast.error("Minimum size is 12 x 12 inches");
                         return;
                       }
@@ -713,7 +713,15 @@ export default function ImagePage() {
                         aspectRatio:
                           selectedPaper &&
                           selectedSize &&
-                          `${selectedSize.width}/${selectedSize.height}`,
+                          `${
+                            (image.resolution?.height > image.resolution?.width
+                              ? selectedSize.width
+                              : selectedSize.height)
+                          }/${
+                            image.resolution?.height > image.resolution?.width
+                              ? selectedSize.height
+                              : selectedSize.width
+                          }`,
                         height: selectedSize ? height : "100%",
                       }}
                       className={`${

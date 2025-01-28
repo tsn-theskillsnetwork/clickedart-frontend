@@ -171,7 +171,6 @@ export default function MembershipPage() {
           },
         }
       );
-      console.log("Worked");
       Swal.fire({
         icon: "success",
         title: "Subscription Successful",

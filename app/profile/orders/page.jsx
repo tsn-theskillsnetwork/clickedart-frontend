@@ -175,11 +175,12 @@ export default function OrdersPage() {
                               {!item.paperInfo && (
                                 <Link
                                   href={
-                                    item.imageInfo?.image?.imageLinks &&
-                                    item.imageInfo?.resolution &&
-                                    item.imageInfo?.image?.imageLinks[
-                                      item.imageInfo?.resolution
-                                    ] || "/profile/orders"
+                                    (item.imageInfo?.image?.imageLinks &&
+                                      item.imageInfo?.resolution &&
+                                      item.imageInfo?.image?.imageLinks[
+                                        item.imageInfo?.resolution
+                                      ]) ||
+                                    "/profile/orders"
                                   }
                                 >
                                   <Button2
@@ -265,39 +266,32 @@ export default function OrdersPage() {
                       <p className="text-paragraph font-semibold text-surface-500">
                         Total: {order.finalAmount}
                       </p>
-                    </div>
-                    <div className="sm:px-2 sm:w-1/5 flex flex-col items-start gap-2 border-b sm:border-b-0">
-                      {order.orderItems.some((item) => item.paperInfo) ? (
-                        <div className="flex flex-col items-center gap-2">
-                          <p className="text-sm font-semibold">Print Status:</p>
+                      {order.printStatus !== "no-print" && (
+                        <>
+                          <p className="font-medium">Print Status:</p>
                           <div
-                            className={`flex items-center p-1 pr-3 ${
-                              order.orderStatus === "completed" &&
-                              "bg-green-100 text-green-600"
-                            } ${
-                              order.orderStatus === "pending" &&
-                              "bg-orange-100 text-orange-600"
-                            } ${
-                              order.orderStatus === "cancelled" &&
-                              "bg-red-100 text-red-600"
-                            } rounded-full `}
+                            className={`flex items-center p-1 pr-3 bg-green-100 text-green-600 rounded-full `}
                           >
                             <Dot strokeWidth={6} />
                             <p className="text-base font-semibold capitalize">
-                              {order.orderStatus}
+                              {order.printStatus}
                             </p>
                           </div>
-                        </div>
-                      ) : (
+                        </>
+                      )}
+                    </div>
+                    <div className="sm:px-2 sm:w-1/5 flex flex-col items-start gap-2 border-b sm:border-b-0">
+                      <>
+                        <p className="font-medium">Order Status:</p>
                         <div
                           className={`flex items-center p-1 pr-3 bg-green-100 text-green-600 rounded-full `}
                         >
                           <Dot strokeWidth={6} />
                           <p className="text-base font-semibold capitalize">
-                            Completed
+                            {order.orderStatus}
                           </p>
                         </div>
-                      )}
+                      </>
                       <Dialog>
                         <DialogTrigger>
                           <div className="bg-primary text-white font-medium p-2 rounded-md">

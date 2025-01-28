@@ -33,6 +33,12 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import toast from "react-hot-toast";
+import Button2 from "@/components/button2";
+import { DatePicker } from "@mui/x-date-pickers";
+import dayjs, { Dayjs } from "dayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 // Registering chart.js components
 ChartJS.register(
@@ -51,40 +57,68 @@ export default function DashboardPage() {
   const [error, setError] = useState(null);
   const [photos, setPhotos] = useState([]);
   const [stats, setStats] = useState([]);
+  const [dateRange, setDateRange] = useState({
+    startDate: "",
+    endDate: "",
+  });
+  const [isCustomDate, setIsCustomDate] = useState(false);
+
+  const fetchPhotos = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-images-by-photographer?photographer=${photographer._id}`
+      );
+      setPhotos(res.data.photos);
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/photographeranalytics/get-photographer-analytics?photographer=${photographer._id}`
+      );
+      setStats(res.data);
+      setIsCustomDate(false);
+      console.log(res.data);
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchPhotos = async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-images-by-photographer?photographer=${photographer._id}`
-        );
-        setPhotos(res.data.photos);
-        setLoading(false);
-      } catch (error) {
-        setError(error);
-        setLoading(false);
-      }
-    };
-
-    const fetchStats = async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/photographeranalytics/get-photographer-analytics?photographer=${photographer._id}`
-        );
-        setStats(res.data);
-        setLoading(false);
-        console.log(res.data);
-      } catch (error) {
-        setError(error);
-        setLoading(false);
-      }
-    };
-
     fetchPhotos();
     fetchStats();
   }, [photographer]);
+
+  const fetchCustomStats = async () => {
+    if (!dateRange.startDate || !dateRange.endDate) {
+      toast.error("Please select a date range. Getting all Data instead.");
+      fetchStats();
+      setIsCustomDate(false);
+      return;
+    }
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/photographeranalytics/custom-analytics-by-date?photographer=${photographer._id}&startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`
+      );
+      setStats(res.data);
+      setIsCustomDate(true);
+      console.log(res.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Prepare data for the graph
   const monthlyData = stats?.monthlyData || [];
@@ -100,7 +134,7 @@ export default function DashboardPage() {
         data: salesData,
         borderColor: "rgba(75, 192, 192, 1)",
         backgroundColor: "rgba(75, 192, 192, 0.2)",
-        fill: true,
+        // fill: true,
         tension: 0.4,
       },
       {
@@ -108,7 +142,7 @@ export default function DashboardPage() {
         data: royaltyData,
         borderColor: "rgba(153, 102, 255, 1)",
         backgroundColor: "rgba(153, 102, 255, 0.2)",
-        fill: true,
+        // fill: true,
         tension: 0.4,
       },
     ],
@@ -135,58 +169,141 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="flex flex-1 flex-col gap-4 p-4">
-            <div className="grid auto-rows-min gap-4 lg:grid-cols-2 xl:grid-cols-3">
-              {/* Existing NumberCards */}
-              <NumberCard
-                title="Total Downloads"
-                number={String(stats?.downloads || "0") || "0"}
-                color="blue"
-              />
-              <NumberCard
-                title="Total Sales"
-                number={String(stats?.totalSales || "0") || "0"}
-              />
-              <div className="rounded-xl bg-muted/50 shadow-md px-2 flex flex-col items-center gap-4 py-4">
-                <h4 className="text-heading-06 sm:text-heading-05 md:text-heading-04">
-                  Frequently Used Categories
-                </h4>
-
-                <h2
-                  className={`text-heading-04 sm:text-heading-03 md:text-heading-02 font-semibold text-secondary-200`}
-                >
-                  {stats?.frequentlyUsedCategories
-                    ?.map((category) => category.categoryDetails.name)
-                    .join(", ") || "None"}
-                </h2>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <div className="flex items-center flex-wrap justify-center gap-4">
+                Custom Date Range:
+                <DatePicker
+                  label="From"
+                  value={dayjs(dateRange.startDate)}
+                  maxDate={dayjs(Date.now())}
+                  onChange={(date) =>
+                    setDateRange({ ...dateRange, startDate: date })
+                  }
+                />
+                <DatePicker
+                  label="To"
+                  value={dayjs(dateRange.endDate)}
+                  minDate={dayjs(dateRange.startDate)}
+                  onChange={(date) =>
+                    setDateRange({ ...dateRange, endDate: date })
+                  }
+                />
+                <Button2 size="sm" onClick={fetchCustomStats}>
+                  Get Data
+                </Button2>
+                <Button2 size="sm" onClick={fetchStats}>
+                  Show All Data
+                </Button2>
               </div>
-              <NumberCard
-                title="Total Royalty Amount"
-                number={String(stats?.totalRoyaltyAmount || "0") || "0"}
-                color="green"
-              />
-              <NumberCard
-                title="Total Paid Amount"
-                number={String(stats?.totalPaidAmount || "0") || "0"}
-                color="green"
-              />
-              <NumberCard
-                title="Total Print Cut Amount"
-                number={String(stats?.totalPrintCutAmount || "0") || "0"}
-                color="green"
-              />
-              <NumberCard
-                title="Uploaded Photos"
-                number={String(stats?.totalUploadingImgCount || "0") || "0"}
-              />
-              <NumberCard
-                title="Pending Photos"
-                number={String(stats?.pendingImagesCount || "0") || "0"}
-                color="red"
-              />
+              {isCustomDate ? (
+                <p className="text-sm text-secondary-200 text-center">
+                  Showing data from{" "}
+                  {dayjs(dateRange.startDate).format("DD MMM YYYY")} to{" "}
+                  {dayjs(dateRange.endDate).format("DD MMM YYYY")}
+                </p>
+              ) : (
+                <p className="text-sm text-secondary-200 text-center">
+                  Showing all data
+                </p>
+              )}
+            </LocalizationProvider>
+            <div className="bg-white p-6 rounded-lg shadow-md shadow-zinc-300 mt-8">
+              <h4 className="text-xl font-semibold">Revenue Overview</h4>
+              <div className="grid auto-rows-min gap-4 lg:grid-cols-2 xl:grid-cols-3">
+                {/* Existing NumberCards */}
+                <NumberCard
+                  title="Total Digital Sales"
+                  number={`₹${String(stats?.totalSales || "0")}`}
+                />
+                <NumberCard
+                  title="Total Print Sales"
+                  number={`₹${String(
+                    stats?.totalPrintSales?.toFixed(2) || "0"
+                  )}`}
+                />
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-md shadow-zinc-300 mt-8">
+              <h4 className="text-xl font-semibold">Sales Metrics</h4>
+              <div className="grid auto-rows-min gap-4 lg:grid-cols-2 xl:grid-cols-3 mt-5">
+                <NumberCard
+                  title="Digital Sale(s)"
+                  number={`${String(stats?.totalDigitalDownloads || "0")}`}
+                  color="blue"
+                />
+                <NumberCard
+                  title="Print Sale(s)"
+                  number={`${String(stats?.totalPrintDownloads || "0")}`}
+                  color="blue"
+                />
+                {!isCustomDate ? (
+                  <NumberCard
+                    title="Active Buyer(s)"
+                    number={`${String(stats?.activeBuyers || "0")}`}
+                    color="blue"
+                  />
+                ) : (
+                  <NumberCard
+                    title="Total Sales"
+                    number={`${String(
+                      stats?.totalDigitalDownloads +
+                        stats?.totalPrintDownloads || "0"
+                    )}`}
+                    color="blue"
+                  />
+                )}
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-md shadow-zinc-300 mt-8">
+              <h4 className="text-xl font-semibold">Earning</h4>
+              <div className="grid auto-rows-min gap-4 lg:grid-cols-2 xl:grid-cols-3 mt-5">
+                <NumberCard
+                  title="Total Digital Royalty Amount"
+                  number={`₹${String(stats?.totalRoyaltyAmount || "0")}`}
+                  color="green"
+                />
+                <NumberCard
+                  title="Total Print Royalty Amount"
+                  number={`₹${String(
+                    stats?.totalPrintCutAmount?.toFixed(2) || "0"
+                  )}`}
+                  color="green"
+                />
+                <NumberCard
+                  title="Total Paid Amount"
+                  number={`${String(stats?.totalPaidAmount || "0")}`}
+                  color="green"
+                />
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-md shadow-zinc-300 mt-8">
+              <h4 className="text-xl font-semibold">Photos</h4>
+              <div className="grid auto-rows-min gap-4 lg:grid-cols-2 xl:grid-cols-3 mt-5">
+                <NumberCard
+                  title="Uploaded Photos"
+                  number={`${String(stats?.totalUploadingImgCount || "0")}`}
+                />
+                <NumberCard
+                  title="Pending Photos"
+                  number={`${String(stats?.pendingImagesCount || "0")}`}
+                  color="red"
+                />
+              </div>
             </div>
 
             {/* Monthly Sales and Royalty Graph */}
-            <div className="bg-white p-6 rounded-lg shadow-lg mt-8">
+            <div className="bg-white p-6 rounded-lg shadow-md shadow-zinc-300 mt-8">
+              <h4 className="text-xl font-semibold">
+                Frequently Used Categories
+              </h4>
+
+              <p className={`text-paragraph font-medium text-secondary-200`}>
+                {stats?.frequentlyUsedCategories
+                  ?.map((category) => category.categoryDetails.name)
+                  .join(", ") || "None"}
+              </p>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-md shadow-zinc-300">
               <h2 className="text-xl font-semibold">
                 Sales and Royalty Amount (Monthly)
               </h2>

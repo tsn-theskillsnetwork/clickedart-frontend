@@ -23,7 +23,10 @@ import axios from "axios";
 import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import "react-datepicker/dist/react-datepicker.css";
-import DatePicker from "react-datepicker";
+import { DatePicker } from "@mui/x-date-pickers";
+import dayjs, { Dayjs } from "dayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import countries from "@/lib/address/countries.json";
 import states from "@/lib/address/states.json";
 import cities from "@/lib/address/cities.json";
@@ -905,25 +908,17 @@ const RegistrationForm = () => {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-2">
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <Label>Date of Birth</Label>
-                <Input
-                  type="date"
-                  name="dob"
-                  value={formData.dob}
-                  onChange={handleInputChange}
+                <DatePicker
+                  label="Date of Birth"
+                  maxDate={dayjs(Date.now())}
+                  onChange={(value) => setFormData({ ...formData, dob: value })}
                 />
-                {/* <DatePicker
-                className="border border-gray-300 rounded-md p-2 w-full"
-                placeholderText="Select Date of Birth"
-                selected={formData.dob}
-                onChange={handleInputChange}
-                dateFormat="MMMM d, yyyy"
-              /> */}
                 {errors.dob && (
                   <p className="text-red-500 text-sm">{errors.dob}</p>
                 )}
-              </div>
+              </LocalizationProvider>
 
               <div className="flex items-center gap-3">
                 <Label>Is this a company account?</Label>
