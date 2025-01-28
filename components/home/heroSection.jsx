@@ -75,7 +75,7 @@ export default function HeroSection() {
           ClickedArt
         </h1>
         <div className="h-12 overflow-hidden">
-          <div className="absolute w-full z-30 h-12 left-0 right-0 flex items-center overflow-y-hidden">
+          <div className="absolute w-full z-30 h-8 left-0 right-0 flex items-center overflow-y-hidden">
             <AnimatePresence mode="popLayout">
               <motion.div
                 key={currentImage}

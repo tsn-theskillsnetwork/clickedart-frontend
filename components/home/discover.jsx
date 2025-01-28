@@ -28,20 +28,18 @@ export default function Discover({ stories }) {
         <h1 className="font-bold text-heading-05 sm:text-heading-03 md:text-heading-02 text-accent-400">
           Every Photo Tells a Story—Discover It
         </h1>
-        <Button size="lg" variant="filled" state="default">
-          Explore More
-        </Button>
+        <Link href="/stories">
+          <Button size="lg" variant="filled" state="default">
+            Explore More
+          </Button>
+        </Link>
       </div>
 
       {/* Slider Section */}
       <div className="w-10/12 mx-auto">
         <Slider {...settings}>
           {stories.map((story, index) => (
-            <Link
-              href={`/story/${story._id}`}
-              key={index}
-              className="py-10"
-            >
+            <Link href={`/story/${story._id}`} key={index} className="py-10">
               <div className="group relative">
                 {/* Image */}
                 <Image

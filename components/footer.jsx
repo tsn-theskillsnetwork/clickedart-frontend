@@ -106,7 +106,7 @@ export default function Footer() {
           <div className="flex max-w-[28%] sm:mr-20">
             <div className="flex flex-col gap-2 items-start">
               <p className="font-semibold text-lg">
-                Sell your photograph on ClickedArt!
+                Sell your photographs on ClickedArt!
               </p>
               <p className="mt-3 text-sm font-medium">
                 Turn Your Passion into Profit — Join Our Community of Creators
