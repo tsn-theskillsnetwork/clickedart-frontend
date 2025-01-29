@@ -7,35 +7,39 @@ import { Share } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 export default function StoryPageComponent({ story }) {
   const pathname = usePathname();
-  const handleShare = async () => {
-    const currentUrl = window.location.origin + pathname;
+  const [isClient, setIsClient] = useState(false);
 
-    if (navigator.share) {
-      try {
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+  const handleShare = async () => {
+    const currentUrl = window.location.origin + window.location.pathname;
+  
+    try {
+      if (navigator.share) {
         await navigator.share({
-          title: story.title || "Check this out!",
+          title: story?.title || "Check this out!",
           text:
-            story.description ||
+            story?.description ||
             "I found this interesting and wanted to share it with you.",
           url: currentUrl,
         });
         console.log("Shared successfully!");
-      } catch (error) {
-        console.error("Error sharing:", error);
-      }
-    } else {
-      try {
-        await navigator.clipboard.writeText(currentUrl);
+      } else {
+        console.warn("Web Share API not supported.");
+        // Fallback: Copy to clipboard or open a share dialog
+        navigator.clipboard.writeText(currentUrl);
         alert("Link copied to clipboard!");
-      } catch (error) {
-        console.error("Failed to copy link:", error);
       }
+    } catch (error) {
+      console.error("Error sharing:", error);
     }
   };
+  
 
   return (
     <>

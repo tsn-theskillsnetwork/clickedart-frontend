@@ -11,6 +11,7 @@ import Swal from "sweetalert2";
 import useAuthStore from "@/authStore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Button2 from "@/components/button2";
 
 export default function page() {
   const { user, photographer } = useAuthStore();
@@ -203,6 +204,11 @@ export default function page() {
         {/* <div className="my-5"> */}
         <Featured photographers={photographers} />
         {/* </div> */}
+        <Link className="my-2" href="/search?type=photographers">
+          <Button2 color="primary" size="lg" className="mt-10">
+            See All Artists
+          </Button2>
+        </Link>
       </div>
       <div className="w-full flex flex-col items-center my-10 min-h-20 px-4">
         <h2 className="text-heading-03 text-center sm:text-heading-02 font-bold text-primary">
@@ -287,9 +293,9 @@ export default function page() {
         <Image
           width={1600}
           height={900}
-          src="https://images.pexels.com/photos/268533/pexels-photo-268533.jpeg"
+          src="/assets/images/featuredArtistFooter.png"
           alt=""
-          className="w-full h-96 sm:h-[35vh] md:h-[40vh] xl:h-[80vh] object-cover object-center"
+          className="w-full h-96 sm:h-[35vh] md:h-[40vh] xl:h-[70vh] object-cover object-center"
         />
         <div className="absolute flex flex-col md:justify-start justify-center inset-0 bg-white bg-opacity-25">
           <div className="md:pt-10 flex flex-col gap-4 text-start sm:text-start px-10 sm:px-28 lg:w-3/4">

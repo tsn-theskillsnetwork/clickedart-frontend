@@ -195,13 +195,14 @@ export default function MembershipPage() {
       <div className="relative flex flex-col py-10 sm:py-16 md:py-20 lg:py-24 xl:py-28 2xl:py-32">
         <div className="absolute inset-0 z-0 opacity-80">
           <Image
-            src="/assets/images/img4.jpg"
+            src="/assets/images/membershipHeader.jpg"
             className="h-full w-full object-cover"
             alt="bg"
             width={2048}
             height={2048}
           />
         </div>
+        <div className="absolute inset-0 z-0 bg-black opacity-30"></div>
         <div className="flex flex-col justify-center items-start gap-4 sm:gap-6 md:gap-8 lg:gap-10 px-5 sm:px-6 md:px-10 lg:px-28 h-full z-10">
           <h1 className="text-heading-05 sm:text-heading-04 md:text-heading-03 lg:text-heading-02 font-semibold text-white">
             Choose your Membership Plan
@@ -616,7 +617,7 @@ export default function MembershipPage() {
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-10 items-center justify-center w-full sm:w-11/12 lg:w-5/6 mx-auto py-10 mb-10">
+      {/* <div className="flex flex-col gap-10 items-center justify-center w-full sm:w-11/12 lg:w-5/6 mx-auto py-10 mb-10">
         <div className="flex flex-col sm:flex-row gap-10 sm:gap-2 lg:gap-28 items-center bg-[#897F75B0] text-white px-5 py-12 sm:p-12 mx-auto rounded-lg">
           <div className="flex flex-col gap-5 lg:gap-10 sm:px-10">
             <h2 className="text-heading-06 sm:text-heading-05 md:text-heading-04 lg:text-heading-03 xl:text-heading-02 font-semibold">
@@ -644,7 +645,7 @@ export default function MembershipPage() {
             />
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

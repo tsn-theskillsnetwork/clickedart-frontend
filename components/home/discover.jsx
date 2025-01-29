@@ -28,7 +28,7 @@ export default function Discover({ stories }) {
         <h1 className="font-bold text-heading-05 sm:text-heading-03 md:text-heading-02 text-accent-400">
           Every Photo Tells a Story—Discover It
         </h1>
-        <Link href="/stories">
+        <Link href="/story">
           <Button size="lg" variant="filled" state="default">
             Explore More
           </Button>
