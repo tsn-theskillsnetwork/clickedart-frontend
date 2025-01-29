@@ -21,12 +21,12 @@ export default function Stats() {
           className="absolute inset-0 w-full h-full object-cover object-top -z-50 opacity-90"
         />
         <div className="h-full bg-black bg-opacity-20 py-10 md:py-10">
-          <div className="px-5 sm:px-36 lg:w-1/2 w-full">
+          <div className="px-5 sm:px-36 w-full">
             <h1 className="text-heading-05 sm:text-heading-03 md:text-heading-02 font-bold text-white">
               {layout?.footerDetails?.content?.title || "Welcome to ClickedArt"}
             </h1>
             <div className="md:w-5/6 md:mt-4">
-              <p className="text-white text-sm sm:text-md md:text-base">
+              <p className="text-white text-sm sm:text-md md:text-paragraph text-justify">
                 {layout?.footerDetails?.content?.body ||
                   "We provide high quality images for your projects. Download images for free and use them in your projects. We provide upto 800 Megapixel resolution images for free."}
               </p>
