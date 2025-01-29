@@ -70,6 +70,7 @@ const RegistrationForm = () => {
     companyName: "",
     companyEmail: "",
     companyAddress: "",
+    referralcode: "",
     bestPhotos: [],
     companyPhone: "",
     companyAddress: "",
@@ -85,6 +86,7 @@ const RegistrationForm = () => {
   const [verifyPassword, setVerifyPassword] = useState("");
 
   const [errors, setErrors] = useState({});
+  const [errors2, setErrors2] = useState({});
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [cropperImage, setCropperImage] = useState(null);
@@ -102,63 +104,38 @@ const RegistrationForm = () => {
     setFormData({ ...formData, [name]: value ?? "" });
   };
 
-  console.log(errors);
+  //console.log(errors);
 
   const checkUsernameAndEmailExists = async () => {
+    const serverErrors = {};
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/photographer/checkUsernameAndEmailExists`,
-        {
-          username: formData.username,
-          email: formData.email,
-        },
-        {
-          headers: { "Content-Type": "application/json" },
-        }
+        { username: formData.username, email: formData.email },
+        { headers: { "Content-Type": "application/json" } }
       );
 
       const data = response.data;
-
-      if (data.usernameExists) {
-        setErrors((prev) => ({
-          ...prev,
-          username: "Username already exists.",
-        }));
-      }
-
-      if (data.emailExists) {
-        setErrors((prev) => ({
-          ...prev,
-          email: "Email already exists.",
-        }));
-      }
+      if (data.usernameExists)
+        serverErrors.username = "Username already exists.";
+      if (data.emailExists) serverErrors.email = "Email already exists.";
     } catch (err) {
-      if (err.response) {
-        if (err.response.status === 409) {
-          const data = err.response.data;
-
-          if (data.usernameExists) {
-            setErrors((prev) => ({
-              ...prev,
-              username: "Username already exists.",
-            }));
-            toast.error("Username already exists.");
-          }
-
-          if (data.emailExists) {
-            setErrors((prev) => ({
-              ...prev,
-              email: "Email already exists.",
-            }));
-            toast.error("Email already exists.");
-          }
-        } else {
-          console.error("Unexpected error:", err.response.data);
+      if (err.response?.status === 409) {
+        const data = err.response.data;
+        if (data.usernameExists) {
+          serverErrors.username = "Username already exists.";
+          toast.error("Username already exists.");
+        }
+        if (data.emailExists) {
+          serverErrors.email = "Email already exists.";
+          toast.error("Email already exists.");
         }
       } else {
-        console.error("Network error or server not reachable:", err);
+        console.error("Error checking username/email:", err);
+        toast.error("An error occurred. Please try again.");
       }
     }
+    return serverErrors;
   };
 
   const handleImageChange = (e) => {
@@ -226,11 +203,11 @@ const RegistrationForm = () => {
           (progress.loaded / progress.total) * 100
         );
         setProgr(percentCompleted);
-        console.log(`Progress: ${percentCompleted}%`);
+        //console.log(`Progress: ${percentCompleted}%`);
       });
 
       await upload.done();
-      console.log("File uploaded successfully!");
+      //console.log("File uploaded successfully!");
 
       const fileUrl = `https://${target.Bucket}.s3.ap-south-1.amazonaws.com/${target.Key}`;
       setFormData((prev) => {
@@ -242,7 +219,7 @@ const RegistrationForm = () => {
         };
       });
 
-      console.log("File URL:", fileUrl);
+      //console.log("File URL:", fileUrl);
     } catch (error) {
       console.error("Error uploading file:", error);
     }
@@ -250,62 +227,76 @@ const RegistrationForm = () => {
 
   const validateForm1 = () => {
     const newErrors = {};
-    if (formData.firstName.length < 3)
+    if (!formData.firstName.trim())
+      newErrors.firstName = "First Name is required.";
+    else if (formData.firstName.trim().length < 3)
       newErrors.firstName = "First Name must be at least 3 characters.";
-    if (formData.lastName.length < 3)
+
+    if (!formData.lastName.trim())
+      newErrors.lastName = "Last Name is required.";
+    else if (formData.lastName.length < 3)
       newErrors.lastName = "Last Name must be at least 3 characters.";
-    if (formData.username.length < 3)
+
+    if (!formData.username.trim()) newErrors.username = "Username is required.";
+    else if (formData.username.length < 3)
       newErrors.username = "Username must be at least 3 characters.";
-    if (!/^[a-zA-Z0-9_]+$/.test(formData.username))
+    else if (!/^[a-zA-Z0-9_]+$/.test(formData.username))
       newErrors.username =
         "Username can only contain letters, numbers, and underscores.";
-    if (!/^\S+@\S+\.\S+$/.test(formData.email))
-      newErrors.email = "Enter a valid email address.";
+
+    if (!formData.email.trim()) newErrors.email = "Email is required.";
+    else if (!/^\S+@\S+\.\S+$/.test(formData.email))
+      newErrors.email = "Invalid email format.";
+
     if (!formData.password) newErrors.password = "Password is required.";
-    if (formData.password !== verifyPassword)
-      newErrors.verifyPassword = "Passwords do not match.";
-    if (formData.password.length < 8)
+    else if (formData.password.length < 8)
       newErrors.password = "Password must be at least 8 characters.";
-    if (
-      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-        formData.password
-      )
+    else if (
+      !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/.test(formData.password)
     )
       newErrors.password =
-        "Password must contain at least 8 characters, including one uppercase, one lowercase, one number and one special character.";
-    if (!formData.mobile) newErrors.mobile = "Mobile number is required.";
-    if (formData.mobile && isNaN(formData.mobile))
-      newErrors.mobile = "Mobile number must be a number.";
-    if (formData.whatsapp && isNaN(formData.whatsapp))
-      newErrors.whatsapp = "WhatsApp number must be a number.";
+        "Password must include uppercase, lowercase, number, and special character.";
+
+    if (formData.password !== verifyPassword)
+      newErrors.verifyPassword = "Passwords do not match.";
+
+    if (!formData.mobile.trim())
+      newErrors.mobile = "Mobile number is required.";
+    else if (!/^\d+$/.test(formData.mobile))
+      newErrors.mobile = "Invalid mobile number format.";
+    else if (formData.mobile.length !== 10)
+      newErrors.mobile = "Mobile number must be 10 digits.";
+
+    if (formData.whatsapp && !/^\d+$/.test(formData.whatsapp))
+      newErrors.whatsapp = "Invalid WhatsApp number format.";
+
     if (formData.bio.length > 100)
       newErrors.bio = "Bio must be less than 100 characters.";
+
     if (!formData.shippingAddress.country)
       newErrors.country = "Country is required.";
+
     if (!formData.shippingAddress.state) newErrors.state = "State is required.";
+
     if (!formData.shippingAddress.city) newErrors.city = "City is required.";
+
     if (!formData.shippingAddress.pincode)
       newErrors.pincode = "Pincode is required.";
-    if (formData.yearsOfExperience && isNaN(formData.yearsOfExperience))
-      newErrors.yearsOfExperience = "Years of experience must be a number.";
-    if (formData.dob && isNaN(new Date(formData.dob).getTime()))
-      newErrors.dob = "Date of birth is invalid.";
-    if (
-      formData.photographyStyles &&
-      !/^[\w\s,]*$/.test(formData.photographyStyles)
+    else if (!/^\d+$/.test(formData.shippingAddress.pincode))
+      newErrors.pincode = "Invalid pincode format.";
+
+    if (!formData.dob) newErrors.dob = "Date of Birth is required.";
+
+    if (formData.connectedAccounts.length === 0)
+      newErrors.connectedAccounts =
+        "At least one social media account is required.";
+    else if (
+      formData.connectedAccounts.length === 1 &&
+      formData.connectedAccounts[0].accountName === "" &&
+      formData.connectedAccounts[0].accountLink === ""
     )
-      newErrors.photographyStyles =
-        "Photography styles must be comma-separated.";
-    if (formData.connectedAccounts.length < 1)
-      newErrors.connectedAccounts = "Please add at least one account.";
-    if (formData.connectedAccounts.length > 0) {
-      for (let i = 0; i < formData.connectedAccounts.length; i++) {
-        if (!formData.connectedAccounts[i].accountName)
-          newErrors.connectedAccounts = "Account name is required.";
-        if (!formData.connectedAccounts[i].accountLink)
-          newErrors.connectedAccounts = "Account link is required.";
-      }
-    }
+      newErrors.connectedAccounts =
+        "At least one social media account is required.";
     return newErrors;
   };
 
@@ -321,18 +312,24 @@ const RegistrationForm = () => {
     return newErrors;
   };
 
-  const handleNext = () => {
-    const newErrors = validateForm1();
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-    checkUsernameAndEmailExists();
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+  const handleNext = async () => {
+    // Validate client-side fields
+    const formErrors = validateForm1();
+    if (Object.keys(formErrors).length > 0) {
+      setErrors(formErrors);
       return;
     }
 
+    // Check server for existing username/email
+    const serverErrors = await checkUsernameAndEmailExists();
+    const combinedErrors = { ...formErrors, ...serverErrors };
+
+    if (Object.keys(combinedErrors).length > 0) {
+      setErrors(combinedErrors);
+      return;
+    }
+
+    // Proceed to next step if no errors
     setErrors({});
     setStep(2);
   };
@@ -398,11 +395,11 @@ const RegistrationForm = () => {
 
     const newErrors = validateForm2();
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+      setErrors2(newErrors);
       return;
     }
 
-    setErrors({});
+    setErrors2({});
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/photographer/register`,
@@ -533,23 +530,6 @@ const RegistrationForm = () => {
                 </div>
               )}
               <div>
-                <div>
-                  <Label>
-                    Email <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    placeholder="Email"
-                    required
-                  />
-                  {errors.email && (
-                    <p className="text-red-500 text-sm">{errors.email}</p>
-                  )}
-                </div>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full ">
                   <div>
                     <Label>
@@ -584,6 +564,23 @@ const RegistrationForm = () => {
                       <p className="text-red-500 text-sm">{errors.lastName}</p>
                     )}
                   </div>
+                  <div>
+                    <Label>
+                      Email <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      autoComplete="email"
+                      onChange={handleInputChange}
+                      placeholder="Email"
+                      required
+                    />
+                    {errors.email && (
+                      <p className="text-red-500 text-sm">{errors.email}</p>
+                    )}
+                  </div>
                 </div>
 
                 <div>
@@ -593,9 +590,12 @@ const RegistrationForm = () => {
                   <div className="flex items-center gap-2">
                     <Input
                       type={showPassword ? "text" : "password"}
-                      name="password"
+                      name="new-password"
                       value={formData.password}
-                      onChange={handleInputChange}
+                      onChange={(e) =>
+                        setFormData({ ...formData, password: e.target.value })
+                      }
+                      autoComplete="new-password"
                       placeholder="At least 8 characters, 1 uppercase, 1 lowercase, 1 number and 1 special character"
                       required
                     />
@@ -619,8 +619,9 @@ const RegistrationForm = () => {
                   </Label>
                   <Input
                     type={showPassword ? "text" : "password"}
-                    name="password"
+                    name="new-password"
                     value={verifyPassword}
+                    autoComplete="new-password"
                     onChange={(e) => setVerifyPassword(e.target.value)}
                     placeholder="Verify Password"
                     required
@@ -643,6 +644,7 @@ const RegistrationForm = () => {
                   name="username"
                   placeholder="Username"
                   value={formData.username || ""}
+                  autoComplete="username"
                   onChange={handleInputChange}
                   required
                 />
@@ -686,10 +688,6 @@ const RegistrationForm = () => {
                   <p className="text-red-500 text-sm">{errors.mobile}</p>
                 )}
               </div>
-
-              {errors.mobile && (
-                <p className="text-red-500 text-sm">{errors.mobile}</p>
-              )}
 
               <div>
                 <Label>WhatsApp</Label>
@@ -909,7 +907,9 @@ const RegistrationForm = () => {
               </div>
 
               <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <Label>Date of Birth</Label>
+                <Label>
+                  Date of Birth <span className="text-red-500">*</span>
+                </Label>
                 <DatePicker
                   label="Date of Birth"
                   maxDate={dayjs(Date.now())}
@@ -1297,11 +1297,22 @@ const RegistrationForm = () => {
                   </li>
                 </ul>
               </div>
-              {errors.bestPhotos && (
-                <p className="text-red-500 text-sm">{errors.bestPhotos}</p>
+              {errors2.bestPhotos && (
+                <p className="text-red-500 text-sm">{errors2.bestPhotos}</p>
               )}
               {message && <p className="text-green-500">{message}</p>}
               {error && <p className="text-red-500">{error}</p>}
+
+              <Label>Have a Referral Code?</Label>
+              <Input
+                type="text"
+                name="referralCode"
+                value={formData.referralcode}
+                onChange={(e) =>
+                  setFormData({ ...formData, referralcode: e.target.value })
+                }
+              />
+
               <div className="mt-2 flex justify-center">
                 <Button type="button" onClick={() => setStep(1)}>
                   Previous

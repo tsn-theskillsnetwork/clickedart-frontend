@@ -45,7 +45,7 @@ const SignInPage = () => {
       );
 
       const data = response.data;
-      console.log(data);
+      //console.log(data);
 
       setMessage("Sign-in successful!");
       setError("");

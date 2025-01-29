@@ -55,7 +55,7 @@ export default function ImageEdit() {
 
   const handleUpdate = async (event) => {
     event.preventDefault();
-    console.log("update triggered");
+    //console.log("update triggered");
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/images/update-image-in-vault`,
@@ -67,7 +67,7 @@ export default function ImageEdit() {
           },
         }
       );
-      console.log(response.data);
+      //console.log(response.data);
       toast.success("Image uploaded successfully");
       alert("Image updated successfully. Please check your profile.");
       router.push("/profile");
@@ -111,15 +111,15 @@ export default function ImageEdit() {
   //         (progress.loaded / progress.total) * 100
   //       );
   //       setProgr(percentCompleted);
-  //       console.log(`Progress: ${percentCompleted}%`);
+  //       //console.log(`Progress: ${percentCompleted}%`);
   //     });
 
-  //     await upload.done().then((r) => console.log(r));
-  //     console.log("File uploaded successfully!");
+  //     await upload.done().then((r) => //console.log(r));
+  //     //console.log("File uploaded successfully!");
   //     const fileUrl = `https://${target.Bucket}.s3.ap-south-1.amazonaws.com/${target.Key}`;
   //     setImageUrl(fileUrl);
   //     setPhoto({ ...photo, imageLinks: {} });
-  //     console.log("File URL:", fileUrl);
+  //     //console.log("File URL:", fileUrl);
   //   } catch (error) {
   //     console.error("Error uploading file:", error);
   //   }
@@ -136,7 +136,7 @@ export default function ImageEdit() {
           },
         }
       );
-      console.log(response.data);
+      //console.log(response.data);
       toast.success("Image deleted successfully");
       alert("Image deleted successfully. Please check your profile.");
       router.push("/profile");
@@ -152,8 +152,8 @@ export default function ImageEdit() {
     label: category.name,
   }));
 
-  console.log("Photo:", updatedPhoto);
-  console.log("Active Plan:", activePlan);
+  //console.log("Photo:", updatedPhoto);
+  //console.log("Active Plan:", activePlan);
 
   const handlePriceChange = (e) => {
     const newValue = e.target.value;
@@ -196,7 +196,7 @@ export default function ImageEdit() {
           `${process.env.NEXT_PUBLIC_SERVER}/api/category/get`
         );
         setCategories(res.data.categories);
-        // console.log(res.data.categories);
+        // //console.log(res.data.categories);
       } catch (error) {
         console.log(error);
       }
@@ -208,7 +208,7 @@ export default function ImageEdit() {
           `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-image-by-id?id=${id}`
         );
         setPhoto(res.data.photo);
-        console.log(res.data.photo);
+        //console.log(res.data.photo);
       } catch (error) {
         console.log(error);
       }
@@ -223,10 +223,10 @@ export default function ImageEdit() {
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/get-user-active-subscription?photographer=${photographer._id}`
         );
-        console.log(
-          "Active Subscription ",
-          res.data.subscription?.planId?.name
-        );
+        // console.log(
+        //   "Active Subscription ",
+        //   res.data.subscription?.planId?.name
+        // );
         setActivePlan(res.data.subscription?.planId?.name?.toLowerCase());
         if (res.data.subscription?.planId?.name?.toLowerCase() === "basic") {
           setLimit(10);

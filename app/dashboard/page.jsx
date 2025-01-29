@@ -85,7 +85,7 @@ export default function DashboardPage() {
       );
       setStats(res.data);
       setIsCustomDate(false);
-      console.log(res.data);
+      //console.log(res.data);
     } catch (error) {
       setError(error);
     } finally {
@@ -112,7 +112,7 @@ export default function DashboardPage() {
       );
       setStats(res.data);
       setIsCustomDate(true);
-      console.log(res.data);
+      //console.log(res.data);
     } catch (error) {
       console.error(error);
     } finally {

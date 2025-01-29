@@ -54,7 +54,7 @@ export default function CatalogueCreatePage() {
     }
   };
 
-  console.log("catalogue", catalogue);
+  //console.log("catalogue", catalogue);
 
   useEffect(() => {
     setCatalogue({ ...catalogue, photographer: photographer?._id });

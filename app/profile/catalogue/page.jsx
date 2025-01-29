@@ -37,9 +37,9 @@ export default function CataloguesPage() {
   const [selectedImage, setSelectedImage] = useState([]);
   const [catalogues, setCatalogues] = useState([]);
 
-  console.log("catalogues", catalogues);
-  console.log("images", images);
-  console.log("selected", selectedImage);
+  //console.log("catalogues", catalogues);
+  //console.log("images", images);
+  //console.log("selected", selectedImage);
 
   const handleSubmit = async (catalogueId) => {
     setMessage("");
@@ -75,7 +75,7 @@ export default function CataloguesPage() {
         }
       );
 
-      console.log("response", response.data);
+      //console.log("response", response.data);
 
       setMessage("Image added to catalogue successfully!");
       fetchCatalogues();
@@ -104,7 +104,7 @@ export default function CataloguesPage() {
         }
       );
 
-      console.log("response", response.data);
+      //console.log("response", response.data);
 
       setMessage("Image removed from catalogue successfully!");
       setError("");
@@ -132,7 +132,7 @@ export default function CataloguesPage() {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/catalogue/get-catalogues-by-photographer?photographer=${photographer?._id}`
       );
-      console.log("res", res.data);
+      //console.log("res", res.data);
       setCatalogues(res.data.catalogues);
     } catch (err) {
       console.log(err);
@@ -147,7 +147,7 @@ export default function CataloguesPage() {
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-images-by-photographer?photographer=${photographer?._id}`
         );
-        console.log("res", res.data);
+        //console.log("res", res.data);
         setImages(res.data.photos);
       } catch (err) {
         console.log(err);

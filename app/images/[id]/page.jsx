@@ -146,8 +146,8 @@ export default function ImagePage() {
       },
     },
   });
-  console.log(selectedSize);
-  console.log(selectedPaper);
+  //console.log(selectedSize);
+  //console.log(selectedPaper);
   const fetchImage = async () => {
     try {
       setLoading(true);

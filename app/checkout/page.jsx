@@ -145,7 +145,7 @@ export default function CheckoutPage() {
       }
 
       if (!validateOrder(orderData)) return;
-      console.log("Test:", orderData.finalAmount, user._id);
+      //console.log("Test:", orderData.finalAmount, user._id);
       const result = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/download/payment`,
         {
@@ -308,7 +308,7 @@ export default function CheckoutPage() {
     }));
   }, [user, cartItems, discount, coupon, price] || []);
 
-  console.log("Order Data:", orderData);
+  //console.log("Order Data:", orderData);
 
   const handleCoupon = async (event) => {
     event.preventDefault();

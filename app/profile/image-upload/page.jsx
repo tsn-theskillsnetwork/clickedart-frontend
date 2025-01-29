@@ -59,7 +59,7 @@ export default function PhotoUploadPage() {
     isActive: false,
   });
 
-  console.log(photo);
+  //console.log(photo);
 
   const [categories, setCategories] = useState([]);
   const [licenses, setLicenses] = useState([]);
@@ -89,7 +89,7 @@ export default function PhotoUploadPage() {
   //       }
   //     );
 
-  //     console.log(response.data);
+  //     //console.log(response.data);
 
   //     const data = response.data;
   //     setPhoto({
@@ -115,9 +115,9 @@ export default function PhotoUploadPage() {
   //       },
   //     });
 
-  //     console.log(photo);
+  //     //console.log(photo);
   //   } catch (error) {
-  //     console.log("Error uploading image:", error);
+  //     //console.log("Error uploading image:", error);
   //   }
   // };
 
@@ -154,15 +154,15 @@ export default function PhotoUploadPage() {
           (progress.loaded / progress.total) * 100
         );
         setProgr(percentCompleted);
-        console.log(`Progress: ${percentCompleted}%`);
+        //console.log(`Progress: ${percentCompleted}%`);
       });
 
-      await upload.done().then((r) => console.log(r));
-      console.log("File uploaded successfully!");
+      await upload.done().then((r) => console.log("Uploaded"));
+      //console.log("File uploaded successfully!");
       const fileUrl = `https://${target.Bucket}.s3.ap-south-1.amazonaws.com/${target.Key}`;
       setPhoto({ ...photo, imageLinks: { original: fileUrl } });
 
-      console.log("File URL:", fileUrl);
+      //console.log("File URL:", fileUrl);
     } catch (error) {
       console.error("Error uploading file:", error);
     }
@@ -182,7 +182,7 @@ export default function PhotoUploadPage() {
         }
       );
       const data = await response.json();
-      console.log(data);
+      //console.log(data);
       if (data.success) {
         router.push("/profile");
       }

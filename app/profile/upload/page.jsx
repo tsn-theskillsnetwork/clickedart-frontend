@@ -74,8 +74,8 @@ const ProfilePage = () => {
     isActive: false,
   });
 
-  // console.log("Active Plan:", activePlan);
-  // console.log("CATEGORY", categories);
+  // //console.log("Active Plan:", activePlan);
+  // //console.log("CATEGORY", categories);
   const [timeoutId, setTimeoutId] = useState(null);
   const [keywordInput, setKeywordInput] = useState(photo.keywords.join(", "));
 
@@ -145,7 +145,7 @@ const ProfilePage = () => {
       );
 
       const data = res.data;
-      console.log("Image uploaded successfully:", data);
+      //console.log("Image uploaded successfully:", data);
 
       const res2 = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/upload/upload-watermark-image`,
@@ -154,7 +154,7 @@ const ProfilePage = () => {
         }
       );
 
-      console.log("Watermark uploaded successfully:", res2.data);
+      //console.log("Watermark uploaded successfully:", res2.data);
       setNewWatermark(res2.data.url);
 
       toast.success("File uploaded successfully!", { id: toastId });
@@ -173,7 +173,7 @@ const ProfilePage = () => {
           watermarkImage: newWatermark,
         }
       );
-      console.log("Watermark added:", response.data);
+      //console.log("Watermark added:", response.data);
       toast.success("Watermark added successfully");
       setWatermark(response.data.watermark);
     } catch (error) {
@@ -186,7 +186,7 @@ const ProfilePage = () => {
       const response = await axios.delete(
         `${process.env.NEXT_PUBLIC_SERVER}/api/customwatermark/delete-custom-watermark?id=${id}`
       );
-      console.log("Watermark removed:", response.data);
+      //console.log("Watermark removed:", response.data);
       toast.success("Watermark removed successfully");
       setWatermark("");
     } catch (error) {
@@ -194,14 +194,14 @@ const ProfilePage = () => {
     }
   };
 
-  // console.log("New Watermark",newWatermark)
+  // //console.log("New Watermark",newWatermark)
 
   const getWatermarks = async () => {
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/customwatermark/get-custom-watermark?photographer=${photographer?._id}`
       );
-      console.log("Watermarks:", response.data);
+      //console.log("Watermarks:", response.data);
       setWatermark(response.data.watermarkImage);
     } catch (error) {
       console.log("Error fetching watermarks:", error);
@@ -213,7 +213,7 @@ const ProfilePage = () => {
     }
   }, [activePlan]);
 
-  // console.log(photo);
+  // //console.log(photo);
 
   const handleDescriptionChange = (e) => {
     const newValue = e.target.value;
@@ -266,15 +266,15 @@ const ProfilePage = () => {
           (progress.loaded / progress.total) * 100
         );
         setProgr(percentCompleted);
-        console.log(`Progress: ${percentCompleted}%`);
+        //console.log(`Progress: ${percentCompleted}%`);
       });
 
-      await upload.done().then((r) => console.log(r));
-      console.log("File uploaded successfully!");
+      await upload.done().then((r) => console.log("File uploaded successfully!"));
+      //console.log("File uploaded successfully!");
       const fileUrl = `https://${target.Bucket}.s3.ap-south-1.amazonaws.com/${target.Key}`;
       setImageUrl(fileUrl);
       setPhoto({ ...photo, imageLinks: {} });
-      console.log("File URL:", fileUrl);
+      //console.log("File URL:", fileUrl);
     } catch (error) {
       console.error("Error uploading file:", error);
     }
@@ -284,24 +284,24 @@ const ProfilePage = () => {
     try {
       setLoading(true);
       toast.loading("Fetching resolutions...");
-      console.log("Plan type:", activePlan);
+      //console.log("Plan type:", activePlan);
       if (photo.imageLinks.original) {
         setStep("2");
         window.scrollTo(0, 160);
         return;
       }
-      console.log("wtermark:", watermark);
-      console.log("photographer:", photographer?._id);
-      console.log("imageUrl:", imageUrl);
-      console.log("plan:", activePlan);
-      console.log(
-        "isCustomText:",
-        activePlan === "basic" || watermark ? false : true
-      );
-      console.log(
-        "customText:",
-        watermark || activePlan === "basic" ? "" : customText
-      );
+      //console.log("wtermark:", watermark);
+      //console.log("photographer:", photographer?._id);
+      //console.log("imageUrl:", imageUrl);
+      //console.log("plan:", activePlan);
+      // console.log(
+      //   "isCustomText:",
+      //   activePlan === "basic" || watermark ? false : true
+      // );
+      // console.log(
+      //   "customText:",
+      //   watermark || activePlan === "basic" ? "" : customText
+      // );
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/upload/handle-photos-with-watermark-and-resolutions-options`,
         {
@@ -313,7 +313,7 @@ const ProfilePage = () => {
         }
       );
       const data = response.data;
-      console.log("Resolutions data:", data);
+      //console.log("Resolutions data:", data);
       setPhoto((prevPhoto) => ({
         ...prevPhoto,
         imageLinks: data.urls,
@@ -344,7 +344,7 @@ const ProfilePage = () => {
           },
         }
       );
-      console.log(response.data);
+      //console.log(response.data);
       Swal.fire({
         title: "Success!",
         text: "Your photo has uploaded successfully and sent to Admin for Approval and may take 0-3 working days to reflect in your profile.",
@@ -360,7 +360,7 @@ const ProfilePage = () => {
     }
   };
 
-  // console.log(photo);
+  // //console.log(photo);
 
   useEffect(() => {
     fetchData(
@@ -395,17 +395,17 @@ const ProfilePage = () => {
 
     const fetchActivePlan = async () => {
       if (!photographer || !photographer._id) {
-        console.log("Photographer data is missing");
+        //console.log("Photographer data is missing");
         return;
       }
       try {
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/get-user-active-subscription?photographer=${photographer._id}`
         );
-        console.log(
-          "Active Subscription ",
-          res.data.subscription?.planId?.name
-        );
+        //console.log(
+        //   "Active Subscription ",
+        //   res.data.subscription?.planId?.name
+        // );
         setActivePlan(res.data.subscription?.planId?.name?.toLowerCase());
         if (res.data.subscription?.planId?.name?.toLowerCase() === "basic") {
           setLimit(10);
@@ -429,7 +429,7 @@ const ProfilePage = () => {
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-images-by-photographer?photographer=${photographer._id}`
         );
-        // console.log(res.data);
+        // //console.log(res.data);
         setPhotosLength(res.data.photos?.length);
       } catch (error) {
         setError(error);
@@ -442,14 +442,14 @@ const ProfilePage = () => {
     fetchPhotos();
   }, [photographer]);
 
-  // console.log("plan", plan);
+  // //console.log("plan", plan);
   useEffect(() => {
     if (isHydrated && !photographer) {
       router.push("/profile");
     }
   }, [isHydrated, photographer, router]);
 
-  // console.log("categories", categories);
+  // //console.log("categories", categories);
 
   return (
     <>

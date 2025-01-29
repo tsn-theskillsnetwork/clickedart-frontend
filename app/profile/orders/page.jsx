@@ -68,7 +68,7 @@ export default function OrdersPage() {
       ...orderSupport,
       order: order,
     };
-    console.log("Updated Order:", updatedOrderSupport);
+    //console.log("Updated Order:", updatedOrderSupport);
 
     if (!validateOrderSupport()) return;
 
@@ -77,7 +77,7 @@ export default function OrdersPage() {
         `${process.env.NEXT_PUBLIC_SERVER}/api/ordersupport/create-order-support-request`,
         updatedOrderSupport
       );
-      console.log(response.data);
+      //console.log(response.data);
       toast.success("Order Support Requested");
     } catch (error) {
       if (
@@ -100,7 +100,7 @@ export default function OrdersPage() {
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_SERVER}/api/download/get-my-orders?userId=${user?._id}&pageNumber=${page}&pageSize=${pageSize}`
         );
-        console.log(response.data);
+        //console.log(response.data);
         setOrders(response.data.orders);
         setPageCount(response.data.pageCount);
       } catch (error) {
@@ -280,9 +280,9 @@ export default function OrdersPage() {
                         </>
                       )}
                     </div>
-                    <div className="sm:px-2 sm:w-1/5 flex flex-col items-start gap-2 border-b sm:border-b-0">
+                    <div className="sm:px-2 sm:w-1/5 flex flex-col items-center gap-2 border-b sm:border-b-0">
                       <>
-                        <p className="font-medium">Order Status:</p>
+                        <p className="font-medium">Order Status</p>
                         <div
                           className={`flex items-center p-1 pr-3 bg-green-100 text-green-600 rounded-full `}
                         >
@@ -385,6 +385,17 @@ export default function OrdersPage() {
                           </form>
                         </DialogContent>
                       </Dialog>
+                      {(order.printStatus === "no-print" ||
+                        order.printStatus === "delivered") && (
+                        <button
+                          className="text-blue-600 text-center font-medium p-2 rounded-md border bg-blue-100 hover:bg-white border-blue-600 transition-all duration-200 ease-in-out"
+                          onClick={() => {
+                            router.push(`/bill/${order._id}`);
+                          }}
+                        >
+                          Invoice
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}

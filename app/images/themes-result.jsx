@@ -58,7 +58,7 @@ export default function ThemesResultPage() {
       );
 
       const data = await res.json();
-      console.log(data);
+      //console.log(data);
 
       if (!res.ok) {
         throw new Error(data.message || "Failed to add image to wishlist");
@@ -86,7 +86,7 @@ export default function ThemesResultPage() {
       );
 
       const data = await res.json();
-      console.log(data);
+      //console.log(data);
 
       if (!res.ok) {
         throw new Error(data.message || "Failed to remove image from wishlist");
@@ -124,7 +124,7 @@ export default function ThemesResultPage() {
           }
         );
         const data = await res.json();
-        console.log(data);
+        //console.log(data);
         setThemes(data.categories);
       } catch (error) {
         console.error(error);
@@ -147,10 +147,10 @@ export default function ThemesResultPage() {
           }
         );
         const data = await res.json();
-        console.log(data);
+        //console.log(data);
         setImages(data.results);
         setPageCount(data.pageCount);
-        console.log(data.results);
+        //console.log(data.results);
       } catch (error) {
         console.error(error);
       }
@@ -170,7 +170,7 @@ export default function ThemesResultPage() {
         const data = await res.json();
         setImages(data.photos);
         setPageCount(data.pageCount);
-        console.log(data.photos);
+        //console.log(data.photos);
       } catch (error) {
         console.error(error);
       }

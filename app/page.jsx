@@ -22,7 +22,7 @@ export default function Home() {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/story/get-all-story`
       );
-      console.log("STORY", res.data);
+      //console.log("STORY", res.data);
       setStories(res.data.stories);
     } catch (error) {
       console.log("Failed to fetch stories:", error);

@@ -53,7 +53,9 @@ const RegistrationForm = () => {
     isMarried: false,
     anniversary: "",
     dob: "",
+    referralcode: "",
     image: "",
+
     interests: [],
   });
 
@@ -72,34 +74,6 @@ const RegistrationForm = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value ?? "" });
-  };
-
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const uploadData = new FormData();
-    uploadData.append("image", file);
-
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/upload/uploadSingleImage`,
-        {
-          method: "POST",
-          body: uploadData,
-        }
-      );
-      const data = await res.text();
-      if (res.ok) {
-        setFormData((prev) => ({
-          ...prev,
-          image: data,
-        }));
-        console.log("Image uploaded successfully", data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   const handleImageChange = (e) => {
@@ -153,8 +127,7 @@ const RegistrationForm = () => {
       newErrors.city = "District is required.";
     if (!formData.shippingAddress.pincode)
       newErrors.pincode = "Pincode is required.";
-    if (formData.age && (formData.age < 0 || isNaN(formData.age)))
-      newErrors.age = "Age must be a positive number.";
+    if (!formData.dob) newErrors.dob = "Date of birth is required.";
     if (formData.dob && isNaN(new Date(formData.dob).getTime()))
       newErrors.dob = "Date of birth is invalid.";
     if (formData.interests && !/^[\w\s,]*$/.test(formData.interests))
@@ -266,14 +239,13 @@ const RegistrationForm = () => {
           const data = err.response.data;
           toast.error(data.message);
         } else {
-          console.error("Unexpected error:", err.response.data);
+          setError(err.response.data.message);
         }
       } else {
         console.error("Network error or server not reachable:", err);
       }
     }
   };
-
   const toastShownRef = useRef(false);
 
   useEffect(() => {
@@ -306,8 +278,6 @@ const RegistrationForm = () => {
             <h2 className="text-heading-04 font-medium text-center">
               User Registration
             </h2>
-            {message && <p className="text-green-500">{message}</p>}
-            {error && <p className="text-red-500">{error}</p>}
             <div className="flex flex-col items-center gap-4">
               {cropperImage ? (
                 <Cropper
@@ -387,7 +357,7 @@ const RegistrationForm = () => {
                 <Input
                   type="text"
                   name="firstName"
-                  value={formData.firstName}
+                  value={formData.firstName || ""}
                   onChange={handleInputChange}
                   required
                 />
@@ -403,7 +373,7 @@ const RegistrationForm = () => {
                 <Input
                   type="text"
                   name="lastName"
-                  value={formData.lastName}
+                  value={formData.lastName || ""}
                   onChange={handleInputChange}
                   required
                 />
@@ -420,7 +390,7 @@ const RegistrationForm = () => {
               <Input
                 type="email"
                 name="email"
-                value={formData.email}
+                value={formData.email || ""}
                 onChange={handleInputChange}
                 required
               />
@@ -437,7 +407,7 @@ const RegistrationForm = () => {
                 <Input
                   type={showPassword ? "text" : "password"}
                   name="password"
-                  value={formData.password}
+                  value={formData.password || ""}
                   onChange={handleInputChange}
                   placeholder="At least 8 characters, 1 uppercase, 1 lowercase, 1 number and 1 special character"
                   required
@@ -484,7 +454,7 @@ const RegistrationForm = () => {
               <Input
                 type="tel"
                 name="mobile"
-                value={formData.mobile}
+                value={formData.mobile || ""}
                 placeholder="10-digit mobile number"
                 onChange={handleInputChange}
               />
@@ -499,7 +469,7 @@ const RegistrationForm = () => {
                 type="tel"
                 name="whatsapp"
                 placeholder="10-digit WhatsApp number"
-                value={formData.whatsapp}
+                value={formData.whatsapp || ""}
                 onChange={handleInputChange}
               />
               {errors.whatsapp && (
@@ -617,7 +587,7 @@ const RegistrationForm = () => {
                   <Input
                     type="text"
                     name="shippingAddress.address"
-                    value={formData.shippingAddress?.address}
+                    value={formData.shippingAddress?.address || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.address = e.target.value;
@@ -633,7 +603,7 @@ const RegistrationForm = () => {
                   <Input
                     type="text"
                     name="shippingAddress.landmark"
-                    value={formData.shippingAddress?.landmark}
+                    value={formData.shippingAddress?.landmark || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.landmark = e.target.value;
@@ -651,7 +621,7 @@ const RegistrationForm = () => {
                   <Input
                     type="text"
                     name="shippingAddress.pincode"
-                    value={formData.shippingAddress?.pincode}
+                    value={formData.shippingAddress?.pincode || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.pincode = e.target.value;
@@ -670,7 +640,7 @@ const RegistrationForm = () => {
                   <Input
                     type="text"
                     name="shippingAddress.area"
-                    value={formData.shippingAddress?.area}
+                    value={formData.shippingAddress?.area || ""}
                     onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
                       newAddress.area = e.target.value;
@@ -685,7 +655,9 @@ const RegistrationForm = () => {
             </div>
 
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <Label>Date of Birth</Label>
+              <Label>
+                Date of Birth <span className="text-red-500">*</span>
+              </Label>
               <DatePicker
                 label="Date of Birth"
                 onChange={(value) => setFormData({ ...formData, dob: value })}
@@ -708,6 +680,17 @@ const RegistrationForm = () => {
               )}
             </div>
 
+            <div>
+              <Label>Referral Code</Label>
+              <Input
+                type="text"
+                name="referralcode"
+                value={formData.referralcode || ""}
+                onChange={handleInputChange}
+              />
+            </div>
+            {message && <p className="text-green-500">{message}</p>}
+            {error && <p className="text-red-500">{error}</p>}
             <div className="flex flex-col items-center">
               <Button type="submit">Register</Button>
             </div>

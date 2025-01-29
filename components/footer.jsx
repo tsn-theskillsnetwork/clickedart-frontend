@@ -46,9 +46,6 @@ export default function Footer() {
         <div className="grid grid-cols-3 w-full">
           <div className="flex flex-col gap-2">
             <p className="font-semibold text-lg">Follow us</p>
-            {/* <Link href="#" className="mt-3 text-sm font-medium">
-                Facebook
-              </Link> */}
             <div className="mt-3 flex flex-col gap-2">
               {layout &&
                 layout.footerDetails?.footerlinks?.map((link, index) => {

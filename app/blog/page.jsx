@@ -10,8 +10,8 @@ export default function BlogPage() {
   const [blogPosts, setBlogPosts] = useState([]);
   const [successStories, setSuccessStories] = useState([]);
 
-  console.log(blogPosts);
-  console.log(successStories);
+  //console.log(blogPosts);
+  //console.log(successStories);
 
   useEffect(() => {
     fetchData(

@@ -33,9 +33,22 @@ export default function MembershipPage() {
   const handlePayment = useCallback(
     async (planId, price, duration) => {
       if (!photographer) {
-        toast.error("Please login as Photographer to continue");
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Please login to continue",
+        });
         return;
       }
+      if (!photographer.isMonetized) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Please complete your Monetization from your Profile to continue",
+        });
+        return;
+      }
+      if (price === "") return;
       const result = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/payment`,
         {
@@ -43,7 +56,7 @@ export default function MembershipPage() {
           userId: photographer._id,
         }
       );
-      console.log("result", result);
+      //console.log("result", result);
 
       const options = {
         key: result.data.result.notes.key,
@@ -79,7 +92,7 @@ export default function MembershipPage() {
         },
       };
 
-      console.log("options", options);
+      //console.log("options", options);
 
       const rzpay = new Razorpay(options);
       rzpay.open();
@@ -93,7 +106,7 @@ export default function MembershipPage() {
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_SERVER}/api/plans/get-all-plans`
         );
-        console.log(response.data);
+        //console.log(response.data);
         setPlans(response.data.plans);
         setActive(response.data.plans[0]._id);
       } catch (error) {
@@ -110,10 +123,10 @@ export default function MembershipPage() {
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/get-user-active-subscription?photographer=${photographer._id}`
         );
-        console.log(
-          "Active Subscription ",
-          res.data.subscription?.planId?.name
-        );
+        // console.log(
+        //   "Active Subscription ",
+        //   res.data.subscription?.planId?.name
+        // );
         setUserPlan(res.data.subscription?.planId?.name);
       } catch (error) {
         console.log(error.response ? error.response.data : error.message);
@@ -125,10 +138,26 @@ export default function MembershipPage() {
   }, [photographer] || []);
 
   const handleTrial = async (planId, duration) => {
-    if (!photographer) return;
-    const cost = plans.find((plan) => plan._id === planId).cost.find(
-      (cost) => cost.duration === duration
-    ).price;
+    if (!photographer) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Please login to continue",
+      });
+      return;
+    }
+    if (!photographer.isMonetized) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Please complete your Monetization from your Profile to continue",
+      });
+      return;
+    }
+
+    const cost = plans
+      .find((plan) => plan._id === planId)
+      .cost.find((cost) => cost.duration === duration).price;
     Swal.fire({
       title: "Free Trial",
       text: "Are you sure you want to start the free trial?",
@@ -138,24 +167,36 @@ export default function MembershipPage() {
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes",
       cancelButtonText: "No",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        handleSubscribe(planId, cost, duration);
+        try {
+          const response = await axios.post(
+            `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/update-to-free-subscriptions`,
+            {
+              userId: photographer._id,
+              planId,
+              price: 0,
+              duration,
+            },
+            {
+              headers: {
+                "x-auth-token": token,
+              },
+            }
+          );
+          Swal.fire({
+            icon: "success",
+            title: "Subscription Successful",
+            text: "You have successfully subscribed to the plan. It will be activated under 24 hours.",
+          });
+        } catch (error) {
+          console.error(error);
+        }
       }
     });
   };
 
-  //   const confirm = window.confirm(
-  //     "Are you sure you want to start the free trial?"
-  //   );
-  //   if (confirm) {
-  //     handleSubscribe(planId, cost, duration);
-  //   }
-  // };
-
   const handleSubscribe = async (planId, price, duration) => {
-    if (!photographer) return;
-    if (price === "") return;
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/add-subscription`,
@@ -181,17 +222,17 @@ export default function MembershipPage() {
       console.error(error);
     }
   };
-  console.log(selectedPlanId, selectedPlanPrice, selectedPlanDuration);
+  //console.log(selectedPlanId, selectedPlanPrice, selectedPlanDuration);
 
   useEffect(() => {
     if (paymentStatus === true) {
-      console.log(selectedPlanId, selectedPlanPrice, selectedPlanDuration);
+      //console.log(selectedPlanId, selectedPlanPrice, selectedPlanDuration);
       handleSubscribe(selectedPlanId, selectedPlanPrice, selectedPlanDuration);
     }
   }, [selectedPlanDuration]);
 
   return (
-    <div className="flex flex-col -mt-4 overflow-x-hidden">
+    <div className="flex flex-col -mt-4 mb-20">
       <div className="relative flex flex-col py-10 sm:py-16 md:py-20 lg:py-24 xl:py-28 2xl:py-32">
         <div className="absolute inset-0 z-0 opacity-80">
           <Image
@@ -213,9 +254,7 @@ export default function MembershipPage() {
           </p>
           {userPlan !== "Premium" && (
             <button
-              onClick={() =>
-                handleTrial("67853b3d25457a993c90b1a1", "monthly")
-              }
+              onClick={() => handleTrial("67853b3d25457a993c90b1a1", "monthly")}
               className="bg-white text-primary text-xs mx-auto md:mx-0 sm:text-paragraph lg:text-heading-05 font-semibold rounded-lg py-2.5 px-3 mt-2"
             >
               Start with a free 1-month trial of the Premium Plan
@@ -376,7 +415,11 @@ export default function MembershipPage() {
                   {userPlan === plan.name && (
                     <div className="w-full">
                       <p
-                        className={`${plan._id === active ? "text-white border-white" : "text-primary border-primary"} md:text-sm w-full text-center border-2 lg:text-heading-06 xl:text-heading-05 font-medium rounded-lg py-4 px-6 mt-4`}
+                        className={`${
+                          plan._id === active
+                            ? "text-white border-white"
+                            : "text-primary border-primary"
+                        } md:text-sm w-full text-center border-2 lg:text-heading-06 xl:text-heading-05 font-medium rounded-lg py-4 px-6 mt-4`}
                       >
                         Current Plan
                       </p>

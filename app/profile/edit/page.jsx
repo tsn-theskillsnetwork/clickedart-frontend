@@ -80,7 +80,7 @@ const ProfileEditPage = () => {
           ...prev,
           userId: data.user._id,
         }));
-        console.log(data);
+        //console.log(data);
       }
     } catch (error) {
       console.log(error);
@@ -110,7 +110,7 @@ const ProfileEditPage = () => {
           ...prev,
           photographerId: data.photographer._id,
         }));
-        console.log(data);
+        //console.log(data);
       }
     } catch (error) {
       console.log(error);
@@ -149,7 +149,7 @@ const ProfileEditPage = () => {
           ...prev,
           coverImage: data,
         }));
-        console.log("Cover Photo uploaded successfully", data);
+        //console.log("Cover Photo uploaded successfully", data);
       }
     } catch (error) {
       console.log(error);

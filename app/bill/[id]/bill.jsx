@@ -1,6 +1,7 @@
 "use client";
 import Button2 from "@/components/button2";
 import { Mail, Phone } from "lucide-react";
+import Image from "next/image";
 import { useRef } from "react";
 
 export default function BillDetailsPage({ data }) {
@@ -13,7 +14,7 @@ export default function BillDetailsPage({ data }) {
     margin: 1,
     image: { type: "jpeg", quality: 0.98 },
     html2canvas: { scale: 2 },
-    jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+    jsPDF: { unit: "in", format: "A4", orientation: "portrait" },
   };
 
   const contentRef = useRef(null);
@@ -40,20 +41,20 @@ export default function BillDetailsPage({ data }) {
                 <h4 className="text-heading-03 -mt-4">INVOICE</h4>
               </div>
               <div className="flex flex-col items-end gap-2">
-                <img src="/assets/Logo.png" alt="logo" className="w-3 /5" />
+                <img src="/assets/Logo.png" alt="logo" className="w-3/5" />
                 <p className="text-xs font-medium">
                   ( An Unit of ForteNet Skills Network Private Limited )
                 </p>
                 <p className="text-xs">GST IIN: 09AADCF5469Q1ZS</p>
               </div>
             </div>
-            <hr className="border border-black" />
+            {/* <hr className="border border-black" /> */}
 
-            <div className="flex flex-row justify-between items-start py-2">
+            <div className="flex flex-row justify-between items-start pt-5 pb-8">
               <div className="flex flex-col text-left mt-6">
                 <p className="text-sm">Invoice No:</p>
                 <p className="text-sm text-red-500 font-semibold">
-                  {data.invoiceId}
+                  {data.invoiceNumber || data.invoiceId}
                 </p>
                 <p className="text-sm mt-2">Date Issued</p>
                 <p className="text-sm text-red-500 font-medium">
@@ -116,7 +117,9 @@ export default function BillDetailsPage({ data }) {
                       <td className="text-center p-2 border-x border-black">
                         {item.subTotal > 0 ? "Print" : "Digital"}
                       </td>
-                      <td className="text-center p-2 border-x border-black">1</td>
+                      <td className="text-center p-2 border-x border-black">
+                        1
+                      </td>
                       <td className="text-center p-2 border-x border-black">
                         {item.finalPrice}
                       </td>
@@ -170,8 +173,22 @@ export default function BillDetailsPage({ data }) {
                 signature. For any clarification, kindly contact us on
                 support@clickedart.com
               </p>
-              <div className="grid grid-cols-2 gap-2 mt-4">
-                <div className="h-full w-full flex items-end">
+              <div className="grid grid-cols-2 gap-2 mt-4 items-center">
+                <img
+                  src="/assets/clickedart.jpg"
+                  alt="logo"
+                  className="w-full"
+                />
+                <div className="h-full w-full flex flex-col justify-end">
+                  <Image
+                    src="/assets/sign.png"
+                    alt="signature"
+                    width={150}
+                    height={50}
+                    className="mx-auto -mb-5 select-none pointer-events-none"
+                    style={{ userSelect: "none" }}
+                    onContextMenu={(e) => e.preventDefault()}
+                  />
                   <p className="text-paragraph text-center border-t border-black mx-auto mt-4 font-semibold px-4 py-2">
                     AUTHORISED SIGN
                   </p>

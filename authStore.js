@@ -7,7 +7,7 @@ const useAuthStore = create(
       token: null,
       user: null,
       photographer: null,
-      isHydrated: false, // Flag for hydration status
+      isHydrated: false, 
 
       signin: (newToken) =>
         set({
@@ -32,10 +32,10 @@ const useAuthStore = create(
         }),
     }),
     {
-      name: "auth-storage", // The key for sessionStorage
+      name: "auth-storage",
       storage: {
         getItem: (key) => {
-          if (typeof window === "undefined") return null; // Ensure this only runs in the browser
+          if (typeof window === "undefined") return null;
           const storedData = sessionStorage.getItem(key);
           return storedData ? JSON.parse(storedData) : null;
         },
@@ -51,7 +51,6 @@ const useAuthStore = create(
         },
       },
       onRehydrateStorage: () => (state) => {
-        // Set the `isHydrated` flag to true after hydration
         state.isHydrated = true;
       },
     }

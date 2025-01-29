@@ -7,7 +7,7 @@ import React from "react";
 
 export default function ContactPage() {
   const { layout } = useLayoutStore();
-  console.log(layout);
+  //console.log(layout);
   return (
     <div className="flex flex-col items-center px-4 my-20 h-screen">
       <div className="relative flex flex-col w-full md:w-5/6 overflow-hidden rounded-lg">

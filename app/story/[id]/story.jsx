@@ -28,7 +28,7 @@ export default function StoryPageComponent({ story }) {
             "I found this interesting and wanted to share it with you.",
           url: currentUrl,
         });
-        console.log("Shared successfully!");
+        //console.log("Shared successfully!");
       } else {
         console.warn("Web Share API not supported.");
         // Fallback: Copy to clipboard or open a share dialog

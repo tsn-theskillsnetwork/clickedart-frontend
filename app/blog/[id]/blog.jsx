@@ -21,13 +21,13 @@ export default function BlogPageComponent({ blog }) {
         text: blog.description,
         url: currentUrl,
       });
-      console.log("Share successful");
+      //console.log("Share successful");
     } catch (error) {
       console.error("Error sharing:", error);
     }
   };
 
-  console.log(blog);
+  //console.log(blog);
 
   return (
     <>

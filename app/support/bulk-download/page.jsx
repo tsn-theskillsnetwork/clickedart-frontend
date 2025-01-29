@@ -91,7 +91,7 @@ export default function BulkDownloadForm() {
         formData
       );
       toast.success("Enquiry submitted successfully");
-      console.log("Enquiry submitted successfully", response.data);
+      //console.log("Enquiry submitted successfully", response.data);
       router.back();
     } catch (error) {
       toast.error("Error submitting enquiry");

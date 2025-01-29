@@ -32,7 +32,7 @@ export default function WishlistPage() {
     toast.success("Removed from cart!");
   };
 
-  console.log({ wishlist, loading, error });
+  //console.log({ wishlist, loading, error });
 
   const removeImageFromWishlist = async (imageId) => {
     try {

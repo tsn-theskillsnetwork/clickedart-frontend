@@ -37,7 +37,13 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function StoryPage({ params }) {
-  const { id } = await params;
+  const id = params?.id;
+
+  if (!id) {
+    return <p>Invalid Story ID.</p>;
+  }
+
+  console.log("Rendering StoryPage with ID:", id);
 
   try {
     const story = await fetchStoryData(id);

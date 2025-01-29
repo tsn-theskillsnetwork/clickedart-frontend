@@ -9,7 +9,7 @@ export default function BlogPage() {
   const [blogLength, setBlogLength] = useState(6);
   const [stories, setStories] = useState([]);
 
-  console.log(stories);
+  //console.log(stories);
 
   useEffect(() => {
     fetchData(

@@ -60,7 +60,7 @@ export default function SearchResultPage() {
       );
 
       const data = await res.json();
-      console.log(data);
+      //console.log(data);
 
       if (!res.ok) {
         throw new Error(data.message || "Failed to add image to wishlist");
@@ -88,7 +88,7 @@ export default function SearchResultPage() {
       );
 
       const data = await res.json();
-      console.log(data);
+      //console.log(data);
 
       if (!res.ok) {
         throw new Error(data.message || "Failed to remove image from wishlist");
@@ -130,7 +130,7 @@ export default function SearchResultPage() {
           }
         );
         const data = await res.json();
-        console.log(data);
+        //console.log(data);
         setThemes(data.categories);
       } catch (error) {
         console.error(error);
@@ -143,7 +143,7 @@ export default function SearchResultPage() {
   useEffect(() => {
     const fetchImages = async () => {
       const type = typeValue === "photographers" ? "photographer" : "images";
-      console.log(type);
+      //console.log(type);
       try {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_SERVER}/api/${type}/search-${type}?Query=${searchValue}`,
@@ -155,9 +155,9 @@ export default function SearchResultPage() {
           }
         );
         const data = await res.json();
-        console.log(data);
+        //console.log(data);
         setImages(data.results);
-        console.log(data.results);
+        //console.log(data.results);
       } catch (error) {
         console.error(error);
       }
@@ -176,7 +176,7 @@ export default function SearchResultPage() {
         );
         const data = await res.json();
         setImages(data.photos);
-        console.log(data.photos);
+        //console.log(data.photos);
       } catch (error) {
         console.error(error);
       }
@@ -195,7 +195,7 @@ export default function SearchResultPage() {
         );
         const data = await res.json();
         setImages(data.photographers);
-        console.log(data.photographers);
+        //console.log(data.photographers);
       } catch (error) {
         console.error(error);
       }

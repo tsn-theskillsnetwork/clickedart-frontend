@@ -9,7 +9,7 @@ export default function Stats() {
   const { layout } = useLayoutStore();
   return (
     <div>
-      <div className=" relative bg-cover bg-[center_-4rem] ">
+      <div className="relative">
         <Image
           width={1600}
           height={900}
@@ -18,7 +18,7 @@ export default function Stats() {
             "/assets/Strathmore Clean White 300gsm.png"
           }
           alt=""
-          className="absolute inset-0 w-full h-full object-cover -z-50 opacity-90 xl:object-[center_-10rem]"
+          className="absolute inset-0 w-full h-full object-cover object-top -z-50 opacity-90"
         />
         <div className="h-full bg-black bg-opacity-20 py-10 md:py-10">
           <div className="px-5 sm:px-36 lg:w-1/2 w-full">
@@ -32,71 +32,46 @@ export default function Stats() {
               </p>
             </div>
           </div>
-          <div className="mt-5 md:mt-16 flex flex-row md:py-8 px-5 md:px-20 text-white w-full md:w-8/12 backdrop-blur-md md:rounded-3xl justify-around mx-auto">
-            <div className="flex flex-col justify-center items-center">
-              <h2 className="text-heading-06 md:text-heading-03">
-                {
-                  <CountUp
-                    enableScrollSpy={true}
-                    scrollSpyOnce={true}
-                    end={2000}
-                    suffix="+"
-                    duration={5}
-                  />
-                }
-              </h2>
-              <p className="text-xs md:text-md text-center">Downloads</p>
-            </div>
-            <div className="flex flex-col justify-center items-center">
-              <h2 className="text-heading-06 md:text-heading-03">
-                {
-                  <CountUp
-                    enableScrollSpy={true}
-                    scrollSpyOnce={true}
-                    end={1}
-                    suffix="M+"
-                    duration={5}
-                  />
-                }
-              </h2>
-              <p className="text-xs md:text-md text-center">Images Available</p>
-            </div>
-            <div className="flex flex-col justify-center items-center">
-              <h2 className="text-heading-06 md:text-heading-03">
-                {
-                  <CountUp
-                    enableScrollSpy={true}
-                    scrollSpyOnce={true}
-                    end={800}
-                    duration={5}
-                  />
-                }
+          <div className="mt-5 md:mt-16 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 md:py-8 px-5 md:px-20 text-white w-full md:w-10/12 backdrop-blur-md md:rounded-3xl justify-around mx-auto">
+            <div className="grid justify-center items-center">
+              <h2 className="text-base md:text-heading-06 text-center font-semibold">
+                Empowering Photographers Nationwide
               </h2>
               <p className="text-xs md:text-md text-center">
-                upto 800 Megapixel resolution
+                Showcase, connect, and monetize your art effortlessly
               </p>
             </div>
-            <div className="flex flex-col justify-center items-center">
-              <h2 className="text-heading-06 md:text-heading-03">
-                {
-                  <CountUp
-                    enableScrollSpy={true}
-                    scrollSpyOnce={true}
-                    end={24}
-                    suffix="/"
-                    duration={5}
-                  />
-                }
-                {
-                  <CountUp
-                    enableScrollSpy={true}
-                    scrollSpyOnce={true}
-                    end={7}
-                    duration={5}
-                  />
-                }
+            <div className="grid justify-center items-center">
+              <h2 className="text-base md:text-heading-06 text-center font-semibold">
+                Earn Up to 90% Royalties
               </h2>
-              <p className="text-xs md:text-md text-center">Customer Support</p>
+              <p className="text-xs md:text-md text-center">
+                Flexible plans for maximizing your earnings
+              </p>
+            </div>
+            <div className="grid justify-center items-center">
+              <h2 className="text-base md:text-heading-06 text-center font-semibold">
+                Global Reach for Your Images
+              </h2>
+              <p className="text-xs md:text-md text-center">
+                Sell your photos to a worldwide audience with ease
+              </p>
+            </div>
+            <div className="grid justify-center items-center">
+              <h2 className="text-base md:text-heading-06 text-center font-semibold">
+                Advanced Tools for Creators
+              </h2>
+              <p className="text-xs md:text-md text-center">
+                Watermarking, portfolio customization, and performance analytics
+              </p>
+            </div>
+            <div className="grid justify-center items-center">
+              <h2 className="text-base md:text-heading-06 text-center font-semibold">
+                Secure and Transparent Payments
+              </h2>
+              <p className="text-xs md:text-md text-center">
+                Hassle-free Payouts with full compliance
+              </p>
             </div>
           </div>
         </div>
