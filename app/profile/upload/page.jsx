@@ -219,6 +219,12 @@ const ProfilePage = () => {
         console.error("No file selected");
         return;
       }
+
+      // Check file size
+      if (file.size < 4 * 1024 * 1024) {
+        toast.error("File size should be more than 4MB");
+        return;
+      }
   
       // Detect HEIC file by extension as a fallback
       const fileExtension = file.name.split(".").pop().toLowerCase();

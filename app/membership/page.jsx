@@ -160,8 +160,8 @@ export default function MembershipPage() {
       .cost.find((cost) => cost.duration === duration).price;
     Swal.fire({
       title: "Free Trial",
-      text: "Are you sure you want to start the free trial?",
-      icon: "warning",
+      text: "Start the free trial?",
+      icon: "question",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",

@@ -702,11 +702,22 @@ export default function CheckoutPage() {
                       </dl>
                       <dl className="flex items-center justify-between gap-4 py-3">
                         <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
-                          GST (18%)
+                          CGST (9%)
                         </dt>
                         <dd className="text-base font-medium text-gray-900 dark:text-white">
                           ₹
-                          {((price.totalFinalPrice - discount) * 0.18).toFixed(
+                          {((price.totalFinalPrice - discount) * 0.09).toFixed(
+                            2
+                          )}
+                        </dd>
+                      </dl>
+                      <dl className="flex items-center justify-between gap-4 py-3">
+                        <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
+                          SGST (9%)
+                        </dt>
+                        <dd className="text-base font-medium text-gray-900 dark:text-white">
+                          ₹
+                          {((price.totalFinalPrice - discount) * 0.09).toFixed(
                             2
                           )}
                         </dd>
