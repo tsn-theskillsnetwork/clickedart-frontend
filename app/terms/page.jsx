@@ -2,7 +2,7 @@ import React from "react";
 
 export default function TermsConditionsPage() {
   return (
-    <div className="flex flex-col mt-4 min-h-[400vh] px-20">
+    <div className="flex flex-col mt-4 pb-5 px-20">
       <h1 className="text-2xl font-bold">Terms of Use for ClickedArt.com</h1>
       <p className="font-medium mt-2">Last Updated: 26 January 2025</p>
       <p className="mt-4 text-justify">
@@ -208,6 +208,92 @@ export default function TermsConditionsPage() {
           7.3. Users must not copy, reverse-engineer, or modify any part of the
           Platform.
         </p>
+      </div>
+      <hr className="border-2 my-5 border-surface-300" />
+      <h6 className="text-paragraph font-bold">
+        8. Privacy and Data Protection
+      </h6>
+      <div className="mt-2 space-y-2">
+        <p>
+          8.1. Users’ data is collected and processed in accordance with our
+          Privacy Policy.
+        </p>
+        <p>
+          8.2. Sensitive data, such as payment details, is encrypted for
+          security purposes.
+        </p>
+        <p>
+          8.3. Photographers consent to display their profile and portfolio
+          publicly on the Platform.
+        </p>
+      </div>
+      <hr className="border-2 my-5 border-surface-300" />
+      <h6 className="text-paragraph font-bold">9. Dispute Resolution</h6>
+      <div className="mt-2 space-y-2">
+        <p>
+          9.1. Buyers and photographers are encouraged to resolve disputes
+          amicably.
+        </p>
+        <p>
+          9.2. In unresolved cases, ClickedArt may mediate but is not obligated
+          to arbitrate disputes.
+        </p>
+        <p>
+          9.3. Legal disputes will be subject to the jurisdiction of courts in
+          [Lucknow/Uttar Pradesh].
+        </p>
+      </div>
+      <hr className="border-2 my-5 border-surface-300" />
+      <h6 className="text-paragraph font-bold">10. Prohibited Activities</h6>
+      <div className="mt-2 space-y-2">
+        <p>10.1. Users must not:</p>
+        <ul className="list-disc list-inside ml-5">
+          <li>Post false or misleading content.</li>
+          <li>Attempt to hack or disrupt the Platform.</li>
+          <li>Use the Platform for illegal activities.</li>
+        </ul>
+      </div>
+      <hr className="border-2 my-5 border-surface-300" />
+      <h6 className="text-paragraph font-bold">11. Indemnification</h6>
+      <div className="mt-2 space-y-2">
+        <p>
+          Users agree to indemnify ClickedArt, its affiliates, and employees
+          against any claims, damages, or liabilities arising from their use of
+          the Platform or breach of these Terms.
+        </p>
+      </div>
+      <hr className="border-2 my-5 border-surface-300" />
+      <h6 className="text-paragraph font-bold">12. Limitation of Liability</h6>
+      <div className="mt-2 space-y-2">
+        <p>ClickedArt is not liable for:</p>
+        <ul className="list-disc list-inside ml-5">
+          <li>Loss of earnings for photographers.</li>
+          <li>Errors in metadata provided by photographers.</li>
+          <li>Issues arising from misuse of purchased content by buyers.</li>
+        </ul>
+      </div>
+      <hr className="border-2 my-5 border-surface-300" />
+      <h6 className="text-paragraph font-bold">13. Termination</h6>
+      <div className="mt-2 space-y-2">
+        <p>
+          13.1. ClickedArt reserves the right to suspend or terminate user
+          accounts for violations of these Terms.
+        </p>
+        <p>
+          13.2. Users may terminate their accounts voluntarily by contacting
+          support.
+        </p>
+      </div>
+      <hr className="border-2 my-5 border-surface-300" />
+      <h6 className="text-paragraph font-bold">14. Contact Information</h6>
+      <div className="mt-2 space-y-2">
+        <p>
+          For queries, feedback, or complaints, please contact ClickedArt at:
+        </p>
+        <ul className="list-disc list-inside ml-5">
+          <li>Email: support@clickedart.com</li>
+          <li>Phone: +91 7054001056</li>
+        </ul>
       </div>
     </div>
   );
