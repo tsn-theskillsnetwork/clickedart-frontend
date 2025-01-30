@@ -35,22 +35,38 @@ export default function PhotosPage() {
   const [stats, setStats] = useState([]);
   const [selected, setSelected] = useState("uploaded");
 
-  useEffect(() => {
-    const fetchPhotos = async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-images-by-photographer?photographer=${photographer._id}`
-        );
-        //console.log(res.data);
-        setPhotos(res.data.photos);
-        setLoading(false);
-      } catch (error) {
-        setError(error);
-        setLoading(false);
-      }
-    };
+  const fetchPhotos = async () => {
+    try {
+      setLoading(true);
+      setPhotos([]);
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-images-by-photographer?photographer=${photographer._id}`
+      );
+      setPhotos(res.data.photos);
+      setLoading(false);
+    } catch (error) {
+      setError(error);
+      setLoading(false);
+    }
+  };
 
+  const fetchPendingPhotos = async () => {
+    try {
+      setLoading(true);
+      setPhotos([]);
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/photographer/get-pending-images-by-photographer?photographer=${photographer._id}`
+      );
+      console.log(res.data);
+      setPhotos(res.data.pendingImages);
+      setLoading(false);
+    } catch (error) {
+      setError(error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     const fetchStats = async () => {
       try {
         setLoading(true);
@@ -92,23 +108,10 @@ export default function PhotosPage() {
         ) : (
           <div className="flex flex-col p-4">
             <div className="flex font-medium pl-2">
-              {/* <NumberCard
-                title="Total Downloads"
-                number={String(stats?.downloads) || "0"}
-                color="blue"
-              />
-              <NumberCard
-                title="Uploaded Photos"
-                number={String(stats?.totalUploadingImgCount) || "0"}
-              />
-              <NumberCard
-                title="Pending Photos"
-                number={String(stats?.pendingImagesCount) || "0"}
-                color="red"
-              /> */}
               <button
                 onClick={() => {
                   setSelected("uploaded");
+                  fetchPhotos();
                 }}
                 className={`${
                   selected === "uploaded"
@@ -121,6 +124,7 @@ export default function PhotosPage() {
               <button
                 onClick={() => {
                   setSelected("pending");
+                  fetchPendingPhotos();
                 }}
                 className={`${
                   selected === "pending"
@@ -148,7 +152,7 @@ export default function PhotosPage() {
                         onClick={() => {
                           router.push(`/images/${image._id}`);
                         }}
-                        className="relative group"
+                        className="relative"
                       >
                         <Image
                           width={800}
@@ -160,38 +164,8 @@ export default function PhotosPage() {
                             image.imageLinks.original
                           }
                           alt={image.description}
-                          className="object-cover w-full aspect-[1/1] opacity-100 group-hover:opacity-0 transition-all duration-200 ease-linear"
+                          className="object-cover w-full aspect-[1/1]"
                         />
-
-                        <Image
-                          width={400}
-                          height={400}
-                          src={image.imageLinks.original}
-                          alt={image.description}
-                          className="absolute inset-0 object-contain w-full aspect-[1/1] opacity-0 group-hover:opacity-100 transition-all duration-200 ease-linear"
-                        />
-
-                        <div className="absolute inset-0">
-                          <div className="flex justify-between px-2 pt-2">
-                            <div className="">
-                              <div className="bg-white px-2 text-paragraph group-hover:opacity-0 bg-opacity-75 w-fit transition-all duration-200 ease-linear cursor-default">
-                                <p>
-                                  {image.imageAnalytics?.downloads || 0}{" "}
-                                  Downloads
-                                </p>
-                              </div>
-                            </div>
-                            <div
-                              className={`${
-                                image.exclusiveLicenseStatus === "approved"
-                                  ? "bg-green-600"
-                                  : "bg-orange-500"
-                              } h-3 w-3 rounded-full border border-white`}
-                            >
-                              .
-                            </div>
-                          </div>
-                        </div>
                       </div>
                       <div className="text-neutral-600">
                         <h2 className="text-heading-05 font-semibold">

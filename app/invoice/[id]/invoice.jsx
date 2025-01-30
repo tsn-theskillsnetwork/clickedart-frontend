@@ -1,7 +1,7 @@
 "use client";
 import Button2 from "@/components/button2";
 import { Mail, Phone } from "lucide-react";
-import { useRef} from "react";
+import { useRef } from "react";
 
 export default function InvoiceDetailsPage({ data, monetizationData }) {
   const options = {
@@ -16,7 +16,9 @@ export default function InvoiceDetailsPage({ data, monetizationData }) {
 
   const convertToPdf = async () => {
     const content = contentRef.current;
-    const html2pdf = await import("html2pdf.js");
+    // Dynamically import the library
+    const html2pdfModule = await import("html2pdf.js");
+    const html2pdf = html2pdfModule.default || html2pdfModule;
 
     html2pdf().set(options).from(content).save();
   };

@@ -64,14 +64,14 @@ export default function Home() {
         <div className="px-4 mt-10">
           <ProductCategoriesMobile />
         </div>
-        <div className=" px-4 mb-20">
-          <BestSelling />
-        </div>
         <div className="hidden sm:block px-4 my-20">
           <Discover stories={stories} />
         </div>
         <div className="block sm:hidden px-6 my-20">
           <DiscoverMobile stories={stories} />
+        </div>
+        <div className=" px-4 mb-20">
+          <BestSelling />
         </div>
         <div className="px-4">
           <Testimonial />

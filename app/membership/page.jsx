@@ -502,19 +502,18 @@ export default function MembershipPage() {
                     <p>{plan.name}</p>
                   </div>
                   <div
-                    className={`text-heading-06 flex-flex-col gap-2 sm:text-heading-05 font-bold ${
+                    className={`text-heading-06 flex-flex-col gap-2 sm:text-heading-05  ${
                       plan._id === active ? "text-white" : "text-primary"
                     }`}
                   >
                     {plan.cost.map((cost, index) => (
                       <div
                         key={index}
-                        className="flex flex-col items-center gap-0 capitalize"
+                        className="flex flex-col items-center gap-0 "
                       >
-                        <p>₹{cost.price}</p>
-                        <p className="-mt-2 text-sm font-semibold">
-                          {cost.duration}
-                        </p>
+                        <p className="font-bold ">₹{cost.price}</p>
+                        <p className="-mt-2 text-xs ">(including GST)</p>
+                        <p className="text-sm font-semibold capitalize">{cost.duration}</p>
                       </div>
                     ))}
                   </div>

@@ -11,7 +11,7 @@ export default function BestSellingCard({ images }) {
 
   const settings = {
     dots: false,
-    infinite: true,
+    infinite: false,
     arrows: false,
     speed: 500,
     slidesToShow: 3,

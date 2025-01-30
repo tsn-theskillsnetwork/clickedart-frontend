@@ -10,6 +10,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { motion } from "framer-motion";
+import Button from "@/components/button";
 
 const faqs1 = [
   {
@@ -246,7 +247,9 @@ export default function AboutPage() {
           className="object-cover absolute inset-0 w-full h-full -z-20"
         />
         <div className="absolute inset-0 bg-black opacity-20 -z-20" />
-        <h1 className="text-heading-04 sm:text-heading-03 md:text-heading-02 lg:text-heading-01 font-semibold text-white">Who We Are</h1>
+        <h1 className="text-heading-04 sm:text-heading-03 md:text-heading-02 lg:text-heading-01 font-semibold text-white">
+          Who We Are
+        </h1>
         <p className="text-base sm:text-heading-06 md:text-heading-05 lg:text-heading-04 font-medium text-center text-white">
           We&apos;re a team of passionate photographers turning imagination into
           reality
@@ -297,6 +300,41 @@ export default function AboutPage() {
           </p>
         </div>
 
+        <div className="relative flex flex-col gap-5 items-center justify-center py-20 rounded-xl overflow-hidden mt-10">
+          <Image
+            src="/assets/banners/mission.png"
+            alt="About us"
+            width={1600}
+            height={1600}
+            className="object-cover absolute inset-0 w-full h-full -z-20"
+          />
+          <div className="absolute inset-0 bg-white opacity-20 -z-20" />
+          <h1 className="text-heading-05 sm:text-heading-04 md:text-heading-03 lg:ext-heading-02 font-semibold text-black">
+            Our Mission
+          </h1>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 px-10">
+            <div>
+              <p className="text-paragraph md:text-heading-05 lg:text-heading-04 text-center text-black font-bold">
+                For Photographers
+              </p>
+              <p className="mt-2 text-base md:text-paragraph lg:text-heading-05 font-medium text-center text-black">
+                Empower photographers with a platform to showcase, sell, and
+                monetize their creative work while connecting them with a global
+                audience.
+              </p>
+            </div>
+            <div>
+              <p className="text-paragraph md:text-heading-05 lg:text-heading-04 text-center text-black font-bold">
+                For Buyers
+              </p>
+              <p className="mt-2 text-base md:text-paragraph lg:text-heading-05 font-medium text-center text-black">
+                Provide buyers with easy access to authentic, high-quality
+                original images and prints that cater to their personal,
+                commercial, and creative needs.
+              </p>
+            </div>
+          </div>
+        </div>
         <div className="flex flex-col my-20 w-full items-center">
           <h1 className="text-heading-06 sm:text-heading-04 md:text-heading-03 lg:text-heading-02 xl:text-heading-01 font-bold mb-5 mx-auto">
             Frequently Asked Questions
@@ -351,41 +389,13 @@ export default function AboutPage() {
             ))}
           </Accordion>
         </div>
-
-        <div className="relative flex flex-col gap-5 items-center justify-center py-20 rounded-xl overflow-hidden mt-10">
-          <Image
-            src="/assets/banners/mission.png"
-            alt="About us"
-            width={1600}
-            height={1600}
-            className="object-cover absolute inset-0 w-full h-full -z-20"
-          />
-          <div className="absolute inset-0 bg-white opacity-20 -z-20" />
-          <h1 className="text-heading-05 sm:text-heading-04 md:text-heading-03 lg:ext-heading-02 font-semibold text-black">
-            Our Mission
-          </h1>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 px-10">
-            <div>
-              <p className="text-paragraph md:text-heading-05 lg:text-heading-04 text-center text-black font-bold">
-                For Photographers
-              </p>
-              <p className="mt-2 text-base md:text-paragraph lg:text-heading-05 font-medium text-center text-black">
-                Empower photographers with a platform to showcase, sell, and
-                monetize their creative work while connecting them with a global
-                audience.
-              </p>
-            </div>
-            <div>
-              <p className="text-paragraph md:text-heading-05 lg:text-heading-04 text-center text-black font-bold">
-                For Buyers
-              </p>
-              <p className="mt-2 text-base md:text-paragraph lg:text-heading-05 font-medium text-center text-black">
-                Provide buyers with easy access to authentic, high-quality
-                original images and prints that cater to their personal,
-                commercial, and creative needs.
-              </p>
-            </div>
-          </div>
+        <div className="flex flex-col items-center justify-center my-20">
+          <h2 className="text-heading-06 sm:text-heading-05 md:text-heading-04 lg:text-heading-03 font-semibold">
+            Still have questions?
+          </h2>
+          <Link href="/support/custom-enquiry">
+            <Button className="mt-5">Contact Us</Button>
+          </Link>
         </div>
       </div>
     </div>

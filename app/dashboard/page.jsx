@@ -55,27 +55,12 @@ export default function DashboardPage() {
   const { photographer } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [photos, setPhotos] = useState([]);
   const [stats, setStats] = useState([]);
   const [dateRange, setDateRange] = useState({
     startDate: "",
     endDate: "",
   });
   const [isCustomDate, setIsCustomDate] = useState(false);
-
-  const fetchPhotos = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-images-by-photographer?photographer=${photographer._id}`
-      );
-      setPhotos(res.data.photos);
-    } catch (error) {
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const fetchStats = async () => {
     try {
@@ -85,16 +70,16 @@ export default function DashboardPage() {
       );
       setStats(res.data);
       setIsCustomDate(false);
-      //console.log(res.data);
+      console.log(res.data);
     } catch (error) {
       setError(error);
+      console.log(error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchPhotos();
     fetchStats();
   }, [photographer]);
 
@@ -112,7 +97,7 @@ export default function DashboardPage() {
       );
       setStats(res.data);
       setIsCustomDate(true);
-      //console.log(res.data);
+      console.log(res.data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -172,28 +157,32 @@ export default function DashboardPage() {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <div className="flex items-center flex-wrap justify-center gap-4">
                 Custom Date Range:
-                <DatePicker
-                  label="From"
-                  value={dayjs(dateRange.startDate)}
-                  maxDate={dayjs(Date.now())}
-                  onChange={(date) =>
-                    setDateRange({ ...dateRange, startDate: date })
-                  }
-                />
-                <DatePicker
-                  label="To"
-                  value={dayjs(dateRange.endDate)}
-                  minDate={dayjs(dateRange.startDate)}
-                  onChange={(date) =>
-                    setDateRange({ ...dateRange, endDate: date })
-                  }
-                />
-                <Button2 size="sm" onClick={fetchCustomStats}>
-                  Get Data
-                </Button2>
-                <Button2 size="sm" onClick={fetchStats}>
-                  Show All Data
-                </Button2>
+                <div className="flex gap-4">
+                  <DatePicker
+                    label="From"
+                    value={dayjs(dateRange.startDate)}
+                    maxDate={dayjs(Date.now())}
+                    onChange={(date) =>
+                      setDateRange({ ...dateRange, startDate: date })
+                    }
+                  />
+                  <DatePicker
+                    label="To"
+                    value={dayjs(dateRange.endDate)}
+                    minDate={dayjs(dateRange.startDate)}
+                    onChange={(date) =>
+                      setDateRange({ ...dateRange, endDate: date })
+                    }
+                  />
+                </div>
+                <div className="flex gap-4">
+                  <Button2 size="sm" onClick={fetchCustomStats}>
+                    Get Data
+                  </Button2>
+                  <Button2 size="sm" onClick={fetchStats}>
+                    Show All Data
+                  </Button2>
+                </div>
               </div>
               {isCustomDate ? (
                 <p className="text-sm text-secondary-200 text-center">
@@ -270,8 +259,15 @@ export default function DashboardPage() {
                   color="green"
                 />
                 <NumberCard
+                  title="Total Referral Amount"
+                  number={`₹${String(
+                    stats?.totalReferralAmount?.toFixed(2) || "0"
+                  )}`}
+                  color="green"
+                />
+                <NumberCard
                   title="Total Paid Amount"
-                  number={`${String(stats?.totalPaidAmount || "0")}`}
+                  number={`₹${String(stats?.totalPaidAmount || "0")}`}
                   color="green"
                 />
               </div>
@@ -280,11 +276,11 @@ export default function DashboardPage() {
               <h4 className="text-xl font-semibold">Photos</h4>
               <div className="grid auto-rows-min gap-4 lg:grid-cols-2 xl:grid-cols-3 mt-5">
                 <NumberCard
-                  title="Uploaded Photos"
+                  title="Approved"
                   number={`${String(stats?.totalUploadingImgCount || "0")}`}
                 />
                 <NumberCard
-                  title="Pending Photos"
+                  title="Pending for Approval"
                   number={`${String(stats?.pendingImagesCount || "0")}`}
                   color="red"
                 />

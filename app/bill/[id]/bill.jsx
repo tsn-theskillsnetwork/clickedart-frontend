@@ -21,8 +21,20 @@ export default function BillDetailsPage({ data }) {
 
   const convertToPdf = async () => {
     const content = contentRef.current;
-    const html2pdf = await import("html2pdf.js");
 
+    // Dynamically import the library
+    const html2pdfModule = await import("html2pdf.js");
+    const html2pdf = html2pdfModule.default || html2pdfModule;
+
+    const options = {
+      margin: 1,
+      filename: "document.pdf",
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+    };
+
+    // Generate the PDF
     html2pdf().set(options).from(content).save();
   };
   return (
