@@ -6,12 +6,16 @@ import { useRef } from "react";
 export default function InvoiceDetailsPage({ data, monetizationData }) {
   const options = {
     filename: "my-document.pdf",
-    margin: 1,
+    margin: 0, // Reduces the margin
     image: { type: "jpeg", quality: 0.98 },
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+    html2canvas: { scale: 3 }, // Increase scale for better resolution
+    jsPDF: {
+      unit: "in",
+      format: "letter", // You can change this to 'a4' if needed
+      orientation: "portrait",
+      compress: true, // Compresses the content to fit within the page
+    },
   };
-
   const contentRef = useRef(null);
 
   const convertToPdf = async () => {
@@ -23,7 +27,7 @@ export default function InvoiceDetailsPage({ data, monetizationData }) {
     html2pdf().set(options).from(content).save();
   };
   return (
-    <main className="w-[600px] mx-auto -mt-10 ">
+    <main className="w-[800px] mx-auto -mt-10 ">
       {data && (
         <>
           <div className="flex justify-end">

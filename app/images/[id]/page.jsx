@@ -244,6 +244,8 @@ export default function ImagePage() {
     setSelectedPaper(paper);
   };
 
+  console.log("Image", image);
+
   useEffect(() => {
     if (!isHydrated || toastShownRef.current) return;
 
@@ -714,13 +716,15 @@ export default function ImagePage() {
                           selectedPaper &&
                           selectedSize &&
                           `${
-                            (image.resolution?.height > image.resolution?.width
-                              ? selectedSize.width
-                              : selectedSize.height)
-                          }/${
-                            image.resolution?.height > image.resolution?.width
+                            image.resolutions?.original?.width >
+                            image.resolutions?.original?.height
                               ? selectedSize.height
                               : selectedSize.width
+                          }/${
+                            image.resolutions?.original?.width >
+                            image.resolutions?.original?.height
+                              ? selectedSize.width
+                              : selectedSize.height
                           }`,
                         height: selectedSize ? height : "100%",
                       }}
