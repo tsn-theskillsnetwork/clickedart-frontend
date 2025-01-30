@@ -239,7 +239,7 @@ export default function AboutPage() {
     <div className="flex flex-col min-h-[70vh]">
       <div className="relative flex flex-col gap-5 items-center justify-center py-20">
         <Image
-          src="/assets/images/img4.jpg"
+          src="/assets/banners/who-we-are-about-us.png"
           alt="About us"
           width={1600}
           height={1600}
@@ -280,17 +280,17 @@ export default function AboutPage() {
 
         <div className="relative flex flex-col gap-5 items-center justify-center py-20 mt-10 rounded-xl overflow-hidden">
           <Image
-            src="/assets/images/img6.jpg"
+            src="/assets/banners/vision.png"
             alt="About us"
             width={1600}
             height={1600}
             className="object-cover absolute inset-0 w-full h-full -z-20"
           />
-          <div className="absolute inset-0 bg-black opacity-20 -z-20" />
-          <h1 className="text-heading-05 sm:text-heading-04 md:text-heading-03 lg:text-heading-02 font-semibold text-white">
+          <div className="absolute inset-0 bg-black opacity-0 -z-20" />
+          <h1 className="text-heading-05 sm:text-heading-04 md:text-heading-03 lg:text-heading-02 font-semibold text-black">
             Our Vision
           </h1>
-          <p className="text-base md:text-paragraph lg:text-heading-05 font-medium text-center text-white">
+          <p className="text-base md:text-paragraph lg:text-heading-05 font-medium text-center text-black">
             To become India&apos;s most trusted marketplace for connecting
             photographers and buyers, fostering a thriving ecosystem for
             creativity, collaboration, and inspiration.
@@ -354,32 +354,32 @@ export default function AboutPage() {
 
         <div className="relative flex flex-col gap-5 items-center justify-center py-20 rounded-xl overflow-hidden mt-10">
           <Image
-            src="/assets/images/img2.jpg"
+            src="/assets/banners/mission.png"
             alt="About us"
             width={1600}
             height={1600}
             className="object-cover absolute inset-0 w-full h-full -z-20"
           />
-          <div className="absolute inset-0 bg-black opacity-20 -z-20" />
-          <h1 className="text-heading-05 sm:text-heading-04 md:text-heading-03 lg:ext-heading-02 font-semibold text-white">
+          <div className="absolute inset-0 bg-white opacity-20 -z-20" />
+          <h1 className="text-heading-05 sm:text-heading-04 md:text-heading-03 lg:ext-heading-02 font-semibold text-black">
             Our Mission
           </h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 px-10">
             <div>
-              <p className="text-paragraph md:text-heading-05 lg:text-heading-04 text-center text-white font-bold">
+              <p className="text-paragraph md:text-heading-05 lg:text-heading-04 text-center text-black font-bold">
                 For Photographers
               </p>
-              <p className="mt-2 text-base md:text-paragraph lg:text-heading-05 font-medium text-center text-white">
+              <p className="mt-2 text-base md:text-paragraph lg:text-heading-05 font-medium text-center text-black">
                 Empower photographers with a platform to showcase, sell, and
                 monetize their creative work while connecting them with a global
                 audience.
               </p>
             </div>
             <div>
-              <p className="text-paragraph md:text-heading-05 lg:text-heading-04 text-center text-white font-bold">
+              <p className="text-paragraph md:text-heading-05 lg:text-heading-04 text-center text-black font-bold">
                 For Buyers
               </p>
-              <p className="mt-2 text-base md:text-paragraph lg:text-heading-05 font-medium text-center text-white">
+              <p className="mt-2 text-base md:text-paragraph lg:text-heading-05 font-medium text-center text-black">
                 Provide buyers with easy access to authentic, high-quality
                 original images and prints that cater to their personal,
                 commercial, and creative needs.

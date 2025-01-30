@@ -314,10 +314,11 @@ export default function MembershipPage() {
                         ) : (
                           <span
                             key={index}
-                            className="flex flex-col items-center gap-0 capitalize"
+                            className="flex flex-col items-center gap-0 "
                           >
                             <p>₹{cost.price}</p>
-                            <p className="-mt-4 text-heading-06">
+                            <p className="text-xs -mt-4">(including GST)</p>
+                            <p className="text-heading-06 capitalize">
                               {cost.duration}
                             </p>
                           </span>
@@ -331,7 +332,7 @@ export default function MembershipPage() {
                       Features
                     </p>
                     <div className="flex flex-col items-center gap-2">
-                      <h3 className="text-lg font-semibold ">Advanced Tools</h3>
+                      <h3 className="text-lg font-semibold">Advanced Tools</h3>
                       <p className="text-center">{plan.advancedTools}</p>
                     </div>
                     <div className="flex flex-col items-center gap-2">

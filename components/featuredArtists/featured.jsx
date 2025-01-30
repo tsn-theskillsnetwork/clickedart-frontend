@@ -33,7 +33,7 @@ export default function Featured({ photographers }) {
             <div className=" flex flex-col mx-auto items-center justify-center gap-2 bg-white shadow-md shadow-zinc-400 rounded-md overflow-hidden hover:scale-105 transition-all duration-300 ease-in-out">
               <img
                 onClick={() => router.push(`/photographer/${photographer._id}`)}
-                src={photographer.profileImage}
+                src={photographer.profileImage || "/assets/placeholders/profile.jpg"}
                 alt={photographer.firstName || `Slide ${index + 1}`}
                 className=" object-cover object-top w-full aspect-[1/1]"
               />

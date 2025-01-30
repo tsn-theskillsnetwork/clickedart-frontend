@@ -87,7 +87,7 @@ export default function ProfilePage() {
         <div className="flex flex-col min-h-screen pb-20">
           <div className="w-full">
             <Image
-              src={photographer.coverImage || "/assets/hero/bg2.jpg"}
+              src={photographer.coverImage || "/assets/placeholders/image.webp"}
               alt="bg1"
               width={1920}
               height={800}

@@ -246,7 +246,7 @@ export default function SearchResultPage() {
                   <Image
                     width={256}
                     height={256}
-                    src={image.profileImage}
+                    src={image.profileImage || "/assets/placeholders/profile.jpg"}
                     alt={image.firstName}
                     className=" object-cover object-top w-64 aspect-[1/1]"
                   />

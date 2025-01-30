@@ -52,6 +52,10 @@ const ProfilePage = () => {
   const [catalogues, setCatalogues] = useState([]);
   const [activePlan, setActivePlan] = useState("Basic");
   const [limit, setLimit] = useState(1);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const openDialog = () => setIsOpen(true);
+  const closeDialog = () => setIsOpen(false);
   const [newCatalogue, setNewCatalogue] = useState({
     name: "",
     description: "",
@@ -64,7 +68,20 @@ const ProfilePage = () => {
     setNewCatalogue({ ...newCatalogue, [name]: value });
   };
 
+  const catelogueValidation = () => {
+    if (!newCatalogue.name) {
+      toast.error("Please enter the name of the catalogue.");
+      return false;
+    }
+    if (!newCatalogue.description) {
+      toast.error("Please enter the description of the catalogue.");
+      return false;
+    }
+    return true;
+  };
+
   const handleCreateCatelogue = async () => {
+    if (!catelogueValidation()) return;
     setMessage("");
     setError("");
 
@@ -81,6 +98,7 @@ const ProfilePage = () => {
       const data = response.data;
       toast.success("Catalogue created successfully!");
       fetchCatalogues();
+      closeDialog();
       setMessage("Catalogue created successfully!");
       setError("");
     } catch (err) {
@@ -229,7 +247,9 @@ const ProfilePage = () => {
           {photographer && (
             <div className="w-full">
               <Image
-                src={photographer.coverImage || "/assets/placeholders/broken-image.png"}
+                src={
+                  photographer.coverImage || "/assets/placeholders/image.webp"
+                }
                 alt="bg1"
                 width={1920}
                 height={800}
@@ -389,7 +409,10 @@ const ProfilePage = () => {
                     <Link href="/membership">
                       <div className="flex gap-2 items-center">
                         <span className="text-primary">Upgrade</span>
-                        <ArrowUpCircleIcon strokeWidth={3} className="text-primary" />
+                        <ArrowUpCircleIcon
+                          strokeWidth={3}
+                          className="text-primary"
+                        />
                       </div>
                     </Link>
                   )}
@@ -549,15 +572,18 @@ const ProfilePage = () => {
                         </p>
                       </div>
                     ) : (
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <div className="w-full h-full flex flex-col aspect-[1/1] items-center justify-center shadow-[0_4px_10px_rgba(0,0,0,0.2)] bg-white cursor-pointer">
-                            <Plus className="w-20 h-20 text-surface-400" />
-                            <p className="text-surface-400 font-semibold">
-                              Create New Catelogue
-                            </p>
-                          </div>
-                        </DialogTrigger>
+                      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                        {/* <DialogTrigger asChild> */}
+                        <div
+                          onClick={openDialog}
+                          className="w-full h-full flex flex-col aspect-[1/1] items-center justify-center shadow-[0_4px_10px_rgba(0,0,0,0.2)] bg-white cursor-pointer"
+                        >
+                          <Plus className="w-20 h-20 text-surface-400" />
+                          <p className="text-surface-400 font-semibold">
+                            Create New Catelogue
+                          </p>
+                        </div>
+                        {/* </DialogTrigger> */}
                         <DialogContent className="sm:max-w-[425px]">
                           <DialogHeader>
                             <DialogTitle>Create Catelogue</DialogTitle>
@@ -586,14 +612,14 @@ const ProfilePage = () => {
                             </div>
                           </div>
                           <DialogFooter>
-                            <DialogClose asChild>
-                              <Button2
-                                size="sm"
-                                onClick={() => handleCreateCatelogue()}
-                              >
-                                Save changes
-                              </Button2>
-                            </DialogClose>
+                            {/* <DialogClose asChild> */}
+                            <Button2
+                              size="sm"
+                              onClick={() => handleCreateCatelogue()}
+                            >
+                              Save changes
+                            </Button2>
+                            {/* </DialogClose> */}
                           </DialogFooter>
                         </DialogContent>
                       </Dialog>
@@ -659,13 +685,13 @@ const ProfilePage = () => {
                                   <div>
                                     <Dialog>
                                       <DialogTrigger asChild>
-                                        <p
-                                          onClick={() => {
-                                            setSelectedCatelogue(catalogue);
-                                          }}
-                                        >
-                                          Edit
-                                        </p>
+                                      <p
+                                        onClick={() => {
+                                          setSelectedCatelogue(catalogue);
+                                        }}
+                                      >
+                                        Edit
+                                      </p>
                                       </DialogTrigger>
                                       <DialogContent className="sm:max-w-[425px]">
                                         <DialogHeader>

@@ -20,7 +20,7 @@ export async function generateMetadata({ params }) {
     const blog = await fetchBlogData(id);
     return {
       title: blog.content.title,
-      description: blog.summary?.substring(0, 160) || "Read this amazing blog on our platform.",
+      description: blog.content.summary?.substring(0, 160) || "Read this amazing blog on our platform.",
       openGraph: {
         title: blog.content.title,
         description: blog.content.summary,

@@ -39,6 +39,7 @@
     "cropperjs": "^1.6.2",
     "dayjs": "^1.11.13",
     "framer-motion": "^11.11.11",
+    "heic2any": "^0.0.4",
     "html2pdf.js": "^0.10.2",
     "js-cookie": "^3.0.5",
     "keen-slider": "^6.8.6",

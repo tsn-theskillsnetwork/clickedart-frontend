@@ -23,7 +23,7 @@ export async function generateMetadata({ params }) {
       description: story.description?.substring(0, 160) || "Read this amazing story on our platform.",
       openGraph: {
         title: story.title,
-        description: story.description,
+        description: story.title,
         url: `${process.env.NEXT_PUBLIC_URL}/story/${id}`,
         image: story.media_url,
       },

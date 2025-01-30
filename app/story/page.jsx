@@ -23,25 +23,24 @@ export default function BlogPage() {
 
   return (
     <div className="flex flex-col px-4 lg:px-20">
-      {/* <div className="relative flex flex-col my-5 sm:my-10 md:my-16 xl:my-20 rounded-2xl overflow-hidden">
+      <div className="relative flex flex-col my-5 sm:my-10 md:my-16 xl:my-20 rounded-2xl overflow-hidden">
         <Image
-          src="https://images.pexels.com/photos/11061325/pexels-photo-11061325.jpeg"
+          src="/assets/banners/story-page.png"
           className="absolute inset-0 w-full h-full z-0 object-cover"
           alt="Blog"
           width={1800}
           height={1400}
         />
-        <div className="bg-[#14162466] bg-opacity-30 absolute inset-0 z-0"></div>
+        <div className="bg-black opacity-30 absolute inset-0 z-0"></div>
         <div className="flex flex-col gap-2 mt-20 md:mt-40 xl:mt-40 mb-10 md:mb-20 xl:mb-40 items-center z-10 text-white">
-          <h1 className="text-center z-10 text-white text-heading-04 sm:text-heading-03 md:text-heading-02 lg:text-heading-01 font-bold">
-            From Ideas to Masterpieces
+          <h1 className="text-center z-10 drop-shadow-md text-white text-heading-04 sm:text-heading-03 md:text-heading-02 lg:text-heading-01 font-bold">
+            Beyond the Click
           </h1>
-          <p className="text-center z-10 text-white text-paragraph sm:text-heading-06 md:text-heading-05 lg:text-heading-04 font-semibold">
-            Inspiration, tips, and stories to bring your creative vision to
-            life.
+          <p className="text-center z-10 drop-shadow-md text-white text-paragraph sm:text-heading-06 md:text-heading-05 lg:text-heading-04 font-semibold">
+            Where Every Image Speaks a Thousand Words
           </p>
         </div>
-      </div> */}
+      </div>
       <h2 className="text-heading-04 sm:text-heading-03 lg:text-heading-02 font-bold mb-5">
         Stories
       </h2>

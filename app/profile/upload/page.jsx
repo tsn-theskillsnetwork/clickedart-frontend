@@ -32,7 +32,7 @@ import Swal from "sweetalert2";
 
 const ProfilePage = () => {
   const router = useRouter();
-  const { photographer, user, token, isHydrated } = useAuthStore();
+  const { photographer, token, isHydrated } = useAuthStore();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -41,7 +41,6 @@ const ProfilePage = () => {
   const [progr, setProgr] = useState(0);
   const [step, setStep] = useState("1");
   const [activePlan, setActivePlan] = useState("basic");
-  const [isCustomText, setIsCustomText] = useState(false);
   const [customText, setCustomText] = useState("ClickedArt");
   const [imageUrl, setImageUrl] = useState("");
   const [watermark, setWatermark] = useState(null);
@@ -74,8 +73,6 @@ const ProfilePage = () => {
     isActive: false,
   });
 
-  // //console.log("Active Plan:", activePlan);
-  // //console.log("CATEGORY", categories);
   const [timeoutId, setTimeoutId] = useState(null);
   const [keywordInput, setKeywordInput] = useState(photo.keywords.join(", "));
 
@@ -145,7 +142,6 @@ const ProfilePage = () => {
       );
 
       const data = res.data;
-      //console.log("Image uploaded successfully:", data);
 
       const res2 = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/upload/upload-watermark-image`,
@@ -153,8 +149,6 @@ const ProfilePage = () => {
           imageUrl: data,
         }
       );
-
-      //console.log("Watermark uploaded successfully:", res2.data);
       setNewWatermark(res2.data.url);
 
       toast.success("File uploaded successfully!", { id: toastId });
@@ -173,7 +167,6 @@ const ProfilePage = () => {
           watermarkImage: newWatermark,
         }
       );
-      //console.log("Watermark added:", response.data);
       toast.success("Watermark added successfully");
       setWatermark(response.data.watermark);
     } catch (error) {
@@ -183,10 +176,9 @@ const ProfilePage = () => {
 
   const handleWatermarkRemove = async (id) => {
     try {
-      const response = await axios.delete(
+      await axios.delete(
         `${process.env.NEXT_PUBLIC_SERVER}/api/customwatermark/delete-custom-watermark?id=${id}`
       );
-      //console.log("Watermark removed:", response.data);
       toast.success("Watermark removed successfully");
       setWatermark("");
     } catch (error) {
@@ -194,14 +186,11 @@ const ProfilePage = () => {
     }
   };
 
-  // //console.log("New Watermark",newWatermark)
-
   const getWatermarks = async () => {
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/customwatermark/get-custom-watermark?photographer=${photographer?._id}`
       );
-      //console.log("Watermarks:", response.data);
       setWatermark(response.data.watermarkImage);
     } catch (error) {
       console.log("Error fetching watermarks:", error);
@@ -213,7 +202,6 @@ const ProfilePage = () => {
     }
   }, [activePlan]);
 
-  // //console.log(photo);
 
   const handleDescriptionChange = (e) => {
     const newValue = e.target.value;
@@ -225,21 +213,31 @@ const ProfilePage = () => {
 
   const handleChange = async (event) => {
     try {
-      const file = event.target.files[0];
-
+      let file = event.target.files[0];
+  
       if (!file) {
         console.error("No file selected");
         return;
       }
-
-      if (event.target.files[0].size < 4 * 1000 * 1024) {
-        toast.error("File with minimum size of 4MB is allowed");
-        return false;
-      }
-
-      if (event.target.files[0].size > 100 * 1000 * 1024) {
-        toast.error("File with maximum size of 100MB is allowed");
-        return false;
+  
+      // Detect HEIC file by extension as a fallback
+      const fileExtension = file.name.split(".").pop().toLowerCase();
+      const isHEIC = file.type === "image/heic" || file.type === "image/heif" || fileExtension === "heic" || fileExtension === "heif";
+  
+      // Convert HEIC to JPEG if needed
+      if (isHEIC) {
+        toast.loading("Processing...");
+        const heic2any = (await import("heic2any")).default;
+  
+        try {
+          const convertedBlob = await heic2any({ blob: file, toType: "image/jpeg" });
+          file = new File([convertedBlob], `${file.name.split('.')[0]}.jpeg`, { type: "image/jpeg" });
+          toast.dismiss();
+        } catch (conversionError) {
+          console.error("HEIC conversion failed:", conversionError);
+          toast.error("HEIC conversion failed. Please use a supported image format.");
+          return;
+        }
       }
 
       const s3 = new S3Client({
@@ -249,59 +247,45 @@ const ProfilePage = () => {
           secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
         },
       });
-
+  
       const target = {
         Bucket: "clickedart-bucket",
         Key: `images/${file.name}`,
         Body: file,
+        ContentType: file.type,
       };
-
+  
       const upload = new Upload({
         client: s3,
         params: target,
       });
-
+  
       upload.on("httpUploadProgress", (progress) => {
-        const percentCompleted = Math.round(
-          (progress.loaded / progress.total) * 100
-        );
+        const percentCompleted = Math.round((progress.loaded / progress.total) * 100);
         setProgr(percentCompleted);
-        //console.log(`Progress: ${percentCompleted}%`);
       });
-
-      await upload.done().then((r) => console.log("File uploaded successfully!"));
-      //console.log("File uploaded successfully!");
+  
+      await upload.done();
+  
       const fileUrl = `https://${target.Bucket}.s3.ap-south-1.amazonaws.com/${target.Key}`;
       setImageUrl(fileUrl);
-      setPhoto({ ...photo, imageLinks: {} });
-      //console.log("File URL:", fileUrl);
+      setPhoto({ ...photo, imageLinks: { image: fileUrl } });
+  
     } catch (error) {
       console.error("Error uploading file:", error);
     }
   };
+  
 
   const getResolutions = async () => {
     try {
       setLoading(true);
-      toast.loading("Fetching resolutions...");
-      //console.log("Plan type:", activePlan);
+      toast.loading("Processing Image...");
       if (photo.imageLinks.original) {
         setStep("2");
         window.scrollTo(0, 160);
         return;
       }
-      //console.log("wtermark:", watermark);
-      //console.log("photographer:", photographer?._id);
-      //console.log("imageUrl:", imageUrl);
-      //console.log("plan:", activePlan);
-      // console.log(
-      //   "isCustomText:",
-      //   activePlan === "basic" || watermark ? false : true
-      // );
-      // console.log(
-      //   "customText:",
-      //   watermark || activePlan === "basic" ? "" : customText
-      // );
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/upload/handle-photos-with-watermark-and-resolutions-options`,
         {
@@ -309,11 +293,13 @@ const ProfilePage = () => {
           imageUrl,
           plan: activePlan,
           isCustomText: activePlan === "basic" || watermark ? "false" : "true",
-          customText: watermark || activePlan === "basic" ? "" : customText || "ClickedArt",
+          customText:
+            watermark || activePlan === "basic"
+              ? ""
+              : customText || "ClickedArt",
         }
       );
       const data = response.data;
-      //console.log("Resolutions data:", data);
       setPhoto((prevPhoto) => ({
         ...prevPhoto,
         imageLinks: data.urls,
@@ -344,7 +330,6 @@ const ProfilePage = () => {
           },
         }
       );
-      //console.log(response.data);
       Swal.fire({
         title: "Success!",
         text: "Your photo has uploaded successfully and sent to Admin for Approval and may take 0-3 working days to reflect in your profile.",
@@ -359,8 +344,6 @@ const ProfilePage = () => {
       toast.error("Error uploading image");
     }
   };
-
-  // //console.log(photo);
 
   useEffect(() => {
     fetchData(
@@ -380,11 +363,6 @@ const ProfilePage = () => {
     label: category.name,
   }));
 
-  // useEffect(() => {
-  //   if (!imageUrl) return;
-  //   getResolutions();
-  // }, [imageUrl, plan, isCustomText, customText]);
-
   useEffect(() => {
     setPhoto({ ...photo, photographer: photographer?._id });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -395,17 +373,12 @@ const ProfilePage = () => {
 
     const fetchActivePlan = async () => {
       if (!photographer || !photographer._id) {
-        //console.log("Photographer data is missing");
         return;
       }
       try {
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/get-user-active-subscription?photographer=${photographer._id}`
         );
-        //console.log(
-        //   "Active Subscription ",
-        //   res.data.subscription?.planId?.name
-        // );
         setActivePlan(res.data.subscription?.planId?.name?.toLowerCase());
         if (res.data.subscription?.planId?.name?.toLowerCase() === "basic") {
           setLimit(10);
@@ -429,7 +402,6 @@ const ProfilePage = () => {
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-images-by-photographer?photographer=${photographer._id}`
         );
-        // //console.log(res.data);
         setPhotosLength(res.data.photos?.length);
       } catch (error) {
         setError(error);
@@ -442,14 +414,11 @@ const ProfilePage = () => {
     fetchPhotos();
   }, [photographer]);
 
-  // //console.log("plan", plan);
   useEffect(() => {
     if (isHydrated && !photographer) {
       router.push("/profile");
     }
   }, [isHydrated, photographer, router]);
-
-  // //console.log("categories", categories);
 
   return (
     <>
@@ -544,7 +513,7 @@ const ProfilePage = () => {
                                 onChange={handleChange}
                                 className="h-full w-full opacity-0 cursor-pointer"
                                 type="file"
-                                accept="image/*"
+                                accept="image/*, .heic, .heif"
                               />
                             </div>
                           </div>
@@ -689,7 +658,7 @@ const ProfilePage = () => {
                         )}
                       </div>
                     )}
-                    
+
                     <div className="flex justify-center">
                       <button
                         onClick={() => {

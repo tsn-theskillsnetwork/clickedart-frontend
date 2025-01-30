@@ -12,13 +12,13 @@ export default function ContactPage() {
     <div className="flex flex-col items-center px-4 my-20 h-screen">
       <div className="relative flex flex-col w-full md:w-5/6 overflow-hidden rounded-lg">
         <Image
-          src="/assets/themes/nature.jpg"
-          className="absolute inset-0 w-full h-full z-0 object-cover "
+          src={"/assets/banners/contact-us.png" || "/assets/placeholders/image.webp"}
+          className="absolute inset-0 w-full h-full z-0 object-cover object-left "
           alt="Contact"
           width={800}
           height={400}
         />
-        <div className="bg-black bg-opacity-30 absolute inset-0 z-0"></div>
+        <div className="bg-black bg-opacity-10 absolute inset-0 z-0"></div>
         <div className="text-center z-10 my-16 sm:my-20 md:my-24 lg:my-36 text-white">
           <h1 className="2xl:text-heading-lg lg:text-heading-03 sm:text-heading-05 text-heading-06 font-bold">
             CONTACT US

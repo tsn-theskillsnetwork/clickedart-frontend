@@ -34,7 +34,7 @@ export default function BlogPage() {
     <div className="flex flex-col px-4 lg:px-20">
       <div className="relative flex flex-col my-5 sm:my-10 md:my-16 xl:my-20 rounded-2xl overflow-hidden">
         <Image
-          src="https://images.pexels.com/photos/11061325/pexels-photo-11061325.jpeg"
+          src={"/assets/banners/blog-page.png" || "/assets/placeholders/image.webp"}
           className="absolute inset-0 w-full h-full z-0 object-cover"
           alt="Blog"
           width={1800}
