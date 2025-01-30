@@ -8,8 +8,19 @@ import Image from "next/image";
 
 export const metadata = {
   title: "ClickedArt",
+  icons: {
+    icon: "/favicon.png",
+    apple: "/favicon.png",
+  },
   description:
-    "ClickedArt is a platform for photographers to showcase their work.",
+    "ClicDkedArt is a platform for photographers to showcase their work.",
+  openGraph: {
+    title: "ClickedArt",
+    description:
+      "ClickedArt is a platform for photographers to showcase their work.",
+    url: "https://clickedart.com",
+    siteName: "ClickedArt",
+  },
 };
 
 export default async function RootLayout({ children }) {
