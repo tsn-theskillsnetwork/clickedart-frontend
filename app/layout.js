@@ -20,7 +20,7 @@ export default async function RootLayout({ children }) {
           <section className="bg-white dark:bg-gray-900">
             <div className="py-8 px-4 mx-auto max-w-screen-md text-center lg:py-16 lg:px-12">
               <Image
-                src="/assets/logo.png"
+                src="/assets/Logo.png"
                 alt="ClickedArt"
                 width={1000}
                 height={500}
