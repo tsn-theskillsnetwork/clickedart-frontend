@@ -115,7 +115,7 @@ export default function ThemesResultPage() {
     const fetchThemes = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/category/get`,
+          `${process.env.NEXT_PUBLIC_SERVER}/api/category/get?pageSize=${Infinity}`,
           {
             method: "GET",
             headers: {
@@ -124,8 +124,8 @@ export default function ThemesResultPage() {
           }
         );
         const data = await res.json();
-        //console.log(data);
-        setThemes(data.categories);
+        const sorted = data.categories.sort((a, b) => a.name.localeCompare(b.name));
+        setThemes(sorted);
       } catch (error) {
         console.error(error);
       }
@@ -339,8 +339,8 @@ export default function ThemesResultPage() {
 
                 <div className="absolute inset-0">
                   <div className="flex justify-between mx-4 mt-4">
-                    <div className="bg-white px-2 text-paragraph group-hover:opacity-0 bg-opacity-75 w-fit transition-all duration-200 ease-linear cursor-default">
-                      <p>{image.imageAnalytics?.downloads} Downloads</p>
+                    <div className="bg-transparent px-2 text-paragraph group-hover:opacity-0 bg-opacity-75 w-fit transition-all duration-200 ease-linear cursor-default">
+                      {/* <p>{image.imageAnalytics?.downloads} Downloads</p> */}
                     </div>
                     <Heart
                       size={28}

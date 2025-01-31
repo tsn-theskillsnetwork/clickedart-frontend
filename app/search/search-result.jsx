@@ -121,7 +121,7 @@ export default function SearchResultPage() {
     const fetchThemes = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/category/get`,
+          `${process.env.NEXT_PUBLIC_SERVER}/api/category/get?pageSize=${Infinity}`,
           {
             method: "GET",
             headers: {
@@ -131,7 +131,8 @@ export default function SearchResultPage() {
         );
         const data = await res.json();
         //console.log(data);
-        setThemes(data.categories);
+        const sorted = data.categories.sort((a, b) => a.name.localeCompare(b.name));
+        setThemes(sorted);
       } catch (error) {
         console.error(error);
       }
@@ -378,39 +379,35 @@ export default function SearchResultPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-44">
             {sortedImages.map((image, index) => (
-              <div key={index}>
-                <div
-                  onClick={() => {
-                    router.push(`/images/${image._id}`);
-                  }}
-                  className="relative group"
-                >
-                  <Image
-                    width={800}
-                    height={800}
-                    priority
-                    src={
-                      image.imageLinks.thumbnail || "/assets/placeholders/broken-image.png"
-                    }
-                    alt={image.description}
-                    className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear opacity-50 blur-[4px] border border-primary-200"
-                  />
-                  <Image
-                    width={800}
-                    height={800}
-                    src={
-                      image.imageLinks.thumbnail || "/assets/placeholders/broken-image.png"
-                    }
-                    alt={image.description}
-                    className="absolute inset-0 object-contain w-full aspect-[1/1] transition-all duration-200 ease-linear drop-shadow-md"
-                  />
+              <div key={index} className="shadow-[0px_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out">
+              <div
+                onClick={() => {
+                  router.push(`/images/${image._id}`);
+                }}
+                className="relative group"
+              >
+                <Image
+                  width={800}
+                  height={800}
+                  priority
+                  src={image.imageLinks.thumbnail || "/assets/placeholders/image.webp"}
+                  alt={image.description}
+                  className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear opacity-50 blur-[4px] border border-primary-200"
+                />
+                <Image
+                  width={800}
+                  height={800}
+                  src={image.imageLinks.thumbnail || "/assets/placeholders/image.webp"}
+                  alt={image.description}
+                  className="absolute inset-0 object-contain w-full aspect-[1/1] transition-all duration-200 ease-linear drop-shadow-md"
+                />
 
-                  <div className="absolute inset-0">
-                    <div className="flex justify-between mx-4 mt-4">
-                      <div className="bg-white px-2 text-paragraph group-hover:opacity-0 bg-opacity-75 w-fit transition-all duration-200 ease-linear cursor-default">
-                        <p>{image.imageAnalytics?.downloads} Downloads</p>
-                      </div>
-                      {/* <Heart
+                <div className="absolute inset-0">
+                  <div className="flex justify-between mx-4 mt-4">
+                    <div className="bg-white px-2 text-paragraph group-hover:opacity-0 bg-opacity-75 w-fit transition-all duration-200 ease-linear cursor-default">
+                      <p>{image.imageAnalytics?.downloads} Downloads</p>
+                    </div>
+                    <Heart
                       size={28}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -429,63 +426,61 @@ export default function SearchResultPage() {
                           ? "text-red-400 fill-red-500"
                           : "text-white group-hover:text-red-600"
                       }  transition-all duration-200 ease-linear cursor-pointer`}
-                    /> */}
-                    </div>
+                    />
                   </div>
-                </div>
-                <div className="text-neutral-600">
-                  <h2 className="text-heading-05 font-semibold">
-                    {image.title || "Untitled"}
-                  </h2>
-                  {searchValue ? (
-                    <Link
-                      href={`/photographer/${image.photographer?._id}`}
-                      className="font-medium"
-                    >
-                      {image.photographer?.firstName
-                        ? image.photographer?.firstName +
-                          " " +
-                          image.photographer?.lastName
-                        : image.photographer?.name}
-                    </Link>
-                  ) : (
-                    <Link
-                      href={`/photographer/${image.photographer?._id}`}
-                      className="font-medium"
-                    >
-                      {image.photographer?.firstName
-                        ? image.photographer?.firstName +
-                          " " +
-                          image.photographer?.lastName
-                        : image.photographer?.name}
-                    </Link>
-                  )}
-                  <p className="font-medium text-surface-500">
-                    {image.category?.name}
-                  </p>
-                  <div className="flex flex-row gap-2 overflow-y-scroll no-scrollbar">
-                    {image.keywords?.map((tag, index) => (
-                      <span
-                        key={index}
-                        className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-700 bg-primary-400 bg-opacity-15 rounded-lg px-2 py-1"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  {/* <h2 className="text-heading-06 font-medium">
-                  {image.description}
-                </h2> */}
-                  <p className="text-paragraph font-medium">
-                    {(
-                      (image.resolutions?.original?.height *
-                        image.resolutions?.original?.width) /
-                      1000000
-                    ).toFixed(1)}{" "}
-                    MP
-                  </p>
                 </div>
               </div>
+              <div className="text-neutral-600 p-2">
+                <h2 className="text-heading-05 font-semibold">
+                  {image.title || "Untitled"}
+                </h2>
+                <Link
+                  href={`/photographer/${image.photographer?._id}`}
+                  className="font-medium"
+                >
+                  {image.photographer?.firstName
+                    ? image.photographer?.firstName +
+                      " " +
+                      image.photographer?.lastName
+                    : image.photographer?.name}
+                </Link>
+                <p className="font-medium text-surface-500">
+                  {image.category?.name}
+                </p>
+                {/* <div className="flex flex-row gap-2 overflow-y-scroll no-scrollbar">
+                  {image.keywords?.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-700 bg-primary-400 bg-opacity-15 rounded-lg px-2 py-1"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div> */}
+                {/* <h2 className="text-heading-06 font-medium">
+                  {image.description}
+                </h2> */}
+                <div className="flex justify-between">
+                  <p className="text-paragraph font-medium">
+                    {image.resolutions?.original?.width}{" "}
+                    <span className="font-bold">x</span>{" "}
+                    {image.resolutions?.original?.height} px
+                  </p>
+                  <p className="text-paragraph font-bold">
+                    ₹{image.price?.original}
+                  </p>
+                </div>
+                <p className="text-paragraph font-medium">
+                  (
+                  {(
+                    (image.resolutions?.original?.height *
+                      image.resolutions?.original?.width) /
+                    1000000
+                  ).toFixed(1)}{" "}
+                  MP)
+                </p>
+              </div>
+            </div>
             ))}
           </div>
           <div className="flex justify-center items-center mt-10"></div>

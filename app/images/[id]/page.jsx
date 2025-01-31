@@ -131,21 +131,6 @@ export default function ImagePage() {
       src: "/assets/placeholders/Sofa Room Logo Mockup.jpg",
     },
   ];
-
-  const [sliderRef, slider] = useKeenSlider({
-    slides: {
-      perView: 1,
-      spacing: 15,
-    },
-    breakpoints: {
-      "(min-width: 768px)": {
-        slides: { perView: 2, spacing: 15 },
-      },
-      "(min-width: 1024px)": {
-        slides: { perView: 3, spacing: 15 },
-      },
-    },
-  });
   //console.log(selectedSize);
   //console.log(selectedPaper);
   const fetchImage = async () => {
@@ -244,7 +229,7 @@ export default function ImagePage() {
     setSelectedPaper(paper);
   };
 
-  console.log("Image", image);
+  // console.log("Image", image);
 
   useEffect(() => {
     if (!isHydrated || toastShownRef.current) return;
@@ -716,13 +701,13 @@ export default function ImagePage() {
                           selectedPaper &&
                           selectedSize &&
                           `${
-                            image.resolutions?.original?.width >
-                            image.resolutions?.original?.height
+                            image.resolutions?.thumbnail?.width >
+                            image.resolutions?.thumbnail?.height
                               ? selectedSize.height
                               : selectedSize.width
                           }/${
-                            image.resolutions?.original?.width >
-                            image.resolutions?.original?.height
+                            image.resolutions?.thumbnail?.width >
+                            image.resolutions?.thumbnail?.height
                               ? selectedSize.width
                               : selectedSize.height
                           }`,
