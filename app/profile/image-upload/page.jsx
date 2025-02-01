@@ -64,6 +64,7 @@ export default function PhotoUploadPage() {
   const [categories, setCategories] = useState([]);
   const [licenses, setLicenses] = useState([]);
   const [progr, setProgr] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   // const handleImageUpload = async (e) => {
   //   const file = e.target.files[0];
@@ -193,14 +194,16 @@ export default function PhotoUploadPage() {
 
   useEffect(() => {
     fetchData(
-      `${process.env.NEXT_PUBLIC_SERVER}/api/category/get`,
+      `category/get`,
       "categories",
-      setCategories
+      setCategories,
+      setLoading
     );
     fetchData(
-      `${process.env.NEXT_PUBLIC_SERVER}/api/license/get-all-license`,
+      `license/get-all-license`,
       "licenses",
-      setLicenses
+      setLicenses,
+      setLoading
     );
   }, []);
 

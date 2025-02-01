@@ -232,7 +232,7 @@ const RegistrationForm = () => {
         image: "",
         interests: [],
       });
-      router.push("/verify");
+      router.push("/verify?type=user&email=" + formData.email);
     } catch (err) {
       if (err.response) {
         if (err.response.status === 409) {

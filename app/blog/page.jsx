@@ -9,24 +9,18 @@ export default function BlogPage() {
   const [blogLength, setBlogLength] = useState(6);
   const [blogPosts, setBlogPosts] = useState([]);
   const [successStories, setSuccessStories] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   //console.log(blogPosts);
   //console.log(successStories);
 
   useEffect(() => {
+    fetchData(`blog/get-all-blogs`, "blogs", setBlogPosts, setLoading);
     fetchData(
-      `${process.env.NEXT_PUBLIC_SERVER}/api/blog/get-all-blogs`,
-      "blogs",
-      setBlogPosts,
-      null,
-      null
-    );
-    fetchData(
-      `${process.env.NEXT_PUBLIC_SERVER}/api/blog/get-all-success-stories`,
+      `blog/get-all-success-stories`,
       "successstories",
       setSuccessStories,
-      null,
-      null
+      setLoading
     );
   }, []);
 
@@ -34,7 +28,9 @@ export default function BlogPage() {
     <div className="flex flex-col px-4 lg:px-20">
       <div className="relative flex flex-col my-5 sm:my-10 md:my-16 xl:my-20 rounded-2xl overflow-hidden">
         <Image
-          src={"/assets/banners/blog-page.png" || "/assets/placeholders/image.webp"}
+          src={
+            "/assets/banners/blog-page.png" || "/assets/placeholders/image.webp"
+          }
           className="absolute inset-0 w-full h-full z-0 object-cover"
           alt="Blog"
           width={1800}
@@ -66,7 +62,9 @@ export default function BlogPage() {
                   passHref
                 >
                   <Image
-                    src={post.coverImage[0] || "/assets/placeholders/profile.jpg"}
+                    src={
+                      post.coverImage[0] || "/assets/placeholders/profile.jpg"
+                    }
                     alt={post.content.title || "Blog Post"}
                     width={600}
                     height={400}

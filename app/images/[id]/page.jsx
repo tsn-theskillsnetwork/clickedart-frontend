@@ -255,16 +255,16 @@ export default function ImagePage() {
 
   useEffect(() => {
     fetchData(
-      `${process.env.NEXT_PUBLIC_SERVER}/api/paper/get-paper`,
+      `paper/get-paper`,
       "papers",
       setPapers,
-      setError
+      setLoading
     );
     fetchData(
-      `${process.env.NEXT_PUBLIC_SERVER}/api/frames/get-frames`,
+      `frames/get-frames`,
       "frames",
       setFrames,
-      setError
+      setLoading
     );
     setSubTotal(image.price?.original);
 

@@ -8,16 +8,14 @@ import React, { useEffect, useState } from "react";
 export default function BlogPage() {
   const [blogLength, setBlogLength] = useState(6);
   const [stories, setStories] = useState([]);
-
-  //console.log(stories);
-
+  const [loading, setLoading] = useState(true);
+  
   useEffect(() => {
     fetchData(
-      `${process.env.NEXT_PUBLIC_SERVER}/api/story/get-all-story`,
+      `story/get-all-story`,
       "stories",
       setStories,
-      null,
-      null
+      setLoading,
     );
   }, []);
 

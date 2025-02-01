@@ -353,14 +353,16 @@ const ProfilePage = () => {
 
   useEffect(() => {
     fetchData(
-      `${process.env.NEXT_PUBLIC_SERVER}/api/category/get?pageSize=1000`,
+      `category/get?pageSize=1000`,
       "categories",
-      setCategories
+      setCategories,
+      setLoading
     );
     fetchData(
-      `${process.env.NEXT_PUBLIC_SERVER}/api/license/get-all-license?pageSize=1000`,
+      `license/get-all-license?pageSize=1000`,
       "licenses",
-      setLicenses
+      setLicenses,
+      setLoading
     );
   }, []);
 

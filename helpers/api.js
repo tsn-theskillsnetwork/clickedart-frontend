@@ -1,41 +1,59 @@
 import axios from "axios";
 
-export const fetchData = async (url, data, setter, setError) => {
+export const fetchData = async (url, data, setter, setLoading) => {
   try {
-    const response = await axios.get(url);
+    setLoading?.(true);
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER}/api/${url}`
+    );
     setter(response.data[data]);
   } catch (error) {
     console.log("Error fetching data", error);
-    setError?.(error.message);
+  } finally {
+    setLoading?.(false);
   }
 };
 
-export const postData = async (url, data, setError) => {
+export const postData = async (url, data, setLoading) => {
   try {
-    const response = await axios.post(url, data);
+    setLoading?.(true);
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_SERVER}/api/${url}`,
+      data
+    );
     return response.data;
   } catch (error) {
     console.log("Error posting data", error);
-    setError?.(error.message);
+  } finally {
+    setLoading?.(false);
   }
 };
 
-export const putData = async (url, data, setError) => {
+export const putData = async (url, data, setLoading) => {
   try {
-    const response = await axios.put(url, data);
+    setLoading?.(true);
+    const response = await axios.put(
+      `${process.env.NEXT_PUBLIC_SERVER}/api/${url}`,
+      data
+    );
     return response.data;
   } catch (error) {
     console.log("Error updating data", error);
-    setError?.(error.message);
+  } finally {
+    setLoading?.(false);
   }
 };
 
-export const deleteData = async (url, setError) => {
+export const deleteData = async (url, setLoading) => {
   try {
-    const response = await axios.delete(url);
+    setLoading?.(true);
+    const response = await axios.delete(
+      `${process.env.NEXT_PUBLIC_SERVER}/api/${url}`
+    );
     return response.data;
   } catch (error) {
     console.log("Error deleting data", error);
-    setError?.(error.message);
+  } finally {
+    setLoading?.(false);
   }
 };

@@ -52,7 +52,7 @@ ChartJS.register(
 );
 
 export default function DashboardPage() {
-  const { photographer } = useAuthStore();
+  const { photographer, isHydrated } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [stats, setStats] = useState([]);
@@ -134,182 +134,203 @@ export default function DashboardPage() {
   };
 
   return (
-    <SidebarProvider>
-      <AppSidebar currentUrl={"/dashboard"} />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 h-4" />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbPage>Dashboard</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </header>
-        {loading ? (
-          <div className="flex items-center justify-center h-[80vh]">
-            <Loader />
-          </div>
-        ) : (
-          <div className="flex flex-1 flex-col gap-4 p-4">
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <div className="flex items-center flex-wrap justify-center gap-4">
-                Custom Date Range:
-                <div className="flex gap-4">
-                  <DatePicker
-                    label="From"
-                    value={dayjs(dateRange.startDate)}
-                    maxDate={dayjs(Date.now())}
-                    onChange={(date) =>
-                      setDateRange({ ...dateRange, startDate: date })
-                    }
-                  />
-                  <DatePicker
-                    label="To"
-                    value={dayjs(dateRange.endDate)}
-                    minDate={dayjs(dateRange.startDate)}
-                    onChange={(date) =>
-                      setDateRange({ ...dateRange, endDate: date })
-                    }
+    <>
+      {photographer && photographer.isMonetized ? (
+        <SidebarProvider>
+          <AppSidebar currentUrl={"/dashboard"} />
+          <SidebarInset>
+            <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+              <SidebarTrigger className="-ml-1" />
+              <Separator orientation="vertical" className="mr-2 h-4" />
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Dashboard</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+            </header>
+            {loading ? (
+              <div className="flex items-center justify-center h-[80vh]">
+                <Loader />
+              </div>
+            ) : (
+              <div className="flex flex-1 flex-col gap-4 p-4">
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <div className="flex items-center flex-wrap justify-center gap-4">
+                    Custom Date Range:
+                    <div className="flex gap-4">
+                      <DatePicker
+                        label="From"
+                        value={dayjs(dateRange.startDate)}
+                        maxDate={dayjs(Date.now())}
+                        onChange={(date) =>
+                          setDateRange({ ...dateRange, startDate: date })
+                        }
+                      />
+                      <DatePicker
+                        label="To"
+                        value={dayjs(dateRange.endDate)}
+                        minDate={dayjs(dateRange.startDate)}
+                        onChange={(date) =>
+                          setDateRange({ ...dateRange, endDate: date })
+                        }
+                      />
+                    </div>
+                    <div className="flex gap-4">
+                      <Button2 size="sm" onClick={fetchCustomStats}>
+                        Get Data
+                      </Button2>
+                      <Button2 size="sm" onClick={fetchStats}>
+                        Show All Data
+                      </Button2>
+                    </div>
+                  </div>
+                  {isCustomDate ? (
+                    <p className="text-sm text-secondary-200 text-center">
+                      Showing data from{" "}
+                      {dayjs(dateRange.startDate).format("DD MMM YYYY")} to{" "}
+                      {dayjs(dateRange.endDate).format("DD MMM YYYY")}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-secondary-200 text-center">
+                      Showing all data
+                    </p>
+                  )}
+                </LocalizationProvider>
+                <div className="bg-white p-6 rounded-lg shadow-md shadow-zinc-300 mt-8">
+                  <h4 className="text-xl font-semibold">Revenue Overview</h4>
+                  <div className="grid auto-rows-min gap-4 lg:grid-cols-2 xl:grid-cols-3">
+                    {/* Existing NumberCards */}
+                    <NumberCard
+                      title="Total Digital Sales"
+                      number={`₹${String(stats?.totalSales || "0")}`}
+                    />
+                    <NumberCard
+                      title="Total Print Sales"
+                      number={`₹${String(
+                        stats?.totalPrintSales?.toFixed(2) || "0"
+                      )}`}
+                    />
+                  </div>
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow-md shadow-zinc-300 mt-8">
+                  <h4 className="text-xl font-semibold">Sales Metrics</h4>
+                  <div className="grid auto-rows-min gap-4 lg:grid-cols-2 xl:grid-cols-3 mt-5">
+                    <NumberCard
+                      title="Digital Sale(s)"
+                      number={`${String(stats?.totalDigitalDownloads || "0")}`}
+                      color="blue"
+                    />
+                    <NumberCard
+                      title="Print Sale(s)"
+                      number={`${String(stats?.totalPrintDownloads || "0")}`}
+                      color="blue"
+                    />
+                    {!isCustomDate ? (
+                      <NumberCard
+                        title="Active Buyer(s)"
+                        number={`${String(stats?.activeBuyers || "0")}`}
+                        color="blue"
+                      />
+                    ) : (
+                      <NumberCard
+                        title="Total Sales"
+                        number={`${String(
+                          stats?.totalDigitalDownloads +
+                            stats?.totalPrintDownloads || "0"
+                        )}`}
+                        color="blue"
+                      />
+                    )}
+                  </div>
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow-md shadow-zinc-300 mt-8">
+                  <h4 className="text-xl font-semibold">Earning</h4>
+                  <div className="grid auto-rows-min gap-4 lg:grid-cols-2 xl:grid-cols-3 mt-5">
+                    <NumberCard
+                      title="Total Digital Royalty Amount"
+                      number={`₹${String(stats?.totalRoyaltyAmount || "0")}`}
+                      color="green"
+                    />
+                    <NumberCard
+                      title="Total Print Royalty Amount"
+                      number={`₹${String(
+                        stats?.totalPrintCutAmount?.toFixed(2) || "0"
+                      )}`}
+                      color="green"
+                    />
+                    <NumberCard
+                      title="Total Referral Amount"
+                      number={`₹${String(
+                        stats?.totalReferralAmount?.toFixed(2) || "0"
+                      )}`}
+                      color="green"
+                    />
+                    <NumberCard
+                      title="Total Paid Amount"
+                      number={`₹${String(stats?.totalPaidAmount || "0")}`}
+                      color="green"
+                    />
+                  </div>
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow-md shadow-zinc-300 mt-8">
+                  <h4 className="text-xl font-semibold">Photos</h4>
+                  <div className="grid auto-rows-min gap-4 lg:grid-cols-2 xl:grid-cols-3 mt-5">
+                    <NumberCard
+                      title="Approved"
+                      number={`${String(stats?.totalUploadingImgCount || "0")}`}
+                    />
+                    <NumberCard
+                      title="Pending for Approval"
+                      number={`${String(stats?.pendingImagesCount || "0")}`}
+                      color="red"
+                    />
+                  </div>
+                </div>
+
+                {/* Monthly Sales and Royalty Graph */}
+                <div className="bg-white p-6 rounded-lg shadow-md shadow-zinc-300 mt-8">
+                  <h4 className="text-xl font-semibold">
+                    Frequently Used Categories
+                  </h4>
+
+                  <p
+                    className={`text-paragraph font-medium text-secondary-200`}
+                  >
+                    {stats?.frequentlyUsedCategories
+                      ?.map((category) => category.categoryDetails.name)
+                      .join(", ") || "None"}
+                  </p>
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow-md shadow-zinc-300">
+                  <h2 className="text-xl font-semibold">
+                    Sales and Royalty Amount (Monthly)
+                  </h2>
+                  <Line
+                    className="!max-h-[70vh] !max-w-[70vw]"
+                    data={chartData}
                   />
                 </div>
-                <div className="flex gap-4">
-                  <Button2 size="sm" onClick={fetchCustomStats}>
-                    Get Data
-                  </Button2>
-                  <Button2 size="sm" onClick={fetchStats}>
-                    Show All Data
-                  </Button2>
-                </div>
-              </div>
-              {isCustomDate ? (
-                <p className="text-sm text-secondary-200 text-center">
-                  Showing data from{" "}
-                  {dayjs(dateRange.startDate).format("DD MMM YYYY")} to{" "}
-                  {dayjs(dateRange.endDate).format("DD MMM YYYY")}
-                </p>
-              ) : (
-                <p className="text-sm text-secondary-200 text-center">
-                  Showing all data
-                </p>
-              )}
-            </LocalizationProvider>
-            <div className="bg-white p-6 rounded-lg shadow-md shadow-zinc-300 mt-8">
-              <h4 className="text-xl font-semibold">Revenue Overview</h4>
-              <div className="grid auto-rows-min gap-4 lg:grid-cols-2 xl:grid-cols-3">
-                {/* Existing NumberCards */}
-                <NumberCard
-                  title="Total Digital Sales"
-                  number={`₹${String(stats?.totalSales || "0")}`}
-                />
-                <NumberCard
-                  title="Total Print Sales"
-                  number={`₹${String(
-                    stats?.totalPrintSales?.toFixed(2) || "0"
-                  )}`}
-                />
-              </div>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-md shadow-zinc-300 mt-8">
-              <h4 className="text-xl font-semibold">Sales Metrics</h4>
-              <div className="grid auto-rows-min gap-4 lg:grid-cols-2 xl:grid-cols-3 mt-5">
-                <NumberCard
-                  title="Digital Sale(s)"
-                  number={`${String(stats?.totalDigitalDownloads || "0")}`}
-                  color="blue"
-                />
-                <NumberCard
-                  title="Print Sale(s)"
-                  number={`${String(stats?.totalPrintDownloads || "0")}`}
-                  color="blue"
-                />
-                {!isCustomDate ? (
-                  <NumberCard
-                    title="Active Buyer(s)"
-                    number={`${String(stats?.activeBuyers || "0")}`}
-                    color="blue"
-                  />
-                ) : (
-                  <NumberCard
-                    title="Total Sales"
-                    number={`${String(
-                      stats?.totalDigitalDownloads +
-                        stats?.totalPrintDownloads || "0"
-                    )}`}
-                    color="blue"
-                  />
-                )}
-              </div>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-md shadow-zinc-300 mt-8">
-              <h4 className="text-xl font-semibold">Earning</h4>
-              <div className="grid auto-rows-min gap-4 lg:grid-cols-2 xl:grid-cols-3 mt-5">
-                <NumberCard
-                  title="Total Digital Royalty Amount"
-                  number={`₹${String(stats?.totalRoyaltyAmount || "0")}`}
-                  color="green"
-                />
-                <NumberCard
-                  title="Total Print Royalty Amount"
-                  number={`₹${String(
-                    stats?.totalPrintCutAmount?.toFixed(2) || "0"
-                  )}`}
-                  color="green"
-                />
-                <NumberCard
-                  title="Total Referral Amount"
-                  number={`₹${String(
-                    stats?.totalReferralAmount?.toFixed(2) || "0"
-                  )}`}
-                  color="green"
-                />
-                <NumberCard
-                  title="Total Paid Amount"
-                  number={`₹${String(stats?.totalPaidAmount || "0")}`}
-                  color="green"
-                />
-              </div>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-md shadow-zinc-300 mt-8">
-              <h4 className="text-xl font-semibold">Photos</h4>
-              <div className="grid auto-rows-min gap-4 lg:grid-cols-2 xl:grid-cols-3 mt-5">
-                <NumberCard
-                  title="Approved"
-                  number={`${String(stats?.totalUploadingImgCount || "0")}`}
-                />
-                <NumberCard
-                  title="Pending for Approval"
-                  number={`${String(stats?.pendingImagesCount || "0")}`}
-                  color="red"
-                />
-              </div>
-            </div>
 
-            {/* Monthly Sales and Royalty Graph */}
-            <div className="bg-white p-6 rounded-lg shadow-md shadow-zinc-300 mt-8">
-              <h4 className="text-xl font-semibold">
-                Frequently Used Categories
-              </h4>
-
-              <p className={`text-paragraph font-medium text-secondary-200`}>
-                {stats?.frequentlyUsedCategories
-                  ?.map((category) => category.categoryDetails.name)
-                  .join(", ") || "None"}
-              </p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-md shadow-zinc-300">
-              <h2 className="text-xl font-semibold">
-                Sales and Royalty Amount (Monthly)
-              </h2>
-              <Line className="!max-h-[70vh] !max-w-[70vw]" data={chartData} />
-            </div>
-
-            <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
+                <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
+              </div>
+            )}
+          </SidebarInset>
+        </SidebarProvider>
+      ) : (
+        <div className="flex items-center justify-center h-[80vh]">
+          <div className="flex flex-col items-center gap-4">
+            {isHydrated ? (
+              <h1 className="text-2xl font-semibold">
+                Please Sign in as Photographer
+              </h1>
+            ) : (
+              <Loader />
+            )}
           </div>
-        )}
-      </SidebarInset>
-    </SidebarProvider>
+        </div>
+      )}
+    </>
   );
 }
