@@ -4,17 +4,17 @@ import React from "react";
 
 export default function TestimonialCard({ avatar, name, stars, comment }) {
   return (
-    <div className="flex flex-col px-10 py-5 bg-white shadow-lg shadow-zinc-300 rounded-3xl justify-center items-center gap-4 w-11/12">
+    <div className="flex flex-col px-10 py-5 bg-white shadow-lg shadow-zinc-300 rounded-3xl justify-center items-center gap-4 w-full !h-full">
       <div>
         <Image
           width={80}
           height={80}
           src={avatar || "/assets/placeholders/profile.jpg"}  // Fallback to default image
-          alt={name || "User Avatar"}  // Provide an alt text if name is not available
+          alt={name || "User Avatar"}
           className="rounded-full w-20 h-20 object-cover object-top border-2 border-white shadow-zinc-400 shadow-lg"
         />
       </div>
-      <div className="text-center">{comment}</div>
+      <div className="text-justify">{comment}</div>
       <div className="flex flex-col justify-center items-center">
         <div className="flex flex-row">
           {/* Full stars */}
@@ -22,7 +22,7 @@ export default function TestimonialCard({ avatar, name, stars, comment }) {
             <Star
               className="fill-yellow-300 text-yellow-300"
               key={index}
-              aria-hidden="true"  // To prevent screen readers from announcing each star
+              aria-hidden="true"
             />
           ))}
           {/* Empty stars */}

@@ -35,6 +35,7 @@ import Link from "next/link";
 import RecommendedSection from "@/components/image/recommendedSection";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import ImageSkeleton from "./imageSkeleton";
 
 export default function ImagePage() {
   const id = useParams().id;
@@ -42,7 +43,7 @@ export default function ImagePage() {
   const { addItemToCart, removeItemFromCart, isItemInCart } = useCartStore();
 
   const [image, setImage] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [recommendedLength, setRecommendedLength] = useState(4);
 
@@ -135,7 +136,6 @@ export default function ImagePage() {
   //console.log(selectedPaper);
   const fetchImage = async () => {
     try {
-      setLoading(true);
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-image-by-id?id=${id}`,
         {
@@ -250,26 +250,16 @@ export default function ImagePage() {
   }, [isHydrated, id]);
 
   useEffect(() => {
-    fetchImage();
-  }, [id]);
-
-  useEffect(() => {
-    fetchData(
-      `paper/get-paper`,
-      "papers",
-      setPapers,
-      setLoading
-    );
-    fetchData(
-      `frames/get-frames`,
-      "frames",
-      setFrames,
-      setLoading
-    );
+    fetchData(`paper/get-paper`, "papers", setPapers);
+    fetchData(`frames/get-frames`, "frames", setFrames);
     setSubTotal(image.price?.original);
 
     handleDigital();
   }, []);
+
+  useEffect(() => {
+    fetchImage();
+  }, [id]);
 
   const descriptionSection = (
     <div className="flex flex-col gap-2 mt-5 bg-zinc-100 pb-5 rounded-md shadow-md px-4">
@@ -682,18 +672,17 @@ export default function ImagePage() {
   return (
     <>
       {loading ? (
-        <div
-          className={`flex flex-col items-center justify-center min-h-[50vh]`}
-        >
-          <p>Loading...</p>
-        </div>
+        <ImageSkeleton />
       ) : (
         <>
           {image.length !== 0 ? (
             <div className={`px-5 lg:px-20`}>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-16 pt-10 bg-[#FBFBFB] -mt-2">
-                <div className="lg:col-span-2 flex flex-col gap-10">
-                  <motion.div layout className="relative flex justify-center">
+                <div className="lg:col-span-2 flex flex-col gap-10  h-full">
+                  <motion.div
+                    layout
+                    className="flex justify-center sticky top-32"
+                  >
                     <motion.div
                       layout
                       style={{

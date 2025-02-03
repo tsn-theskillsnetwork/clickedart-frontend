@@ -1,5 +1,6 @@
 "use client";
 
+import { Skeleton } from "@/components/ui/skeleton";
 import { fetchData } from "@/helpers/api";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,14 +10,9 @@ export default function BlogPage() {
   const [blogLength, setBlogLength] = useState(6);
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
-    fetchData(
-      `story/get-all-story`,
-      "stories",
-      setStories,
-      setLoading,
-    );
+    fetchData(`story/get-all-story`, "stories", setStories, setLoading);
   }, []);
 
   return (
@@ -42,6 +38,19 @@ export default function BlogPage() {
       <h2 className="text-heading-04 sm:text-heading-03 lg:text-heading-02 font-bold mb-5">
         Stories
       </h2>
+      {loading && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-10 mb-20">
+          {[...Array(blogLength)].map((_, index) => (
+            <div key={index} className="flex flex-col gap-4">
+              <Skeleton className="w-full aspect-[16/9] rounded-lg" />
+              <div className="flex flex-col gap-4">
+                <Skeleton className="w-full h-6" />
+                <Skeleton className="w-1/4 h-4" />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-10 mb-20">
         {stories.slice(0, blogLength).map((post, index) => (
           <Link

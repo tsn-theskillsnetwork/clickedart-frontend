@@ -18,6 +18,7 @@ import useWishlistStore from "@/store/wishlist";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import Button from "@/components/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SearchResultPage() {
   const { user } = useAuthStore();
@@ -38,6 +39,7 @@ export default function SearchResultPage() {
   const [theme, setTheme] = useState(themeValue);
   const [sort, setSort] = useState(sortValue);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
   // const [wishlist, setWishlist] = useState([]);
 
   const addImageToWishlist = async (imageId) => {
@@ -161,6 +163,8 @@ export default function SearchResultPage() {
         //console.log(data.results);
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -180,6 +184,8 @@ export default function SearchResultPage() {
         //console.log(data.photos);
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -199,6 +205,8 @@ export default function SearchResultPage() {
         //console.log(data.photographers);
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -377,6 +385,21 @@ export default function SearchResultPage() {
               </div>
             </div>
           </div>
+          {loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-44">
+            {[...Array(pageSize)].map((_, index) => (
+              <div key={index} className="flex flex-col gap-4">
+                <Skeleton className="w-full aspect-[1/1] rounded-lg" />
+                <div className="flex flex-col gap-4">
+                  <Skeleton className="w-full h-6" />
+                  <Skeleton className="w-1/2 h-4" />
+                  <Skeleton className="w-1/2 h-4" />
+                  <Skeleton className="w-1/4 h-4" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-44">
             {sortedImages.map((image, index) => (
               <div key={index} className="shadow-[0px_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out">
@@ -447,19 +470,6 @@ export default function SearchResultPage() {
                 <p className="font-medium text-surface-500">
                   {image.category?.name}
                 </p>
-                {/* <div className="flex flex-row gap-2 overflow-y-scroll no-scrollbar">
-                  {image.keywords?.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-700 bg-primary-400 bg-opacity-15 rounded-lg px-2 py-1"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div> */}
-                {/* <h2 className="text-heading-06 font-medium">
-                  {image.description}
-                </h2> */}
                 <div className="flex justify-between">
                   <p className="text-paragraph font-medium">
                     {image.resolutions?.original?.width}{" "}

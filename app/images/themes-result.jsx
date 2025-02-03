@@ -17,6 +17,7 @@ import useAuthStore from "@/authStore";
 import useWishlistStore from "@/store/wishlist";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ThemesResultPage() {
   const { user } = useAuthStore();
@@ -39,6 +40,7 @@ export default function ThemesResultPage() {
   const [search, setSearch] = useState("");
   const [pageSize, setPageSize] = useState(12);
   const [pageCount, setPageCount] = useState(1);
+  const [loading, setLoading] = useState(true);
   // const [wishlist, setWishlist] = useState([]);
 
   const addImageToWishlist = async (imageId) => {
@@ -124,7 +126,9 @@ export default function ThemesResultPage() {
           }
         );
         const data = await res.json();
-        const sorted = data.categories.sort((a, b) => a.name.localeCompare(b.name));
+        const sorted = data.categories.sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
         setThemes(sorted);
       } catch (error) {
         console.error(error);
@@ -153,6 +157,8 @@ export default function ThemesResultPage() {
         //console.log(data.results);
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -173,6 +179,8 @@ export default function ThemesResultPage() {
         //console.log(data.photos);
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -242,46 +250,7 @@ export default function ThemesResultPage() {
               </SelectContent>
             </Select>
           </div>
-          {/* <div className="pl-5 relative flex flex-row bg-white border border-primary-200 text-black group rounded-lg items-center gap-4 w-full focus-within:outline focus-within:outline-blue-500">
-            <input
-              type="text"
-              placeholder="Search Themes"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              className="active:border-none active:outline-none focus:outline-none focus:border-none py-4 text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-semibold my-1 w-full"
-            />
-            <button
-              onClick={handleSearch}
-              className="bg-accent-200 h-full aspect-[1/1] text-white rounded-r-lg absolute inset-y-0 right-0"
-            >
-              <p className="sr-only">Search</p>
-              <div className="h-full aspect-[1/1] flex justify-center items-center">
-                <Search size={40} className="mx-auto" />
-              </div>
-            </button>
-          </div> */}
           <div className="flex flex-col sm:flex-row gap-5">
-            {/* <div className="flex flex-col">
-              <p className="font-semibold text-primary-dark text-paragraph">
-                Filter by
-              </p>
-              <Select
-                className="w-36"
-                defaultValue={filter}
-                onValueChange={(value) => setFilter(value)}
-              >
-                <SelectTrigger className="!text-paragraph w-full sm:w-40 py-5 font-semibold shadow-sm bg-gray-200">
-                  <SelectValue />
-                  <p className="sr-only">Filter by</p>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="price">Price</SelectItem>
-                  <SelectItem value="rating">Rating</SelectItem>
-                  <SelectItem value="popularity">Popularity</SelectItem>
-                </SelectContent>
-              </Select>
-            </div> */}
             <div className="flex flex-col">
               <p className="font-semibold text-primary-dark text-paragraph">
                 Sort by
@@ -312,9 +281,27 @@ export default function ThemesResultPage() {
             </div>
           </div>
         </div>
+        {loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-44">
+            {[...Array(pageSize)].map((_, index) => (
+              <div key={index} className="flex flex-col gap-4">
+                <Skeleton className="w-full aspect-[1/1] rounded-lg" />
+                <div className="flex flex-col gap-4">
+                  <Skeleton className="w-full h-6" />
+                  <Skeleton className="w-1/2 h-4" />
+                  <Skeleton className="w-1/2 h-4" />
+                  <Skeleton className="w-1/4 h-4" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-44">
           {sortedImages.map((image, index) => (
-            <div key={index} className="shadow-[0px_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out">
+            <div
+              key={index}
+              className="shadow-[0px_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out"
+            >
               <div
                 onClick={() => {
                   router.push(`/images/${image._id}`);
@@ -325,14 +312,20 @@ export default function ThemesResultPage() {
                   width={800}
                   height={800}
                   priority
-                  src={image.imageLinks.thumbnail || "/assets/placeholders/image.webp"}
+                  src={
+                    image.imageLinks.thumbnail ||
+                    "/assets/placeholders/image.webp"
+                  }
                   alt={image.description}
                   className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear opacity-50 blur-[4px] border border-primary-200"
                 />
                 <Image
                   width={800}
                   height={800}
-                  src={image.imageLinks.thumbnail || "/assets/placeholders/image.webp"}
+                  src={
+                    image.imageLinks.thumbnail ||
+                    "/assets/placeholders/image.webp"
+                  }
                   alt={image.description}
                   className="absolute inset-0 object-contain w-full aspect-[1/1] transition-all duration-200 ease-linear drop-shadow-md"
                 />
@@ -382,19 +375,6 @@ export default function ThemesResultPage() {
                 <p className="font-medium text-surface-500">
                   {image.category?.name}
                 </p>
-                {/* <div className="flex flex-row gap-2 overflow-y-scroll no-scrollbar">
-                  {image.keywords?.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-700 bg-primary-400 bg-opacity-15 rounded-lg px-2 py-1"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div> */}
-                {/* <h2 className="text-heading-06 font-medium">
-                  {image.description}
-                </h2> */}
                 <div className="flex justify-between">
                   <p className="text-paragraph font-medium">
                     {image.resolutions?.original?.width}{" "}

@@ -12,12 +12,15 @@ import useAuthStore from "@/authStore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Button2 from "@/components/button2";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function page() {
   const { user, photographer } = useAuthStore();
   const router = useRouter();
   const [photographers, setPhotographers] = useState([]);
   const [images, setImages] = useState([]);
+  const [artistLoading, setArtistLoading] = useState(true);
+  const [imageLoading, setImageLoading] = useState(true);
 
   const fetchFeaturedArtists = async () => {
     try {
@@ -27,6 +30,8 @@ export default function page() {
       setPhotographers(res.data.featuredPhotographer);
     } catch (error) {
       console.error("Failed to fetch featured artists:", error);
+    } finally {
+      setArtistLoading(false);
     }
   };
 
@@ -39,6 +44,8 @@ export default function page() {
       //console.log(res.data);
     } catch (error) {
       console.error("Failed to fetch featured artists:", error);
+    } finally {
+      setImageLoading(false);
     }
   };
 
@@ -202,7 +209,7 @@ export default function page() {
           </p>
         </div>
         {/* <div className="my-5"> */}
-        <Featured photographers={photographers} />
+        <Featured photographers={photographers} loading={artistLoading} />
         {/* </div> */}
         <Link className="my-2" href="/search?type=photographers">
           <Button2 color="primary" size="lg" className="mt-10">
@@ -214,8 +221,32 @@ export default function page() {
         <h2 className="text-heading-03 text-center sm:text-heading-02 font-bold text-primary">
           Featured Artwork Showcase
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-10 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-60">
-          {images.map((image, index) => (
+        {imageLoading && (
+          <div className="grid grid-cols-1 w-full sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-10 px-2 sm:px-5 md:px-10 lg:px-20 xl:px-60">
+            {[...Array(3).keys()].map((index) => (
+              <div
+                key={index}
+                className="shadow-[0px_2px_4px_rgba(0,0,0,0.2)] aspect-1/1 h-full hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out"
+              >
+                <div className="relative group">
+                  <Skeleton className="w-full aspect-[1/1]" />
+                </div>
+                <div className="text-neutral-600 space-y-2 p-2">
+                  <Skeleton className="w-full h-8" />
+                  <Skeleton className="w-1/2 h-4" />
+                  <Skeleton className="w-1/2 h-4" />
+                  <div className="flex justify-between">
+                    <Skeleton className="w-1/2 h-4" />
+                    <Skeleton className="w-1/5 h-4" />
+                  </div>
+                  <Skeleton className="w-1/4 h-4" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-10 px-2 sm:px-5 md:px-10 lg:px-20 xl:px-60">
+          {images?.map((image, index) => (
             <div
               key={index}
               className="shadow-[0px_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out"
