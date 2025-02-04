@@ -468,6 +468,7 @@ const ProfilePage = () => {
               >
                 Catalogues
               </p>
+              <Link href={`/profile/blog`} className={`text-surface-400 cursor-pointer`}>Blogs</Link>
               <div
                 className={`h-[2px] lg:h-[4px] bg-primary absolute bottom-3 ${
                   selectedTab === "photos"
@@ -685,13 +686,13 @@ const ProfilePage = () => {
                                   <div>
                                     <Dialog>
                                       <DialogTrigger asChild>
-                                      <p
-                                        onClick={() => {
-                                          setSelectedCatelogue(catalogue);
-                                        }}
-                                      >
-                                        Edit
-                                      </p>
+                                        <p
+                                          onClick={() => {
+                                            setSelectedCatelogue(catalogue);
+                                          }}
+                                        >
+                                          Edit
+                                        </p>
                                       </DialogTrigger>
                                       <DialogContent className="sm:max-w-[425px]">
                                         <DialogHeader>

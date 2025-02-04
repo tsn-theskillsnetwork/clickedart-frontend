@@ -252,11 +252,13 @@ const RegistrationForm = () => {
     else if (formData.password.length < 8)
       newErrors.password = "Password must be at least 8 characters.";
     else if (
-      !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/.test(formData.password)
-    )
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(
+        formData.password
+      )
+    ) {
       newErrors.password =
-        "Password must include uppercase, lowercase, number, and special character.";
-
+        "Password must contain at least 8 characters, including one uppercase, one lowercase, one number, and one special character.";
+    }
     if (formData.password !== verifyPassword)
       newErrors.verifyPassword = "Passwords do not match.";
 

@@ -110,12 +110,13 @@ const RegistrationForm = () => {
     if (formData.password.length < 8)
       newErrors.password = "Password must be at least 8 characters.";
     if (
-      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(
         formData.password
       )
-    )
+    ) {
       newErrors.password =
-        "Password must contain at least 8 characters, including one uppercase, one lowercase, one number and one special character.";
+        "Password must contain at least 8 characters, including one uppercase, one lowercase, one number, and one special character.";
+    }
     if (!formData.mobile || formData.mobile.length !== 10)
       newErrors.mobile = "Mobile number must be 10 digits.";
     if (formData.whatsapp && formData.whatsapp.length !== 10)
