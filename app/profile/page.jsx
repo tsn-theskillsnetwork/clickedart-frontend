@@ -10,6 +10,7 @@ import {
   ArrowUpCircle,
   ArrowUpCircleIcon,
   EllipsisIcon,
+  ExternalLink,
   IndianRupeeIcon,
   MoveUp,
   Pencil,
@@ -468,7 +469,13 @@ const ProfilePage = () => {
               >
                 Catalogues
               </p>
-              <Link href={`/profile/blog`} className={`text-surface-400 cursor-pointer`}>Blogs</Link>
+              <Link
+                href={`/profile/blog`}
+                className={`text-surface-400 cursor-pointer flex gap-2 items-center`}
+              >
+                <p>Blog</p>
+                <ExternalLink className="w-4 h-4" />
+              </Link>
               <div
                 className={`h-[2px] lg:h-[4px] bg-primary absolute bottom-3 ${
                   selectedTab === "photos"

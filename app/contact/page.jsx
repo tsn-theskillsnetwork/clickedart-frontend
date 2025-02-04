@@ -54,7 +54,7 @@ export default function ContactPage() {
             {layout?.footerDetails?.email}
           </h5>
         </div>
-        {/* <div className="flex flex-col gap-2 px-4 md:px-5 py-6 shadow-[0_5px_10px_rgba(0,0,0,0.15)] rounded-lg bg-white">
+        <div className="flex flex-col gap-2 px-4 md:px-5 py-6 shadow-[0_5px_10px_rgba(0,0,0,0.15)] rounded-lg bg-white">
           <div className="flex flex-row gap-4">
             <MapPin className="mt-1 shrink-0" size={24} />
             <h5 className="md:text-paragraph xl:text-heading-06 2xl:text-heading-05 font-semibold">
@@ -64,7 +64,7 @@ export default function ContactPage() {
           <h5 className="xl:text-heading-06 md:text-paragraph 2xl:text-heading-05 font-bold">
             {layout?.footerDetails?.address}
           </h5>
-        </div> */}
+        </div>
       </div>
     </div>
   );
