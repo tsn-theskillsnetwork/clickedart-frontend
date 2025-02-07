@@ -29,11 +29,7 @@ export async function generateMetadata({ params }) {
       openGraph: {
         title: `${photographer.firstName} ${photographer.lastName}`,
         description: photographer.bio || "No bio available",
-        type: "profile",
-        profile: {
-          firstName: photographer.firstName,
-          lastName: photographer.lastName
-        },
+        type: "website",
         url: `${process.env.NEXT_PUBLIC_URL}/photographer/${id}`,
         images: [
           {
