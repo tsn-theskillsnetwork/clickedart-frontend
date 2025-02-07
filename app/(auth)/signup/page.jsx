@@ -331,7 +331,7 @@ const RegistrationForm = () => {
                   <button
                     type="button"
                     onClick={() =>
-                      setFormData({ ...formData, profileImage: "" })
+                      setFormData({ ...formData, image: "" })
                     }
                     className="text-red-500"
                   >
