@@ -212,68 +212,63 @@ const ProfilePage = () => {
   const handleChange = async (event) => {
     try {
       let file = event.target.files[0];
-
+  
       if (!file) {
         console.error("No file selected");
         return;
       }
-
+  
+      // Detect HEIC file by extension as a fallback
+      const fileExtension = file.name.split(".").pop().toLowerCase();
+      const isHEIC =
+        file.type === "image/heic" ||
+        file.type === "image/heif" ||
+        fileExtension === "heic" ||
+        fileExtension === "heif";
+  
+      // If it's a HEIC file, convert it to JPEG
+      if (isHEIC) {
+        toast.loading("Processing...");
+        const heic2any = (await import("heic2any")).default;
+  
+        try {
+          const convertedBlob = await heic2any({
+            blob: file,
+            toType: "image/jpeg",
+          });
+          file = new File([convertedBlob], `${file.name.split(".")[0]}.jpeg`, {
+            type: "image/jpeg",
+          });
+          toast.dismiss();
+        } catch (conversionError) {
+          console.error("HEIC conversion failed:", conversionError);
+          toast.error("HEIC conversion failed. Please use a supported image format.");
+          return;
+        }
+      }
+  
       // Create an image element to check its dimensions
       const image = new Image();
       const imageUrl = URL.createObjectURL(file);
-
+  
       image.onload = async () => {
         const width = image.width;
         const height = image.height;
         const megapixels = (width * height) / 1000000; // calculate in MP
-
+  
         if (megapixels < 5) {
-          // Check if the image size is less than 4 megapixels
+          // Check if the image size is less than 5 megapixels
           toast.error("Image should be at least 5 MP.");
           return;
         }
-
+  
         // Check file size (in MB)
         if (file.size > 100 * 1024 * 1024) {
           toast.error("File size should not exceed 100 MB.");
           return;
         }
-
-        // Detect HEIC file by extension as a fallback
-        const fileExtension = file.name.split(".").pop().toLowerCase();
-        const isHEIC =
-          file.type === "image/heic" ||
-          file.type === "image/heif" ||
-          fileExtension === "heic" ||
-          fileExtension === "heif";
-
-        // Convert HEIC to JPEG if needed
-        if (isHEIC) {
-          toast.loading("Processing...");
-          const heic2any = (await import("heic2any")).default;
-
-          try {
-            const convertedBlob = await heic2any({
-              blob: file,
-              toType: "image/jpeg",
-            });
-            file = new File(
-              [convertedBlob],
-              `${file.name.split(".")[0]}.jpeg`,
-              {
-                type: "image/jpeg",
-              }
-            );
-            toast.dismiss();
-          } catch (conversionError) {
-            console.error("HEIC conversion failed:", conversionError);
-            toast.error(
-              "HEIC conversion failed. Please use a supported image format."
-            );
-            return;
-          }
-        }
-
+  
+        // Upload the image to S3
         const s3 = new S3Client({
           region: "ap-south-1",
           credentials: {
@@ -281,39 +276,40 @@ const ProfilePage = () => {
             secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
           },
         });
-
+  
         const target = {
           Bucket: "clickedart-bucket",
           Key: `images/${file.name}`,
           Body: file,
           ContentType: file.type,
         };
-
+  
         const upload = new Upload({
           client: s3,
           params: target,
         });
-
+  
         upload.on("httpUploadProgress", (progress) => {
           const percentCompleted = Math.round(
             (progress.loaded / progress.total) * 100
           );
           setProgr(percentCompleted);
         });
-
+  
         await upload.done();
-
+  
         const fileUrl = `https://${target.Bucket}.s3.ap-south-1.amazonaws.com/${target.Key}`;
         setImageUrl(fileUrl);
         setPhoto({ ...photo, imageLinks: { image: fileUrl } });
       };
-
+  
       // Trigger image loading
       image.src = imageUrl;
     } catch (error) {
       console.error("Error uploading file:", error);
     }
   };
+  
 
   const getResolutions = async () => {
     try {
