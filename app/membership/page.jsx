@@ -154,10 +154,6 @@ export default function MembershipPage() {
       });
       return;
     }
-
-    const cost = plans
-      .find((plan) => plan._id === planId)
-      .cost.find((cost) => cost.duration === duration).price;
     Swal.fire({
       title: "Free Trial",
       text: "Start the free trial?",
@@ -413,7 +409,7 @@ export default function MembershipPage() {
                     plan._id === active ? "scale-y-95" : "scale-y-100"
                   } transition-transform w-40 lg:w-60 duration-200 ease-linear`}
                 >
-                  {userPlan === plan.name && (
+                  {userPlan === plan.name && plan.name !== "Basic" && (
                     <div className="w-full">
                       <p
                         className={`${
@@ -426,9 +422,8 @@ export default function MembershipPage() {
                       </p>
                     </div>
                   )}
-                  {userPlan != plan.name && plan.name !== "Basic" && (
+                  {userPlan !== plan.name && plan.name !== "Basic" && (
                     <div className="w-full">
-                      {/* The button */}
                       <button
                         onClick={() => setSelectedPlan(plan._id)}
                         className={`${
@@ -513,7 +508,9 @@ export default function MembershipPage() {
                       >
                         <p className="font-bold ">₹{cost.price}</p>
                         <p className="-mt-2 text-xs ">(including GST)</p>
-                        <p className="text-sm font-semibold capitalize">{cost.duration}</p>
+                        <p className="text-sm font-semibold capitalize">
+                          {cost.duration}
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -619,6 +616,15 @@ export default function MembershipPage() {
                         {plan.watermarkingTools}
                       </p>
                     </div>
+                    {userPlan === plan.name && plan.name !== "Basic" && (
+                      <div className="w-full">
+                        <p
+                          className={`text-primary border-primary md:text-sm w-full text-center border-2 lg:text-heading-06 xl:text-heading-05 font-medium rounded-lg py-4 px-6 mt-4`}
+                        >
+                          Current Plan
+                        </p>
+                      </div>
+                    )}
                     {userPlan != plan.name && plan.name !== "Basic" && (
                       <button
                         onClick={() => setSelectedPlan(plan._id)}
