@@ -346,7 +346,7 @@ const RegistrationForm = () => {
                         <div className="absolute flex flex-col items-center">
                           <ImageIcon className="w-12 h-12 text-blue-500" />
                           <span className="block text-gray-500 font-semibold">
-                            Drag &amp; drop your files here
+                            Drag &amp; drop your Image
                           </span>
                           <span className="block text-gray-400 font-normal mt-1">
                             or click to upload
