@@ -32,7 +32,7 @@ export async function generateMetadata({ params }) {
         type: "profile",
         profile: {
           firstName: photographer.firstName,
-          lastName: photographer.lastName
+          lastName: photographer.lastName,
         },
         url: `${process.env.NEXT_PUBLIC_URL}/photographer/${id}`,
         images: [
@@ -42,6 +42,12 @@ export async function generateMetadata({ params }) {
             width: 1200,
             height: 630,
             alt: `${photographer.firstName} ${photographer.lastName}'s Profile Image`,
+          },
+          {
+            url: photographer.coverImage || `/assets/placeholders/image.webp`,
+            width: 1200,
+            height: 630,
+            alt: `${photographer.firstName} ${photographer.lastName}'s Cover Image`,
           },
         ],
       },
