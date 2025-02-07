@@ -271,17 +271,17 @@ export default function Navbar() {
                 </p>
               </Link>
             ))}
-            <Link href="/blog">
+            <Link onClick={() => setIsMenuOpen(false)} href="/blog">
               <p className="text-lg font-semibold text-black cursor-pointer">
                 Blog
               </p>
             </Link>
-            <Link href="/story">
+            <Link onClick={() => setIsMenuOpen(false)} href="/story">
               <p className="text-lg font-semibold text-black cursor-pointer">
                 Story
               </p>
             </Link>
-            <Link href="/contact">
+            <Link onClick={() => setIsMenuOpen(false)} href="/contact">
               <p className="text-lg font-semibold text-black cursor-pointer">
                 Contact Us
               </p>
@@ -289,27 +289,27 @@ export default function Navbar() {
 
             {user || photographer ? (
               <>
-                <Link href="/profile">
+                <Link onClick={() => setIsMenuOpen(false)} href="/profile">
                   <p className="text-lg font-semibold text-black cursor-pointer">
                     Profile
                   </p>
                 </Link>
-                <Signout variant="text" />
+                <Signout onClick={() => setIsMenuOpen(false)} variant="text" />
               </>
             ) : (
-              <Link href="/signin">
+              <Link onClick={() => setIsMenuOpen(false)} href="/signin">
                 <p className="text-lg font-semibold text-black cursor-pointer">
                   Sign In
                 </p>
               </Link>
             )}
 
-            <Link href="/wishlist">
+            <Link onClick={() => setIsMenuOpen(false)} href="/wishlist">
               <p className="text-lg font-semibold text-black cursor-pointer">
                 Wishlist ({wishlist?.length > 0 ? wishlist.length : 0})
               </p>
             </Link>
-            <Link href="/cart">
+            <Link onClick={() => setIsMenuOpen(false)} href="/cart">
               <p className="text-lg font-semibold text-black cursor-pointer">
                 Cart ({cartItems?.length > 0 ? cartItems.length : 0})
               </p>
