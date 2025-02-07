@@ -1,7 +1,7 @@
 import axios from "axios";
 import ProfilePage from "./profile";
 
-const fetchPhotoggrapher = async (id) => {
+const fetchPhotographer = async (id) => {
   try {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_SERVER}/api/photographer/get-photographer-by-id?photographerId=${id}`
@@ -17,7 +17,7 @@ export async function generateMetadata({ params }) {
   const { id } = await params;
 
   try {
-    const photographer = await fetchPhotoggrapher(id);
+    const photographer = await fetchPhotographer(id);
 
     if (!photographer) {
       throw new Error("Photographer not found");
@@ -66,7 +66,7 @@ export default async function BlogPage({ params }) {
   const { id } = await params;
 
   try {
-    const photographer = await fetchPhotoggrapher(id);
+    const photographer = await fetchPhotographer(id);
     return <ProfilePage photographer={photographer} />;
   } catch (error) {
     return (
