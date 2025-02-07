@@ -3,18 +3,44 @@
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import React, { useEffect, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function RecommendedSection({ category, id }) {
   const [images, setImages] = useState([]);
-  const [recommendedLength, setRecommendedLength] = useState(4);
-  const [page, setPage] = useState(1);
+
+  const sliderRef = useRef(null);
+
+  const settings = {
+    dots: false,
+    infinite: false,
+    arrows: false,
+    speed: 500,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    responsive: [
+      { breakpoint: 1024, settings: { slidesToShow: 3 } },
+      { breakpoint: 768, settings: { slidesToShow: 2 } },
+      { breakpoint: 480, settings: { slidesToShow: 1 } },
+    ],
+  };
+
+  const handlePrev = () => {
+    sliderRef.current?.slickPrev();
+  };
+
+  const handleNext = () => {
+    sliderRef.current?.slickNext();
+  };
 
   useEffect(() => {
     const fetchImages = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/category/search-category?Query=${category}&pageNumber=${page}&pageSize=40`
+          `${process.env.NEXT_PUBLIC_SERVER}/api/category/search-category?Query=${category}&pageSize=9`
         );
 
         setImages(response.data.results);
@@ -26,92 +52,65 @@ export default function RecommendedSection({ category, id }) {
   }, [category]);
 
   return (
-    <div className="flex flex-col items-start gap-5 my-5">
-      <p className="text-paragraph sm:text-heading-06 md:text-heading-04 lg:text-heading-03 font-semibold">
-        Recommended for You
-      </p>
-      {images.filter(
-        (image) => image.isActive && image.photographer && image._id !== id
-      ).length === 0 && (
-        <p className="text-base sm:text-paragraph md:text-heading-06 lg:text-heading-05 text-center mx-auto text-red-700 font-medium">
-          No recommended images
+    <div className="mb-5">
+      <div className="flex flex-cols gap-5 my-5">
+        <p className="text-paragraph sm:text-heading-06 md:text-heading-04 lg:text-heading-03 font-semibold">
+          Recommended for You
         </p>
-      )}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 md:gap-6 lg:gap-8">
-        {images
-          .filter(
-            (image) => image.isActive && image.photographer && image._id !== id
-          )
-          .map((image, index) => (
-            <div key={index} className="flex flex-col gap-4">
-              <Link href={`/images/${image._id}`} className="relative group">
-                <Image
-                  width={800}
-                  height={800}
-                  src={image.imageLinks.original}
-                  alt={image.title}
-                  className="object-contain w-full aspect-[1/1] transition-all duration-200 ease-linear"
-                />
-                <Image
-                  width={800}
-                  height={800}
-                  src={image.imageLinks.original}
-                  alt={image.title}
-                  className="object-cover absolute inset-0 w-full aspect-[1/1] transition-all duration-200 ease-linear -z-10 blur-sm"
-                />
-                <div className="absolute inset-0 bg-white object-contain w-full aspect-[1/1] transition-all opacity-30 -z-10 duration-200 ease-linear" />
-                {/* <Image
-                width={800}
-                height={800}
-                src={image.src2}
-                alt={image.title}
-                className="absolute inset-0 object-contain w-full aspect-[1/1] opacity-0 group-hover:opacity-100 transition-all duration-200 ease-linear"
-              /> */}
-                {/* <div className="absolute inset-0">
-                <div className="flex justify-end mx-4 mt-4">
-                  <Heart
-                    size={28}
-                    className="text-white group-hover:text-zinc-400 transition-all duration-200 ease-linear"
-                  />
-                </div>
-              </div> */}
-              </Link>
-              <div className="text-neutral-600">
-                <h2 className="text-base sm:text-paragraph md:text-heading-06 lg:text-heading-05 font-bold capitalize">
-                  {image.title}
-                </h2>
-                <p className="text-xs sm:text-base lg:text-paragraph font-semibold">
-                  {image.category?.name}
-                </p>
-                <p className="text-xs sm:text-base lg:text-paragraph font-medium">
-                  {image.description}
-                </p>
-                <Link
-                  href={`/photographer/${image.photographer._id}`}
-                  className="text-xs sm:text-base lg:text-paragraph font-medium"
-                >
-                  {`${image.photographer.firstName || ""} ${
-                    image.photographer.lastName || ""
-                  } ${image.photographer.name || ""}`}
-                </Link>
-              </div>
-            </div>
-          ))}
-      </div>
-      <div className="w-full">
-        {recommendedLength <
-          images?.filter(
-            (image) => image.isActive && image.photographer && image._id !== id
-          ).length && (
-          <div className="col-span-4 flex justify-center">
-            <button
-              onClick={() => setRecommendedLength(recommendedLength + 4)}
-              className="bg-white text-xs sm:text-base lg:text-primary font-semibold border-2 border-primary px-8 py-2 rounded-md hover:bg-primary hover:text-white transition-all duration-200"
-            >
-              Load More
-            </button>
-          </div>
+        {images.filter(
+          (image) => image.isActive && image.photographer && image._id !== id
+        ).length === 0 && (
+          <p className="text-base sm:text-paragraph md:text-heading-06 lg:text-heading-05 text-center mx-auto text-red-700 font-medium">
+            No recommended images
+          </p>
         )}
+      </div>
+      <div className="relative">
+        {/* Slider */}
+        <Slider ref={sliderRef} {...settings}>
+          {images
+            .filter(
+              (image) =>
+                image.isActive && image.photographer && image._id !== id
+            )
+            .map((image, index) => (
+              <div key={index} className="p-4 capitalize relative">
+                <Link href={`/images/${image._id}`}>
+                  <Image
+                    width={800}
+                    height={800}
+                    src={image.imageLinks.thumbnail}
+                    alt={image.title}
+                    className="object-cover w-full aspect-[1/1] rounded-lg shadow-[0px_2px_8px_rgba(0,0,0,0.5)]"
+                  />
+                </Link>
+                <div className="text-neutral-600 mt-2">
+                  <h2 className="font-bold text-lg">{image.title}</h2>
+                  <Link
+                    href={`/photographer/${image.photographer?._id}`}
+                    className="text-sm"
+                  >
+                    {image.photographer?.firstName}{" "}
+                    {image.photographer?.lastName}
+                  </Link>
+                </div>
+              </div>
+            ))}
+        </Slider>
+        <div className=" flex gap-10 justify-center">
+          <button
+            onClick={handlePrev}
+            className="bg-gray-200 p-2 rounded-full shadow hover:bg-gray-300"
+          >
+            <ChevronLeft size={32} className="text-gray-600" />
+          </button>
+          <button
+            onClick={handleNext}
+            className="bg-gray-200 p-2 rounded-full shadow hover:bg-gray-300"
+          >
+            <ChevronRight size={32} className="text-gray-600" />
+          </button>
+        </div>
       </div>
     </div>
   );
