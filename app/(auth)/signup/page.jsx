@@ -76,27 +76,57 @@ const RegistrationForm = () => {
     setFormData({ ...formData, [name]: value ?? "" });
   };
 
-  const handleImageChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      if (e.target.files[0].size > 5 * 1000 * 1024) {
-        toast.error("File with maximum size of 5MB is allowed");
-        return false;
-      }
-
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          if (reader.result) {
-            setCropperImage(reader.result);
-          } else {
-            toast.error("Failed to load image.");
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      try {
+        // Detect HEIC file by extension as a fallback
+        const fileExtension = file.name.split(".").pop().toLowerCase();
+        const isHEIC =
+          file.type === "image/heic" ||
+          file.type === "image/heif" ||
+          fileExtension === "heic" ||
+          fileExtension === "heif";
+  
+        if (isHEIC) {
+          toast.loading("Processing...");
+          const heic2any = (await import("heic2any")).default;
+  
+          try {
+            const convertedBlob = await heic2any({
+              blob: file,
+              toType: "image/jpeg",
+            });
+            const newFile = new File([convertedBlob], `${file.name.split(".")[0]}.jpeg`, {
+              type: "image/jpeg",
+            });
+            // Use the new JPEG file for cropping
+            const reader = new FileReader();
+            reader.onload = () => {
+              setCropperImage(reader.result);
+            };
+            reader.readAsDataURL(newFile);
+            toast.dismiss();
+          } catch (conversionError) {
+            console.error("HEIC conversion failed:", conversionError);
+            toast.error(
+              "HEIC conversion failed. Please use a supported image format."
+            );
           }
-        };
-        reader.readAsDataURL(file);
+        } else {
+          // If not HEIC, proceed with normal file
+          const reader = new FileReader();
+          reader.onload = () => {
+            setCropperImage(reader.result);
+          };
+          reader.readAsDataURL(file);
+        }
+      } catch (error) {
+        console.error("Error handling image:", error);
       }
     }
   };
+  
 
   const validateForm = () => {
     const newErrors = {};
@@ -325,7 +355,7 @@ const RegistrationForm = () => {
                         <input
                           name=""
                           onChange={handleImageChange}
-                          accept="image/*"
+                          accept="image/*, image/heic, image/heif"
                           className="h-full w-full opacity-0 cursor-pointer"
                           type="file"
                         />

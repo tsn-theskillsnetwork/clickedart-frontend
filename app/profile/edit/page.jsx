@@ -117,14 +117,58 @@ const ProfileEditPage = () => {
     }
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setCropperImage(reader.result);
-      };
-      reader.readAsDataURL(file);
+      try {
+        // Detect HEIC file by extension as a fallback
+        const fileExtension = file.name.split(".").pop().toLowerCase();
+        const isHEIC =
+          file.type === "image/heic" ||
+          file.type === "image/heif" ||
+          fileExtension === "heic" ||
+          fileExtension === "heif";
+
+        if (isHEIC) {
+          toast.loading("Processing...");
+          const heic2any = (await import("heic2any")).default;
+
+          try {
+            const convertedBlob = await heic2any({
+              blob: file,
+              toType: "image/jpeg",
+            });
+            const newFile = new File(
+              [convertedBlob],
+              `${file.name.split(".")[0]}.jpeg`,
+              {
+                type: "image/jpeg",
+              }
+            );
+            // Use the new JPEG file for cropping
+            const reader = new FileReader();
+            reader.onload = () => {
+              setCropperImage(reader.result);
+            };
+            reader.readAsDataURL(newFile);
+            toast.dismiss();
+          } catch (conversionError) {
+            console.error("HEIC conversion failed:", conversionError);
+            toast.error(
+              "HEIC conversion failed. Please use a supported image format."
+            );
+          }
+        } else {
+          // If not HEIC, proceed with normal file
+          const reader = new FileReader();
+          reader.onload = () => {
+            setCropperImage(reader.result);
+          };
+          reader.readAsDataURL(file);
+        }
+      } catch (error) {
+        console.error("Error handling image:", error);
+      }
     }
   };
 
@@ -132,24 +176,76 @@ const ProfileEditPage = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const uploadData = new FormData();
-    uploadData.append("image", file);
-
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/upload/uploadSingleImage`,
-        {
-          method: "POST",
-          body: uploadData,
+      // Detect HEIC file by extension as a fallback
+      const fileExtension = file.name.split(".").pop().toLowerCase();
+      const isHEIC =
+        file.type === "image/heic" ||
+        file.type === "image/heif" ||
+        fileExtension === "heic" ||
+        fileExtension === "heif";
+
+      if (isHEIC) {
+        toast.loading("Processing...");
+        const heic2any = (await import("heic2any")).default;
+
+        try {
+          const convertedBlob = await heic2any({
+            blob: file,
+            toType: "image/jpeg",
+          });
+          const newFile = new File(
+            [convertedBlob],
+            `${file.name.split(".")[0]}.jpeg`,
+            {
+              type: "image/jpeg",
+            }
+          );
+          // Proceed with uploading the new JPEG file
+          const uploadData = new FormData();
+          uploadData.append("image", newFile);
+
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER}/api/upload/uploadSingleImage`,
+            {
+              method: "POST",
+              body: uploadData,
+            }
+          );
+
+          const data = await res.text();
+          if (res.ok) {
+            setFormData((prev) => ({
+              ...prev,
+              coverImage: data,
+            }));
+          }
+          toast.dismiss();
+        } catch (conversionError) {
+          console.error("HEIC conversion failed:", conversionError);
+          toast.error(
+            "HEIC conversion failed. Please use a supported image format."
+          );
         }
-      );
-      const data = await res.text();
-      if (res.ok) {
-        setFormData((prev) => ({
-          ...prev,
-          coverImage: data,
-        }));
-        //console.log("Cover Photo uploaded successfully", data);
+      } else {
+        // If not HEIC, proceed with normal file upload
+        const uploadData = new FormData();
+        uploadData.append("image", file);
+
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/upload/uploadSingleImage`,
+          {
+            method: "POST",
+            body: uploadData,
+          }
+        );
+        const data = await res.text();
+        if (res.ok) {
+          setFormData((prev) => ({
+            ...prev,
+            coverImage: data,
+          }));
+        }
       }
     } catch (error) {
       console.log(error);
@@ -304,6 +400,7 @@ const ProfileEditPage = () => {
                         onChange={handleImageUpload}
                         className="h-full w-full cursor-pointer"
                         type="file"
+                        accept="image/*, .heic, .heif"
                       />
                     </div>
                     <DialogFooter>
@@ -363,6 +460,7 @@ const ProfileEditPage = () => {
                           onChange={handleImageChange}
                           className="h-full w-full opacity-0 cursor-pointer"
                           type="file"
+                          accept="image/*, .heic, .heif"
                         />
                       </div>
                     </div>
@@ -1003,108 +1101,6 @@ const ProfileEditPage = () => {
                 <p className="text-red-500 text-sm">{errors.dob}</p>
               )}
             </div>
-
-            {/* <div>
-              <Label>Interests</Label>
-              <Input
-                type="text"
-                name="interests"
-                onChange={(e) => {
-                  const newInterests = e.target.value
-                    .split(",")
-                    .map((item) => item.trim());
-                  setFormData({ ...formData, interests: newInterests });
-                }}
-                placeholder="Comma-separated interests"
-              />
-              {errors.interests && (
-                <p className="text-red-500 text-sm">{errors.interests}</p>
-              )}
-            </div> */}
-
-            {/* <div>
-              <Label>Connect Accounts</Label>
-              <div className="flex flex-col gap-2">
-                {formData.connectedAccounts?.map((account, index) => (
-                  <div key={index} className="flex gap-2">
-                    <Select
-                      className="w-36"
-                      value={account.accountName || ""}
-                      onValueChange={(value) => {
-                        const newAccounts = [...formData.connectedAccounts];
-                        newAccounts[index].accountName = value;
-                        setFormData({
-                          ...formData,
-                          connectedAccounts: newAccounts,
-                        });
-                      }}
-                    >
-                      <SelectTrigger className="w-40">
-                        <SelectValue />
-                        <p className="sr-only">Account Name</p>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="facebook">Facebook</SelectItem>
-                        <SelectItem value="twitter">Twitter</SelectItem>
-                        <SelectItem value="instagram">Instagram</SelectItem>
-                        <SelectItem value="linkedIn">LinkedIn</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Input
-                      type="text"
-                      name="accountLink"
-                      value={account.accountLink || ""}
-                      onChange={(e) => {
-                        const newAccounts = [...formData.connectedAccounts];
-                        newAccounts[index].accountLink = e.target.value;
-                        setFormData({
-                          ...formData,
-                          connectedAccounts: newAccounts,
-                        });
-                      }}
-                      placeholder="Account Link"
-                    />
-                  </div>
-                ))}
-              </div>
-              <div className="flex flex-row gap-2 mt-2">
-                <button
-                  type="button"
-                  className="p-2 rounded-md border-2 border-green-500 hover:bg-green-500 hover:text-white"
-                  onClick={() =>
-                    setFormData({
-                      ...formData,
-                      connectedAccounts: [
-                        ...formData.connectedAccounts,
-                        {
-                          accountName: "",
-                          accountLink: "",
-                        },
-                      ],
-                    })
-                  }
-                >
-                  <Plus size={16} />
-                </button>
-                <button
-                  type="button"
-                  className="p-2 rounded-md border-2 border-red-500 hover:bg-red-500 hover:text-white disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-current"
-                  disabled={formData.connectedAccounts?.length === 0}
-                  onClick={() =>
-                    setFormData({
-                      ...formData,
-                      connectedAccounts: formData.connectedAccounts.slice(
-                        0,
-                        -1
-                      ),
-                    })
-                  }
-                >
-                  <Trash size={16} />
-                </button>
-              </div>
-            </div> */}
-
             <div className="flex flex-col items-center">
               <Button2 type="submit">Update</Button2>
             </div>

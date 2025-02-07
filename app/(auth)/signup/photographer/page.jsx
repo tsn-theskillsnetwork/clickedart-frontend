@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Image from "next/image";
+import NextImage from "next/image";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 import { S3Client } from "@aws-sdk/client-s3";
@@ -138,24 +138,57 @@ const RegistrationForm = () => {
     return serverErrors;
   };
 
-  const handleImageChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      if (e.target.files[0].size > 5 * 1000 * 1024) {
-        toast.error("File with maximum size of 5MB is allowed");
-        return false;
-      }
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      try {
+        // Detect HEIC file by extension as a fallback
+        const fileExtension = file.name.split(".").pop().toLowerCase();
+        const isHEIC =
+          file.type === "image/heic" ||
+          file.type === "image/heif" ||
+          fileExtension === "heic" ||
+          fileExtension === "heif";
 
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          if (reader.result) {
-            setCropperImage(reader.result);
-          } else {
-            toast.error("Failed to load image.");
+        if (isHEIC) {
+          toast.loading("Processing...");
+          const heic2any = (await import("heic2any")).default;
+
+          try {
+            const convertedBlob = await heic2any({
+              blob: file,
+              toType: "image/jpeg",
+            });
+            const newFile = new File(
+              [convertedBlob],
+              `${file.name.split(".")[0]}.jpeg`,
+              {
+                type: "image/jpeg",
+              }
+            );
+            // Use the new JPEG file for cropping
+            const reader = new FileReader();
+            reader.onload = () => {
+              setCropperImage(reader.result);
+            };
+            reader.readAsDataURL(newFile);
+            toast.dismiss();
+          } catch (conversionError) {
+            console.error("HEIC conversion failed:", conversionError);
+            toast.error(
+              "HEIC conversion failed. Please use a supported image format."
+            );
           }
-        };
-        reader.readAsDataURL(file);
+        } else {
+          // If not HEIC, proceed with normal file
+          const reader = new FileReader();
+          reader.onload = () => {
+            setCropperImage(reader.result);
+          };
+          reader.readAsDataURL(file);
+        }
+      } catch (error) {
+        console.error("Error handling image:", error);
       }
     }
   };
@@ -169,16 +202,71 @@ const RegistrationForm = () => {
         return;
       }
 
-      if (event.target.files[0].size < 4 * 1000 * 1024) {
-        toast.error("File with minimum size of 4MB is allowed");
-        return false;
-      }
-
-      if (event.target.files[0].size > 100 * 1000 * 1024) {
+      // Check the image size (in MB)
+      if (file.size > 100 * 1000 * 1024) {
         toast.error("File with maximum size of 100MB is allowed");
         return false;
       }
 
+      // Detect HEIC file by extension as a fallback
+      const fileExtension = file.name.split(".").pop().toLowerCase();
+      const isHEIC =
+        file.type === "image/heic" ||
+        file.type === "image/heif" ||
+        fileExtension === "heic" ||
+        fileExtension === "heif";
+
+      if (isHEIC) {
+        toast.loading("Processing...");
+        const heic2any = (await import("heic2any")).default;
+
+        try {
+          const convertedBlob = await heic2any({
+            blob: file,
+            toType: "image/jpeg",
+          });
+          const newFile = new File(
+            [convertedBlob],
+            `${file.name.split(".")[0]}.jpeg`,
+            {
+              type: "image/jpeg",
+            }
+          );
+
+          // Proceed with image processing and upload for the converted JPEG file
+          processAndUploadImage(newFile, key);
+        } catch (conversionError) {
+          console.error("HEIC conversion failed:", conversionError);
+          toast.error(
+            "HEIC conversion failed. Please use a supported image format."
+          );
+        }
+      } else {
+        // If not HEIC, proceed with normal image processing and upload
+        processAndUploadImage(file, key);
+      }
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    }
+  };
+
+  // Function to handle image processing and upload
+  const processAndUploadImage = (file, key) => {
+    // Create an image element to check its dimensions (for megapixels)
+    const image = new Image();
+    const imageUrl = URL.createObjectURL(file);
+
+    image.onload = async () => {
+      const width = image.width;
+      const height = image.height;
+      const megapixels = (width * height) / 1000000; // calculate in MP
+
+      if (megapixels < 5) {
+        toast.error("Image should be at least 5 MP.");
+        return;
+      }
+
+      // Proceed with uploading the file
       const s3 = new S3Client({
         region: "ap-south-1",
         credentials: {
@@ -203,11 +291,9 @@ const RegistrationForm = () => {
           (progress.loaded / progress.total) * 100
         );
         setProgr(percentCompleted);
-        //console.log(`Progress: ${percentCompleted}%`);
       });
 
       await upload.done();
-      //console.log("File uploaded successfully!");
 
       const fileUrl = `https://${target.Bucket}.s3.ap-south-1.amazonaws.com/${target.Key}`;
       setFormData((prev) => {
@@ -219,10 +305,11 @@ const RegistrationForm = () => {
         };
       });
 
-      //console.log("File URL:", fileUrl);
-    } catch (error) {
-      console.error("Error uploading file:", error);
-    }
+      toast.dismiss();
+    };
+
+    // Trigger image loading
+    image.src = imageUrl;
   };
 
   const validateForm1 = () => {
@@ -472,7 +559,7 @@ const RegistrationForm = () => {
                   />
                 ) : formData.profileImage ? (
                   <>
-                    <Image
+                    <NextImage
                       src={formData.profileImage}
                       alt="Profile Image"
                       width={200}
@@ -508,7 +595,7 @@ const RegistrationForm = () => {
                             onChange={handleImageChange}
                             className="h-full w-full opacity-0 cursor-pointer"
                             type="file"
-                            accept="image/*"
+                            accept="image/*, image/heic, image/heif"
                           />
                         </div>
                       </div>
@@ -1188,7 +1275,7 @@ const RegistrationForm = () => {
                 <div key={index} className="flex flex-col items-center gap-4">
                   {photo ? (
                     <>
-                      <Image
+                      <NextImage
                         src={photo}
                         alt="Profile Image"
                         width={200}
@@ -1231,7 +1318,7 @@ const RegistrationForm = () => {
                               onChange={(event) =>
                                 handleBestPhotosUpload(event, index)
                               }
-                              accept="image/*"
+                              accept="image/*, image/heic, image/heif"
                               className="h-full w-full opacity-0 cursor-pointer"
                               type="file"
                             />
