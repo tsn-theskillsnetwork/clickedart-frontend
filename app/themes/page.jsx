@@ -28,7 +28,6 @@ export default function ThemesPage() {
       } catch (error) {
         console.log(error);
       } finally {
-        window.scrollTo(0, 0);
         setLoading(false);
       }
     };
