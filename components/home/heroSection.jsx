@@ -71,11 +71,11 @@ export default function HeroSection() {
       </div>
 
       <div className="absolute inset-0 z-20 flex flex-col mt-20 sm:mt-20 items-center text-white">
-        <h1 className="text-heading-03 md:text-heading-02 lg:text-heading-01 2xl:text-heading-lg font-semibold">
+        {/* {<h1 className="text-heading-03 md:text-heading-02 lg:text-heading-01 2xl:text-heading-lg font-semibold">
           ClickedArt
-        </h1>
-        <div className="h-12 overflow-hidden">
-          <div className="absolute w-full z-30 h-8 left-0 right-0 flex items-center overflow-y-hidden">
+        </h1>} */}
+        <div className="h-12 overflow-hidden mt-20">
+          <div className="absolute w-full z-30 h-12 pb-2 left-0 right-0 flex items-center overflow-y-hidden">
             <AnimatePresence mode="popLayout">
               <motion.div
                 key={currentImage}
@@ -85,7 +85,7 @@ export default function HeroSection() {
                 className="mx-auto"
                 transition={{ duration: 0.5, ease: "easeInOut" }}
               >
-                <p className="text-md sm:text-xl md:text-paragraph lg:text-heading-06 xl:text-heading-05 font-semibold">
+                <p className="text-base sm:text-paragraph md:text-heading-05 lg:text-heading-04 xl:text-heading-03 font-semibold">
                   {taglines[currentImage]}
                 </p>
               </motion.div>
@@ -153,7 +153,10 @@ export default function HeroSection() {
           <button
             onClick={() => {
               if (photographer) router.push("/profile");
-              else if (user) Swal.fire("Please sign in as a Photographer to sell your photos");
+              else if (user)
+                Swal.fire(
+                  "Please sign in as a Photographer to sell your photos"
+                );
               else router.push("/signin/photographer");
             }}
             className="border-2 bg-gradient-to-tr from-transparent to-transparent hover:from-black border-white rounded-2xl px-2 py-2 sm:px-4 sm:py-2 sm:pl-5 w-52 md:w-72 group transition-all duration-200 ease-linear"
