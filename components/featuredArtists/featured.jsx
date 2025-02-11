@@ -32,7 +32,7 @@ export default function Featured({ photographers, loading }) {
       { breakpoint: 480, settings: { slidesToShow: 1 } },
     ],
   };
-  
+
   //sort by created date
   const sortedPhotographers = photographers.sort((a, b) => {
     return new Date(b.createdAt) - new Date(a.createdAt);
@@ -48,7 +48,7 @@ export default function Featured({ photographers, loading }) {
 
   return (
     <div className="w-full relative">
-      <Slider ref={sliderRef} {...settings}>
+      <Slider className="w-11/12 mx-auto" ref={sliderRef} {...settings}>
         {sortedPhotographers?.map((photographer, index) => (
           <div key={index} className="p-6 h-full">
             <div className=" flex flex-col mx-auto items-center justify-center gap-2 bg-white shadow-md shadow-zinc-400 rounded-md overflow-hidden hover:scale-105 transition-all duration-300 ease-in-out">
@@ -76,22 +76,22 @@ export default function Featured({ photographers, loading }) {
           </div>
         ))}
       </Slider>
-      {photographers.length > 1 && (
-        <div className="flex justify-center gap-5">
-          <button
-            onClick={handlePrev}
-            className="bg-white p-2 rounded-full shadow hover:bg-gray-300"
-          >
-            <ChevronLeft size={32} className="text-gray-600" />
-          </button>
-          <button
-            onClick={handleNext}
-            className="bg-white p-2 rounded-full shadow hover:bg-gray-300"
-          >
-            <ChevronRight size={32} className="text-gray-600" />
-          </button>
-        </div>
-      )}
+      <div className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10">
+        <button
+          onClick={handlePrev}
+          className="bg-white p-2 rounded-full shadow hover:bg-gray-100"
+        >
+          <ChevronLeft size={32} className="text-gray-600" />
+        </button>
+      </div>
+      <div className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10">
+        <button
+          onClick={handleNext}
+          className="bg-white p-2 rounded-full shadow hover:bg-gray-100"
+        >
+          <ChevronRight size={32} className="text-gray-600" />
+        </button>
+      </div>
       <Slider {...settings}>
         {loading &&
           [...Array(4).keys()].map((index) => (
