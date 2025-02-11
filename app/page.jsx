@@ -43,7 +43,7 @@ export default function Home() {
       >
         <HeroSection />
         <div className="px-4 sm:px-32 mt-28 mb-0">
-          <p className="text-paragraph sm:text-heading-05 font-semibold text-surface-600 text-justify">
+          {/* <p className="text-paragraph sm:text-heading-05 font-semibold text-surface-600 text-justify">
             <span className="text-heading-04 sm:text-heading-03 font-bold">
               ClickedART{" "}
             </span>
@@ -54,12 +54,12 @@ export default function Home() {
             dedicated to empowering Indian photographers, providing a
             professional space for them to showcase and sell their exceptional
             work.
-          </p>
-          <Link href={"/about"} className="pt-10">
+          </p> */}
+          {/* <Link href={"/about"} className="pt-10">
             <Button size="xl" variant="filled" state="default">
               Know more about us
             </Button>
-          </Link>
+          </Link> */}
         </div>
         <div className="px-4 mt-10">
           <ProductCategoriesMobile />
