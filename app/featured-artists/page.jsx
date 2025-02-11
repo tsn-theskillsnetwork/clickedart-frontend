@@ -211,7 +211,7 @@ export default function page() {
         {/* <div className="my-5"> */}
         <Featured photographers={photographers} loading={artistLoading} />
         {/* </div> */}
-        <Link className="my-2" href="/search?type=photographers">
+        <Link className="my-2" href="/photographer">
           <Button2 color="primary" size="lg" className="mt-10">
             See All Artists
           </Button2>
