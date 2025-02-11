@@ -40,17 +40,6 @@ export default function Testimonial() {
 
   return (
     <div className="flex flex-col items-center space-y-10">
-      {/* Heading Section */}
-      <div className="flex flex-col items-center justify-center text-center sm:w-1/2">
-        <div className="text-heading-04 sm:text-heading-02 text-primary font-bold">
-          Trusted by Our Community, Loved by You
-        </div>
-        <div className="text-heading-06 text-primary font-semibold mt-2">
-          Discover why our community chooses us - real stories from people who
-          trust and love our products
-        </div>
-      </div>
-
       {/* Slider Section */}
       <div className="w-full relative">
         <Slider ref={sliderRef} {...settings} className="!h-full">
@@ -80,6 +69,16 @@ export default function Testimonial() {
           </button>
         </div>
       </div>
+        {/* Heading Section */}
+        <div className="flex flex-col items-center justify-center text-center sm:w-3/4">
+          <div className="text-heading-04 sm:text-heading-02 text-primary font-bold">
+            Trusted by Our Community, Loved by You
+          </div>
+          <div className="text-heading-06 text-primary font-semibold mt-2">
+            Discover why our community chooses us - real stories from people who
+            trust and love our products
+          </div>
+        </div>
     </div>
   );
 }

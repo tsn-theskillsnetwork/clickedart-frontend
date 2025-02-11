@@ -6,10 +6,14 @@ import "slick-carousel/slick/slick-theme.css";
 import Image from "next/image";
 import Button from "../button";
 import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function Discover({ stories }) {
+  const sliderRef = React.useRef(null);
+
   const settings = {
-    dots: true,
+    dots: false,
+    arrows: false,
     infinite: false,
     speed: 500,
     slidesToShow: 5,
@@ -21,25 +25,23 @@ export default function Discover({ stories }) {
     ],
   };
 
+  const handlePrev = () => {
+    sliderRef.current?.slickPrev();
+  };
+
+  const handleNext = () => {
+    sliderRef.current?.slickNext();
+  };
+
   return (
     <div className="flex flex-col gap-2">
       {/* Header Section */}
-      <div className="flex flex-row items-center justify-center gap-8 mb-10">
-        <h1 className="font-bold text-heading-05 sm:text-heading-03 md:text-heading-02 text-accent-400">
-          Every Photo Tells a Story—Discover It
-        </h1>
-        <Link href="/story">
-          <Button size="lg" variant="filled" state="default">
-            Explore More
-          </Button>
-        </Link>
-      </div>
 
       {/* Slider Section */}
       <div className="w-10/12 mx-auto">
-        <Slider {...settings}>
+        <Slider ref={sliderRef} {...settings}>
           {stories.map((story, index) => (
-            <Link href={`/story/${story._id}`} key={index} className="py-10">
+            <Link href={`/story/${story._id}`} key={index} className="py-4">
               <div className="group relative">
                 {/* Image */}
                 <Image
@@ -61,6 +63,30 @@ export default function Discover({ stories }) {
             </Link>
           ))}
         </Slider>
+      </div>
+      <div className="flex justify-center gap-5">
+        <button
+          onClick={handlePrev}
+          className="bg-gray-200 p-2 rounded-full shadow hover:bg-gray-300"
+        >
+          <ChevronLeft size={32} className="text-gray-600" />
+        </button>
+        <button
+          onClick={handleNext}
+          className="bg-gray-200 p-2 rounded-full shadow hover:bg-gray-300"
+        >
+          <ChevronRight size={32} className="text-gray-600" />
+        </button>
+      </div>
+      <div className="flex flex-row items-center justify-center gap-8 mb-10">
+        <h1 className="font-bold text-heading-05 sm:text-heading-03 md:text-heading-02 text-primary">
+          Every Photo Tells a Story—Discover It
+        </h1>
+        <Link href="/story">
+          <Button size="lg" variant="filled" state="default">
+            Explore More
+          </Button>
+        </Link>
       </div>
     </div>
   );
