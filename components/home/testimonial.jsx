@@ -54,13 +54,15 @@ export default function Testimonial() {
             </div>
           ))}
         </Slider>
-        <div className="flex justify-center gap-5">
+        <div className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10">
           <button
             onClick={handlePrev}
             className="bg-gray-200 p-2 rounded-full shadow hover:bg-gray-300"
           >
             <ChevronLeft size={32} className="text-gray-600" />
           </button>
+        </div>
+        <div className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10">
           <button
             onClick={handleNext}
             className="bg-gray-200 p-2 rounded-full shadow hover:bg-gray-300"
@@ -69,8 +71,8 @@ export default function Testimonial() {
           </button>
         </div>
       </div>
-        {/* Heading Section */}
-        <div className="flex flex-col items-center justify-center text-center sm:w-3/4">
+      {/* Heading Section */}
+      {/* <div className="flex flex-col items-center justify-center text-center sm:w-3/4">
           <div className="text-heading-04 sm:text-heading-02 text-primary font-bold">
             Trusted by Our Community, Loved by You
           </div>
@@ -78,7 +80,7 @@ export default function Testimonial() {
             Discover why our community chooses us - real stories from people who
             trust and love our products
           </div>
-        </div>
+        </div> */}
     </div>
   );
 }

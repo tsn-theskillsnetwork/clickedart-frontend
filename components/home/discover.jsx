@@ -34,11 +34,11 @@ export default function Discover({ stories }) {
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col relative gap-2">
       {/* Header Section */}
 
       {/* Slider Section */}
-      <div className="w-10/12 mx-auto">
+      <div className="w-11/12 mx-auto">
         <Slider ref={sliderRef} {...settings}>
           {stories.map((story, index) => (
             <Link href={`/story/${story._id}`} key={index} className="py-4">
@@ -64,13 +64,15 @@ export default function Discover({ stories }) {
           ))}
         </Slider>
       </div>
-      <div className="flex justify-center gap-5">
+      <div className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10">
         <button
           onClick={handlePrev}
           className="bg-gray-200 p-2 rounded-full shadow hover:bg-gray-300"
         >
           <ChevronLeft size={32} className="text-gray-600" />
         </button>
+      </div>
+      <div className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10">
         <button
           onClick={handleNext}
           className="bg-gray-200 p-2 rounded-full shadow hover:bg-gray-300"
@@ -78,7 +80,7 @@ export default function Discover({ stories }) {
           <ChevronRight size={32} className="text-gray-600" />
         </button>
       </div>
-      <div className="flex flex-row items-center justify-center gap-8 mb-10">
+      <div className="flex flex-row items-center justify-center gap-8 -mt-3 mb-10">
         <h1 className="font-bold text-heading-05 sm:text-heading-03 md:text-heading-02 text-primary">
           Every Photo Tells a Story—Discover It
         </h1>

@@ -42,7 +42,7 @@ export default function Home() {
         className="-mt-24 sm:-mt-28"
       >
         <HeroSection />
-        <div className="px-4 sm:px-32 mt-28 mb-0">
+        {/* <div className="px-4 sm:px-32 mt-28 mb-0"> */}
           {/* <p className="text-paragraph sm:text-heading-05 font-semibold text-surface-600 text-justify">
             <span className="text-heading-04 sm:text-heading-03 font-bold">
               ClickedART{" "}
@@ -60,23 +60,23 @@ export default function Home() {
               Know more about us
             </Button>
           </Link> */}
-        </div>
-        <div className="px-4 mt-10">
+        {/* </div> */}
+        <div className="px-4 mt-5">
           <ProductCategoriesMobile />
         </div>
-        <div className="hidden sm:block px-4 my-20">
+        <div className="hidden sm:block px-4 mb-5">
           <Discover stories={stories} />
         </div>
-        <div className="block sm:hidden px-6 my-20">
+        <div className="block sm:hidden px-6 mb-5">
           <DiscoverMobile stories={stories} />
         </div>
-        <div className=" px-4 mb-20">
+        <div className=" px-4 mb-5">
           <BestSelling />
         </div>
         <div className="px-4">
           <Testimonial />
         </div>
-        <div className="mt-20">
+        <div className="mt-5">
           <Stats />
         </div>
       </motion.div>
