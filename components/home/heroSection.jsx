@@ -11,10 +11,12 @@ import useAuthStore from "@/authStore";
 import Swal from "sweetalert2";
 
 const taglines = [
-  "Where Creativity Meets Marketplace",
-  "Marketplace for the Visionaries",
-  "Your canvas, Your market",
-  "Turning Creativity into Opportunity",
+  "Stunning Clicks, Premium Prints - Experience ClickedArt!",
+  "Bridging Creativity & Commerce - ClickedArt for All!",
+  "Photographers Create, Buyers Collect - ClickedArt Connects!",
+  "Buy Original, Support Artists - ClickedArt Empowers Creativity!",
+  "Discover, Download, Print - ClickedArt for Professionals & Collectors!",
+  // "ClickedArt - Where Every Image Finds Its Perfect Home, Digitally & in Print!",
 ];
 
 export default function HeroSection() {
@@ -27,7 +29,11 @@ export default function HeroSection() {
   const [searchType, setSearchType] = useState("images");
 
   const handleSearch = () => {
-    router.push(`/search?search=${search}&type=${searchType}`);
+    if (searchType === "images") {
+      router.push(`/search?search=${search}`);
+    } else if (searchType === "photographers") {
+      router.push(`/photographer?search=${search}`);
+    }
   };
 
   const heroPhotos = layout?.heroSectionPhotos || []; // Dynamic images array
@@ -75,13 +81,13 @@ export default function HeroSection() {
           ClickedArt
         </h1>} */}
         <div className="h-12 overflow-hidden mt-20">
-          <div className="absolute w-full z-30 h-12 pb-2 left-0 right-0 flex items-center overflow-y-hidden">
+          <div className="absolute w-full z-30 h-12 pb-2 left-0 right-0 flex items-center overflow-hidden">
             <AnimatePresence mode="popLayout">
               <motion.div
                 key={currentImage}
-                initial={{ y: 50 }}
-                animate={{ y: 0 }}
-                exit={{ y: -50 }}
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -50, opacity: 0 }}
                 className="mx-auto"
                 transition={{ duration: 0.5, ease: "easeInOut" }}
               >

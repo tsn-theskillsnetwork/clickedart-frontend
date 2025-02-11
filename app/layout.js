@@ -15,7 +15,7 @@ export const metadata = {
     apple: "/favicon.png",
   },
   description:
-    "ClicDkedArt is a platform for photographers to showcase their work.",
+    "ClickedArt is a platform for photographers to showcase their work.",
   openGraph: {
     title: "ClickedArt",
     description:

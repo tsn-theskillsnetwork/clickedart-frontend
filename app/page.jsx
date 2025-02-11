@@ -61,7 +61,7 @@ export default function Home() {
             </Button>
           </Link> */}
         {/* </div> */}
-        <div className="px-4 mt-5">
+        <div className="px-4 my-5">
           <ProductCategoriesMobile />
         </div>
         <div className="hidden sm:block px-4 mb-5">

@@ -133,7 +133,7 @@ export default function ProductCategoriesMobile() {
         ))}
       </div>
       {themes.length > 6 && (
-        <Link className="mt-10 mb-20" href="/themes">
+        <Link className="mt-5" href="/themes">
           <Button size="lg">
             View All Themes
           </Button>

@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Heart, Search, Tag } from "lucide-react";
+import { ChevronDown, Heart, Search, Tag } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -19,6 +19,7 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import Button from "@/components/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Icon } from "@iconify/react";
 
 export default function SearchResultPage() {
   const { user } = useAuthStore();
@@ -28,7 +29,7 @@ export default function SearchResultPage() {
   const router = useRouter();
 
   const [images, setImages] = useState([]);
-
+  const page = searchParams.get("page") || 1;
   const sortValue = searchParams.get("sort") || "date";
   const themeValue = searchParams.get("theme") || "all";
   const searchValue = searchParams.get("search") || "";
@@ -38,9 +39,18 @@ export default function SearchResultPage() {
   const [themes, setThemes] = useState([]);
   const [theme, setTheme] = useState(themeValue);
   const [sort, setSort] = useState(sortValue);
+  const [pageSize, setPageSize] = useState(24);
+  const [pageCount, setPageCount] = useState(1);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
-  // const [wishlist, setWishlist] = useState([]);
+
+  const handleSearch = () => {
+    router.push(`/search?search=${search}`);
+  };
+
+  useEffect(() => {
+    setSearch(searchValue);
+  }, [searchValue]);
 
   const addImageToWishlist = async (imageId) => {
     try {
@@ -62,7 +72,6 @@ export default function SearchResultPage() {
       );
 
       const data = await res.json();
-      //console.log(data);
 
       if (!res.ok) {
         throw new Error(data.message || "Failed to add image to wishlist");
@@ -132,8 +141,9 @@ export default function SearchResultPage() {
           }
         );
         const data = await res.json();
-        //console.log(data);
-        const sorted = data.categories.sort((a, b) => a.name.localeCompare(b.name));
+        const sorted = data.categories.sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
         setThemes(sorted);
       } catch (error) {
         console.error(error);
@@ -145,11 +155,9 @@ export default function SearchResultPage() {
 
   useEffect(() => {
     const fetchImages = async () => {
-      const type = typeValue === "photographers" ? "photographer" : "images";
-      //console.log(type);
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/${type}/search-${type}?Query=${searchValue}`,
+          `${process.env.NEXT_PUBLIC_SERVER}/api/images/search-images?Query=${searchValue}&pageSize=${pageSize}`,
           {
             method: "GET",
             headers: {
@@ -158,9 +166,9 @@ export default function SearchResultPage() {
           }
         );
         const data = await res.json();
-        //console.log(data);
+        console.log(data);
         setImages(data.results);
-        //console.log(data.results);
+        setPageCount(data.pageCount);
       } catch (error) {
         console.error(error);
       } finally {
@@ -171,7 +179,7 @@ export default function SearchResultPage() {
     const fetchAllImages = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-all-images`,
+          `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-all-images?pageSize=${pageSize}`,
           {
             method: "GET",
             headers: {
@@ -181,7 +189,7 @@ export default function SearchResultPage() {
         );
         const data = await res.json();
         setImages(data.photos);
-        //console.log(data.photos);
+        setPageCount(data.pageCount);
       } catch (error) {
         console.error(error);
       } finally {
@@ -189,203 +197,79 @@ export default function SearchResultPage() {
       }
     };
 
-    const fetchAllPhotographers = async () => {
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/photographer/get-all-photographers`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const data = await res.json();
-        setImages(data.photographers);
-        //console.log(data.photographers);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (searchValue === "" && typeValue !== "photographers") {
+    if (searchValue === "") {
       fetchAllImages();
-    } else if (searchValue === "" && typeValue === "photographers") {
-      fetchAllPhotographers();
     } else {
       fetchImages();
     }
-  }, [searchValue]);
-
-  // useEffect(() => {
-  //   const fetchWishlist = async () => {
-  //     try {
-  //       const response = await fetch(
-  //         `${process.env.NEXT_PUBLIC_SERVER}/api/wishlist/get-my-wishlist?userId=${user?._id}`,
-  //         {
-  //           method: "GET",
-  //         }
-  //       );
-  //       const data = await response.json();
-  //       setWishlist(data.wishlist?.images);
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
-
-  //   fetchWishlist();
-  // }, [user]);
+  }, [searchValue, pageSize]);
 
   return (
     <AnimatePresence mode="popLayout">
-      {typeValue === "photographers" ? (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="flex my-10 flex-col min-h-screen"
-        >
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-44">
-            {images.map((image, index) => (
-              <div key={index} className="keen-slider__slide">
-                <div className="w-64 aspect-[4/5] flex flex-col mx-auto items-center justify-center gap-2 bg-white shadow-md shadow-zinc-400">
-                  <Image
-                    width={256}
-                    height={256}
-                    src={image.profileImage || "/assets/placeholders/profile.jpg"}
-                    alt={image.firstName}
-                    className=" object-cover object-top w-64 aspect-[1/1]"
-                  />
-                  <div className="flex flex-col items-center justify-center gap-2 pb-5">
-                    <p className="text-heading-04 font-semibold text-black">
-                      {`${image.firstName} ${image.lastName}`}
-                    </p>
-                    <p className="text-paragraph font-medium text-black lowercase">
-                      {`@${image.username}`}
-                    </p>
-                    <Link href={`/photographer/${image._id}`}>
-                      <Button size="lg">View Profile</Button>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            ))}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+        className="flex my-10 flex-col min-h-screen"
+      >
+        <div className="flex flex-col sm:flex-row px-20 justify-between gap-5">
+          <div className="mt-4 flex flex-row bg-white text-black shadow-[0_0_8px_rgba(0,0,0,0.4)] group rounded-lg items-center gap-2 w-11/12 md:w-4/5 lg:w-2/3 xl:w-1/2 focus-within:outline focus-within:outline-blue-500 mx-auto">
+            <div className="h-full aspect-[1/1] flex justify-center items-center shrink-0">
+              <Search size={30} color="black" className="mx-auto" />
+            </div>
+            <input
+              type="text"
+              placeholder={`Search for Images`}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              className="py-3 text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-semibold w-full focus:outline-none"
+            />
+            <button
+              onClick={handleSearch}
+              className="bg-accent-200 h-full aspect-[1/1] text-white rounded-r-lg flex justify-center items-center shrink-0"
+            >
+              <p className="sr-only">Search</p>
+              <Icon
+                icon="mdi:image-search"
+                className="mx-auto"
+                style={{ fontSize: "2rem" }}
+              />
+            </button>
           </div>
-          <div className="flex justify-center items-center mt-10"></div>
-        </motion.div>
-      ) : (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="flex my-10 flex-col min-h-screen"
-        >
-          <div className="flex flex-col sm:flex-row px-20 justify-between gap-5">
+          <div className="flex flex-col gap-5">
             <div className="flex flex-col">
               <p className="font-semibold text-primary-dark text-paragraph">
-                Themes
+                Sort by
               </p>
               <Select
                 className="w-36"
-                defaultValue={theme}
+                defaultValue={sort}
                 onValueChange={(value) => {
-                  setTheme(value);
+                  setSort(value);
                   router.push(
-                    `/search?theme=${value}&sort=${sort}${
+                    `/search?theme=${theme}&sort=${value}${
                       search && `&search=${search}`
                     }`
                   );
                 }}
               >
-                <SelectTrigger className="!text-paragraph py-5 w-full sm:w-40 font-semibold shadow-sm bg-gray-200">
+                <SelectTrigger className="!text-paragraph w-full sm:w-40 py-5 font-semibold shadow-sm bg-gray-200">
                   <SelectValue />
-                  <p className="sr-only">Themes</p>
+                  <p className="sr-only">Sort by</p>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  {themes.map((theme, index) => (
-                    <SelectItem key={index} value={theme.name.toLowerCase()}>
-                      {theme.name}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="price">Price</SelectItem>
+                  {/* <SelectItem value="rating">Rating</SelectItem> */}
+                  <SelectItem value="popularity">Popularity</SelectItem>
+                  <SelectItem value="date">Date</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            {/* <div className="pl-5 relative flex flex-row bg-white border border-primary-200 text-black group rounded-lg items-center gap-4 w-full focus-within:outline focus-within:outline-blue-500">
-            <input
-              type="text"
-              placeholder="Search Themes"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              className="active:border-none active:outline-none focus:outline-none focus:border-none py-4 text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-semibold my-1 w-full"
-            />
-            <button
-              onClick={handleSearch}
-              className="bg-accent-200 h-full aspect-[1/1] text-white rounded-r-lg absolute inset-y-0 right-0"
-            >
-              <p className="sr-only">Search</p>
-              <div className="h-full aspect-[1/1] flex justify-center items-center">
-                <Search size={40} className="mx-auto" />
-              </div>
-            </button>
-          </div> */}
-            <div className="flex flex-col sm:flex-row gap-5">
-              {/* <div className="flex flex-col">
-                <p className="font-semibold text-primary-dark text-paragraph">
-                  Filter by
-                </p>
-                <Select
-                  className="w-36"
-                  defaultValue={filter}
-                  onValueChange={(value) => setFilter(value)}
-                >
-                  <SelectTrigger className="!text-paragraph w-full sm:w-40 py-5 font-semibold shadow-sm bg-gray-200">
-                    <SelectValue />
-                    <p className="sr-only">Filter by</p>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="price">Price</SelectItem>
-                    <SelectItem value="rating">Rating</SelectItem>
-                    <SelectItem value="popularity">Popularity</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div> */}
-              <div className="flex flex-col">
-                <p className="font-semibold text-primary-dark text-paragraph">
-                  Sort by
-                </p>
-                <Select
-                  className="w-36"
-                  defaultValue={sort}
-                  onValueChange={(value) => {
-                    setSort(value);
-                    router.push(
-                      `/search?theme=${theme}&sort=${value}${
-                        search && `&search=${search}`
-                      }`
-                    );
-                  }}
-                >
-                  <SelectTrigger className="!text-paragraph w-full sm:w-40 py-5 font-semibold shadow-sm bg-gray-200">
-                    <SelectValue />
-                    <p className="sr-only">Sort by</p>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="price">Price</SelectItem>
-                    {/* <SelectItem value="rating">Rating</SelectItem> */}
-                    <SelectItem value="popularity">Popularity</SelectItem>
-                    <SelectItem value="date">Date</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
           </div>
-          {loading && (
+        </div>
+        {loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-44">
             {[...Array(pageSize)].map((_, index) => (
               <div key={index} className="flex flex-col gap-4">
@@ -400,7 +284,7 @@ export default function SearchResultPage() {
             ))}
           </div>
         )}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-44">
+        {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-44">
             {sortedImages.map((image, index) => (
               <div key={index} className="shadow-[0px_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out">
               <div
@@ -492,10 +376,83 @@ export default function SearchResultPage() {
               </div>
             </div>
             ))}
-          </div>
-          <div className="flex justify-center items-center mt-10"></div>
-        </motion.div>
-      )}
+          </div> */}
+        <div className="sm:columns-2 lg:columns-3 gap-4 mt-10 px-4 sm:px-10 md:px-10 lg:px-20">
+          {sortedImages.map((image, index) => (
+            <div
+              key={index}
+              className=" w-full mb-6 shadow-[0px_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out"
+            >
+              <Link className="relative" href={`/images/${image._id}`}>
+                <Image
+                  src={
+                    image.imageLinks.thumbnail ||
+                    "/assets/placeholders/image.webp"
+                  }
+                  width={image.resolutions?.original?.width}
+                  height={image.resolutions?.original?.height}
+                  alt={image.description}
+                  className="w-full"
+                />
+                <div className="absolute inset-0 flex flex-col justify-between p-4 transition-all duration-200 ease-linear">
+                  <div className="flex justify-between items-center">
+                    <p className="text-white font-semibold text-heading-06 drop-shadow-md">
+                      {image.title || "Untitled"}
+                    </p>
+                    <div className="flex gap-2">
+                      <Heart
+                        size={24}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (user) {
+                            wishlist?.some((item) => item._id === image._id)
+                              ? removeImageFromWishlist(image._id)
+                              : addImageToWishlist(image._id);
+                          } else {
+                            toast.error(
+                              "Please login as User to add to wishlist"
+                            );
+                          }
+                        }}
+                        className={` ${
+                          wishlist?.some((item) => item._id === image._id)
+                            ? "text-red-400 fill-red-500"
+                            : "text-white"
+                        }  transition-all duration-200 ease-linear cursor-pointer`}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center drop-shadow-md">
+                    <p className="text-white font-medium text-paragraph">
+                      {image.photographer?.firstName
+                        ? image.photographer?.firstName +
+                          " " +
+                          image.photographer?.lastName
+                        : image.photographer?.name}
+                    </p>
+                    {/* <p className="text-white font-medium text-paragraph">
+                    {image.category?.name}
+                    </p> */}
+                    <p className="text-white font-semibold text-paragraph">
+                      ₹ {image.price?.original?.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            </div>
+          ))}
+        </div>
+        <div className="w-full flex justify-center items-center mt-10">
+          {pageCount > page && (
+            <div
+              onClick={() => setPageSize((prev) => prev + 12)}
+              className="flex items-center justify-center px-4 rounded-lg mb-10 py-4 bg-primary text-white font-semibold text-heading-06 uppercase cursor-pointer hover:bg-primary-dark transition-all duration-300 ease-in-out"
+            >
+              View More <ChevronDown size={24} className="ml-2" />
+            </div>
+          )}
+        </div>
+      </motion.div>
     </AnimatePresence>
   );
 }

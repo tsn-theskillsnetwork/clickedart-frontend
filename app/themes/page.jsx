@@ -12,7 +12,7 @@ export default function ThemesPage() {
   const router = useRouter();
 
   const [themes, setThemes] = useState([]);
-  const [pageSize, setPageSize] = useState(12);
+  const [pageSize, setPageSize] = useState(24);
   const [pageCount, setPageCount] = useState(1);
   const [loading, setLoading] = useState(true);
 
@@ -40,7 +40,7 @@ export default function ThemesPage() {
         Themes
       </h4> */}
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-5 md:gap-8 lg:gap-10 xl:gap-12 my-5 sm:my-20 justify-center w-11/12 sm:w-5/6 px-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 my-5 justify-center w-full px-4">
           {[...Array(9).keys()].map((index) => (
             <div
               key={index}
@@ -54,7 +54,7 @@ export default function ThemesPage() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-5 md:gap-8 lg:gap-10 xl:gap-12 my-5 sm:my-20 justify-center w-11/12 sm:w-5/6 px-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 my-5 justify-center w-full px-4">
             {themes.map((theme, index) => (
               <div
                 key={index}
@@ -74,7 +74,7 @@ export default function ThemesPage() {
                   />
                 </div>
                 <div className="absolute inset-x-0 bottom-0 px-3">
-                  <h1 className="text-paragraph uppercase sm:text-[2.5vw] font-semibold drop-shadow-md text-white">
+                  <h1 className="text-base uppercase sm:text-[1.5vw] font-semibold drop-shadow-md text-white">
                     {theme.name}
                   </h1>
                 </div>

@@ -38,7 +38,7 @@ export default function ThemesResultPage() {
   const [theme, setTheme] = useState(themeValue);
   const [sort, setSort] = useState(sortValue);
   const [search, setSearch] = useState("");
-  const [pageSize, setPageSize] = useState(12);
+  const [pageSize, setPageSize] = useState(24);
   const [pageCount, setPageCount] = useState(1);
   const [loading, setLoading] = useState(true);
   // const [wishlist, setWishlist] = useState([]);
@@ -296,7 +296,7 @@ export default function ThemesResultPage() {
             ))}
           </div>
         )}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-44">
+        {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-44">
           {sortedImages.map((image, index) => (
             <div
               key={index}
@@ -333,7 +333,6 @@ export default function ThemesResultPage() {
                 <div className="absolute inset-0">
                   <div className="flex justify-between mx-4 mt-4">
                     <div className="bg-transparent px-2 text-paragraph group-hover:opacity-0 bg-opacity-75 w-fit transition-all duration-200 ease-linear cursor-default">
-                      {/* <p>{image.imageAnalytics?.downloads} Downloads</p> */}
                     </div>
                     <Heart
                       size={28}
@@ -395,6 +394,71 @@ export default function ThemesResultPage() {
                   MP)
                 </p>
               </div>
+            </div>
+          ))}
+        </div> */}
+        <div className="sm:columns-2 lg:columns-3 gap-4 mt-10 px-4 sm:px-10 md:px-10 lg:px-20">
+          {sortedImages.map((image, index) => (
+            <div
+              key={index}
+              className="relative w-full mb-6 shadow-[0px_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out"
+            >
+              <Link href={`/images/${image._id}`}>
+                <Image
+                  src={
+                    image.imageLinks.thumbnail ||
+                    "/assets/placeholders/image.webp"
+                  }
+                  width={image.resolutions?.original?.width}
+                  height={image.resolutions?.original?.height}
+                  alt={image.description}
+                  className="w-full"
+                />
+                <div className="absolute inset-0 flex flex-col justify-between p-4 transition-all duration-200 ease-linear">
+                  <div className="flex justify-between items-center">
+                    <p className="text-white font-semibold text-heading-06 drop-shadow-md">
+                      {image.title || "Untitled"}
+                    </p>
+                    <div className="flex gap-2">
+                      <Heart
+                        size={24}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (user) {
+                            wishlist?.some((item) => item._id === image._id)
+                              ? removeImageFromWishlist(image._id)
+                              : addImageToWishlist(image._id);
+                          } else {
+                            toast.error(
+                              "Please login as User to add to wishlist"
+                            );
+                          }
+                        }}
+                        className={` ${
+                          wishlist?.some((item) => item._id === image._id)
+                            ? "text-red-400 fill-red-500"
+                            : "text-white"
+                        }  transition-all duration-200 ease-linear cursor-pointer`}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <p className="text-white font-medium text-paragraph">
+                      {image.photographer?.firstName
+                        ? image.photographer?.firstName +
+                          " " +
+                          image.photographer?.lastName
+                        : image.photographer?.name}
+                    </p>
+                    {/* <p className="text-white font-medium text-paragraph">
+                    {image.category?.name}
+                    </p> */}
+                    <p className="text-white font-semibold text-paragraph">
+                      ₹ {image.price?.original?.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              </Link>
             </div>
           ))}
         </div>

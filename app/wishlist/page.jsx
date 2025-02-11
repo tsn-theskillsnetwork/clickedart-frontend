@@ -68,7 +68,7 @@ export default function WishlistPage() {
         <h5 className="text-heading-05 font-bold">
           Wishlist ({wishlist?.length})
         </h5>
-        <Button>Move All To Bag</Button>
+        {/* <Button>Move All To Bag</Button> */}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
         {wishlist.map((item) => (
