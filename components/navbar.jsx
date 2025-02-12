@@ -62,7 +62,7 @@ export default function Navbar() {
     { name: "Themes", url: "/themes" },
     { name: "Featured Artists", url: "/featured-artists" },
     { name: "Membership", url: "/membership" },
-    { name: "About", url: "/about" },
+    { name: "Blog", url: "/blog" },
     // { name: "More", url: "/more" },
   ];
 
@@ -88,12 +88,12 @@ export default function Navbar() {
         {isOpen && (
           <div className="absolute left-0 mt-2 space-y-2 bg-white shadow-lg w-max p-2 rounded-md z-10">
             <Link
-              href="/blog"
+              href="/explore"
               className={`text-sm md:text-md lg:text-lg xl:text-xl px-1 xl:px-4 py-2 rounded-lg text-center font-semibold ${
-                pathname.startsWith("/blog") ? "menuActive" : "menuHover"
+                pathname.startsWith("/explore") ? "menuActive" : "menuHover"
               } cursor-pointer block`}
             >
-              Blog
+              Explore
             </Link>
             <Link
               href="/story"
@@ -271,9 +271,9 @@ export default function Navbar() {
                 </p>
               </Link>
             ))}
-            <Link onClick={() => setIsMenuOpen(false)} href="/blog">
+            <Link onClick={() => setIsMenuOpen(false)} href="/explore">
               <p className="text-lg font-semibold text-black cursor-pointer">
-                Blog
+                Explore
               </p>
             </Link>
             <Link onClick={() => setIsMenuOpen(false)} href="/story">

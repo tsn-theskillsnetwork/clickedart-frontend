@@ -77,8 +77,8 @@ export default function Footer() {
             <Link href="/images" className="text-sm font-medium">
               Images
             </Link>
-            <Link href="/about" className="text-sm font-medium">
-              About us
+            <Link href="/explore" className="text-sm font-medium">
+              Explore
             </Link>
             <Link href="/contact" className="text-sm font-medium">
               Contact us

@@ -234,7 +234,7 @@ const faqs2 = [
   },
 ];
 
-export default function AboutPage() {
+export default function ExplorePage() {
   const [faqType, setFaqType] = useState("user");
   return (
     <div className="flex flex-col min-h-[70vh]">

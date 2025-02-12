@@ -103,14 +103,14 @@ export default function SearchResultPage() {
           className="flex my-10 flex-col min-h-screen justify-between"
         >
           <div>
-            <div className="flex flex-col sm:flex-row px-2 justify-between gap-5">
-              <div className="mt-4 flex flex-row bg-white text-black shadow-[0_0_8px_rgba(0,0,0,0.4)] group rounded-lg items-center gap-2 w-11/12 md:w-4/5 lg:w-2/3 xl:w-1/2 focus-within:outline focus-within:outline-blue-500 mx-auto">
+            <div className="px-10 sm:px-10 md:px-10 lg:px-20">
+              <div className="mt-4 flex flex-row bg-white text-black shadow-[0_0_8px_rgba(0,0,0,0.4)] px-5 group rounded-lg items-center gap-2 w-full md:w-1/2 focus-within:outline focus-within:outline-blue-500 mx-auto">
                 <div className="h-full aspect-[1/1] flex justify-center items-center shrink-0">
                   <Search size={30} color="black" className="mx-auto" />
                 </div>
                 <input
                   type="text"
-                  placeholder={`Search for Photographers`}
+                  placeholder={`Search for Photographer`}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -118,21 +118,18 @@ export default function SearchResultPage() {
                 />
                 <button
                   onClick={handleSearch}
-                  className="bg-accent-200 h-full aspect-[1/1] text-white rounded-r-lg flex justify-center items-center shrink-0"
+                  className="h-full text-black rounded-r-lg flex justify-center items-center shrink-0"
                 >
                   <p className="sr-only">Search</p>
                   <Icon
-                    icon="mdi:image-search"
+                    icon="mdi:user-search"
                     className="mx-auto"
                     style={{ fontSize: "2rem" }}
                   />
                 </button>
               </div>
-              <div className="flex flex-col gap-5">
-                <div className="flex flex-col"></div>
-              </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-44">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20">
               {images.map((image, index) => (
                 <div key={index} className="keen-slider__slide">
                   <div className="w-full  flex flex-col mx-auto items-center justify-center gap-2 bg-white shadow-md shadow-zinc-400">

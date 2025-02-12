@@ -20,7 +20,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {Heart, ShoppingCart } from "lucide-react";
+import { Heart, ShoppingCart } from "lucide-react";
 import useCartStore from "@/store/cart";
 import "keen-slider/keen-slider.min.css";
 import toast from "react-hot-toast";
@@ -593,6 +593,8 @@ export default function ImagePage({ image }) {
 
   const height = clampedHeight + "%";
 
+  console.log(selectedSize);
+
   return (
     <>
       {loading ? (
@@ -703,6 +705,18 @@ export default function ImagePage({ image }) {
                           image.photographer?.lastName
                         : image.photographer?.name || "Photographer name"}
                     </h5>
+                    <div>
+                      {mode === "digital" ? (
+                        <p className="lg:hidden text-sm lg:text-base font-semibold lg:font-bold text-surface-600">
+                          {image?.resolutions[selectedSize]?.width} x{" "}
+                          {image?.resolutions[selectedSize]?.height}px
+                        </p>
+                      ) : (
+                        <p className="lg:hidden text-sm lg:text-base font-semibold lg:font-bold text-surface-600">
+                          {selectedSize?.width} x {selectedSize?.height} in
+                        </p>
+                      )}
+                    </div>
                     <h5 className="lg:hidden text-paragraph lg:text-heading-05 uppercase font-semibold lg:font-bold text-surface-600">
                       ₹ {subTotal}
                     </h5>

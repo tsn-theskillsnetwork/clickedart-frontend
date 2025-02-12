@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ChevronDown, Heart } from "lucide-react";
+import { ChevronDown, Heart, Search } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -16,6 +16,7 @@ import useAuthStore from "@/authStore";
 import useWishlistStore from "@/store/wishlist";
 import toast from "react-hot-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Icon } from "@iconify/react";
 
 export default function ThemesResultPage() {
   const { user } = useAuthStore();
@@ -34,10 +35,18 @@ export default function ThemesResultPage() {
   const [themes, setThemes] = useState([]);
   const [theme, setTheme] = useState(themeValue);
   const [sort, setSort] = useState(sortValue);
-  const [search, setSearch] = useState("");
   const [pageSize, setPageSize] = useState(24);
   const [pageCount, setPageCount] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+
+  const handleSearch = () => {
+    router.push(`/search?search=${search}`);
+  };
+
+  useEffect(() => {
+    setSearch(searchValue);
+  }, [searchValue]);
 
   const addImageToWishlist = async (imageId) => {
     try {
@@ -191,65 +200,91 @@ export default function ThemesResultPage() {
         transition={{ duration: 0.3 }}
         className="flex my-10 flex-col min-h-screen"
       >
-        <div className="flex flex-col sm:flex-row px-20 justify-between gap-5">
-          <div className="flex flex-col">
-            <p className="font-semibold text-primary-dark text-paragraph">
-              Themes
-            </p>
-            <Select
-              className="w-36"
-              defaultValue={theme}
-              onValueChange={(value) => {
-                setTheme(value);
-                router.push(
-                  `/images?theme=${value}&sort=${sort}${
-                    search && `&search=${search}`
-                  }`
-                );
-              }}
+        <div className="grid grid-cols-1 md:grid-cols-2 px-4 sm:px-10 lg:px-20 justify-between items-start gap-5">
+          <div className="mt-4 flex flex-row bg-white text-black shadow-[0_0_8px_rgba(0,0,0,0.4)] px-5 group rounded-lg items-center gap-2 w-full focus-within:outline focus-within:outline-blue-500 mx-auto">
+            <div className="h-full aspect-[1/1] flex justify-center items-center shrink-0">
+              <Search size={30} color="black" className="mx-auto" />
+            </div>
+            <input
+              type="text"
+              placeholder={`Search for Images`}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              className="py-3 text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-semibold w-full focus:outline-none"
+            />
+            <button
+              onClick={handleSearch}
+              className="h-full aspect-[1/1] text-black rounded-r-lg flex justify-center items-center shrink-0"
             >
-              <SelectTrigger className="!text-paragraph py-5 w-full sm:w-40 font-semibold shadow-sm bg-gray-200">
-                <SelectValue />
-                <p className="sr-only">Themes</p>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                {themes.map((theme, index) => (
-                  <SelectItem key={index} value={theme.name.toLowerCase()}>
-                    {theme.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <p className="sr-only">Search</p>
+              <Icon
+                icon="mdi:image-search"
+                className="mx-auto"
+                style={{ fontSize: "2rem" }}
+              />
+            </button>
           </div>
-          <div className="flex flex-col sm:flex-row gap-5">
+          <div className="grid grid-cols-2 2xl:w-1/2 gap-4 md:ml-auto md:justify-end">
             <div className="flex flex-col">
               <p className="font-semibold text-primary-dark text-paragraph">
-                Sort by
+                Themes
               </p>
               <Select
-                className="w-36"
-                defaultValue={sort}
+                className="w-full"
+                defaultValue={theme}
                 onValueChange={(value) => {
-                  setSort(value);
+                  setTheme(value);
                   router.push(
-                    `/images?theme=${theme}&sort=${value}${
+                    `/images?theme=${value}&sort=${sort}${
                       search && `&search=${search}`
                     }`
                   );
                 }}
               >
-                <SelectTrigger className="!text-paragraph w-full sm:w-40 py-5 font-semibold shadow-sm bg-gray-200">
+                <SelectTrigger className="!text-base py-5 w-full font-semibold shadow-sm bg-gray-200">
                   <SelectValue />
-                  <p className="sr-only">Sort by</p>
+                  <p className="sr-only">Themes</p>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="price">Price</SelectItem>
-                  {/* <SelectItem value="rating">Rating</SelectItem> */}
-                  <SelectItem value="popularity">Popularity</SelectItem>
-                  <SelectItem value="date">Date</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
+                  {themes.map((theme, index) => (
+                    <SelectItem key={index} value={theme.name.toLowerCase()}>
+                      {theme.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="flex flex-col">
+              <div className="flex flex-col">
+                <p className="font-semibold text-primary-dark text-paragraph">
+                  Sort by
+                </p>
+                <Select
+                  className="w-full"
+                  defaultValue={sort}
+                  onValueChange={(value) => {
+                    setSort(value);
+                    router.push(
+                      `/images?theme=${theme}&sort=${value}${
+                        search && `&search=${search}`
+                      }`
+                    );
+                  }}
+                >
+                  <SelectTrigger className="!text-base w-full py-5 font-semibold shadow-sm bg-gray-200">
+                    <SelectValue />
+                    <p className="sr-only">Sort by</p>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="price">Price</SelectItem>
+                    {/* <SelectItem value="rating">Rating</SelectItem> */}
+                    <SelectItem value="popularity">Popularity</SelectItem>
+                    <SelectItem value="date">Date</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
         </div>
@@ -274,20 +309,28 @@ export default function ThemesResultPage() {
               key={index}
               className="relative w-full mb-6 shadow-[0px_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out"
             >
-              <div className="cursor-pointer" onClick={() => router.push(`/images/${image._id}`)}>
+              <div
+                className="cursor-pointer"
+                onClick={() => router.push(`/images/${image._id}`)}
+              >
                 <Image
                   src={
                     image.imageLinks.thumbnail ||
                     "/assets/placeholders/image.webp"
                   }
-                  width={image.resolutions?.original?.width}
-                  height={image.resolutions?.original?.height}
+                  width={800}
+                  height={800}
                   alt={image.description}
                   className="w-full"
                 />
                 <div className="absolute inset-0 flex flex-col justify-between p-4 transition-all duration-200 ease-linear">
                   <div className="flex justify-between items-center">
-                    <p className="text-white font-semibold text-heading-06 drop-shadow-md">
+                    <p
+                      style={{
+                        textShadow: "-1px 1px 2px #666, 1px 1px 2px #666",
+                      }}
+                      className="text-white font-semibold text-heading-06"
+                    >
                       {image.title || "Untitled"}
                     </p>
                     <div className="flex gap-2">
@@ -324,7 +367,12 @@ export default function ThemesResultPage() {
                     {/* <p className="text-white font-medium text-paragraph">
                     {image.category?.name}
                     </p> */}
-                    <p className="text-white font-semibold text-paragraph">
+                    <p
+                      style={{
+                        textShadow: "-1px 1px 2px #666, 1px 1px 2px #666",
+                      }}
+                      className="text-white font-semibold text-paragraph"
+                    >
                       ₹ {image.price?.original?.toLocaleString()}
                     </p>
                   </div>

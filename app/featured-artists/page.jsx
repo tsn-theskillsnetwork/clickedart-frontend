@@ -326,37 +326,36 @@ export default function page() {
           height={900}
           src="/assets/images/featuredArtistFooter.png"
           alt=""
-          className="w-full h-96 sm:h-[35vh] md:h-[40vh] xl:h-[70vh] object-cover object-center"
+          className="absolute inset-0 w-full h-full object-cover object-center -z-10"
         />
-        <div className="absolute flex flex-col md:justify-start justify-center inset-0 bg-white bg-opacity-25">
-          <div className="md:pt-10 flex flex-col gap-4 text-start sm:text-start px-10 sm:px-28 lg:w-3/4">
-            <h1 className="text-heading-05 sm:text-heading-04 md:text-heading-03 xl:text-heading-lg font-bold text-white">
-              Sell with Us
-            </h1>
-            <p className="text-paragraph sm:text-heading-06 md:text-heading-05 xl:text-heading-04 text-white font-medium">
-              Are you an artist looking to showcase your work and sell it on our
-              platform?
-            </p>
-            <p className="sm:text-paragraph md:text-heading-06 xl:text-heading-05 text-white">
-              Turn your passion into profit with ClickedART. Join our platform
-              to showcase your art to a global audience, access powerful tools,
-              and enjoy secure payments.
-            </p>
-            <div className="mt-10">
-              <button
-                onClick={() => {
-                  if (photographer) router.push("/profile");
-                  else if (user)
-                    Swal.fire(
-                      "Please sign in as a Photographer to sell your photos"
-                    );
-                  else router.push("/signin/photographer");
-                }}
-                className="bg-white text-primary rounded-lg font-semibold p-2 sm:p-4 text-heading-06 sm:text-heading-05 hover:bg-primary hover:text-white transition-all duration-200 ease-linear active:bg-primary-200 active:text-white"
-              >
-                Sell Your Artwork
-              </button>
-            </div>
+        <div className="absolute inset-0 bg-black bg-opacity-30 -z-10"></div>
+        <div className="py-5 md:py-10 flex flex-col gap-4 text-start sm:text-start px-10 sm:px-28 lg:w-3/4 z-20">
+          <h1 className="text-heading-05 sm:text-heading-04 md:text-heading-03 xl:text-heading-lg font-bold text-white">
+            Sell with Us
+          </h1>
+          <p className="text-paragraph sm:text-heading-06 md:text-heading-05 xl:text-heading-04 text-white font-medium">
+            Are you an artist looking to showcase your work and sell it on our
+            platform?
+          </p>
+          <p className="sm:text-paragraph md:text-heading-06 xl:text-heading-05 text-white">
+            Turn your passion into profit with ClickedART. Join our platform to
+            showcase your art to a global audience, access powerful tools, and
+            enjoy secure payments.
+          </p>
+          <div className="mt-10">
+            <button
+              onClick={() => {
+                if (photographer) router.push("/profile");
+                else if (user)
+                  Swal.fire(
+                    "Please sign in as a Photographer to sell your photos"
+                  );
+                else router.push("/signin/photographer");
+              }}
+              className="bg-white text-primary rounded-lg font-semibold p-2 sm:p-4 text-heading-06 sm:text-heading-05 hover:bg-primary hover:text-white transition-all duration-200 ease-linear active:bg-primary-200 active:text-white"
+            >
+              Sell Your Artwork
+            </button>
           </div>
         </div>
       </div>

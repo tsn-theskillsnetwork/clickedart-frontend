@@ -41,8 +41,8 @@ export default function SearchResultPage() {
   const [sort, setSort] = useState(sortValue);
   const [pageSize, setPageSize] = useState(24);
   const [pageCount, setPageCount] = useState(1);
-  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
 
   const handleSearch = () => {
     router.push(`/search?search=${search}`);
@@ -213,8 +213,8 @@ export default function SearchResultPage() {
         transition={{ duration: 0.3 }}
         className="flex my-10 flex-col min-h-screen"
       >
-        <div className="flex flex-col sm:flex-row px-20 justify-between gap-5">
-          <div className="mt-4 flex flex-row bg-white text-black shadow-[0_0_8px_rgba(0,0,0,0.4)] group rounded-lg items-center gap-2 w-11/12 md:w-4/5 lg:w-2/3 xl:w-1/2 focus-within:outline focus-within:outline-blue-500 mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 px-4 sm:px-10 lg:px-20 justify-between items-start gap-5">
+          <div className="mt-4 flex flex-row bg-white text-black shadow-[0_0_8px_rgba(0,0,0,0.4)] px-5 group rounded-lg items-center gap-2 w-full focus-within:outline focus-within:outline-blue-500 mx-auto">
             <div className="h-full aspect-[1/1] flex justify-center items-center shrink-0">
               <Search size={30} color="black" className="mx-auto" />
             </div>
@@ -228,7 +228,7 @@ export default function SearchResultPage() {
             />
             <button
               onClick={handleSearch}
-              className="bg-accent-200 h-full aspect-[1/1] text-white rounded-r-lg flex justify-center items-center shrink-0"
+              className="h-full text-black rounded-r-lg flex justify-center items-center shrink-0"
             >
               <p className="sr-only">Search</p>
               <Icon
@@ -238,33 +238,66 @@ export default function SearchResultPage() {
               />
             </button>
           </div>
-          <div className="flex flex-col gap-5">
+          <div className="grid grid-cols-2 2xl:w-1/2 gap-4 md:ml-auto md:justify-end">
             <div className="flex flex-col">
               <p className="font-semibold text-primary-dark text-paragraph">
-                Sort by
+                Themes
               </p>
               <Select
-                className="w-36"
-                defaultValue={sort}
+                className="w-full"
+                defaultValue={theme}
                 onValueChange={(value) => {
-                  setSort(value);
+                  setTheme(value);
                   router.push(
-                    `/search?theme=${theme}&sort=${value}${
+                    `/images?theme=${value}&sort=${sort}${
                       search && `&search=${search}`
                     }`
                   );
                 }}
               >
-                <SelectTrigger className="!text-paragraph w-full sm:w-40 py-5 font-semibold shadow-sm bg-gray-200">
+                <SelectTrigger className="!text-base py-5 w-full font-semibold shadow-sm bg-gray-200">
                   <SelectValue />
-                  <p className="sr-only">Sort by</p>
+                  <p className="sr-only">Themes</p>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="price">Price</SelectItem>
-                  <SelectItem value="popularity">Popularity</SelectItem>
-                  <SelectItem value="date">Date</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
+                  {themes.map((theme, index) => (
+                    <SelectItem key={index} value={theme.name.toLowerCase()}>
+                      {theme.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="flex flex-col">
+              <div className="flex flex-col">
+                <p className="font-semibold text-primary-dark text-paragraph">
+                  Sort by
+                </p>
+                <Select
+                  className="w-full"
+                  defaultValue={sort}
+                  onValueChange={(value) => {
+                    setSort(value);
+                    router.push(
+                      `/images?theme=${theme}&sort=${value}${
+                        search && `&search=${search}`
+                      }`
+                    );
+                  }}
+                >
+                  <SelectTrigger className="!text-base w-full py-5 font-semibold shadow-sm bg-gray-200">
+                    <SelectValue />
+                    <p className="sr-only">Sort by</p>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="price">Price</SelectItem>
+                    {/* <SelectItem value="rating">Rating</SelectItem> */}
+                    <SelectItem value="popularity">Popularity</SelectItem>
+                    <SelectItem value="date">Date</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
         </div>
@@ -307,7 +340,12 @@ export default function SearchResultPage() {
                 />
                 <div className="absolute inset-0 flex flex-col justify-between p-4 transition-all duration-200 ease-linear">
                   <div className="flex justify-between items-center">
-                    <p className="text-white font-semibold text-heading-06 drop-shadow-md">
+                    <p
+                      style={{
+                        textShadow: "-1px 1px 2px #666, 1px 1px 2px #666",
+                      }}
+                      className="text-white font-semibold text-heading-06"
+                    >
                       {image.title || "Untitled"}
                     </p>
                     <div className="flex gap-2">
@@ -341,7 +379,12 @@ export default function SearchResultPage() {
                           image.photographer?.lastName
                         : image.photographer?.name}
                     </p>
-                    <p className="text-white font-semibold text-paragraph">
+                    <p
+                      style={{
+                        textShadow: "-1px 1px 2px #666, 1px 1px 2px #666",
+                      }}
+                      className="text-white font-semibold text-paragraph"
+                    >
                       ₹ {image.price?.original?.toLocaleString()}
                     </p>
                   </div>

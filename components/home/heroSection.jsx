@@ -91,7 +91,7 @@ export default function HeroSection() {
                 className="mx-auto"
                 transition={{ duration: 0.5, ease: "easeInOut" }}
               >
-                <p className="text-base sm:text-paragraph md:text-heading-05 lg:text-heading-04 xl:text-heading-03 font-semibold">
+                <p className="text-base sm:text-paragraph md:text-heading-05 lg:text-heading-04 xl:text-heading-03 font-semibold px-4 text-center">
                   {taglines[currentImage]}
                 </p>
               </motion.div>
