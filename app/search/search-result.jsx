@@ -261,7 +261,6 @@ export default function SearchResultPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="price">Price</SelectItem>
-                  {/* <SelectItem value="rating">Rating</SelectItem> */}
                   <SelectItem value="popularity">Popularity</SelectItem>
                   <SelectItem value="date">Date</SelectItem>
                 </SelectContent>
@@ -284,106 +283,18 @@ export default function SearchResultPage() {
             ))}
           </div>
         )}
-        {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-44">
-            {sortedImages.map((image, index) => (
-              <div key={index} className="shadow-[0px_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out">
-              <div
-                onClick={() => {
-                  router.push(`/images/${image._id}`);
-                }}
-                className="relative group"
-              >
-                <Image
-                  width={800}
-                  height={800}
-                  priority
-                  src={image.imageLinks.thumbnail || "/assets/placeholders/image.webp"}
-                  alt={image.description}
-                  className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear opacity-50 blur-[4px] border border-primary-200"
-                />
-                <Image
-                  width={800}
-                  height={800}
-                  src={image.imageLinks.thumbnail || "/assets/placeholders/image.webp"}
-                  alt={image.description}
-                  className="absolute inset-0 object-contain w-full aspect-[1/1] transition-all duration-200 ease-linear drop-shadow-md"
-                />
-
-                <div className="absolute inset-0">
-                  <div className="flex justify-between mx-4 mt-4">
-                    <div className="bg-white px-2 text-paragraph group-hover:opacity-0 bg-opacity-75 w-fit transition-all duration-200 ease-linear cursor-default">
-                      <p>{image.imageAnalytics?.downloads} Downloads</p>
-                    </div>
-                    <Heart
-                      size={28}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (user) {
-                          wishlist?.some((item) => item._id === image._id)
-                            ? removeImageFromWishlist(image._id)
-                            : addImageToWishlist(image._id);
-                        } else {
-                          toast.error(
-                            "Please login as User to add to wishlist"
-                          );
-                        }
-                      }}
-                      className={` ${
-                        wishlist?.some((item) => item._id === image._id)
-                          ? "text-red-400 fill-red-500"
-                          : "text-white group-hover:text-red-600"
-                      }  transition-all duration-200 ease-linear cursor-pointer`}
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="text-neutral-600 p-2">
-                <h2 className="text-heading-05 font-semibold">
-                  {image.title || "Untitled"}
-                </h2>
-                <Link
-                  href={`/photographer/${image.photographer?._id}`}
-                  className="font-medium"
-                >
-                  {image.photographer?.firstName
-                    ? image.photographer?.firstName +
-                      " " +
-                      image.photographer?.lastName
-                    : image.photographer?.name}
-                </Link>
-                <p className="font-medium text-surface-500">
-                  {image.category?.name}
-                </p>
-                <div className="flex justify-between">
-                  <p className="text-paragraph font-medium">
-                    {image.resolutions?.original?.width}{" "}
-                    <span className="font-bold">x</span>{" "}
-                    {image.resolutions?.original?.height} px
-                  </p>
-                  <p className="text-paragraph font-bold">
-                    ₹{image.price?.original}
-                  </p>
-                </div>
-                <p className="text-paragraph font-medium">
-                  (
-                  {(
-                    (image.resolutions?.original?.height *
-                      image.resolutions?.original?.width) /
-                    1000000
-                  ).toFixed(1)}{" "}
-                  MP)
-                </p>
-              </div>
-            </div>
-            ))}
-          </div> */}
         <div className="sm:columns-2 lg:columns-3 gap-4 mt-10 px-4 sm:px-10 md:px-10 lg:px-20">
           {sortedImages.map((image, index) => (
             <div
               key={index}
               className=" w-full mb-6 shadow-[0px_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out"
             >
-              <Link className="relative" href={`/images/${image._id}`}>
+              <div
+                onClick={() => {
+                  router.push(`/images/${image._id}`);
+                }}
+                className="relative cursor-pointer"
+              >
                 <Image
                   src={
                     image.imageLinks.thumbnail ||
@@ -430,15 +341,12 @@ export default function SearchResultPage() {
                           image.photographer?.lastName
                         : image.photographer?.name}
                     </p>
-                    {/* <p className="text-white font-medium text-paragraph">
-                    {image.category?.name}
-                    </p> */}
                     <p className="text-white font-semibold text-paragraph">
                       ₹ {image.price?.original?.toLocaleString()}
                     </p>
                   </div>
                 </div>
-              </Link>
+              </div>
             </div>
           ))}
         </div>

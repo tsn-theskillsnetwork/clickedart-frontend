@@ -7,16 +7,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ChevronDown, Heart, Search, Tag } from "lucide-react";
+import { ChevronDown, Heart } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import useCartStore from "@/store/cart";
 import useAuthStore from "@/authStore";
 import useWishlistStore from "@/store/wishlist";
 import toast from "react-hot-toast";
-import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ThemesResultPage() {
@@ -33,7 +31,6 @@ export default function ThemesResultPage() {
   const themeValue = searchParams.get("theme") || "all";
   const searchValue = searchParams.get("search") || "";
 
-  const [filter, setFilter] = useState("price");
   const [themes, setThemes] = useState([]);
   const [theme, setTheme] = useState(themeValue);
   const [sort, setSort] = useState(sortValue);
@@ -41,7 +38,6 @@ export default function ThemesResultPage() {
   const [pageSize, setPageSize] = useState(24);
   const [pageCount, setPageCount] = useState(1);
   const [loading, setLoading] = useState(true);
-  // const [wishlist, setWishlist] = useState([]);
 
   const addImageToWishlist = async (imageId) => {
     try {
@@ -60,7 +56,6 @@ export default function ThemesResultPage() {
       );
 
       const data = await res.json();
-      //console.log(data);
 
       if (!res.ok) {
         throw new Error(data.message || "Failed to add image to wishlist");
@@ -88,7 +83,6 @@ export default function ThemesResultPage() {
       );
 
       const data = await res.json();
-      //console.log(data);
 
       if (!res.ok) {
         throw new Error(data.message || "Failed to remove image from wishlist");
@@ -151,10 +145,8 @@ export default function ThemesResultPage() {
           }
         );
         const data = await res.json();
-        //console.log(data);
         setImages(data.results);
         setPageCount(data.pageCount);
-        //console.log(data.results);
       } catch (error) {
         console.error(error);
       } finally {
@@ -176,7 +168,6 @@ export default function ThemesResultPage() {
         const data = await res.json();
         setImages(data.photos);
         setPageCount(data.pageCount);
-        //console.log(data.photos);
       } catch (error) {
         console.error(error);
       } finally {
@@ -190,25 +181,6 @@ export default function ThemesResultPage() {
       fetchImages();
     }
   }, [themeValue, pageSize, page]);
-
-  // useEffect(() => {
-  //   const fetchWishlist = async () => {
-  //     try {
-  //       const response = await fetch(
-  //         `${process.env.NEXT_PUBLIC_SERVER}/api/wishlist/get-my-wishlist?userId=${user?._id}`,
-  //         {
-  //           method: "GET",
-  //         }
-  //       );
-  //       const data = await response.json();
-  //       setWishlist(data.wishlist?.images);
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
-
-  //   fetchWishlist();
-  // }, [user]);
 
   return (
     <AnimatePresence mode="popLayout">
@@ -296,114 +268,13 @@ export default function ThemesResultPage() {
             ))}
           </div>
         )}
-        {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-44">
-          {sortedImages.map((image, index) => (
-            <div
-              key={index}
-              className="shadow-[0px_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out"
-            >
-              <div
-                onClick={() => {
-                  router.push(`/images/${image._id}`);
-                }}
-                className="relative group"
-              >
-                <Image
-                  width={800}
-                  height={800}
-                  priority
-                  src={
-                    image.imageLinks.thumbnail ||
-                    "/assets/placeholders/image.webp"
-                  }
-                  alt={image.description}
-                  className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear opacity-50 blur-[4px] border border-primary-200"
-                />
-                <Image
-                  width={800}
-                  height={800}
-                  src={
-                    image.imageLinks.thumbnail ||
-                    "/assets/placeholders/image.webp"
-                  }
-                  alt={image.description}
-                  className="absolute inset-0 object-contain w-full aspect-[1/1] transition-all duration-200 ease-linear drop-shadow-md"
-                />
-
-                <div className="absolute inset-0">
-                  <div className="flex justify-between mx-4 mt-4">
-                    <div className="bg-transparent px-2 text-paragraph group-hover:opacity-0 bg-opacity-75 w-fit transition-all duration-200 ease-linear cursor-default">
-                    </div>
-                    <Heart
-                      size={28}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (user) {
-                          wishlist?.some((item) => item._id === image._id)
-                            ? removeImageFromWishlist(image._id)
-                            : addImageToWishlist(image._id);
-                        } else {
-                          toast.error(
-                            "Please login as User to add to wishlist"
-                          );
-                        }
-                      }}
-                      className={` ${
-                        wishlist?.some((item) => item._id === image._id)
-                          ? "text-red-400 fill-red-500"
-                          : "text-white group-hover:text-red-600"
-                      }  transition-all duration-200 ease-linear cursor-pointer`}
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="text-neutral-600 p-2">
-                <h2 className="text-heading-05 font-semibold">
-                  {image.title || "Untitled"}
-                </h2>
-                <Link
-                  href={`/photographer/${image.photographer?._id}`}
-                  className="font-medium"
-                >
-                  {image.photographer?.firstName
-                    ? image.photographer?.firstName +
-                      " " +
-                      image.photographer?.lastName
-                    : image.photographer?.name}
-                </Link>
-                <p className="font-medium text-surface-500">
-                  {image.category?.name}
-                </p>
-                <div className="flex justify-between">
-                  <p className="text-paragraph font-medium">
-                    {image.resolutions?.original?.width}{" "}
-                    <span className="font-bold">x</span>{" "}
-                    {image.resolutions?.original?.height} px
-                  </p>
-                  <p className="text-paragraph font-bold">
-                    ₹{image.price?.original}
-                  </p>
-                </div>
-                <p className="text-paragraph font-medium">
-                  (
-                  {(
-                    (image.resolutions?.original?.height *
-                      image.resolutions?.original?.width) /
-                    1000000
-                  ).toFixed(1)}{" "}
-                  MP)
-                </p>
-              </div>
-            </div>
-          ))}
-        </div> */}
         <div className="sm:columns-2 lg:columns-3 gap-4 mt-10 px-4 sm:px-10 md:px-10 lg:px-20">
           {sortedImages.map((image, index) => (
             <div
               key={index}
               className="relative w-full mb-6 shadow-[0px_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out"
             >
-              <Link href={`/images/${image._id}`}>
+              <div className="cursor-pointer" onClick={() => router.push(`/images/${image._id}`)}>
                 <Image
                   src={
                     image.imageLinks.thumbnail ||
@@ -458,7 +329,7 @@ export default function ThemesResultPage() {
                     </p>
                   </div>
                 </div>
-              </Link>
+              </div>
             </div>
           ))}
         </div>

@@ -1,4 +1,5 @@
 import axios from "axios";
+import sharp from "sharp";
 import ImagePage from "./image";
 
 const fetchImage = async (id) => {
@@ -13,6 +14,25 @@ const fetchImage = async (id) => {
   }
 };
 
+const optimizeImage = async (imageUrl) => {
+  try {
+    // Fetch image as binary
+    const response = await axios.get(imageUrl, { responseType: "arraybuffer" });
+
+    // Optimize using Sharp
+    const optimizedBuffer = await sharp(Buffer.from(response.data))
+      .resize(1200, 630, { fit: "cover" }) // Resize for Open Graph
+      .toFormat("webp", { quality: 80 }) // Convert to WebP
+      .toBuffer();
+
+    // Convert buffer to base64 data URL
+    return `data:image/webp;base64,${optimizedBuffer.toString("base64")}`;
+  } catch (error) {
+    console.error("Error optimizing image:", error);
+    return null;
+  }
+};
+
 export async function generateMetadata({ params }) {
   const { id } = await params;
 
@@ -22,6 +42,9 @@ export async function generateMetadata({ params }) {
     if (!image) {
       throw new Error("Image not found");
     }
+
+    // Optimize image
+    const optimizedImage = await optimizeImage(image.imageLinks?.thumbnail);
 
     return {
       title: image.title || "Untitled",
@@ -40,8 +63,7 @@ export async function generateMetadata({ params }) {
         url: `${process.env.NEXT_PUBLIC_URL}/images/${id}`,
         images: [
           {
-            url:
-              image.imageLinks?.thumbnail || `/assets/placeholders/image.webp`,
+            url: optimizedImage || `/assets/placeholders/image.webp`,
             width: 1200,
             height: 630,
             alt: image.title || "Untitled",

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import "./styles.css";
-import { AnimatePresence, frame, motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   Select,
   SelectContent,
@@ -16,14 +16,12 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ChevronLeft, ChevronRight, Heart, ShoppingCart } from "lucide-react";
+import {Heart, ShoppingCart } from "lucide-react";
 import useCartStore from "@/store/cart";
-import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import toast from "react-hot-toast";
 import { fetchData } from "@/helpers/api";
@@ -41,11 +39,8 @@ export default function ImagePage({ image }) {
   const id = useParams().id;
   const { isHydrated } = useAuthStore();
   const { addItemToCart, removeItemFromCart, isItemInCart } = useCartStore();
-
-  // const [image, setImage] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [recommendedLength, setRecommendedLength] = useState(4);
 
   const [selected, setSelected] = useState(0);
   const [mode, setMode] = useState("digital");
@@ -132,27 +127,6 @@ export default function ImagePage({ image }) {
       src: "/assets/placeholders/Sofa Room Logo Mockup.jpg",
     },
   ];
-  //console.log(selectedSize);
-  //console.log(selectedPaper);
-  // const fetchImage = async () => {
-  //   try {
-  //     const response = await fetch(
-  //       `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-image-by-id?id=${id}`,
-  //       {
-  //         method: "GET",
-  //       }
-  //     );
-  //     if (!response.ok) throw new Error("Failed to fetch image");
-
-  //     const data = await response.json();
-  //     setImage(data.photo);
-  //   } catch (error) {
-  //     console.log("Error fetching image data", error);
-  //     setError(error.message);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const handleMockup = () => {
     setSelected(1);
@@ -199,25 +173,6 @@ export default function ImagePage({ image }) {
     setSubTotal(calculateSubtotal());
   }, [selectedSize, selectedPaper, selectedFrame, mode, image]);
 
-  // useEffect(() => {
-  //   if (id && token && viewCount === 0) {
-  //     const addViewCount = async () => {
-  //       try {
-  //         const res = await axios.post(
-  //           `${process.env.NEXT_PUBLIC_SERVER}/api/images/add-image-views-count`,
-  //           {
-  //             imageId: id,
-  //           }
-  //         );
-  //         setViewCount(1);
-  //       } catch (error) {
-  //         console.error("Error adding view count", error);
-  //       }
-  //     };
-  //     addViewCount();
-  //   }
-  // }, [id, token, viewCount]);
-
   const toastShownRef = useRef(false);
 
   const handlePaperChange = (paper) => {
@@ -229,8 +184,6 @@ export default function ImagePage({ image }) {
     setSelectedPaper(paper);
   };
 
-  // console.log("Image", image);
-
   useEffect(() => {
     if (!isHydrated || toastShownRef.current) return;
 
@@ -241,7 +194,6 @@ export default function ImagePage({ image }) {
           { imageId: id }
         );
         toastShownRef.current = true;
-        // toast.success("View count added!");
       } catch (error) {
         console.log("Error adding view count", error);
       }
@@ -257,10 +209,6 @@ export default function ImagePage({ image }) {
 
     handleDigital();
   }, []);
-
-  // useEffect(() => {
-  //   fetchImage();
-  // }, [id]);
 
   const descriptionSection = (
     <div className="flex flex-col gap-2 mt-5 bg-zinc-100 pb-5 rounded-md shadow-md px-4">
@@ -278,19 +226,6 @@ export default function ImagePage({ image }) {
         >
           Image Description
         </motion.p>
-        {/* <motion.p
-          layout
-          onClick={() => {
-            setDesc(false);
-          }}
-          className={`font-medium ${
-            !desc
-              ? "text-black font-semibold underline decoration-2 underline-offset-8"
-              : "text-surface-600"
-          } cursor-pointer`}
-        >
-          Comments
-        </motion.p> */}
       </div>
       <hr className="border-surface-200 z-0 -translate-y-1" />
       <AnimatePresence mode="popLayout">
@@ -427,12 +362,6 @@ export default function ImagePage({ image }) {
             >
               Printing Guide
             </a>
-
-            {/* <p className="-mb-8 font-medium">
-              {selectedSize
-                ? `${selectedSize?.width} x ${selectedSize?.height} in`
-                : "Select Size"}
-            </p> */}
             <div>
               <Select
                 className="w-36"
@@ -460,12 +389,6 @@ export default function ImagePage({ image }) {
                       {size.width} x {size.height} in
                     </SelectItem>
                   ))}
-                  {/* <SelectItem
-                    className="!text-paragraph"
-                    value={JSON.stringify(customSize)}
-                  >
-                    {customSize.width} x {customSize.height} in
-                  </SelectItem> */}
                 </SelectContent>
               </Select>
 
@@ -805,9 +728,7 @@ export default function ImagePage({ image }) {
                       </div>
                     </>
                   }
-                  {/* {image.photographer?.isMonetized && ( */}
                   <div className="hidden lg:block">{buySection}</div>
-                  {/* )} */}
                 </div>
               </div>
               {/* Desktop Desc */}
@@ -831,11 +752,6 @@ export default function ImagePage({ image }) {
           </div>
         </>
       )}
-      {/* {error && (
-        <div className="flex flex-col items-center justify-center min-h-[50vh]">
-          <p>Error fetching image data</p>
-        </div>
-      )} */}
     </>
   );
 }

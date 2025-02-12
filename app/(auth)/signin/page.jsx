@@ -23,6 +23,7 @@ const SignInPage = () => {
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -35,6 +36,7 @@ const SignInPage = () => {
     setError("");
 
     try {
+      setLoading(true);
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/user/login`,
         formData,
@@ -60,6 +62,8 @@ const SignInPage = () => {
       } else {
         setError("An error occurred. Please try again later.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -125,7 +129,9 @@ const SignInPage = () => {
             </div>
 
             <div className="flex flex-col items-center">
-              <Button type="submit">Sign In</Button>
+              <Button disabled={loading} type="submit">
+                {loading ? "Signing in..." : "Sign In"}
+              </Button>
             </div>
           </form>
         </>
