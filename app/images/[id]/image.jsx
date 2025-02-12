@@ -707,15 +707,41 @@ export default function ImagePage({ image }) {
                     </h5>
                     <div>
                       {mode === "digital" ? (
-                        <p className="lg:hidden text-sm lg:text-base font-semibold lg:font-bold text-surface-600">
+                        <p className="text-sm lg:text-base font-medium lg:font-semibold text-surface-600">
                           {image?.resolutions[selectedSize]?.width} x{" "}
                           {image?.resolutions[selectedSize]?.height}px
                         </p>
                       ) : (
-                        <p className="lg:hidden text-sm lg:text-base font-semibold lg:font-bold text-surface-600">
-                          {selectedSize?.width} x {selectedSize?.height} in
-                        </p>
+                        <div>
+                          <p className="text-sm lg:text-base font-medium lg:font-semibold text-surface-600">
+                            {image?.resolutions?.original?.width} x{" "}
+                            {image?.resolutions?.original?.height} px
+                          </p>
+                          <p className="text-sm lg:text-base font-medium lg:font-semibold text-surface-600">
+                            Size: {selectedSize?.width} x {selectedSize?.height}{" "}
+                            in
+                          </p>
+                          <p className="text-sm lg:text-base font-medium lg:font-semibold text-surface-600">
+                            DPI:{" "}
+                            {image?.resolutions?.original?.width >
+                            image?.resolutions?.original?.height
+                              ? Math.floor(
+                                  image?.resolutions?.original?.width /
+                                    selectedSize?.width
+                                )
+                              : Math.floor(
+                                  image?.resolutions?.original?.height /
+                                    selectedSize?.height
+                                )}
+                            {/* {Math.floor((image?.resolutions.original?.width /
+                              selectedSize?.width +
+                              image?.resolutions.original?.height /
+                                selectedSize?.height) /
+                              2)} */}
+                          </p>
+                        </div>
                       )}
+                      <hr />
                     </div>
                     <h5 className="lg:hidden text-paragraph lg:text-heading-05 uppercase font-semibold lg:font-bold text-surface-600">
                       ₹ {subTotal}
