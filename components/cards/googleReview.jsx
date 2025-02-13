@@ -8,8 +8,8 @@ const GoogleReviewCard = ({ avatar, name, rating, comment }) => {
           <Image
             src={avatar || "/assets/placeholders/profile.jpg"}
             alt={name}
-            width={48}
-            height={48}
+            width={100}
+            height={100}
             className="object-cover"
           />
         </div>

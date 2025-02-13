@@ -1,41 +1,51 @@
-import { Star } from "lucide-react";
 import Image from "next/image";
-import React from "react";
 
-export default function TestimonialCard({ avatar, name, stars, comment }) {
+const TestimonialCard = ({ avatar, name, stars, comment }) => {
   return (
-    <div className="flex flex-col px-10 py-5 bg-white shadow-lg shadow-zinc-300 rounded-3xl justify-center items-center gap-4 w-full !h-full">
-      <div>
-        <Image
-          width={80}
-          height={80}
-          src={avatar || "/assets/placeholders/profile.jpg"}  // Fallback to default image
-          alt={name || "User Avatar"}
-          className="rounded-full w-20 h-20 object-cover object-top border-2 border-white shadow-zinc-400 shadow-lg"
-        />
-      </div>
-      <div className="text-justify">{comment}</div>
-      <div className="flex flex-col justify-center items-center">
-        <div className="flex flex-row">
-          {/* Full stars */}
-          {Array.from({ length: stars }).map((_, index) => (
-            <Star
-              className="fill-yellow-300 text-yellow-300"
-              key={index}
-              aria-hidden="true"
-            />
-          ))}
-          {/* Empty stars */}
-          {Array.from({ length: 5 - stars }).map((_, index) => (
-            <Star
-              className="fill-yellow-100 text-yellow-100"
-              key={index}
-              aria-hidden="true"
-            />
-          ))}
+    <div className="bg-white rounded-lg shadow-lg p-6 flex flex-col space-y-4 w-full">
+      <div className="flex items-center space-x-4">
+        <div className="w-12 h-12">
+          <Image
+            src={avatar || "/assets/placeholders/profile.jpg"}
+            alt={name}
+            width={100}
+            height={100}
+            className="object-cover w-12 h-12 rounded-full"
+          />
         </div>
-        <div className="text-secondary-200 text-heading-06 font-semibold">{name}</div>
+        <div>
+          <p className="font-semibold text-lg">{name}</p>
+          <div className="flex items-center space-x-1">
+            {[...Array(5)].map((_, index) => (
+              <svg
+                key={index}
+                xmlns="http://www.w3.org/2000/svg"
+                fill={index < stars ? "#FFC107" : "#E0E0E0"}
+                viewBox="0 0 24 24"
+                width="18"
+                height="18"
+              >
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+              </svg>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="text-gray-600">{comment}</div>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2 text-sm text-gray-500">
+          {/* Google Logo */}
+          <Image
+            src="/assets/google_logo.webp"
+            alt="Google"
+            width={20}
+            height={20}
+          />
+          <p>Google Review</p>
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default TestimonialCard;

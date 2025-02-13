@@ -4,11 +4,12 @@ import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import useLayoutStore from "@/store/layout";
 import axios from "axios";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import GoogleReviewCard from "../cards/googleReview";
+import TestimonialCard from "../cards/testimonialCard";
 import Loader from "../loader";
+import useLayoutStore from "@/store/layout";
 
 export default function GoogleReviews() {
   const { layout } = useLayoutStore();
@@ -46,8 +47,10 @@ export default function GoogleReviews() {
     const fetchReviews = async () => {
       try {
         const response = await axios.get(`/api/fetchReviews`);
-        console.log(response.data.result.reviews);
-        setReviews(response.data.result.reviews);
+        const fiveStarReviews = response.data.result.reviews.filter(
+          (review) => review.rating === 5
+        );
+        setReviews(fiveStarReviews);
       } catch (error) {
         console.error(error);
       } finally {
@@ -64,22 +67,34 @@ export default function GoogleReviews() {
       </div>
     );
   }
+  const combinedReviews = [...reviews, ...(layout?.testimonials || [])];
 
   return (
     <div className="flex flex-col items-center space-y-10">
       {/* Slider Section */}
       <div className="w-full relative">
         <Slider ref={sliderRef} {...settings} className="!h-full">
-          {reviews.map((review, index) => (
-            <div key={index} className="p-6">
-              <GoogleReviewCard
-                avatar={review.profile_photo_url}
-                name={review.author_name}
-                rating={review.rating}
-                comment={review.text}
-              />
-            </div>
-          ))}
+          {combinedReviews.map((review, index) => {
+            return (
+              <div key={index} className="p-6">
+                {review.profile_photo_url ? (
+                  <GoogleReviewCard
+                    avatar={review.profile_photo_url}
+                    name={review.author_name}
+                    rating={review.rating}
+                    comment={review.text}
+                  />
+                ) : (
+                  <TestimonialCard
+                    avatar={review.image}
+                    name={review.name}
+                    stars={review.stars}
+                    comment={review.message}
+                  />
+                )}
+              </div>
+            );
+          })}
         </Slider>
         <div className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10">
           <button
