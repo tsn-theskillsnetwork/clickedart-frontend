@@ -2,6 +2,7 @@
 
 import Button from "@/components/button";
 import Button2 from "@/components/button2";
+import EnquiryForm from "@/components/form/Enquiry";
 import useLayoutStore from "@/store/layout";
 import { Icon } from "@iconify/react";
 import { Mail, MapPin, Phone } from "lucide-react";
@@ -11,9 +12,47 @@ import React from "react";
 
 export default function ContactPage() {
   const { layout } = useLayoutStore();
+  const brandColors = {
+    facebook: "text-[#3b5999]",
+    messenger: "text-[#0084ff]",
+    twitter: "text-[#55acee]",
+    linkedin: "text-[#0077b5]",
+    skype: "text-[#00aff0]",
+    dropbox: "text-[#007ee5]",
+    wordpress: "text-[#21759b]",
+    vimeo: "text-[#1ab7ea]",
+    slideshare: "text-[#0077b5]",
+    vk: "text-[#4c75a3]",
+    tumblr: "text-[#34465d]",
+    yahoo: "text-[#410093]",
+    "google-plus": "text-[#dd4b39]",
+    pinterest: "text-[#bd081c]",
+    youtube: "text-[#cd201f]",
+    stumbleupon: "text-[#eb4924]",
+    reddit: "text-[#ff5700]",
+    quora: "text-[#b92b27]",
+    yelp: "text-[#af0606]",
+    weibo: "text-[#df2029]",
+    producthunt: "text-[#da552f]",
+    hackernews: "text-[#ff6600]",
+    soundcloud: "text-[#ff3300]",
+    blogger: "text-[#f57d00]",
+    whatsapp: "text-[#25d366]",
+    wechat: "text-[#09b83e]",
+    line: "text-[#00c300]",
+    medium: "text-[#02b875]",
+    vine: "text-[#00b489]",
+    slack: "text-[#3aaf85]",
+    instagram: "text-[#e4405f]",
+    dribbble: "text-[#ea4c89]",
+    flickr: "text-[#ff0084]",
+    foursquare: "text-[#f94877]",
+    behance: "text-[#131418]",
+    snapchat: "text-[#fffc00]",
+  };
   //console.log(layout);
   return (
-    <div className="flex flex-col items-center px-4 my-20 h-screen">
+    <div className="flex flex-col items-center px-4 my-10 min-h-screen">
       <div className="relative flex flex-col w-full md:w-5/6 overflow-hidden rounded-lg">
         <Image
           src={
@@ -25,14 +64,14 @@ export default function ContactPage() {
           height={1080}
         />
         <div className="bg-black bg-opacity-10 absolute inset-0 z-0"></div>
-        <div className="text-center z-10 my-16 sm:my-20 md:my-24 lg:my-36 text-white">
-          <h1 className="2xl:text-heading-lg lg:text-heading-03 sm:text-heading-05 text-heading-06 font-bold drop-shadow-lg">
+        <div className="text-center z-10 my-4 text-white">
+          <h1 className="2xl:text-heading-lg lg:text-heading-03 sm:text-heading-05 text-heading-06 font-bold text-shadow">
             CONTACT US
           </h1>
-          <h1 className="2xl:text-heading-01 lg:text-heading-04 sm:text-heading-06 text-paragraph font-bold drop-shadow-lg">
+          <h1 className="2xl:text-heading-01 lg:text-heading-04 sm:text-heading-06 text-paragraph font-bold text-shadow">
             We&apos;d Love to Hear From You!
           </h1>
-          <h4 className="2xl:text-heading-04 xl:text-heading-05 lg:text-paragraph sm:text-base text-xs font-semibold drop-shadow-lg">
+          <h4 className="2xl:text-heading-04 xl:text-heading-05 lg:text-paragraph sm:text-base text-xs font-semibold text-shadow">
             Reach out for inquiries, feedback, or just to say hi
           </h4>
         </div>
@@ -72,8 +111,7 @@ export default function ContactPage() {
               {layout?.footerDetails?.address}
             </h5>
           </div>
-        </div>
-        <div className="flex flex-col gap-5 px-4 md:px-5 py-6 border-t border-l-0 md:border-l md:border-t-0">
+          <hr />
           <div className="flex flex-col gap-2">
             <h5 className="xl:text-heading-06 md:text-paragraph 2xl:text-heading-05 font-semibold">
               Our Social Media
@@ -102,7 +140,10 @@ export default function ContactPage() {
                           }
                           width="40"
                           height="40"
-                          className="text-primary"
+                          className={
+                            brandColors[link.accountName.toLowerCase()] ||
+                            "text-primary"
+                          }
                         />
                       </div>
                     </Link>
@@ -110,14 +151,13 @@ export default function ContactPage() {
                 })}
             </div>
           </div>
-          <hr />
+        </div>
+        <div className="flex flex-col gap-5 px-4 md:px-5 py-6 border-t border-l-0 md:border-l md:border-t-0">
           <div className="flex flex-col gap-2">
             <h5 className="xl:text-heading-06 md:text-paragraph 2xl:text-heading-05 font-semibold">
               Have an Enquiry?
             </h5>
-            <Link href="/support/custom-enquiry">
-              <Button2>Get in Touch</Button2>
-            </Link>
+            <EnquiryForm />
           </div>
         </div>
       </div>

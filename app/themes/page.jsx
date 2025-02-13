@@ -36,9 +36,6 @@ export default function ThemesPage() {
 
   return (
     <div className="bg-[#F6F5F4] flex flex-col pt-5 items-center">
-      {/* <h4 className="block sm:hidden text-heading-04 font-semibold text-primary">
-        Themes
-      </h4> */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 my-5 justify-center w-full px-4">
           {[...Array(9).keys()].map((index) => (
@@ -74,7 +71,7 @@ export default function ThemesPage() {
                   />
                 </div>
                 <div className="absolute inset-x-0 bottom-0 px-3">
-                  <h1 className="text-base uppercase sm:text-[1.5vw] font-semibold drop-shadow-md text-white">
+                  <h1 className="text-base uppercase sm:text-[1.5vw] font-semibold drop-shadow-md text-shadow text-white">
                     {theme.name}
                   </h1>
                 </div>
