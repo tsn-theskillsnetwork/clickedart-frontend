@@ -17,6 +17,7 @@ import useWishlistStore from "@/store/wishlist";
 import toast from "react-hot-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Icon } from "@iconify/react";
+import Link from "next/link";
 
 export default function ThemesResultPage() {
   const { user } = useAuthStore();
@@ -309,10 +310,7 @@ export default function ThemesResultPage() {
               key={index}
               className="relative w-full mb-6 shadow-[0px_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out"
             >
-              <div
-                className="cursor-pointer"
-                onClick={() => router.push(`/images/${image._id}`)}
-              >
+              <Link href={`/images/${image._id}`} className="cursor-pointer">
                 <Image
                   src={
                     image.imageLinks.thumbnail ||
@@ -333,7 +331,7 @@ export default function ThemesResultPage() {
                     >
                       {image.title || "Untitled"}
                     </p>
-                    <div className="flex gap-2">
+                    {/* <div className="flex gap-2">
                       <Heart
                         size={24}
                         onClick={(e) => {
@@ -354,7 +352,7 @@ export default function ThemesResultPage() {
                             : "text-white"
                         }  transition-all duration-200 ease-linear cursor-pointer`}
                       />
-                    </div>
+                    </div> */}
                   </div>
                   <div className="flex justify-between items-center">
                     <p className="text-white font-medium text-paragraph">
@@ -377,7 +375,7 @@ export default function ThemesResultPage() {
                     </p>
                   </div>
                 </div>
-              </div>
+              </Link>
             </div>
           ))}
         </div>

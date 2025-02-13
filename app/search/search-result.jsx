@@ -322,10 +322,8 @@ export default function SearchResultPage() {
               key={index}
               className=" w-full mb-6 shadow-[0px_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out"
             >
-              <div
-                onClick={() => {
-                  router.push(`/images/${image._id}`);
-                }}
+              <Link
+                href={`/images/${image._id}`}
                 className="relative cursor-pointer"
               >
                 <Image
@@ -348,7 +346,7 @@ export default function SearchResultPage() {
                     >
                       {image.title || "Untitled"}
                     </p>
-                    <div className="flex gap-2">
+                    {/* <div className="flex gap-2">
                       <Heart
                         size={24}
                         onClick={(e) => {
@@ -369,7 +367,7 @@ export default function SearchResultPage() {
                             : "text-white"
                         }  transition-all duration-200 ease-linear cursor-pointer`}
                       />
-                    </div>
+                    </div> */}
                   </div>
                   <div className="flex justify-between items-center drop-shadow-md">
                     <p className="text-white font-medium text-paragraph">
@@ -389,7 +387,7 @@ export default function SearchResultPage() {
                     </p>
                   </div>
                 </div>
-              </div>
+              </Link>
             </div>
           ))}
         </div>
