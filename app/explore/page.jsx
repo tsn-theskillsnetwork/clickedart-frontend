@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/accordion";
 import { motion } from "framer-motion";
 import Button from "@/components/button";
+import ContactPage from "../contact/page";
+import { useSearchParams } from "next/navigation";
 
 const faqs1 = [
   {
@@ -235,168 +237,92 @@ const faqs2 = [
 ];
 
 export default function ExplorePage() {
+  const isContact = useSearchParams().has("contact");
+
   const [faqType, setFaqType] = useState("user");
+
+  useEffect(() => {
+    if (isContact) {
+      document.getElementById("contact").scrollIntoView();
+    }
+  }, [isContact]);
   return (
-    <div className="flex flex-col min-h-[70vh]">
-      <div className="relative flex flex-col gap-5 items-center justify-center py-20">
+    <div className="flex flex-col items-center min-h-[70vh] px-4 sm:px-6 md:px-12 lg:px-20">
+      <div className="relative flex flex-col w-full overflow-hidden rounded-lg my-10">
         <Image
-          src="/assets/banners/who-we-are-about-us.png"
-          alt="About us"
-          width={1600}
-          height={1600}
-          className="object-cover absolute inset-0 w-full h-full -z-20"
+          src={
+            "/assets/banners/explore.jpeg" || "/assets/placeholders/image.webp"
+          }
+          className="absolute inset-0 w-full h-full z-0 object-cover "
+          alt="Contact"
+          width={1920}
+          height={1080}
         />
-        <div className="absolute inset-0 bg-black opacity-20 -z-20" />
-        <h1 className="text-heading-04 sm:text-heading-03 md:text-heading-02 lg:text-heading-01 font-semibold text-white">
-          Who We Are
-        </h1>
-        <p className="text-base sm:text-heading-06 md:text-heading-05 lg:text-heading-04 font-medium text-center text-white">
-          We&apos;re a team of passionate photographers turning imagination into
-          reality
-        </p>
-        <Link href="/contact">
-          <button className="bg-white text-surface-500 px-5 py-2 rounded-md">
-            Connect with us!
-          </button>
-        </Link>
+        <div className="bg-black bg-opacity-10 absolute inset-0 z-0"></div>
+        <div className="text-center z-10 my-10 text-white">
+          <h1 className="2xl:text-heading-lg lg:text-heading-03 sm:text-heading-05 text-heading-06 font-bold text-shadow-dark">
+            Explore
+          </h1>
+          <h4 className="2xl:text-heading-04 xl:text-heading-05 lg:text-paragraph sm:text-base text-xs font-semibold text-shadow-dark">
+            Uncover a World of Stunning Photography and Opportunities
+          </h4>
+        </div>
       </div>
-      <div className="px-4 sm:px-6 md:px-12 lg:px-20 mb-20">
-        <h2 className="text-heading-05 sm:text-heading-04 md:text-heading-03 lg:text-heading-02 font-semibold mt-10">
-          About ClickedArt
-        </h2>
-        <p className="text-base md:text-paragraph lg:text-heading-05 font-medium mt-5">
-          A comprehensive digital marketplace that allows photographers to reach
-          the public, relevant businesses, and corporates in both digital and
-          print formats, ensuring fair compensation for their creative work.
-        </p>
-        <p className="text-base md:text-paragraph lg:text-heading-05 font-medium mt-10">
-          Welcome to ClickedArt.com, a vibrant platform built for photographers
-          and visual content enthusiasts! We empower talented photographers
-          across India to showcase their creativity, connect with a wider
-          audience, and monetize their artistry seamlessly. At the same time, we
-          cater to buyers seeking authentic, highquality visuals that capture
-          the essence of India&apos;s culture, landscapes, and diversity. We
-          believe that every photograph tells a story, and we are here to bridge
-          the gap between creators and admirers by offering a dedicated space
-          where creativity meets purpose.
-        </p>
-
-        <div className="relative flex flex-col gap-5 items-center justify-center py-20 mt-10 rounded-xl overflow-hidden">
-          <Image
-            src="/assets/banners/vision.png"
-            alt="About us"
-            width={1600}
-            height={1600}
-            className="object-cover absolute inset-0 w-full h-full -z-20"
-          />
-          <div className="absolute inset-0 bg-black opacity-0 -z-20" />
-          <h1 className="text-heading-05 sm:text-heading-04 md:text-heading-03 lg:text-heading-02 font-semibold text-black">
-            Our Vision
-          </h1>
-          <p className="text-base md:text-paragraph lg:text-heading-05 font-medium text-center text-black">
-            To become India&apos;s most trusted marketplace for connecting
-            photographers and buyers, fostering a thriving ecosystem for
-            creativity, collaboration, and inspiration.
-          </p>
-        </div>
-
-        <div className="relative flex flex-col gap-5 items-center justify-center py-20 rounded-xl overflow-hidden mt-10">
-          <Image
-            src="/assets/banners/mission.png"
-            alt="About us"
-            width={1600}
-            height={1600}
-            className="object-cover absolute inset-0 w-full h-full -z-20"
-          />
-          <div className="absolute inset-0 bg-white opacity-20 -z-20" />
-          <h1 className="text-heading-05 sm:text-heading-04 md:text-heading-03 lg:ext-heading-02 font-semibold text-black">
-            Our Mission
-          </h1>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 px-10">
-            <div>
-              <p className="text-paragraph md:text-heading-05 lg:text-heading-04 text-center text-black font-bold">
-                For Photographers
-              </p>
-              <p className="mt-2 text-base md:text-paragraph lg:text-heading-05 font-medium text-center text-black">
-                Empower photographers with a platform to showcase, sell, and
-                monetize their creative work while connecting them with a global
-                audience.
-              </p>
-            </div>
-            <div>
-              <p className="text-paragraph md:text-heading-05 lg:text-heading-04 text-center text-black font-bold">
-                For Buyers
-              </p>
-              <p className="mt-2 text-base md:text-paragraph lg:text-heading-05 font-medium text-center text-black">
-                Provide buyers with easy access to authentic, high-quality
-                original images and prints that cater to their personal,
-                commercial, and creative needs.
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-col my-20 w-full items-center">
+      <div className="-mb-16 sm:-mb-20 z-10">
+        <div className="flex flex-col w-full items-center">
           <h1 className="text-heading-06 sm:text-heading-04 md:text-heading-03 lg:text-heading-02 xl:text-heading-01 font-bold mb-5 mx-auto">
             Frequently Asked Questions
           </h1>
-          <div className="flex flex-row relative items-center justify-between w-full sm:w-[90vw] md:w-[80vw] lg:w-[70vw] xl:w-[60vw] py-3 sm:py-4 md:py-4 lg:py-5 my-10 rounded-full">
-            <div
-              className={`absolute inset-0 bg-primary-100 shadow-inner inner-shadow rounded-full`}
-            ></div>
-            <motion.div
-              layout
-              className={`absolute inset-y-0 z-0 bg-gradient-to-t ${
-                faqType === "photographer" && "right-0"
-              } from-[#897F75] to-[#BCB0A4] inner-shadow-2 w-1/2 h-full rounded-full`}
-            ></motion.div>
-            <p
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 md:gap-10 py-3 sm:py-4 w-full md:py-4 lg:py-5 mb-10">
+            <button
               onClick={() => {
                 setFaqType("user");
               }}
-              className={`text-base md:text-paragraph lg:text-base xl:text-heading-06 drop-shadow-md z-10 font-bold ${
-                faqType === "photographer"
-                  ? "text-surface-500"
-                  : "text-zinc-100"
-              } text-center w-full cursor-pointer transition-colors duration-200 ease-in-out`}
+              className={`text-xs sm:text-sm md:text-paragraph drop-shadow-md z-10 font-bold ${
+                faqType === "user"
+                  ? "text-white bg-black hover:bg-surface-700"
+                  : "bg-white text-black hover:bg-surface-200"
+              } text-center cursor-pointer transition-colors duration-200 ease-in-out p-4 w-60 rounded-full border-2 border-black`}
             >
               For Buyers
-            </p>
-            <p
+            </button>
+            <button
               onClick={() => {
                 setFaqType("photographer");
               }}
-              className={`text-base md:text-paragraph lg:text-base xl:text-heading-06 drop-shadow-md z-10 font-bold ${
-                faqType === "user" ? "text-surface-500" : "text-zinc-100"
-              } text-center w-full cursor-pointer transition-colors duration-200 ease-in-out`}
+              className={`text-xs sm:text-sm md:text-paragraph drop-shadow-md z-10 font-bold ${
+                faqType === "photographer"
+                  ? "text-white bg-black hover:bg-surface-700"
+                  : "bg-white text-black hover:bg-surface-200"
+              } text-center cursor-pointer transition-colors duration-200 ease-in-out p-4 w-60 rounded-full border-2 border-black`}
             >
               For Photographers
-            </p>
+            </button>
           </div>
-          <Accordion className="flex flex-col gap-5" type="single" collapsible>
+          <Accordion
+            className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-[90vw] items-start"
+            type="single"
+            collapsible
+          >
             {(faqType === "user" ? faqs1 : faqs2).map((faq, index) => (
               <AccordionItem
                 key={index}
                 value={`item-${index}`}
-                className="w-full sm:w-[90vw] md:w-[80vw] lg:w-[70vw] xl:w-[60vw] border px-4 rounded-xl"
+                className="w-full border px-4 rounded-xl shadow-[1px_1px_5px_rgba(0,0,0,0.2)]"
               >
-                <AccordionTrigger className="sm:!text-heading-06 md:!text-heading-05 lg:!text-heading-04 font-semibold">
+                <AccordionTrigger className="sm:!text-heading-06 font-medium">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="!text-xs sm:!text-sm md:!text-paragraph lg:!text-heading-06">
+                <AccordionContent className="!text-xs sm:!text-sm md:!text-base">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
         </div>
-        <div className="flex flex-col items-center justify-center my-20">
-          <h2 className="text-heading-06 sm:text-heading-05 md:text-heading-04 lg:text-heading-03 font-semibold">
-            Still have questions?
-          </h2>
-          <Link href="/support/custom-enquiry">
-            <Button className="mt-5">Contact Us</Button>
-          </Link>
-        </div>
+      </div>
+      <div className="w-full pt-16 z-0 sm:pt-20" id="contact">
+        <ContactPage />
       </div>
     </div>
   );

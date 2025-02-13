@@ -9,9 +9,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
-export default function ProfilePage({
-  photographer,
-}) {
+export default function ProfilePage({ photographer }) {
   const id = useParams().id;
 
   const [loading, setLoading] = useState(false);
@@ -20,6 +18,44 @@ export default function ProfilePage({
   const [selectedTab, setSelectedTab] = useState("photos");
   const [catalogues, setCatalogues] = useState([]);
   const [stats, setStats] = useState(null);
+  const brandColors = {
+    facebook: "text-[#3b5999]",
+    messenger: "text-[#0084ff]",
+    twitter: "text-[#55acee]",
+    linkedin: "text-[#0077b5]",
+    skype: "text-[#00aff0]",
+    dropbox: "text-[#007ee5]",
+    wordpress: "text-[#21759b]",
+    vimeo: "text-[#1ab7ea]",
+    slideshare: "text-[#0077b5]",
+    vk: "text-[#4c75a3]",
+    tumblr: "text-[#34465d]",
+    yahoo: "text-[#410093]",
+    "google-plus": "text-[#dd4b39]",
+    pinterest: "text-[#bd081c]",
+    youtube: "text-[#cd201f]",
+    stumbleupon: "text-[#eb4924]",
+    reddit: "text-[#ff5700]",
+    quora: "text-[#b92b27]",
+    yelp: "text-[#af0606]",
+    weibo: "text-[#df2029]",
+    producthunt: "text-[#da552f]",
+    hackernews: "text-[#ff6600]",
+    soundcloud: "text-[#ff3300]",
+    blogger: "text-[#f57d00]",
+    whatsapp: "text-[#25d366]",
+    wechat: "text-[#09b83e]",
+    line: "text-[#00c300]",
+    medium: "text-[#02b875]",
+    vine: "text-[#00b489]",
+    slack: "text-[#3aaf85]",
+    instagram: "text-[#e4405f]",
+    dribbble: "text-[#ea4c89]",
+    flickr: "text-[#ff0084]",
+    foursquare: "text-[#f94877]",
+    behance: "text-[#131418]",
+    snapchat: "text-[#fffc00]",
+  };
 
   const fetchPhotos = async () => {
     try {
@@ -82,7 +118,9 @@ export default function ProfilePage({
           </div>
           <div className="relative flex flex-col items-center -mt-16 lg:-mt-28">
             <Image
-              src={photographer?.profileImage || "/assets/placeholders/profile.jpg"}
+              src={
+                photographer?.profileImage || "/assets/placeholders/profile.jpg"
+              }
               alt="avatar"
               width={150}
               height={150}
@@ -125,7 +163,10 @@ export default function ProfilePage({
                           icon={"entypo-social:" + account.accountName}
                           width="40"
                           height="40"
-                          className="text-primary"
+                          className={
+                            brandColors[account.accountName.toLowerCase()] ||
+                            "text-primary"
+                          }
                         />
                       </Link>
                     ))
@@ -214,7 +255,10 @@ export default function ProfilePage({
                         height={800}
                         priority
                         onContextMenu={(e) => e.preventDefault()}
-                        src={image.imageLinks.thumbnail || "/assets/placeholders/broken-image.png"}
+                        src={
+                          image.imageLinks.thumbnail ||
+                          "/assets/placeholders/broken-image.png"
+                        }
                         alt={image.description}
                         // onClick={() => {
                         //   router.push(`/images/${image._id}`);

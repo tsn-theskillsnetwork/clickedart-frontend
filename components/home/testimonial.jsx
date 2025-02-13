@@ -1,16 +1,20 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import TestimonialCard from "../cards/testimonialCard";
 import useLayoutStore from "@/store/layout";
+import axios from "axios";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import GoogleReviewCard from "../cards/googleReview";
+import Loader from "../loader";
 
-export default function Testimonial() {
+export default function GoogleReviews() {
   const { layout } = useLayoutStore();
   const sliderRef = React.useRef(null);
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const settings = {
     dots: false,
@@ -38,18 +42,41 @@ export default function Testimonial() {
     sliderRef.current?.slickNext();
   };
 
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const response = await axios.get(`/api/fetchReviews`);
+        console.log(response.data.result.reviews);
+        setReviews(response.data.result.reviews);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchReviews();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-20">
+        <Loader />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center space-y-10">
       {/* Slider Section */}
       <div className="w-full relative">
         <Slider ref={sliderRef} {...settings} className="!h-full">
-          {layout?.testimonials.map((testimonial, index) => (
+          {reviews.map((review, index) => (
             <div key={index} className="p-6">
-              <TestimonialCard
-                avatar={testimonial.image}
-                name={testimonial.name}
-                stars={testimonial.stars}
-                comment={testimonial.message}
+              <GoogleReviewCard
+                avatar={review.profile_photo_url}
+                name={review.author_name}
+                rating={review.rating}
+                comment={review.text}
               />
             </div>
           ))}
@@ -71,16 +98,6 @@ export default function Testimonial() {
           </button>
         </div>
       </div>
-      {/* Heading Section */}
-      {/* <div className="flex flex-col items-center justify-center text-center sm:w-3/4">
-          <div className="text-heading-04 sm:text-heading-02 text-primary font-bold">
-            Trusted by Our Community, Loved by You
-          </div>
-          <div className="text-heading-06 text-primary font-semibold mt-2">
-            Discover why our community chooses us - real stories from people who
-            trust and love our products
-          </div>
-        </div> */}
     </div>
   );
 }

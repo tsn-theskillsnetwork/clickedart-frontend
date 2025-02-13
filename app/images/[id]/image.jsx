@@ -202,11 +202,20 @@ export default function ImagePage({ image }) {
   }, [isHydrated, id]);
 
   useEffect(() => {
-    fetchData(`paper/get-paper`, "papers", setPapers);
-    fetchData(`frames/get-frames`, "frames", setFrames);
-    setSubTotal(image.price?.original);
-    setLoading(false);
+    const fetch = async () => {
+      await fetchData(`paper/get-paper`, "papers", setPapers);
+      setPapers((prev) => {
+        return prev.sort((a, b) => a.name.localeCompare(b.name));
+      });
+      await fetchData(`frames/get-frames`, "frames", setFrames);
+      setFrames((prev) => {
+        return prev.sort((a, b) => a.name.localeCompare(b.name));
+      });
+      setSubTotal(image.price?.original);
+      setLoading(false);
+    };
 
+    fetch();
     handleDigital();
   }, []);
 

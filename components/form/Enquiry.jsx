@@ -12,10 +12,12 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
 import Loader from "@/components/loader";
+import Swal from "sweetalert2";
 
 export default function EnquiryForm() {
   const router = useRouter();
   const { user, photographer, isHydrated } = useAuthStore();
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -27,15 +29,26 @@ export default function EnquiryForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/customenquiry/create-custom-request`,
         formData
       );
-      toast.success("Enquiry submitted successfully");
-      router.back();
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "Enquiry submitted successfully",
+      });
+      setFormData((prev) => ({
+        ...prev,
+        requestType: "",
+        requestDescription: "",
+      }));
     } catch (error) {
       toast.error("Error submitting enquiry");
       console.error("Error submitting enquiry:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -145,7 +158,11 @@ export default function EnquiryForm() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded-md">
+        <button
+          disabled={loading}
+          type="submit"
+          className="bg-blue-500 text-white p-2 rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed"
+        >
           Submit
         </button>
       </div>

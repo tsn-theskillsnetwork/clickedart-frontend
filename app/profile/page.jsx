@@ -54,6 +54,44 @@ const ProfilePage = () => {
   const [activePlan, setActivePlan] = useState("Basic");
   const [limit, setLimit] = useState(1);
   const [isOpen, setIsOpen] = useState(false);
+  const brandColors = {
+    facebook: "text-[#3b5999]",
+    messenger: "text-[#0084ff]",
+    twitter: "text-[#55acee]",
+    linkedin: "text-[#0077b5]",
+    skype: "text-[#00aff0]",
+    dropbox: "text-[#007ee5]",
+    wordpress: "text-[#21759b]",
+    vimeo: "text-[#1ab7ea]",
+    slideshare: "text-[#0077b5]",
+    vk: "text-[#4c75a3]",
+    tumblr: "text-[#34465d]",
+    yahoo: "text-[#410093]",
+    "google-plus": "text-[#dd4b39]",
+    pinterest: "text-[#bd081c]",
+    youtube: "text-[#cd201f]",
+    stumbleupon: "text-[#eb4924]",
+    reddit: "text-[#ff5700]",
+    quora: "text-[#b92b27]",
+    yelp: "text-[#af0606]",
+    weibo: "text-[#df2029]",
+    producthunt: "text-[#da552f]",
+    hackernews: "text-[#ff6600]",
+    soundcloud: "text-[#ff3300]",
+    blogger: "text-[#f57d00]",
+    whatsapp: "text-[#25d366]",
+    wechat: "text-[#09b83e]",
+    line: "text-[#00c300]",
+    medium: "text-[#02b875]",
+    vine: "text-[#00b489]",
+    slack: "text-[#3aaf85]",
+    instagram: "text-[#e4405f]",
+    dribbble: "text-[#ea4c89]",
+    flickr: "text-[#ff0084]",
+    foursquare: "text-[#f94877]",
+    behance: "text-[#131418]",
+    snapchat: "text-[#fffc00]",
+  };
 
   const openDialog = () => setIsOpen(true);
   const closeDialog = () => setIsOpen(false);
@@ -331,13 +369,16 @@ const ProfilePage = () => {
                         }
                         className="text-sm font-medium"
                         target="_blank" // Opens in a new tab
-                        rel="noopener noreferrer" // For security
+                        rel="noopener noreferrer"
                       >
                         <Icon
                           icon={"entypo-social:" + account.accountName}
                           width="40"
                           height="40"
-                          className="text-primary"
+                          className={
+                            brandColors[account.accountName.toLowerCase()] ||
+                            "text-primary"
+                          }
                         />
                       </Link>
                     ))

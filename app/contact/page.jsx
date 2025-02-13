@@ -52,8 +52,8 @@ export default function ContactPage() {
   };
   //console.log(layout);
   return (
-    <div className="flex flex-col items-center px-4 my-10 min-h-screen">
-      <div className="relative flex flex-col w-full md:w-5/6 overflow-hidden rounded-lg">
+    <div className="flex flex-col items-center my-10 min-h-screen">
+      <div className="relative flex flex-col w-full overflow-hidden rounded-lg">
         <Image
           src={
             "/assets/banners/contact.jpg" || "/assets/placeholders/image.webp"
@@ -76,7 +76,7 @@ export default function ContactPage() {
           </h4>
         </div>
       </div>
-      <div className="grid gap-5 lg:gap-7 2xl:gap-10 grid-cols-1 md:grid-cols-2 lg:grid-cols-2 w-full md:w-5/6 shadow-[2px_2px_10px_rgba(0,0,0,0.5)] mt-10 rounded-lg bg-white">
+      <div className="grid gap-5 lg:gap-7 2xl:gap-10 grid-cols-1 md:grid-cols-2 lg:grid-cols-2 w-full shadow-[2px_2px_10px_rgba(0,0,0,0.5)] mt-10 rounded-lg bg-white">
         <div className="flex flex-col gap-5 px-4 md:px-5 py-6 ">
           <div className="flex flex-col gap-2">
             <div className="flex flex-row gap-4">

@@ -80,7 +80,7 @@ export default function Footer() {
             <Link href="/explore" className="text-sm font-medium">
               Explore
             </Link>
-            <Link href="/contact" className="text-sm font-medium">
+            <Link href="/explore?contact" className="text-sm font-medium">
               Contact us
             </Link>
           </div>

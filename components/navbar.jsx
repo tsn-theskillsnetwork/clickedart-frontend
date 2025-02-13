@@ -405,38 +405,56 @@ export default function Navbar() {
               </Tooltip>
             </TooltipProvider>
           )}
-          <Link href="/wishlist" className="relative">
-            <Heart
-              className={`${
-                scrollLocation > 50 || pathname !== "/"
-                  ? "text-surface-600"
-                  : "text-white"
-              } cursor-pointer`}
-            />
-            {wishlist?.length > 0 && (
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
-                <p className="text-xs text-white font-semibold">
-                  {wishlist.length}
-                </p>
-              </div>
-            )}
-          </Link>
-          <Link href="/cart" className="relative">
-            <ShoppingCart
-              className={`${
-                scrollLocation > 50 || pathname !== "/"
-                  ? "text-surface-600"
-                  : "text-white"
-              } cursor-pointer`}
-            />
-            {cartItems?.length > 0 && (
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
-                <p className="text-xs text-white font-semibold">
-                  {cartItems.length}
-                </p>
-              </div>
-            )}
-          </Link>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Link href="/wishlist" className="relative">
+                  <Heart
+                    className={`${
+                      scrollLocation > 50 || pathname !== "/"
+                        ? "text-surface-600"
+                        : "text-white"
+                    } cursor-pointer`}
+                  />
+                  {wishlist?.length > 0 && (
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                      <p className="text-xs text-white font-semibold">
+                        {wishlist.length}
+                      </p>
+                    </div>
+                  )}
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-white font-medium">Wishlist</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Link href="/cart" className="relative">
+                  <ShoppingCart
+                    className={`${
+                      scrollLocation > 50 || pathname !== "/"
+                        ? "text-surface-600"
+                        : "text-white"
+                    } cursor-pointer`}
+                  />
+                  {cartItems?.length > 0 && (
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                      <p className="text-xs text-white font-semibold">
+                        {cartItems.length}
+                      </p>
+                    </div>
+                  )}
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-white font-medium">Cart</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
     </>
