@@ -714,8 +714,8 @@ export default function ImagePage({ image }) {
                       ) : (
                         <div>
                           <p className="text-sm lg:text-base font-medium lg:font-semibold text-surface-600">
-                            {image?.resolutions?.original?.width} x{" "}
-                            {image?.resolutions?.original?.height} px
+                            {image?.resolutions?.thumbnail?.width} x{" "}
+                            {image?.resolutions?.thumbnail?.height} px
                           </p>
                           <p className="text-sm lg:text-base font-medium lg:font-semibold text-surface-600">
                             Size: {selectedSize?.width} x {selectedSize?.height}{" "}
@@ -723,16 +723,18 @@ export default function ImagePage({ image }) {
                           </p>
                           <p className="text-sm lg:text-base font-medium lg:font-semibold text-surface-600">
                             DPI:{" "}
-                            {image?.resolutions?.original?.width >
-                            image?.resolutions?.original?.height
+                            {image?.resolutions?.thumbnail?.width >
+                            image?.resolutions?.thumbnail?.height
                               ? Math.floor(
-                                  image?.resolutions?.original?.width /
-                                    selectedSize?.width
-                                )
+                                  (image?.resolutions?.thumbnail?.width /
+                                    selectedSize?.width) *
+                                    100
+                                ) / 100
                               : Math.floor(
-                                  image?.resolutions?.original?.height /
-                                    selectedSize?.height
-                                )}
+                                  (image?.resolutions?.thumbnail?.height /
+                                    selectedSize?.height) *
+                                    100
+                                ) / 100}
                             {/* {Math.floor((image?.resolutions.original?.width /
                               selectedSize?.width +
                               image?.resolutions.original?.height /
