@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_CLIENT || "https://clickedart.com";
+const BASE_URL = process.env.NEXT_PUBLIC_CLIENT || "https://www.clickedart.com";
 
 export async function GET() {
   console.log("Fetching dynamic routes...");
