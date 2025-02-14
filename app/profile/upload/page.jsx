@@ -212,12 +212,12 @@ const ProfilePage = () => {
   const handleChange = async (event) => {
     try {
       let file = event.target.files[0];
-  
+
       if (!file) {
         console.error("No file selected");
         return;
       }
-  
+
       // Detect HEIC file by extension as a fallback
       const fileExtension = file.name.split(".").pop().toLowerCase();
       const isHEIC =
@@ -225,12 +225,12 @@ const ProfilePage = () => {
         file.type === "image/heif" ||
         fileExtension === "heic" ||
         fileExtension === "heif";
-  
+
       // If it's a HEIC file, convert it to JPEG
       if (isHEIC) {
         toast.loading("Processing...");
         const heic2any = (await import("heic2any")).default;
-  
+
         try {
           const convertedBlob = await heic2any({
             blob: file,
@@ -242,32 +242,34 @@ const ProfilePage = () => {
           toast.dismiss();
         } catch (conversionError) {
           console.error("HEIC conversion failed:", conversionError);
-          toast.error("HEIC conversion failed. Please use a supported image format.");
+          toast.error(
+            "HEIC conversion failed. Please use a supported image format."
+          );
           return;
         }
       }
-  
+
       // Create an image element to check its dimensions
       const image = new Image();
       const imageUrl = URL.createObjectURL(file);
-  
+
       image.onload = async () => {
         const width = image.width;
         const height = image.height;
         const megapixels = (width * height) / 1000000; // calculate in MP
-  
+
         if (megapixels < 5) {
           // Check if the image size is less than 5 megapixels
           toast.error("Image should be at least 5 MP.");
           return;
         }
-  
+
         // Check file size (in MB)
         if (file.size > 100 * 1024 * 1024) {
           toast.error("File size should not exceed 100 MB.");
           return;
         }
-  
+
         // Upload the image to S3
         const s3 = new S3Client({
           region: "ap-south-1",
@@ -276,40 +278,39 @@ const ProfilePage = () => {
             secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
           },
         });
-  
+
         const target = {
           Bucket: "clickedart-bucket",
           Key: `images/${file.name}`,
           Body: file,
           ContentType: file.type,
         };
-  
+
         const upload = new Upload({
           client: s3,
           params: target,
         });
-  
+
         upload.on("httpUploadProgress", (progress) => {
           const percentCompleted = Math.round(
             (progress.loaded / progress.total) * 100
           );
           setProgr(percentCompleted);
         });
-  
+
         await upload.done();
-  
+
         const fileUrl = `https://${target.Bucket}.s3.ap-south-1.amazonaws.com/${target.Key}`;
         setImageUrl(fileUrl);
         setPhoto({ ...photo, imageLinks: { image: fileUrl } });
       };
-  
+
       // Trigger image loading
       image.src = imageUrl;
     } catch (error) {
       console.error("Error uploading file:", error);
     }
   };
-  
 
   const getResolutions = async () => {
     try {
@@ -353,6 +354,7 @@ const ProfilePage = () => {
 
   const handleUpload = async (event) => {
     event.preventDefault();
+    setLoading(true);
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/images/add-image-in-vault`,
@@ -376,6 +378,8 @@ const ProfilePage = () => {
       console.log(error);
       toast.error(error?.response?.data?.message);
       toast.error("Error uploading image");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -525,11 +529,19 @@ const ProfilePage = () => {
                 ) : (
                   <>
                     {imageUrl ? (
+                      <div className="flex flex-col items-center">
                       <img
                         src={imageUrl}
                         alt="Uploaded Image"
                         className="max-h-[80vh] mx-auto"
                       />
+                      <button
+                        onClick={() => setImageUrl("")}
+                        className="bg-black text-white py-2 px-4 rounded-full mt-5"
+                      >
+                        Change Image
+                      </button>
+                      </div>
                     ) : (
                       <div className="w-full mx-auto rounded-lg overflow-hidden">
                         <div className="md:flex">
@@ -686,7 +698,10 @@ const ProfilePage = () => {
                               </div>
                               <DialogFooter>
                                 <DialogClose asChild>
-                                  <Button2 onClick={() => handleWatermarkAdd()}>
+                                  <Button2
+                                    disabled={loading}
+                                    onClick={() => handleWatermarkAdd()}
+                                  >
                                     Save changes
                                   </Button2>
                                 </DialogClose>
@@ -707,7 +722,8 @@ const ProfilePage = () => {
                           (activePlan === "intermediate" && !customText) ||
                           (activePlan === "premium" &&
                             !watermark?.watermarkImage &&
-                            !customText)
+                            !customText) ||
+                          loading
                         }
                         className="bg-primary text-white py-2 px-4 rounded-full disabled:opacity-50"
                       >
@@ -991,7 +1007,9 @@ const ProfilePage = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <Button onClick={() => setStep("1")}>Back</Button>
-                      <Button2 onClick={handleUpload}>Upload</Button2>
+                      <Button2 disabled={loading} onClick={handleUpload}>
+                        {loading ? "Uploading..." : "Upload"}
+                      </Button2>
                     </div>
                   </form>
                 </div>

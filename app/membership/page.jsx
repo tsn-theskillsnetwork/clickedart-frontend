@@ -229,7 +229,7 @@ export default function MembershipPage() {
 
   return (
     <div className="flex flex-col -mt-4 mb-20">
-      <div className="relative flex flex-col py-10 sm:py-16 md:py-20 lg:py-24 xl:py-28 2xl:py-32">
+      <div className="relative flex flex-col py-10 sm:py-16">
         <div className="absolute inset-0 z-0 opacity-80">
           <Image
             src="/assets/images/membershipHeader.jpg"
@@ -239,12 +239,12 @@ export default function MembershipPage() {
             height={2048}
           />
         </div>
-        <div className="absolute inset-0 z-0 bg-black opacity-30"></div>
+        <div className="absolute inset-0 z-0 bg-black opacity-20"></div>
         <div className="flex flex-col justify-center items-start gap-4 sm:gap-6 md:gap-8 lg:gap-10 px-5 sm:px-6 md:px-10 lg:px-28 h-full z-10">
-          <h1 className="text-heading-05 sm:text-heading-04 md:text-heading-03 lg:text-heading-02 font-semibold text-white">
+          <h1 className="text-heading-05 sm:text-heading-04 md:text-heading-03 lg:text-heading-02 font-semibold text-white text-shadow">
             Choose your Membership Plan
           </h1>
-          <p className="text-paragraph sm:text-heading-06 md:text-heading-05 lg:text-heading-03 font-semibold text-white">
+          <p className="text-paragraph sm:text-heading-06 md:text-heading-05 lg:text-heading-03 font-semibold text-white text-shadow">
             Unlock exclusive features to showcase your creativity and boost your
             sales!
           </p>
@@ -275,7 +275,7 @@ export default function MembershipPage() {
                 onClick={() => setActive(plan._id)}
                 className={` flex w-full h-full py-4 md:px-4 lg:px-12 xl:px-20 flex-col items-center justify-between gap-2 border-primary border-2 rounded-2xl transition-all duration-200 ease-linear ${
                   plan._id === active
-                    ? "bg-primary ease-in-out text-white scale-y-105 -translate-y-4"
+                    ? "bg-primary ease-in-out text-white scale-y-105 -translate-y-9"
                     : " text-primary-dark scale-y-100 -translate-y-0"
                 }`}
               >

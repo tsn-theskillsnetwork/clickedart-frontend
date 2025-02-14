@@ -12,10 +12,6 @@ export default function BlogPage() {
   const [successStories, setSuccessStories] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  //console.log(blogPosts);
-  //console.log(successStories);
-  console.log(loading);
-
   useEffect(() => {
     fetchData(`blog/get-all-blogs`, "blogs", setBlogPosts, setLoading);
     fetchData(
@@ -28,7 +24,7 @@ export default function BlogPage() {
 
   return (
     <div className="flex flex-col px-4 lg:px-20">
-      <div className="relative flex flex-col my-5 sm:my-10 md:my-16 xl:my-20 rounded-2xl overflow-hidden">
+      <div className="relative flex flex-col my-5 sm:my-10 rounded-2xl overflow-hidden">
         <Image
           src={
             "/assets/banners/blog-page.png" || "/assets/placeholders/image.webp"
@@ -38,12 +34,12 @@ export default function BlogPage() {
           width={1800}
           height={1400}
         />
-        <div className="bg-[#14162466] bg-opacity-30 absolute inset-0 z-0"></div>
-        <div className="flex flex-col gap-2 mt-10 md:mt-20 xl:mt-40 mb-10 md:mb-20 xl:mb-40 items-center z-10 text-white">
-          <h1 className="text-center z-10 text-white text-heading-04 sm:text-heading-03 md:text-heading-02 lg:text-heading-01 font-bold">
+        <div className="bg-[#14162466] opacity-20 absolute inset-0 z-0"></div>
+        <div className="flex flex-col gap-2 my-10 items-center z-10 text-white">
+          <h1 className="text-center text-shadow-dark z-10 text-white text-heading-04 sm:text-heading-03 md:text-heading-02 lg:text-heading-01 font-bold">
             From Ideas to Masterpieces
           </h1>
-          <p className="text-center z-10 text-white text-paragraph sm:text-heading-06 md:text-heading-05 lg:text-heading-04 font-semibold">
+          <p className="text-center text-shadow-dark z-10 text-white text-paragraph sm:text-heading-06 md:text-heading-05 lg:text-heading-04 font-semibold">
             Inspiration, tips, and stories to bring your creative vision to
             life.
           </p>
@@ -92,7 +88,7 @@ export default function BlogPage() {
               <h2 className="text-heading-04 sm:text-heading-03 lg:text-heading-02 font-bold mb-5">
                 Success Stories
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-10 mb-20">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-10 mb-20">
                 {successStories.slice(0, blogLength).map((post, index) => (
                   <div key={index} className="flex flex-col gap-4">
                     <Link
@@ -110,14 +106,14 @@ export default function BlogPage() {
                         height={400}
                         className="w-full aspect-[16/9] rounded-lg object-cover"
                       />
-                      <h5 className="text-heading-06 sm:text-heading-05 lg:text-heading-04 font-semibold">
+                      <h5 className="text-heading-sm sm:text-base lg:text-heading-06 font-semibold">
                         {post.content.title}
                       </h5>
                     </Link>
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-2">
                         <div className="flex gap-2 text-sm md:text-base text-surface-500">
-                          <p className="font-bold border-r-2 border-[#7777778f] pr-2">
+                          <p className="font-bold text-sm border-r-2 border-[#7777778f] pr-2">
                             {post.authorInfo?.authorType === "Photographer" ? (
                               <Link
                                 href={`/photographer/${post.authorInfo?.author?._id}`}
@@ -131,7 +127,7 @@ export default function BlogPage() {
                               "Admin"
                             )}
                           </p>
-                          <p className="">
+                          <p className="text-sm">
                             {" "}
                             {new Date(post.createdAt).toLocaleDateString(
                               "en-US",
@@ -144,19 +140,19 @@ export default function BlogPage() {
                           </p>
                         </div>
                       </div>
-                      <p className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-600 truncate">
+                      <p className="text-xs sm:text-sm lg:text-base font-medium text-surface-600 truncate">
                         {post.content.summary}
                       </p>
                       <div className="flex gap-2 flex-wrap items-center">
                         {post.tags.slice(0, 3).map((tag, index) => (
                           <span
                             key={index}
-                            className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-700 bg-primary-400 bg-opacity-15 rounded-lg px-2 py-1"
+                            className="text-xs sm:text-sm lg:text-base font-medium text-surface-700 bg-primary-400 bg-opacity-15 rounded-lg px-2 py-1"
                           >
                             {tag}
                           </span>
                         ))}
-                        <span className="text-sm text-gray-600 font-semibold">
+                        <span className="text-xs text-gray-600 font-semibold">
                           {post.tags.length > 3 &&
                             `+${post.tags.length - 3} more`}
                         </span>
@@ -171,7 +167,7 @@ export default function BlogPage() {
           <h2 className="text-heading-04 sm:text-heading-03 lg:text-heading-02 font-bold mb-5">
             Blogs
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-10 mb-20">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-10 mb-20">
             {blogPosts.slice(0, blogLength).map((post, index) => (
               <div
                 key={index}
@@ -193,14 +189,14 @@ export default function BlogPage() {
                     className="w-full aspect-[16/9] rounded-lg object-cover"
                   />
 
-                  <h5 className="text-heading-06 sm:text-heading-05 lg:text-heading-04 font-semibold">
+                  <h5 className="text-heading-sm sm:text-base lg:text-heading-06 font-semibold">
                     {post.content.title}
                   </h5>
                 </Link>
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2">
                     <div className="flex gap-2 text-sm md:text-base text-surface-500">
-                      <p className="font-bold border-r-2 border-[#7777778f] pr-2">
+                      <p className="font-bold text-sm border-r-2 border-[#7777778f] pr-2">
                         {post.authorInfo?.authorType === "Photographer" ? (
                           <Link
                             href={`/photographer/${post.authorInfo?.author?._id}`}
@@ -214,7 +210,7 @@ export default function BlogPage() {
                           "Admin"
                         )}
                       </p>
-                      <p className="">
+                      <p className="text-sm">
                         {" "}
                         {new Date(post.createdAt).toLocaleDateString("en-US", {
                           month: "short",
@@ -224,19 +220,19 @@ export default function BlogPage() {
                       </p>
                     </div>
                   </div>
-                  <p className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-600 truncate">
+                  <p className="text-xs sm:text-sm lg:text-base font-medium text-surface-600 truncate">
                     {post.content.summary}
                   </p>
                   <div className="flex gap-2 flex-wrap items-center">
                     {post.tags.slice(0, 3).map((tag, index) => (
                       <span
                         key={index}
-                        className="text-sm sm:text-base md:text-heading-06 lg:text-paragraph font-medium text-surface-700 bg-primary-400 bg-opacity-15 rounded-lg px-2 py-1"
+                        className="text-xs sm:text-sm lg:text-base font-medium text-surface-700 bg-primary-400 bg-opacity-15 rounded-lg px-2 py-1"
                       >
                         {tag}
                       </span>
                     ))}
-                    <span className="text-sm text-gray-600 font-semibold">
+                    <span className="text-xs text-gray-600 font-semibold">
                       {post.tags.length > 3 && `+${post.tags.length - 3} more`}
                     </span>
                   </div>
