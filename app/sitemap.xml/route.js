@@ -14,9 +14,21 @@ export async function GET() {
     const staticRoutes = [
       `${BASE_URL}/`,
       `${BASE_URL}/photographer`,
+      `${BASE_URL}/themes`,
       `${BASE_URL}/images`,
       `${BASE_URL}/blog`,
       `${BASE_URL}/story`,
+      `${BASE_URL}/signin`,
+      `${BASE_URL}/signup`,
+      `${BASE_URL}/terms`,
+      `${BASE_URL}/explore`,
+      `${BASE_URL}/verify`,
+      `${BASE_URL}/reset-pass`,
+      `${BASE_URL}/signin/photographer`,
+      `${BASE_URL}/signup/photographer`,
+      `${BASE_URL}/support/bulk-download`,
+      `${BASE_URL}/support/custom-enquiry`,
+      `${BASE_URL}/support/printing-guide`,
     ];
 
     const dynamicRoutes = [
