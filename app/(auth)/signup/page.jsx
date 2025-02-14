@@ -70,6 +70,7 @@ const RegistrationForm = () => {
   const [selectedState, setSelectedState] = useState("0");
   const [showPassword, setShowPassword] = useState(false);
   const [verifyPassword, setVerifyPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -219,6 +220,7 @@ const RegistrationForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     const newErrors = validateForm();
     if (Object.keys(newErrors).length > 0) {
@@ -275,7 +277,10 @@ const RegistrationForm = () => {
       } else {
         console.error("Network error or server not reachable:", err);
       }
+    } finally {
+      setLoading(false);
     }
+
   };
   const toastShownRef = useRef(false);
 
@@ -723,7 +728,7 @@ const RegistrationForm = () => {
             {message && <p className="text-green-500">{message}</p>}
             {error && <p className="text-red-500">{error}</p>}
             <div className="flex flex-col items-center">
-              <Button type="submit">Register</Button>
+              <Button disabled={loading} type="submit">Register</Button>
             </div>
           </form>
           <div className="flex flex-col items-center mt-4">

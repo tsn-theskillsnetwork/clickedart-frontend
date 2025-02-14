@@ -98,6 +98,7 @@ const RegistrationForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState("102");
   const [selectedState, setSelectedState] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -194,6 +195,7 @@ const RegistrationForm = () => {
   };
 
   const handleBestPhotosUpload = async (event, key) => {
+    setLoading(true);
     try {
       const file = event.target.files[0];
 
@@ -247,6 +249,8 @@ const RegistrationForm = () => {
       }
     } catch (error) {
       console.error("Error uploading file:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -481,6 +485,7 @@ const RegistrationForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     const newErrors = validateForm2();
     if (Object.keys(newErrors).length > 0) {
@@ -513,6 +518,8 @@ const RegistrationForm = () => {
         setError("Something went wrong. Please try again later.");
       }
       setMessage("");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -1406,7 +1413,7 @@ const RegistrationForm = () => {
                 <Button type="button" onClick={() => setStep(1)}>
                   Previous
                 </Button>
-                <Button type="submit" variant="primary" fullWidth>
+                <Button disabled={loading} type="submit" variant="primary" fullWidth>
                   Register
                 </Button>
               </div>
