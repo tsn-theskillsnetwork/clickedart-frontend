@@ -88,14 +88,6 @@ export default function Navbar() {
         {isOpen && (
           <div className="absolute left-0 mt-2 space-y-2 bg-white shadow-lg w-max p-2 rounded-md z-10">
             <Link
-              href="/explore"
-              className={`text-sm md:text-md lg:text-lg xl:text-xl px-1 xl:px-4 py-2 rounded-lg text-center font-semibold ${
-                pathname.startsWith("/explore") ? "menuActive" : "menuHover"
-              } cursor-pointer block`}
-            >
-              Explore
-            </Link>
-            <Link
               href="/story"
               className={`text-sm md:text-md lg:text-lg xl:text-xl px-1 xl:px-4 py-2 rounded-lg text-center font-semibold ${
                 pathname.startsWith("/story") ? "menuActive" : "menuHover"
@@ -104,12 +96,12 @@ export default function Navbar() {
               Story
             </Link>
             <Link
-              href="/contact"
+              href="/explore"
               className={`text-sm md:text-md lg:text-lg xl:text-xl px-1 xl:px-4 py-2 rounded-lg text-center font-semibold ${
-                pathname.startsWith("/contact") ? "menuActive" : "menuHover"
+                pathname.startsWith("/explore") ? "menuActive" : "menuHover"
               } cursor-pointer block`}
             >
-              Contact Us
+              Explore
             </Link>
           </div>
         )}
@@ -207,7 +199,7 @@ export default function Navbar() {
         </Link>
 
         {/* Mobile Navbar */}
-        <div className="lg:hidden pt-0">
+        <div className="lg:hidden pt-0 flex">
           <Menu
             ref={menuButtonRef}
             size={30}
@@ -250,7 +242,7 @@ export default function Navbar() {
         {isMenuOpen && (
           <div
             ref={menuRef}
-            className="absolute top-0 left-0 right-0 bg-white shadow-lg p-6 lg:hidden flex flex-col gap-4"
+            className="absolute top-0 left-0 right-0 bg-white bg-opacity-70 backdrop-blur-sm shadow-lg p-6 lg:hidden flex flex-col gap-4"
           >
             <div className="flex justify-end">
               <X
@@ -271,49 +263,82 @@ export default function Navbar() {
                 </p>
               </Link>
             ))}
-            <Link onClick={() => setIsMenuOpen(false)} href="/explore">
-              <p className="text-lg font-semibold text-black cursor-pointer">
-                Explore
-              </p>
-            </Link>
             <Link onClick={() => setIsMenuOpen(false)} href="/story">
               <p className="text-lg font-semibold text-black cursor-pointer">
                 Story
               </p>
             </Link>
-            <Link onClick={() => setIsMenuOpen(false)} href="/contact">
+            <Link onClick={() => setIsMenuOpen(false)} href="/explore">
               <p className="text-lg font-semibold text-black cursor-pointer">
-                Contact Us
+                Explore
               </p>
             </Link>
-
-            {user || photographer ? (
-              <>
-                <Link onClick={() => setIsMenuOpen(false)} href="/profile">
-                  <p className="text-lg font-semibold text-black cursor-pointer">
-                    Profile
-                  </p>
+            <hr />
+            <div className="flex flex-row gap-4 justify-end items-center">
+              {user || photographer ? (
+                <>
+                  <Link onClick={() => setIsMenuOpen(false)} href="/profile">
+                    <User2 />
+                  </Link>
+                  <Signout
+                    onClick={() => setIsMenuOpen(false)}
+                    variant="icon"
+                  />
+                </>
+              ) : (
+                <Link onClick={() => setIsMenuOpen(false)} href="/signin">
+                  <User2 />
                 </Link>
-                <Signout onClick={() => setIsMenuOpen(false)} variant="text" />
-              </>
-            ) : (
-              <Link onClick={() => setIsMenuOpen(false)} href="/signin">
-                <p className="text-lg font-semibold text-black cursor-pointer">
-                  Sign In
-                </p>
-              </Link>
-            )}
+              )}
 
-            <Link onClick={() => setIsMenuOpen(false)} href="/wishlist">
-              <p className="text-lg font-semibold text-black cursor-pointer">
-                Wishlist ({wishlist?.length > 0 ? wishlist.length : 0})
-              </p>
-            </Link>
-            <Link onClick={() => setIsMenuOpen(false)} href="/cart">
-              <p className="text-lg font-semibold text-black cursor-pointer">
-                Cart ({cartItems?.length > 0 ? cartItems.length : 0})
-              </p>
-            </Link>
+              <Link onClick={() => setIsMenuOpen(false)} href="/wishlist">
+                <Heart />
+                {wishlist?.length > 0 && (
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                    <p className="text-xs text-white font-semibold">
+                      {wishlist.length}
+                    </p>
+                  </div>
+                )}
+              </Link>
+              <Link onClick={() => setIsMenuOpen(false)} href="/cart">
+                <ShoppingCart />
+                {cartItems?.length > 0 && (
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                    <p className="text-xs text-white font-semibold">
+                      {cartItems.length}
+                    </p>
+                  </div>
+                )}
+              </Link>
+              <Dialog>
+                <DialogTrigger>
+                  <Search />
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle></DialogTitle>
+                  </DialogHeader>
+                  <Input
+                    onChange={(e) => setSearch(e.target.value)}
+                    type="text"
+                    placeholder="Search for images"
+                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  />
+                  <DialogFooter className="sm:justify-start">
+                    <DialogClose asChild>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={handleSearch}
+                      >
+                        Search
+                      </Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
         )}
 

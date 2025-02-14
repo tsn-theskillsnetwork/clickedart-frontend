@@ -48,8 +48,8 @@ export default function HeroSection() {
   }, [heroPhotos.length]);
 
   return (
-    <div className="relative h-[70vh] sm:h-[80vh] md:h-[90vh] lg:h-[100vh] xl:h-[930px] overflow-hidden">
-      <div className="absolute inset-0 z-0">
+    <div className="relative overflow-hidden">
+      <div className="absolute inset-0 -z-50">
         <div className="absolute inset-0 bg-black opacity-30 z-10"></div>
         <AnimatePresence mode="popLayout">
           <motion.div
@@ -76,11 +76,11 @@ export default function HeroSection() {
         </AnimatePresence>
       </div>
 
-      <div className="absolute inset-0 z-20 flex flex-col mt-20 sm:mt-20 items-center text-white">
+      <div className="z-20 flex flex-col mt-20 sm:mt-20 items-center text-white">
         {/* {<h1 className="text-heading-03 md:text-heading-02 lg:text-heading-01 2xl:text-heading-lg font-semibold">
           ClickedArt
         </h1>} */}
-        <div className="h-12 overflow-hidden mt-20">
+        <div className="h-12 overflow-hidden mt-10">
           <div className="absolute w-full z-30 h-12 pb-2 left-0 right-0 flex items-center overflow-hidden">
             <AnimatePresence mode="popLayout">
               <motion.div
@@ -91,14 +91,14 @@ export default function HeroSection() {
                 className="mx-auto"
                 transition={{ duration: 0.5, ease: "easeInOut" }}
               >
-                <p className="text-base sm:text-paragraph md:text-heading-05 lg:text-heading-04 xl:text-heading-03 font-semibold px-4 text-center">
+                <p className="text-base sm:text-paragraph md:text-heading-06 lg:text-heading-05 xl:text-heading-04 font-semibold px-4 text-center">
                   {taglines[currentImage]}
                 </p>
               </motion.div>
             </AnimatePresence>
           </div>
         </div>
-        <div className="mt-4 flex flex-row bg-white text-black group rounded-lg items-center gap-2 w-11/12 md:w-4/5 lg:w-2/3 xl:w-1/2 focus-within:outline focus-within:outline-blue-500 mx-auto">
+        <div className="mt-4 flex flex-row bg-white text-black group rounded-lg px-2 items-center gap-2 w-11/12 md:w-4/5 lg:w-2/3 xl:w-1/2 focus-within:outline focus-within:outline-blue-500 mx-auto">
           <div className="h-full aspect-[1/1] flex justify-center items-center shrink-0">
             <Search size={30} color="black" className="mx-auto" />
           </div>
@@ -108,7 +108,7 @@ export default function HeroSection() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            className="py-3 text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-semibold w-full focus:outline-none"
+            className="py-3 text-sm sm:text-base md:text-lg lg:text-xl font-semibold w-full focus:outline-none"
           />
 
           <div className="relative shrink-0">
@@ -124,7 +124,7 @@ export default function HeroSection() {
           </div>
           <button
             onClick={handleSearch}
-            className="bg-accent-200 h-full aspect-[1/1] text-white rounded-r-lg flex justify-center items-center shrink-0"
+            className="h-full aspect-[1/1] text-black rounded-r-lg flex justify-center items-center shrink-0"
           >
             <p className="sr-only">Search</p>
             <Icon
@@ -135,7 +135,7 @@ export default function HeroSection() {
           </button>
         </div>
 
-        <div className="mt-[2%] w-full flex flex-col gap-2 items-center md:flex-row justify-around">
+        <div className="relative mt-[2%] w-full flex flex-col gap-2 items-center md:flex-row justify-around">
           <button
             onClick={() => router.push("/images")}
             className="border-2 bg-gradient-to-tr from-transparent to-transparent hover:from-black border-white rounded-2xl px-2 py-2 sm:px-4 sm:py-2 sm:pl-5 w-52 md:w-72 group transition-all duration-200 ease-linear"
@@ -184,7 +184,7 @@ export default function HeroSection() {
           </button>
         </div>
       </div>
-      <div>
+      <div className="w-full h-[28vw]">
         <div className="absolute inset-x-0 mx-auto bottom-3 sm:bottom-5 px-2 left-0 w-[90vw] z-40 flex justify-around gap-2 items-end">
           {heroPhotos.map((image, index) => (
             <div key={index}>

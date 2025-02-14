@@ -47,6 +47,7 @@ export default function GoogleReviews() {
     const fetchReviews = async () => {
       try {
         const response = await axios.get(`/api/fetchReviews`);
+        console.log(response.data.result.reviews);
         const fiveStarReviews = response.data.result.reviews.filter(
           (review) => review.rating === 5
         );

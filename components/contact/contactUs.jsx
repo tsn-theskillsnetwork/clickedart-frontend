@@ -10,7 +10,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-export default function ContactPage() {
+export default function ContactUs() {
   const { layout } = useLayoutStore();
   const brandColors = {
     facebook: "text-[#3b5999]",

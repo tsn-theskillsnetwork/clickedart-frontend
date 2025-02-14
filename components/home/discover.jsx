@@ -19,9 +19,9 @@ export default function Discover({ stories }) {
     slidesToShow: 5,
     slidesToScroll: 1,
     responsive: [
-      { breakpoint: 1024, settings: { slidesToShow: 5 } },
-      { breakpoint: 768, settings: { slidesToShow: 2 } },
-      { breakpoint: 480, settings: { slidesToShow: 1 } },
+      { breakpoint: 1024, settings: { slidesToShow: 4 } },
+      { breakpoint: 768, settings: { slidesToShow: 3 } },
+      { breakpoint: 480, settings: { slidesToShow: 2 } },
     ],
   };
 
@@ -81,11 +81,11 @@ export default function Discover({ stories }) {
         </button>
       </div>
       <div className="flex flex-row items-center justify-center gap-8 -mt-3 mb-10">
-        <h1 className="font-bold text-heading-05 sm:text-heading-03 md:text-heading-02 text-primary">
+        <h1 className="font-bold text-heading-06 sm:text-heading-05 md:text-heading-04 text-primary">
           Every Photo Tells a Story—Discover It
         </h1>
         <Link href="/story">
-          <Button size="lg" variant="filled" state="default">
+          <Button variant="filled" state="default">
             Explore More
           </Button>
         </Link>

@@ -602,8 +602,6 @@ export default function ImagePage({ image }) {
 
   const height = clampedHeight + "%";
 
-  console.log(selectedSize);
-
   return (
     <>
       {loading ? (

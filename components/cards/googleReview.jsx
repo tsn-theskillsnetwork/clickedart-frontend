@@ -1,6 +1,23 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
+import { motion } from "framer-motion";
 
 const GoogleReviewCard = ({ avatar, name, rating, comment }) => {
+  const [length, setLength] = useState(400);
+  const [showMore, setShowMore] = useState(false);
+
+  const handleShowMore = () => {
+    setLength(comment.length);
+    setShowMore(true);
+  };
+
+  const handleShowLess = () => {
+    setLength(400);
+    setShowMore(false);
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 flex flex-col space-y-4 w-full">
       <div className="flex items-center space-x-4">
@@ -31,7 +48,18 @@ const GoogleReviewCard = ({ avatar, name, rating, comment }) => {
           </div>
         </div>
       </div>
-      <div className="text-gray-600">{comment}</div>
+      <div className={`text-gray-600 text-sm font-medium ${showMore ? "h-auto" : "min-h-64 xl:min-h-40"}`}>
+        {comment?.slice(0, length)}
+        {comment.length > length && <span>... </span>}
+        {comment.length > 400 && (
+          <span
+            onClick={showMore ? handleShowLess : handleShowMore}
+            className="text-primary font-semibold"
+          >
+            {showMore ? "Show Less" : "Show More"}
+          </span>
+        )}
+      </div>
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2 text-sm text-gray-500">
           {/* Google Logo */}

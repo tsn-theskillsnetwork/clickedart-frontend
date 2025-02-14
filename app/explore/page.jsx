@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import {
   Accordion,
@@ -9,10 +8,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { motion } from "framer-motion";
-import Button from "@/components/button";
-import ContactPage from "../contact/page";
 import { useSearchParams } from "next/navigation";
+import ContactUs from "../../components/contact/contactUs";
 
 const faqs1 = [
   {
@@ -322,7 +319,7 @@ export default function ExplorePage() {
         </div>
       </div>
       <div className="w-full pt-16 z-0 sm:pt-20" id="contact">
-        <ContactPage />
+        <ContactUs />
       </div>
     </div>
   );

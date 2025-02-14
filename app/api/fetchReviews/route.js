@@ -13,6 +13,7 @@ export async function GET() {
       params: {
         placeid: placeId,
         key: apiKey,
+        reviews_sort: 'newest',
       },
     });
     return new Response(JSON.stringify(response.data), { status: 200 });
