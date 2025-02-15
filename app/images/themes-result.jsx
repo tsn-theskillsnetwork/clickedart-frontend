@@ -316,8 +316,8 @@ export default function ThemesResultPage() {
                     image.imageLinks.thumbnail ||
                     "/assets/placeholders/image.webp"
                   }
-                  width={800}
-                  height={800}
+                  width={500}
+                  height={500}
                   alt={image.description}
                   className="w-full"
                 />

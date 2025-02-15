@@ -331,8 +331,8 @@ export default function SearchResultPage() {
                     image.imageLinks.thumbnail ||
                     "/assets/placeholders/image.webp"
                   }
-                  width={image.resolutions?.original?.width}
-                  height={image.resolutions?.original?.height}
+                  width={500}
+                  height={500}
                   alt={image.description}
                   className="w-full"
                 />
