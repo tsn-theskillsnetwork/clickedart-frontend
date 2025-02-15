@@ -536,14 +536,14 @@ export default function ImageEdit() {
                   <Label className="!text-paragraph">ISO</Label>
                   <Input
                     className="!text-paragraph"
-                    value={photo.cameraDetails.settings.iso || ""}
+                    value={updatedPhoto.cameraDetails.settings.iso || ""}
                     onChange={(e) =>
-                      setPhoto({
-                        ...photo,
+                      setUpdatedPhoto({
+                        ...updatedPhoto,
                         cameraDetails: {
-                          ...photo.cameraDetails,
+                          ...updatedPhoto.cameraDetails,
                           settings: {
-                            ...photo.cameraDetails.settings,
+                            ...updatedPhoto.cameraDetails.settings,
                             iso: e.target.value,
                           },
                         },
@@ -557,9 +557,9 @@ export default function ImageEdit() {
                 <Label className="!text-paragraph">Location</Label>
                 <Input
                   className="!text-paragraph"
-                  value={photo.location || ""}
+                  value={updatedPhoto.location || ""}
                   onChange={(e) =>
-                    setPhoto({ ...photo, location: e.target.value })
+                    setUpdatedPhoto({ ...updatedPhoto, location: e.target.value })
                   }
                 />
               </div>

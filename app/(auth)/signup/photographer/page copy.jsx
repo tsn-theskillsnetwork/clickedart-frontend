@@ -393,17 +393,17 @@ const RegistrationForm = () => {
     return newErrors;
   };
 
-  // const validateForm2 = () => {
-  //   const newErrors = {};
-  //   if (
-  //     formData.bestPhotos[0] === "" ||
-  //     formData.bestPhotos[1] === "" ||
-  //     formData.bestPhotos[2] === ""
-  //   )
-  //     newErrors.bestPhotos = "Please upload at least 3 photos.";
+  const validateForm2 = () => {
+    const newErrors = {};
+    if (
+      formData.bestPhotos[0] === "" ||
+      formData.bestPhotos[1] === "" ||
+      formData.bestPhotos[2] === ""
+    )
+      newErrors.bestPhotos = "Please upload at least 3 photos.";
 
-  //   return newErrors;
-  // };
+    return newErrors;
+  };
 
   const handleNext = async () => {
     // Validate client-side fields
@@ -530,6 +530,10 @@ const RegistrationForm = () => {
 
     if ((user || photographer) && !toastShownRef.current) {
       toastShownRef.current = true;
+      // toast(`Already Signed In as ${user ? "User" : "Photographer"}`, {
+      //   duration: 4000,
+      //   position: "top-center",
+      // });
       router.push("/");
     }
   }, [isHydrated, user, router]);
@@ -1185,7 +1189,7 @@ const RegistrationForm = () => {
                         }}
                       >
                         <SelectTrigger className="w-40">
-                          <SelectValue placeholder="Account Name" />
+                          <SelectValue />
                           <p className="sr-only">Account Name</p>
                         </SelectTrigger>
                         <SelectContent>
@@ -1255,6 +1259,146 @@ const RegistrationForm = () => {
                   </button>
                 </div>
               </div>
+              <div className="mt-2 flex justify-center">
+                <Button type="button" onClick={handleNext}>
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="flex flex-col gap-2">
+              <p className="text-heading-04 font-medium text-center">
+                Upload your 3 Best Photos
+              </p>
+              {progr > 0 && progr < 100 && (
+                <div>
+                  <progress value={progr} max={100}></progress>
+                  <span>{progr}%</span>
+                </div>
+              )}
+              {formData.bestPhotos.map((photo, index) => (
+                <div key={index} className="flex flex-col items-center gap-4">
+                  {photo ? (
+                    <>
+                      <NextImage
+                        src={photo}
+                        alt="Profile Image"
+                        width={200}
+                        height={200}
+                        className="object-contain"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setFormData((prev) => {
+                            const newBestPhotos = [...prev.bestPhotos];
+                            newBestPhotos[index] = "";
+                            return {
+                              ...prev,
+                              bestPhotos: newBestPhotos,
+                            };
+                          })
+                        }
+                        className="text-red-500"
+                      >
+                        Remove
+                      </button>
+                    </>
+                  ) : (
+                    <div className="max-w-md mx-auto rounded-lg overflow-hidden md:max-w-xl">
+                      <div className="md:flex">
+                        <div className="w-full p-3">
+                          <div className="relative h-48 rounded-lg border-2 border-blue-500 bg-gray-50 flex justify-center items-center shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
+                            <div className="absolute flex flex-col items-center">
+                              <ImageIcon className="w-12 h-12 text-blue-500" />
+                              <span className="block text-gray-500 font-semibold">
+                                Drag &amp; drop your Image
+                              </span>
+                              <span className="block text-gray-400 font-normal mt-1">
+                                or click to upload
+                              </span>
+                            </div>
+                            <input
+                              name=""
+                              onChange={(event) =>
+                                handleBestPhotosUpload(event, index)
+                              }
+                              accept="image/*, image/heic, image/heif"
+                              className="h-full w-full opacity-0 cursor-pointer"
+                              type="file"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+              <div className="grid grid-cols grid-cols-3 gap-4 px-4">
+                <ul className="text-xs text-primary font-medium mt-1">
+                  <li className="text-xs mt-1">
+                    File size should be less than 5MB
+                  </li>
+                  <li className="text-xs mt-1">
+                    Ensure the resolution is at least 300 DPI for print-quality
+                    images.
+                  </li>
+                  <li className="text-xs mt-1">
+                    Minimum dimensions: 2000 x 3000 pixels (or equivalent aspect
+                    ratio).
+                  </li>
+                  <li className="text-xs mt-1">
+                    File size should not exceed 20 MB.
+                  </li>
+                </ul>
+                <ul className="text-xs text-primary font-medium mt-1">
+                  <li className="text-xs mt-1">
+                    Only upload original work; plagiarism or copyright
+                    infringement will result in account penalties.
+                  </li>
+                  <li className="text-xs mt-1">
+                    Avoid images with watermarks, logos, or text overlays.
+                  </li>
+                  <li className="text-xs mt-1">
+                    Ensure the photo does not contain offensive, explicit, or
+                    illegal content.
+                  </li>
+                  <li className="text-xs mt-1">
+                    Photos must align with ClickedArt's ethical standards,
+                    particularly for wildlife, cultural, and sensitive subjects.
+                  </li>
+                  <li className="text-xs mt-1">
+                    Ensure the uploaded photo is relevant to the categories
+                    you&apos;ve selected.
+                  </li>
+                </ul>
+                <ul className="text-xs text-primary font-medium mt-1">
+                  <li className="text-xs mt-1">
+                    Submit sharp, high-quality images free from excessive noise,
+                    blurriness, or pixelation.
+                  </li>
+                  <li className="text-xs mt-1">
+                    Post-process images tastefully; avoid over-saturation,
+                    extreme HDR, or unnatural effects.
+                  </li>
+                  <li className="text-xs mt-1">
+                    Composition should follow photography principles, such as
+                    the rule of thirds, framing, or leading lines.
+                  </li>
+                  <li className="text-xs mt-1">
+                    Ensure the photo has no distracting elements unless integral
+                    to the subject.
+                  </li>
+                </ul>
+              </div>
+              {errors2.bestPhotos && (
+                <p className="text-red-500 text-sm">{errors2.bestPhotos}</p>
+              )}
+              {message && <p className="text-green-500">{message}</p>}
+              {error && <p className="text-red-500">{error}</p>}
+
               <Label>Have a Referral Code?</Label>
               <Input
                 type="text"
@@ -1266,12 +1410,10 @@ const RegistrationForm = () => {
               />
 
               <div className="mt-2 flex justify-center">
-                <Button
-                  disabled={loading}
-                  type="submit"
-                  variant="primary"
-                  fullWidth
-                >
+                <Button type="button" onClick={() => setStep(1)}>
+                  Previous
+                </Button>
+                <Button disabled={loading} type="submit" variant="primary" fullWidth>
                   Register
                 </Button>
               </div>
