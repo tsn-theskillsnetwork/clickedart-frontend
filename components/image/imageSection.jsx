@@ -21,15 +21,45 @@ export default function ImageSection({ selectedFrame, image }) {
         />
       </div>
       {selectedFrame && (
-        <Image
-          priority
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="absolute z-10 inset-0 w-full h-full"
-          src={selectedFrame.image}
-          alt={selectedFrame.name}
-        />
+        // <img
+        //   className="absolute z-10 inset-0 h-full w-2"
+        //   src={selectedFrame.image[0]}
+        //   alt={selectedFrame.name}
+        // />
+        <>
+          <Image
+            priority
+            width={800}
+            height={800}
+            className="absolute object-cover z-10 inset-0 h-full w-2"
+            src={selectedFrame.image[0]}
+            alt={selectedFrame.name}
+          />
+          <Image
+            priority
+            width={800}
+            height={800}
+            className="absolute object-cover z-10 rotate-180 right-0 inset-y-0 h-full w-2"
+            src={selectedFrame.image[0]}
+            alt={selectedFrame.name}
+          />
+          <Image
+            priority
+            width={800}
+            height={800}
+            className="absolute object-cover z-20 inset-0 w-full h-2"
+            src={selectedFrame.image[1]}
+            alt={selectedFrame.name}
+          />
+          <Image
+            priority
+            width={800}
+            height={800}
+            className="absolute object-cover z-20 rotate-180 bottom-0 inset-x-0 w-full h-2"
+            src={selectedFrame.image[1]}
+            alt={selectedFrame.name}
+          />
+        </>
       )}
     </div>
   );
