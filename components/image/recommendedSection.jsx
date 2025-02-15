@@ -77,8 +77,8 @@ export default function RecommendedSection({ category, id }) {
               <div key={index} className="p-4 capitalize relative">
                 <Link href={`/images/${image._id}`}>
                   <Image
-                    width={800}
-                    height={800}
+                    width={500}
+                    height={500}
                     src={image.imageLinks.thumbnail}
                     alt={image.title}
                     className="object-cover w-full aspect-[1/1] rounded-lg shadow-[0px_2px_8px_rgba(0,0,0,0.5)]"

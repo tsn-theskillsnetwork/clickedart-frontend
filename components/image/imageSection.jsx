@@ -2,6 +2,7 @@ import Image from "next/image";
 import React from "react";
 
 export default function ImageSection({ selectedFrame, image }) {
+  console.log(image);
   return (
     <div
       className={`relative flex h-full w-full ${
@@ -9,20 +10,19 @@ export default function ImageSection({ selectedFrame, image }) {
       } bg-white transition-all  duration-300 ease-in-out`}
     >
       <div className="relative w-full h-full  inner-shadow-3 z-10">
-        <img
-          src={
-            image.imageLinks?.thumbnail ||
-            image.imageLinks?.small ||
-            image.imageLinks?.medium ||
-            image.imageLinks?.original ||
-            "/assets/images/img3.jpg"
-          }
+        <Image
+          priority
+          quality={30}
+          width={800}
+          height={800}
+          src={image.imageLinks?.thumbnail || "/assets/images/img3.jpg"}
           alt={image.title || "Image"}
           className="z-0 object-cover h-full w-full  mx-auto"
         />
       </div>
       {selectedFrame && (
-        <img
+        <Image
+          priority
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

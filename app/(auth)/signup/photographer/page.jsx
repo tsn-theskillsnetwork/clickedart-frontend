@@ -32,6 +32,8 @@ import states from "@/lib/address/states.json";
 import cities from "@/lib/address/cities.json";
 import useAuthStore from "@/authStore";
 import Loader from "@/components/loader";
+import { convertFieldResponseIntoMuiTextFieldProps } from "@mui/x-date-pickers/internals";
+import SpinLoader from "@/components/spinLoader";
 
 const RegistrationForm = () => {
   const router = useRouter();
@@ -136,6 +138,7 @@ const RegistrationForm = () => {
         toast.error("An error occurred. Please try again.");
       }
     }
+
     return serverErrors;
   };
 
@@ -194,130 +197,11 @@ const RegistrationForm = () => {
     }
   };
 
-  const handleBestPhotosUpload = async (event, key) => {
-    setLoading(true);
-    try {
-      const file = event.target.files[0];
-
-      if (!file) {
-        console.error("No file selected");
-        return;
-      }
-
-      // Check the image size (in MB)
-      if (file.size > 100 * 1000 * 1024) {
-        toast.error("File with maximum size of 100MB is allowed");
-        return false;
-      }
-
-      // Detect HEIC file by extension as a fallback
-      const fileExtension = file.name.split(".").pop().toLowerCase();
-      const isHEIC =
-        file.type === "image/heic" ||
-        file.type === "image/heif" ||
-        fileExtension === "heic" ||
-        fileExtension === "heif";
-
-      if (isHEIC) {
-        toast.loading("Processing...");
-        const heic2any = (await import("heic2any")).default;
-
-        try {
-          const convertedBlob = await heic2any({
-            blob: file,
-            toType: "image/jpeg",
-          });
-          const newFile = new File(
-            [convertedBlob],
-            `${file.name.split(".")[0]}.jpeg`,
-            {
-              type: "image/jpeg",
-            }
-          );
-
-          // Proceed with image processing and upload for the converted JPEG file
-          processAndUploadImage(newFile, key);
-        } catch (conversionError) {
-          console.error("HEIC conversion failed:", conversionError);
-          toast.error(
-            "HEIC conversion failed. Please use a supported image format."
-          );
-        }
-      } else {
-        // If not HEIC, proceed with normal image processing and upload
-        processAndUploadImage(file, key);
-      }
-    } catch (error) {
-      console.error("Error uploading file:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Function to handle image processing and upload
-  const processAndUploadImage = (file, key) => {
-    // Create an image element to check its dimensions (for megapixels)
-    const image = new Image();
-    const imageUrl = URL.createObjectURL(file);
-
-    image.onload = async () => {
-      const width = image.width;
-      const height = image.height;
-      const megapixels = (width * height) / 1000000; // calculate in MP
-
-      if (megapixels < 5) {
-        toast.error("Image should be at least 5 MP.");
-        return;
-      }
-
-      // Proceed with uploading the file
-      const s3 = new S3Client({
-        region: "ap-south-1",
-        credentials: {
-          accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
-          secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
-        },
-      });
-
-      const target = {
-        Bucket: "clickedart-bucket",
-        Key: `bestPhotos/${file.name}`,
-        Body: file,
-      };
-
-      const upload = new Upload({
-        client: s3,
-        params: target,
-      });
-
-      upload.on("httpUploadProgress", (progress) => {
-        const percentCompleted = Math.round(
-          (progress.loaded / progress.total) * 100
-        );
-        setProgr(percentCompleted);
-      });
-
-      await upload.done();
-
-      const fileUrl = `https://${target.Bucket}.s3.ap-south-1.amazonaws.com/${target.Key}`;
-      setFormData((prev) => {
-        const newBestPhotos = [...prev.bestPhotos];
-        newBestPhotos[key] = fileUrl;
-        return {
-          ...prev,
-          bestPhotos: newBestPhotos,
-        };
-      });
-
-      toast.dismiss();
-    };
-
-    // Trigger image loading
-    image.src = imageUrl;
-  };
-
   const validateForm1 = () => {
     const newErrors = {};
+    if (!formData.profileImage)
+      newErrors.profileImage = "Profile Image is required.";
+
     if (!formData.firstName.trim())
       newErrors.firstName = "First Name is required.";
     else if (formData.firstName.trim().length < 3)
@@ -393,40 +277,6 @@ const RegistrationForm = () => {
     return newErrors;
   };
 
-  // const validateForm2 = () => {
-  //   const newErrors = {};
-  //   if (
-  //     formData.bestPhotos[0] === "" ||
-  //     formData.bestPhotos[1] === "" ||
-  //     formData.bestPhotos[2] === ""
-  //   )
-  //     newErrors.bestPhotos = "Please upload at least 3 photos.";
-
-  //   return newErrors;
-  // };
-
-  const handleNext = async () => {
-    // Validate client-side fields
-    const formErrors = validateForm1();
-    if (Object.keys(formErrors).length > 0) {
-      setErrors(formErrors);
-      return;
-    }
-
-    // Check server for existing username/email
-    const serverErrors = await checkUsernameAndEmailExists();
-    const combinedErrors = { ...formErrors, ...serverErrors };
-
-    if (Object.keys(combinedErrors).length > 0) {
-      setErrors(combinedErrors);
-      return;
-    }
-
-    // Proceed to next step if no errors
-    setErrors({});
-    setStep(2);
-  };
-
   const handleCrop = async () => {
     const cropper = cropperRef.current?.cropper;
     if (cropper) {
@@ -482,18 +332,28 @@ const RegistrationForm = () => {
       }
     }
   };
+  console.log(loading);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    const newErrors = validateForm2();
-    if (Object.keys(newErrors).length > 0) {
-      setErrors2(newErrors);
+    // Validate client-side fields
+    const formErrors = validateForm1();
+
+    // Check server for existing username/email
+    const serverErrors = await checkUsernameAndEmailExists();
+    const combinedErrors = { ...formErrors, ...serverErrors };
+
+    if (Object.keys(combinedErrors).length > 0) {
+      console.log("worked", combinedErrors);
+      setLoading(false);
+      setErrors(combinedErrors);
+      toast.error("Please fill the required fields before submitting.");
       return;
     }
 
-    setErrors2({});
+    setErrors({});
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/photographer/register`,
@@ -583,7 +443,13 @@ const RegistrationForm = () => {
                   <div className="max-w-md mx-auto rounded-lg overflow-hidden md:max-w-xl">
                     <div className="md:flex">
                       <div className="w-full p-3">
-                        <div className="relative h-48 rounded-lg border-2 border-blue-500 bg-gray-50 flex justify-center items-center shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
+                        <div
+                          className={`relative h-48 rounded-lg border-2 ${
+                            errors.profileImage
+                              ? "border-red-500 bg-red-50"
+                              : "border-blue-500 bg-gray-50"
+                          } flex justify-center items-center shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out`}
+                        >
                           <div className="absolute flex flex-col items-center">
                             <ImageIcon className="w-12 h-12 text-blue-500" />
                             <span className="block text-gray-500 font-semibold">
@@ -592,6 +458,11 @@ const RegistrationForm = () => {
                             <span className="block text-gray-400 font-normal mt-1">
                               or click to upload
                             </span>
+                            {errors.profileImage && (
+                              <p className="text-red-500 text-sm">
+                                {errors.profileImage}
+                              </p>
+                            )}
                           </div>
                           <input
                             name=""
@@ -615,6 +486,7 @@ const RegistrationForm = () => {
                   </button>
                 )}
               </div>
+
               {uploadProgress > 0 && uploadProgress < 100 && (
                 <div>
                   <progress value={uploadProgress} max={100}></progress>
@@ -630,10 +502,9 @@ const RegistrationForm = () => {
                     <Input
                       type="text"
                       name="firstName"
-                      value={formData.firstName}
+                      value={formData.firstName || ""}
                       placeholder="First Name"
                       onChange={handleInputChange}
-                      required
                     />
                     {errors.firstName && (
                       <p className="text-red-500 text-sm">{errors.firstName}</p>
@@ -648,9 +519,8 @@ const RegistrationForm = () => {
                       type="text"
                       name="lastName"
                       placeholder="Last Name"
-                      value={formData.lastName}
+                      value={formData.lastName || ""}
                       onChange={handleInputChange}
-                      required
                     />
                     {errors.lastName && (
                       <p className="text-red-500 text-sm">{errors.lastName}</p>
@@ -663,11 +533,10 @@ const RegistrationForm = () => {
                     <Input
                       type="email"
                       name="email"
-                      value={formData.email}
+                      value={formData.email || ""}
                       autoComplete="email"
                       onChange={handleInputChange}
                       placeholder="Email"
-                      required
                     />
                     {errors.email && (
                       <p className="text-red-500 text-sm">{errors.email}</p>
@@ -683,13 +552,12 @@ const RegistrationForm = () => {
                     <Input
                       type={showPassword ? "text" : "password"}
                       name="new-password"
-                      value={formData.password}
+                      value={formData.password || ""}
                       onChange={(e) =>
                         setFormData({ ...formData, password: e.target.value })
                       }
                       autoComplete="new-password"
                       placeholder="At least 8 characters, 1 uppercase, 1 lowercase, 1 number and 1 special character"
-                      required
                     />
 
                     {showPassword ? (
@@ -704,6 +572,9 @@ const RegistrationForm = () => {
                       />
                     )}
                   </div>
+                  {errors.password && (
+                    <p className="text-red-500 text-sm">{errors.password}</p>
+                  )}
                 </div>
                 <div>
                   <Label>
@@ -712,15 +583,11 @@ const RegistrationForm = () => {
                   <Input
                     type={showPassword ? "text" : "password"}
                     name="new-password"
-                    value={verifyPassword}
+                    value={verifyPassword || ""}
                     autoComplete="new-password"
                     onChange={(e) => setVerifyPassword(e.target.value)}
                     placeholder="Verify Password"
-                    required
                   />
-                  {errors.password && (
-                    <p className="text-red-500 text-sm">{errors.password}</p>
-                  )}
                   {errors.verifyPassword && (
                     <p className="text-red-500 text-sm">
                       {errors.verifyPassword}
@@ -738,7 +605,6 @@ const RegistrationForm = () => {
                   value={formData.username || ""}
                   autoComplete="username"
                   onChange={handleInputChange}
-                  required
                 />
                 {errors.username && (
                   <p className="text-red-500 text-sm">{errors.username}</p>
@@ -747,7 +613,7 @@ const RegistrationForm = () => {
               <div>
                 <Label>Account Type</Label>
                 <Select
-                  value={formData.accountType}
+                  value={formData.accountType || ""}
                   onValueChange={(value) =>
                     setFormData({ ...formData, accountType: value })
                   }
@@ -771,8 +637,7 @@ const RegistrationForm = () => {
                 <Input
                   type="tel"
                   name="mobile"
-                  required
-                  value={formData.mobile}
+                  value={formData.mobile || ""}
                   onChange={handleInputChange}
                   placeholder="Mobile Number"
                 />
@@ -786,7 +651,7 @@ const RegistrationForm = () => {
                 <Input
                   type="tel"
                   name="whatsapp"
-                  value={formData.whatsapp}
+                  value={formData.whatsapp || ""}
                   onChange={handleInputChange}
                   placeholder="WhatsApp Number"
                 />
@@ -799,7 +664,7 @@ const RegistrationForm = () => {
                 <Label>Bio (Max Length: 100 Words)</Label>
                 <Textarea
                   name="bio"
-                  value={formData.bio}
+                  value={formData.bio || ""}
                   onChange={handleInputChange}
                   placeholder="Tell us about yourself..."
                 />
@@ -842,7 +707,7 @@ const RegistrationForm = () => {
                       </SelectTrigger>
                       <SelectContent>
                         {countries[2].data.map((country) => (
-                          <SelectItem key={country.id} value={country.name}>
+                          <SelectItem key={country.id} value={country.name || ""}>
                             {country.name}
                           </SelectItem>
                         ))}
@@ -859,7 +724,6 @@ const RegistrationForm = () => {
                     </Label>
                     <Select
                       defaultValue={formData.shippingAddress?.state}
-                      required
                       onValueChange={(value) => {
                         const selectedState = states[2].data.find(
                           (state) => state.name === value
@@ -882,7 +746,7 @@ const RegistrationForm = () => {
                             (state) => state.countryId === selectedCountry
                           ) // Filter states by selected country ID
                           .map((state) => (
-                            <SelectItem key={state.id} value={state.name}>
+                            <SelectItem key={state.id} value={state.name || ""}>
                               {state.name}
                             </SelectItem>
                           ))}
@@ -898,7 +762,6 @@ const RegistrationForm = () => {
                     </Label>
                     <Select
                       defaultValue={formData.shippingAddress?.city}
-                      required
                       onValueChange={(value) => {
                         const newAddress = { ...formData.shippingAddress };
                         newAddress.city = value;
@@ -915,7 +778,7 @@ const RegistrationForm = () => {
                         {cities[2].data
                           .filter((city) => city.stateId === selectedState) // Filter cities by selected state ID
                           .map((city) => (
-                            <SelectItem key={city.id} value={city.name}>
+                            <SelectItem key={city.id} value={city.name || ""}>
                               {city.name}
                             </SelectItem>
                           ))}
@@ -930,7 +793,7 @@ const RegistrationForm = () => {
                     <Input
                       type="text"
                       name="shippingAddress.address"
-                      value={formData.shippingAddress?.address}
+                      value={formData.shippingAddress?.address || ""}
                       onChange={(e) => {
                         const newAddress = { ...formData.shippingAddress };
                         newAddress.address = e.target.value;
@@ -946,7 +809,7 @@ const RegistrationForm = () => {
                     <Input
                       type="text"
                       name="shippingAddress.landmark"
-                      value={formData.shippingAddress?.landmark}
+                      value={formData.shippingAddress?.landmark || ""}
                       onChange={(e) => {
                         const newAddress = { ...formData.shippingAddress };
                         newAddress.landmark = e.target.value;
@@ -964,8 +827,7 @@ const RegistrationForm = () => {
                     <Input
                       type="text"
                       name="shippingAddress.pincode"
-                      value={formData.shippingAddress?.pincode}
-                      required
+                      value={formData.shippingAddress?.pincode || ""}
                       onChange={(e) => {
                         const newAddress = { ...formData.shippingAddress };
                         newAddress.pincode = e.target.value;
@@ -984,7 +846,7 @@ const RegistrationForm = () => {
                     <Input
                       type="text"
                       name="shippingAddress.area"
-                      value={formData.shippingAddress?.area}
+                      value={formData.shippingAddress?.area || ""}
                       onChange={(e) => {
                         const newAddress = { ...formData.shippingAddress };
                         newAddress.area = e.target.value;
@@ -1031,7 +893,7 @@ const RegistrationForm = () => {
                     <Input
                       type="text"
                       name="companyName"
-                      value={formData.companyName}
+                      value={formData.companyName || ""}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -1041,7 +903,7 @@ const RegistrationForm = () => {
                     <Input
                       type="email"
                       name="companyEmail"
-                      value={formData.companyEmail}
+                      value={formData.companyEmail || ""}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -1051,7 +913,7 @@ const RegistrationForm = () => {
                     <Input
                       type="text"
                       name="companyAddress"
-                      value={formData.companyAddress}
+                      value={formData.companyAddress || ""}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -1061,7 +923,7 @@ const RegistrationForm = () => {
                     <Input
                       type="tel"
                       name="companyPhone"
-                      value={formData.companyPhone}
+                      value={formData.companyPhone || ""}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -1074,7 +936,7 @@ const RegistrationForm = () => {
                   type="url"
                   name="portfolioLink"
                   placeholder="https://example.com"
-                  value={formData.portfolioLink}
+                  value={formData.portfolioLink || ""}
                   onChange={handleInputChange}
                 />
               </div>
@@ -1155,7 +1017,7 @@ const RegistrationForm = () => {
                 <Input
                   type="number"
                   name="yearsOfExperience"
-                  value={formData.yearsOfExperience}
+                  value={formData.yearsOfExperience || ""}
                   onChange={handleInputChange}
                 />
                 {errors.yearsOfExperience && (
@@ -1174,7 +1036,7 @@ const RegistrationForm = () => {
                     <div key={index} className="flex gap-2">
                       <Select
                         className="w-36"
-                        value={account.accountName}
+                        value={account.accountName || ""}
                         onValueChange={(value) => {
                           const newAccounts = [...formData.connectedAccounts];
                           newAccounts[index].accountName = value;
@@ -1198,7 +1060,7 @@ const RegistrationForm = () => {
                       <Input
                         type="text"
                         name="accountLink"
-                        value={account.accountLink}
+                        value={account.accountLink || ""}
                         onChange={(e) => {
                           const newAccounts = [...formData.connectedAccounts];
                           newAccounts[index].accountLink = e.target.value;
@@ -1259,21 +1121,27 @@ const RegistrationForm = () => {
               <Input
                 type="text"
                 name="referralCode"
-                value={formData.referralcode}
+                value={formData.referralcode || ""}
                 onChange={(e) =>
                   setFormData({ ...formData, referralcode: e.target.value })
                 }
               />
 
               <div className="mt-2 flex justify-center">
-                <Button
+                <button
+                  className="bg-primary text-white px-4 py-2 rounded disabled:opacity-50 disabled:hover:bg-primary disabled:hover:text-white"
                   disabled={loading}
                   type="submit"
-                  variant="primary"
-                  fullWidth
                 >
-                  Register
-                </Button>
+                  {loading ? (
+                    <div className="flex items-center gap-2">
+                      <SpinLoader />
+                      Registering...
+                    </div>
+                  ) : (
+                    "Register"
+                  )}
+                </button>
               </div>
             </div>
           )}

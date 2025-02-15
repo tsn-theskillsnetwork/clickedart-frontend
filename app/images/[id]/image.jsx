@@ -680,7 +680,9 @@ export default function ImagePage({ image }) {
                       }`}
                       onClick={handleDigital}
                     >
-                      <img
+                      <Image
+                        width={100}
+                        height={100}
                         className="object-cover h-24 w-40 border-4 border-white shadow-[0_0_4px_rgba(0,0,0,0.7)]"
                         src={images[0].src}
                         alt=""
@@ -693,8 +695,8 @@ export default function ImagePage({ image }) {
                       onClick={handleMockup}
                     >
                       <Image
-                        width={400}
-                        height={400}
+                        width={100}
+                        height={100}
                         className="object-cover h-24 w-40 border-4 border-white shadow-[0_0_4px_rgba(0,0,0,0.7)]"
                         src={images[1].src}
                         alt=""
@@ -702,10 +704,10 @@ export default function ImagePage({ image }) {
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <h2 className="text-heading-06 lg:text-heading-02 font-semibold text-surface-600 capitalize">
+                    <h2 className="text-heading-06 lg:text-heading-04 font-semibold text-surface-600 capitalize">
                       {image.title || "Artwork name"}
                     </h2>
-                    <h5 className="text-heading-sm lg:text-heading-05 uppercase font-semibold text-surface-500">
+                    <h5 className="text-sm lg:text-heading-06 uppercase font-semibold text-surface-500">
                       {image.photographer?.firstName
                         ? image.photographer?.firstName +
                           " " +

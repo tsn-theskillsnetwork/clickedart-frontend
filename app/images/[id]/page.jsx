@@ -69,7 +69,7 @@ export async function generateMetadata({ params }) {
   }
 }
 
-export default async function BlogPage({ params }) {
+export default async function Image({ params }) {
   const { id } = await params;
 
   try {
