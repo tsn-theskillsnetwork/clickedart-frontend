@@ -336,13 +336,13 @@ export default function SearchResultPage() {
                   alt={image.description}
                   className="w-full"
                 />
-                <div className="absolute inset-0 flex flex-col justify-between p-4 transition-all duration-200 ease-linear">
+                <div className="absolute inset-0 flex flex-col justify-between py-2 px-4 transition-all duration-200 ease-linear">
                   <div className="flex justify-between items-center">
                     <p
                       style={{
                         textShadow: "-1px 1px 2px #666, 1px 1px 2px #666",
                       }}
-                      className="text-white font-semibold text-heading-06"
+                      className="text-white font-semibold text-xs sm:text-sm"
                     >
                       {image.title || "Untitled"}
                     </p>
@@ -370,7 +370,7 @@ export default function SearchResultPage() {
                     </div> */}
                   </div>
                   <div className="flex justify-between items-center drop-shadow-md">
-                    <p className="text-white font-medium text-paragraph">
+                    <p className="text-white font-medium text-xs sm:text-sm">
                       {image.photographer?.firstName
                         ? image.photographer?.firstName +
                           " " +
