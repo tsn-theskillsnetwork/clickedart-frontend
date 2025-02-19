@@ -14,6 +14,13 @@ import Link from "next/link";
 import useAuthStore from "@/authStore";
 import Loader from "@/components/loader";
 import Swal from "sweetalert2";
+import {
+  EditIcon,
+  ExternalLinkIcon,
+  ImageIcon,
+  Trash2Icon,
+} from "lucide-react";
+import Image from "next/image";
 
 // Dynamic import for ReactQuill to avoid SSR issues
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
@@ -134,6 +141,39 @@ export default function BlogEdit() {
     }
   };
 
+  const handleCopy = () => {
+    navigator.clipboard.writeText(id);
+    toast.success("Blog ID copied to clipboard!");
+  };
+
+  const handleDelete = async () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3e3e3e",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axios.delete(
+            `${process.env.NEXT_PUBLIC_SERVER}/api/blog/delete-blog?blogId=${id}`,
+            {
+              headers: { "x-auth-token": token },
+            }
+          );
+          router.push("/profile/blog");
+          toast.success("Blog deleted successfully!");
+        } catch (error) {
+          console.error("Error deleting blog:", error);
+          toast.error("Failed to delete blog.");
+        }
+      }
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -153,12 +193,12 @@ export default function BlogEdit() {
         return toast.error(data.error);
       }
       Swal.fire({
-        title: "Blog Updated",
-        text: "Your blog has been updated successfully.",
+        title: "Blog Updated and sent for review!",
+        text: "Your blog has been updated and sent for review. Please wait for the approval.",
         icon: "success",
         confirmButtonText: "OK",
       }).then(() => {
-        router.push(`/profile/blog`);
+        router.back();
       });
     } catch (error) {
       console.error(error);
@@ -173,8 +213,6 @@ export default function BlogEdit() {
           `${process.env.NEXT_PUBLIC_SERVER}/api/blog/get-blog-by-id?id=${id}`
         );
         const data = response.data;
-
-        // setBlog(data.blog);
         setBlog({ ...data.blog, blogId: data.blog._id, isActive: false });
       } catch (error) {
         console.log(error);
@@ -188,98 +226,187 @@ export default function BlogEdit() {
     }
   }, [photographer]);
 
-  console.log(blog)
+  if (!photographer) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
+        {isHydrated ? (
+          <>
+            <h1 className="text-3xl font-bold text-center text-gray-800">
+              You need to be a photographer to create a blog.
+            </h1>
+          </>
+        ) : (
+          <Loader />
+        )}
+      </div>
+    );
+  }
+
+  if (
+    photographer &&
+    blog &&
+    blog.authorInfo?.author?._id !== photographer._id
+  ) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
+        <h1 className="text-3xl font-bold text-center text-gray-800">
+          You are not authorized to view this page.
+        </h1>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-4">
+    <div className="px-2 md:px-5">
       {!isLoading && blog ? (
-        <form
-          onSubmit={handleSubmit}
-          className="max-w-4xl mx-auto mt-5 min-h-screen"
-        >
-          <div className="bg-white shadow-[0_0_8px_rgba(0,0,0,0.3)] rounded-lg p-6 space-y-6">
-            <div>
-              <Label htmlFor="coverImage">Cover Image</Label>
-              <Input
-                id="coverImage"
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-              />
-              {blog.coverImage && (
-                <img
-                  src={blog.coverImage}
-                  alt="Cover Preview"
-                  className="mt-4 w-full h-48 object-contain rounded-lg shadow-sm"
-                />
+        <div className=" min-h-screen">
+          <div className="flex flex-col gap-10 lg:flex-row lg:gap-0 py-5 px-2 md:px-5">
+            <div className="flex flex-col w-full px-5 items-start gap-2">
+              {blog.coverImage ? (
+                <>
+                  <img
+                    src={blog.coverImage}
+                    className="w-full object-contain max-h-[80vh] mx-auto"
+                    alt="photo"
+                  />
+                  <Button
+                    variant="link"
+                    onClick={() =>
+                      setBlog((prev) => ({
+                        ...prev,
+                        coverImage: "",
+                      }))
+                    }
+                    className="flex items-center gap-2 mx-auto text-red-600"
+                  >
+                    Remove Cover Image
+                  </Button>
+                </>
+              ) : (
+                <div className="w-full mx-auto rounded-lg overflow-hidden">
+                  <div className="md:flex">
+                    <div className="w-full p-3">
+                      <div className="relative h-[60vh] rounded-lg border flex justify-center items-center shadow-[0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_4px_10px_rgba(0,0,0,0.3)] transition-shadow duration-300 ease-in-out">
+                        <div className="absolute flex flex-col items-center">
+                          <ImageIcon className="w-12 h-12 text-surface-200" />
+                          <span className="block text-gray-500 font-semibold">
+                            Drop your image here
+                          </span>
+                          <span className="block text-gray-400 font-normal mt-1">
+                            or click to upload
+                          </span>
+                        </div>
+                        <input
+                          name=""
+                          onChange={handleImageUpload}
+                          className="h-full w-full opacity-0 cursor-pointer"
+                          type="file"
+                          accept="image/*"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
+              <div className="flex items-center flex-wrap gap-4">
+                <Button
+                  variant="link"
+                  onClick={handleSubmit}
+                  className="flex flex-row gap-2 items-center border-2 border-green-600 rounded-full bg-green-100 text-base text-green-600 mx-auto"
+                >
+                  <EditIcon size={20} />
+                  <div className="font-medium">Update</div>
+                </Button>
+
+                <Link
+                  className="mx-auto"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={`https://www.clickedart.com/blog/${id}`}
+                >
+                  <Button
+                    variant="link"
+                    className="flex flex-row gap-2 items-center border-2 border-blue-600 rounded-full bg-blue-100 text-base text-blue-600 mx-auto"
+                  >
+                    <ExternalLinkIcon size={20} />
+                    <div className="font-medium">View</div>
+                  </Button>
+                </Link>
+
+                <Button
+                  onClick={handleDelete}
+                  variant="link"
+                  className="flex flex-row gap-2 items-center border-2 border-red-600 rounded-full bg-red-50 text-base text-red-600 mx-auto"
+                >
+                  <Trash2Icon size={20} />
+                  <div className="font-medium">Delete</div>
+                </Button>
+              </div>
             </div>
-            <div>
-              <Label htmlFor="title">Title</Label>
-              <Input
-                id="title"
-                type="text"
-                value={blog.content?.title || ""}
-                onChange={(e) =>
-                  setBlog({
-                    ...blog,
-                    content: { ...blog.content, title: e.target.value },
-                  })
-                }
-              />
+
+            <div className="flex flex-col w-full p-2 md:p-5 border-2 rounded-xl bg-gray-50">
+              <p className="text-xl font-semibold">Blog Details</p>
+              <div className="flex flex-col mt-5 gap-5">
+                <div className="flex flex-col gap-2">
+                  <Label>Blog ID</Label>
+                  <div className="flex flex-col sm:flex-row gap-5 ">
+                    <div
+                      onClick={handleCopy}
+                      className="rounded-2xl px-2 py-2 font-semibold border cursor-pointer"
+                    >
+                      <span className="text-sm md:text-base font-normal text-gray-800">
+                        {id}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Label>Title</Label>
+                  <Input
+                    className="bg-white"
+                    value={blog.content?.title}
+                    onChange={(e) =>
+                      setBlog((prev) => ({
+                        ...prev,
+                        content: { ...prev.content, title: e.target.value },
+                      }))
+                    }
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Label>Summary</Label>
+                  <Textarea
+                    className="bg-white h-24"
+                    value={blog.content?.summary}
+                    onChange={(e) =>
+                      setBlog((prev) => ({
+                        ...prev,
+                        content: { ...prev.content, summary: e.target.value },
+                      }))
+                    }
+                  />
+                </div>
+              </div>
             </div>
-            <div>
-              <Label htmlFor="summary">Summary</Label>
-              <Textarea
-                id="summary"
-                value={blog.content?.summary || ""}
-                onChange={(e) =>
-                  setBlog({
-                    ...blog,
-                    content: { ...blog.content, summary: e.target.value },
-                  })
-                }
-              />
-            </div>
-            <div>
-              <Label htmlFor="body">Body</Label>
-              <ReactQuill
-                modules={modules}
-                theme="snow"
-                value={blog.content?.body || ""}
-                onChange={(value) =>
-                  setBlog({
-                    ...blog,
-                    content: { ...blog.content, body: value },
-                  })
-                }
-              />
-            </div>
-            <div>
-              <Label htmlFor="tags">Tags</Label>
-              <Input
-                id="tags"
-                type="text"
-                value={blog.tags?.join(", ") || ""}
-                onChange={(e) =>
-                  setBlog({
-                    ...blog,
-                    tags: e.target.value.split(",").map((tag) => tag.trim()),
-                  })
-                }
-              />
-            </div>
-            <hr />
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-            <Button
-              variant="primary"
-              type="submit"
-              className="w-full bg-blue-600 text-white hover:bg-blue-700"
-            >
-              Update Blog
-            </Button>
           </div>
-        </form>
+          <div className="flex flex-col gap-2 px-2 md:px-5 pb-5 bg-gray-50">
+            <div className="flex flex-col gap-2 p-4 rounded-lg shadow-[0_2px_5px_rgba(0,0,0,0.2)]">
+              <Label>Body</Label>
+              <ReactQuill
+                className="bg-white"
+                theme="snow"
+                modules={modules}
+                value={blog.content?.body}
+                onChange={(value) =>
+                  setBlog((prev) => ({
+                    ...prev,
+                    content: { ...prev.content, body: value },
+                  }))
+                }
+              />
+            </div>
+          </div>
+        </div>
       ) : (
         <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
           {isHydrated ? (

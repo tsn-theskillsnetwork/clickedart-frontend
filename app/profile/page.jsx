@@ -18,7 +18,7 @@ import {
   Share2Icon,
 } from "lucide-react";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Dialog,
   DialogClose,
@@ -41,12 +41,14 @@ import { Icon } from "@iconify/react";
 const ProfilePage = () => {
   const router = useRouter();
   const { photographer, user } = useAuthStore();
+  const searchParams = useSearchParams();
+  const section = searchParams.get("section");
 
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [message, setMessage] = useState("");
-  const [selectedTab, setSelectedTab] = useState("photos");
+  const [blogs, setBlogs] = useState([]);
   const [selectedImage, setSelectedImage] = useState([]);
   const [selectedCatelogue, setSelectedCatelogue] = useState([]);
   const [photos, setPhotos] = useState([]);
@@ -105,6 +107,10 @@ const ProfilePage = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewCatalogue({ ...newCatalogue, [name]: value });
+  };
+
+  const handleTabClick = (newSection) => {
+    router.push(`/profile?section=${newSection}`, { scroll: false });
   };
 
   const catelogueValidation = () => {
@@ -268,12 +274,26 @@ const ProfilePage = () => {
     }
   };
 
+  const fetchBlogs = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/blog/get-my-blogs?author=${photographer._id}`
+      );
+      const data = response.data;
+
+      setBlogs(data.blogs);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     if (!photographer) return;
 
     fetchStats();
     fetchPhotos();
     fetchCatalogues();
+    fetchBlogs();
     fetchActivePlan();
   }, [photographer]);
 
@@ -486,42 +506,45 @@ const ProfilePage = () => {
           </div>
           {photographer && (
             <div className="relative flex gap-10 text-base lg:text-heading-03 px-4 lg:px-24 py-4">
-              <p
-                onClick={() => {
-                  setSelectedTab("photos");
-                }}
+              <button
+                onClick={() => handleTabClick("photos")}
                 className={`${
-                  selectedTab === "photos"
+                  section !== "catalogues" && section !== "blogs"
                     ? "text-primary font-semibold"
                     : "text-surface-400"
                 } cursor-pointer`}
               >
                 Photos
-              </p>
-              <p
-                onClick={() => {
-                  setSelectedTab("catalogues");
-                }}
+              </button>
+
+              <button
+                onClick={() => handleTabClick("catalogues")}
                 className={`${
-                  selectedTab === "catalogues"
+                  section === "catalogues"
                     ? "text-primary font-semibold"
                     : "text-surface-400"
                 } cursor-pointer`}
               >
                 Catalogues
-              </p>
-              <Link
-                href={`/profile/blog`}
-                className={`text-surface-400 cursor-pointer flex gap-2 items-center`}
+              </button>
+
+              <button
+                onClick={() => handleTabClick("blogs")}
+                className={`${
+                  section === "blogs"
+                    ? "text-primary font-semibold"
+                    : "text-surface-400"
+                } cursor-pointer`}
               >
-                <p>Blog</p>
-                <ExternalLink className="w-4 h-4" />
-              </Link>
+                Blogs
+              </button>
               <div
                 className={`h-[2px] lg:h-[4px] bg-primary absolute bottom-3 ${
-                  selectedTab === "photos"
-                    ? "left-[0.8rem] w-[4rem] lg:left-[6rem] lg:w-[9rem]"
-                    : "left-[7rem] w-[6rem] lg:left-[17rem] lg:w-[15rem]"
+                  section === "catalogues"
+                    ? "left-[7rem] w-[6rem] lg:left-[17rem] lg:w-[15rem]"
+                    : section === "blogs"
+                    ? "left-[15rem] w-[3.3rem] lg:left-[33.5rem] lg:w-[8rem]"
+                    : "left-[0.8rem] w-[4rem] lg:left-[6rem] lg:w-[9rem]"
                 } transition-all duration-300 ease-in-out`}
               ></div>
             </div>
@@ -529,13 +552,13 @@ const ProfilePage = () => {
           <hr className="mt-[-14px] lg:-mt-4 border lg:border-2" />
           {photographer && (
             <div className="py-10 px-4 lg:px-24 bg-[#FCFAFA]">
-              {selectedTab === "photos" ? (
+              {section !== "catalogues" && section !== "blogs" ? (
                 <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
                   <Link
                     href="/profile/upload"
-                    className="relative group shadow-[2px_2px_6px_rgba(0,0,0,0.4)]"
+                    className="relative group w-full min-h-60 shadow-[2px_2px_6px_rgba(0,0,0,0.4)]"
                   >
-                    <div className="w-full aspect-[1/1] flex flex-col items-center justify-center bg-white cursor-pointer">
+                    <div className="h-full w-full flex flex-col items-center justify-center bg-white cursor-pointer">
                       <Plus className="w-20 h-20 text-surface-400" />
                       <p className="text-surface-400 font-semibold">
                         Upload New Photo
@@ -604,218 +627,278 @@ const ProfilePage = () => {
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col gap-10 py-10">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
-                    {catalogues.length >= limit ? (
-                      <div
-                        onClick={() => {
-                          toast.error(
-                            "Upgrade your plan to create more catalogues."
-                          );
-                        }}
-                        className="w-full h-full flex flex-col aspect-[1/1] items-center justify-center shadow-[0_4px_10px_rgba(0,0,0,0.2)] bg-white cursor-pointer"
-                      >
-                        <Plus className="w-20 h-20 text-surface-400" />
-                        <p className="text-surface-400 font-semibold">
-                          Create New Catelogue
-                        </p>
-                      </div>
-                    ) : (
-                      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                        {/* <DialogTrigger asChild> */}
-                        <div
-                          onClick={openDialog}
-                          className="w-full h-full flex flex-col aspect-[1/1] items-center justify-center shadow-[0_4px_10px_rgba(0,0,0,0.2)] bg-white cursor-pointer"
-                        >
-                          <Plus className="w-20 h-20 text-surface-400" />
-                          <p className="text-surface-400 font-semibold">
-                            Create New Catelogue
-                          </p>
-                        </div>
-                        {/* </DialogTrigger> */}
-                        <DialogContent className="sm:max-w-[425px]">
-                          <DialogHeader>
-                            <DialogTitle>Create Catelogue</DialogTitle>
-                          </DialogHeader>
-                          <div className="grid gap-4 py-4">
-                            <div>
-                              <Label>Name *</Label>
-                              <Input
-                                type="text"
-                                name="name"
-                                value={newCatalogue.name}
-                                onChange={handleInputChange}
-                                required
-                              />
-                            </div>
-
-                            <div>
-                              <Label>Description *</Label>
-                              <Input
-                                type="text"
-                                name="description"
-                                value={newCatalogue.description}
-                                onChange={handleInputChange}
-                                required
-                              />
-                            </div>
-                          </div>
-                          <DialogFooter>
-                            {/* <DialogClose asChild> */}
-                            <Button2
-                              size="sm"
-                              onClick={() => handleCreateCatelogue()}
-                            >
-                              Save changes
-                            </Button2>
-                            {/* </DialogClose> */}
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-                    )}
-
-                    {catalogues?.map((catalogue) => (
-                      <div
-                        key={catalogue._id}
-                        className="relative bg-white flex flex-col gap-2 shadow-[0_4px_10px_rgba(0,0,0,0.2)] p-4 rounded-md"
-                      >
-                        <Link
-                          href={`/profile/catalogue/${catalogue._id}`}
-                          className="grid grid-cols-2 gap-4 pb-5 aspect-[1/1]"
-                        >
-                          {catalogue.images?.length > 0 ? (
-                            <>
-                              {/* //map only 4 images */}
-                              {catalogue.images.slice(0, 4).map((image) => (
-                                <div
-                                  key={image._id}
-                                  className="shadow-[0_2px_6px_rgba(0,0,0,0.2)] aspect-[1/1] rounded-md overflow-hidden"
-                                >
-                                  <Image
-                                    width={800}
-                                    height={800}
-                                    priority
-                                    src={
-                                      image.imageLinks.small ||
-                                      image.imageLinks.medium ||
-                                      image.imageLinks.original
-                                    }
-                                    alt={image.description}
-                                    className="object-cover w-full aspect-[1/1]"
-                                  />
-                                </div>
-                              ))}
-                            </>
-                          ) : (
-                            <div className="flex flex-col col-span-2 items-center justify-center w-full">
-                              <p className="text-paragraph font-medium">
-                                No images in this catalogue
-                              </p>
-                            </div>
-                          )}
-                        </Link>
-                        <div className=" px-4 bottom-0 flex justify-between items-center mt-0">
-                          <div className="flex flex-col">
-                            <p className="text-heading-05 font-semibold">
-                              {catalogue.name}
+                <>
+                  {section === "catalogues" && (
+                    <div className="flex flex-col gap-10 py-10">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
+                        {catalogues.length >= limit ? (
+                          <div
+                            onClick={() => {
+                              toast.error(
+                                "Upgrade your plan to create more catalogues."
+                              );
+                            }}
+                            className="w-full h-full flex flex-col aspect-[1/1] items-center justify-center shadow-[0_4px_10px_rgba(0,0,0,0.2)] bg-white cursor-pointer"
+                          >
+                            <Plus className="w-20 h-20 text-surface-400" />
+                            <p className="text-surface-400 font-semibold">
+                              Create New Catelogue
                             </p>
                           </div>
-                          <Popover>
-                            <PopoverTrigger>
-                              <EllipsisIcon className="w-6 h-6 text-gray-500" />
-                            </PopoverTrigger>
-                            <PopoverContent className="w-min">
-                              <div className="flex flex-col items-center">
-                                <Button
-                                  className="text-orange-500"
-                                  variant="ghost"
-                                  size="sm"
-                                >
-                                  <div>
-                                    <Dialog>
-                                      <DialogTrigger asChild>
-                                        <p
-                                          onClick={() => {
-                                            setSelectedCatelogue(catalogue);
-                                          }}
-                                        >
-                                          Edit
-                                        </p>
-                                      </DialogTrigger>
-                                      <DialogContent className="sm:max-w-[425px]">
-                                        <DialogHeader>
-                                          <DialogTitle>
-                                            Edit Catelogue
-                                          </DialogTitle>
-                                        </DialogHeader>
-                                        <div className="grid gap-4 py-4">
-                                          <Label
-                                            htmlFor="name"
-                                            className="text-left"
-                                          >
-                                            Name
-                                          </Label>
-                                          <Input
-                                            onChange={(e) => {
-                                              setSelectedCatelogue({
-                                                ...catalogue,
-                                                name: e.target.value,
-                                              });
-                                            }}
-                                            value={selectedCatelogue?.name}
-                                          />
-                                          <Label
-                                            htmlFor="description"
-                                            className="text-left"
-                                          >
-                                            Description
-                                          </Label>
-                                          <Input
-                                            onChange={(e) => {
-                                              setSelectedCatelogue({
-                                                ...catalogue,
-                                                description: e.target.value,
-                                              });
-                                            }}
-                                            value={
-                                              selectedCatelogue?.description
-                                            }
-                                          />
-                                        </div>
-                                        <DialogFooter>
-                                          <Button2
-                                            size="sm"
-                                            onClick={() =>
-                                              handleCatelogueUpdate(
-                                                catalogue._id
-                                              )
-                                            }
-                                          >
-                                            Save changes
-                                          </Button2>
-                                        </DialogFooter>
-                                      </DialogContent>
-                                    </Dialog>
-                                  </div>
-                                </Button>
-                                <Button
-                                  className="text-red-500"
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() =>
-                                    handleCatelogueDelete(catalogue._id)
-                                  }
-                                >
-                                  Delete
-                                </Button>
+                        ) : (
+                          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                            {/* <DialogTrigger asChild> */}
+                            <div
+                              onClick={openDialog}
+                              className="w-full h-full flex flex-col aspect-[1/1] items-center justify-center shadow-[0_4px_10px_rgba(0,0,0,0.2)] bg-white cursor-pointer"
+                            >
+                              <Plus className="w-20 h-20 text-surface-400" />
+                              <p className="text-surface-400 font-semibold">
+                                Create New Catelogue
+                              </p>
+                            </div>
+                            {/* </DialogTrigger> */}
+                            <DialogContent className="sm:max-w-[425px]">
+                              <DialogHeader>
+                                <DialogTitle>Create Catelogue</DialogTitle>
+                              </DialogHeader>
+                              <div className="grid gap-4 py-4">
+                                <div>
+                                  <Label>Name *</Label>
+                                  <Input
+                                    type="text"
+                                    name="name"
+                                    value={newCatalogue.name}
+                                    onChange={handleInputChange}
+                                    required
+                                  />
+                                </div>
+
+                                <div>
+                                  <Label>Description *</Label>
+                                  <Input
+                                    type="text"
+                                    name="description"
+                                    value={newCatalogue.description}
+                                    onChange={handleInputChange}
+                                    required
+                                  />
+                                </div>
                               </div>
-                            </PopoverContent>
-                          </Popover>
-                        </div>
+                              <DialogFooter>
+                                {/* <DialogClose asChild> */}
+                                <Button2
+                                  size="sm"
+                                  onClick={() => handleCreateCatelogue()}
+                                >
+                                  Save changes
+                                </Button2>
+                                {/* </DialogClose> */}
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                        )}
+
+                        {catalogues?.map((catalogue) => (
+                          <div
+                            key={catalogue._id}
+                            className="relative bg-white flex flex-col gap-2 shadow-[0_4px_10px_rgba(0,0,0,0.2)] p-4 rounded-md"
+                          >
+                            <Link
+                              href={`/profile/catalogue/${catalogue._id}`}
+                              className="grid grid-cols-2 gap-4 pb-5 aspect-[1/1]"
+                            >
+                              {catalogue.images?.length > 0 ? (
+                                <>
+                                  {/* //map only 4 images */}
+                                  {catalogue.images.slice(0, 4).map((image) => (
+                                    <div
+                                      key={image._id}
+                                      className="shadow-[0_2px_6px_rgba(0,0,0,0.2)] aspect-[1/1] rounded-md overflow-hidden"
+                                    >
+                                      <Image
+                                        width={800}
+                                        height={800}
+                                        priority
+                                        src={
+                                          image.imageLinks.small ||
+                                          image.imageLinks.medium ||
+                                          image.imageLinks.original
+                                        }
+                                        alt={image.description}
+                                        className="object-cover w-full aspect-[1/1]"
+                                      />
+                                    </div>
+                                  ))}
+                                </>
+                              ) : (
+                                <div className="flex flex-col col-span-2 items-center justify-center w-full">
+                                  <p className="text-paragraph font-medium">
+                                    No images in this catalogue
+                                  </p>
+                                </div>
+                              )}
+                            </Link>
+                            <div className=" px-4 bottom-0 flex justify-between items-center mt-0">
+                              <div className="flex flex-col">
+                                <p className="text-heading-05 font-semibold">
+                                  {catalogue.name}
+                                </p>
+                              </div>
+                              <Popover>
+                                <PopoverTrigger>
+                                  <EllipsisIcon className="w-6 h-6 text-gray-500" />
+                                </PopoverTrigger>
+                                <PopoverContent className="w-min">
+                                  <div className="flex flex-col items-center">
+                                    <Button
+                                      className="text-orange-500"
+                                      variant="ghost"
+                                      size="sm"
+                                    >
+                                      <div>
+                                        <Dialog>
+                                          <DialogTrigger asChild>
+                                            <p
+                                              onClick={() => {
+                                                setSelectedCatelogue(catalogue);
+                                              }}
+                                            >
+                                              Edit
+                                            </p>
+                                          </DialogTrigger>
+                                          <DialogContent className="sm:max-w-[425px]">
+                                            <DialogHeader>
+                                              <DialogTitle>
+                                                Edit Catelogue
+                                              </DialogTitle>
+                                            </DialogHeader>
+                                            <div className="grid gap-4 py-4">
+                                              <Label
+                                                htmlFor="name"
+                                                className="text-left"
+                                              >
+                                                Name
+                                              </Label>
+                                              <Input
+                                                onChange={(e) => {
+                                                  setSelectedCatelogue({
+                                                    ...catalogue,
+                                                    name: e.target.value,
+                                                  });
+                                                }}
+                                                value={selectedCatelogue?.name}
+                                              />
+                                              <Label
+                                                htmlFor="description"
+                                                className="text-left"
+                                              >
+                                                Description
+                                              </Label>
+                                              <Input
+                                                onChange={(e) => {
+                                                  setSelectedCatelogue({
+                                                    ...catalogue,
+                                                    description: e.target.value,
+                                                  });
+                                                }}
+                                                value={
+                                                  selectedCatelogue?.description
+                                                }
+                                              />
+                                            </div>
+                                            <DialogFooter>
+                                              <Button2
+                                                size="sm"
+                                                onClick={() =>
+                                                  handleCatelogueUpdate(
+                                                    catalogue._id
+                                                  )
+                                                }
+                                              >
+                                                Save changes
+                                              </Button2>
+                                            </DialogFooter>
+                                          </DialogContent>
+                                        </Dialog>
+                                      </div>
+                                    </Button>
+                                    <Button
+                                      className="text-red-500"
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() =>
+                                        handleCatelogueDelete(catalogue._id)
+                                      }
+                                    >
+                                      Delete
+                                    </Button>
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </div>
+                    </div>
+                  )}
+                  {section === "blogs" && (
+                    <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
+                      <Link
+                        href="/profile/blog/create"
+                        className="relative group w-full min-h-60 shadow-[2px_2px_6px_rgba(0,0,0,0.4)]"
+                      >
+                        <div className="h-full w-full flex flex-col items-center justify-center bg-white cursor-pointer">
+                          <Plus className="w-20 h-20 text-surface-400" />
+                          <p className="text-surface-400 font-semibold">
+                            Add New Blog
+                          </p>
+                        </div>
+                      </Link>
+                      {blogs.map((blog) => (
+                        <Link
+                          href={`/profile/blog/edit/${blog._id}`}
+                          key={blog._id}
+                          className="flex flex-col w-full aspect-[1/1] justify-between gap-4 p-4 bg-white rounded-lg shadow-md"
+                        >
+                          <div className="flex flex-col gap-4">
+                            <Image
+                              width={800}
+                              height={800}
+                              src={blog.coverImage[0]}
+                              alt={blog.content?.title || "Blog cover image"}
+                              className="w-full object-cover rounded-lg"
+                            />
+
+                            <div className="flex flex-wrap gap-2 items-center">
+                              {blog.tags.slice(0, 3).map((tag) => (
+                                <span
+                                  key={tag}
+                                  className="px-2 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-semibold"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                              <span className="text-sm text-gray-600 font-semibold">
+                                {blog.tags.length > 3 &&
+                                  `+${blog.tags.length - 3} more`}
+                              </span>
+                            </div>
+                            <h2 className="text-lg font-semibold">
+                              {blog.content.title}
+                            </h2>
+                            <p className="text-sm text-gray-700 truncate">
+                              {blog.content.summary}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {new Date(blog.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}

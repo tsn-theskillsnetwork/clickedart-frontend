@@ -15,6 +15,7 @@ export default function ProfilePage({ photographer }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [photos, setPhotos] = useState([]);
+  const [blogs, setBlogs] = useState([]);
   const [selectedTab, setSelectedTab] = useState("photos");
   const [catalogues, setCatalogues] = useState([]);
   const [stats, setStats] = useState(null);
@@ -97,10 +98,24 @@ export default function ProfilePage({ photographer }) {
     }
   };
 
+  const fetchBlogs = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/blog/get-my-blogs?author=${photographer._id}`
+      );
+      const data = response.data;
+
+      setBlogs(data.blogs);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
-    fetchPhotos();
     fetchStats();
+    fetchPhotos();
     fetchCatalogues();
+    fetchBlogs();
   }, [id]);
 
   return (
@@ -231,11 +246,25 @@ export default function ProfilePage({ photographer }) {
             >
               Catalogues
             </p>
+            <p
+              onClick={() => {
+                setSelectedTab("blogs");
+              }}
+              className={`${
+                selectedTab === "blogs"
+                  ? "text-primary font-semibold"
+                  : "text-surface-400"
+              } cursor-pointer`}
+            >
+              Blogs
+            </p>
             <div
               className={`h-[2px] lg:h-[4px] bg-primary absolute bottom-3 ${
-                selectedTab === "photos"
-                  ? "left-[0.8rem] w-[4rem] lg:left-[6rem] lg:w-[9rem]"
-                  : "left-[7rem] w-[6rem] lg:left-[17rem] lg:w-[15rem]"
+                selectedTab === "catalogues"
+                  ? "left-[7rem] w-[6rem] lg:left-[17rem] lg:w-[15rem]"
+                  : selectedTab === "blogs"
+                  ? "left-[15rem] w-[3.3rem] lg:left-[33.5rem] lg:w-[8rem]"
+                  : "left-[0.8rem] w-[4rem] lg:left-[6rem] lg:w-[9rem]"
               } transition-all duration-300 ease-in-out`}
             ></div>
           </div>
@@ -289,59 +318,108 @@ export default function ProfilePage({ photographer }) {
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col gap-10 py-10">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
-                  {catalogues?.map((catalogue) => (
-                    <div
-                      key={catalogue._id}
-                      className="relative bg-white flex flex-col gap-2 shadow-[0_4px_10px_rgba(0,0,0,0.2)] p-4 rounded-md"
-                    >
-                      <Link
-                        href={`/catalogue/${catalogue._id}`}
-                        className="grid grid-cols-2 gap-4 pb-5 aspect-[1/1]"
-                      >
-                        {catalogue.images?.length > 0 ? (
-                          <>
-                            {catalogue.images?.map((image) => (
-                              <div
-                                key={image._id}
-                                className="shadow-[0_2px_6px_rgba(0,0,0,0.2)] aspect-[1/1] rounded-md overflow-hidden"
-                              >
-                                <Image
-                                  width={800}
-                                  height={800}
-                                  priority
-                                  src={
-                                    image.imageLinks.thumbnail ||
-                                    image.imageLinks.small ||
-                                    image.imageLinks.medium ||
-                                    image.imageLinks.original
-                                  }
-                                  alt={image.description}
-                                  className="object-cover w-full aspect-[1/1]"
-                                />
+              <>
+                {selectedTab === "catalogues" && (
+                  <div className="flex flex-col gap-10 py-10">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
+                      {catalogues?.map((catalogue) => (
+                        <div
+                          key={catalogue._id}
+                          className="relative bg-white flex flex-col gap-2 shadow-[0_4px_10px_rgba(0,0,0,0.2)] p-4 rounded-md"
+                        >
+                          <Link
+                            href={`/catalogue/${catalogue._id}`}
+                            className="grid grid-cols-2 gap-4 pb-5 aspect-[1/1]"
+                          >
+                            {catalogue.images?.length > 0 ? (
+                              <>
+                                {catalogue.images?.map((image) => (
+                                  <div
+                                    key={image._id}
+                                    className="shadow-[0_2px_6px_rgba(0,0,0,0.2)] aspect-[1/1] rounded-md overflow-hidden"
+                                  >
+                                    <Image
+                                      width={800}
+                                      height={800}
+                                      priority
+                                      src={
+                                        image.imageLinks.thumbnail ||
+                                        image.imageLinks.small ||
+                                        image.imageLinks.medium ||
+                                        image.imageLinks.original
+                                      }
+                                      alt={image.description}
+                                      className="object-cover w-full aspect-[1/1]"
+                                    />
+                                  </div>
+                                ))}
+                              </>
+                            ) : (
+                              <div className="flex flex-col col-span-2 items-center justify-center w-full">
+                                <p className="text-paragraph font-medium">
+                                  No images in this catalogue
+                                </p>
                               </div>
-                            ))}
-                          </>
-                        ) : (
-                          <div className="flex flex-col col-span-2 items-center justify-center w-full">
-                            <p className="text-paragraph font-medium">
-                              No images in this catalogue
-                            </p>
+                            )}
+                          </Link>
+                          <div className=" px-4 bottom-0 flex justify-between items-center mt-0">
+                            <div className="flex flex-col">
+                              <p className="text-heading-05 font-semibold">
+                                {catalogue.name}
+                              </p>
+                            </div>
                           </div>
-                        )}
-                      </Link>
-                      <div className=" px-4 bottom-0 flex justify-between items-center mt-0">
-                        <div className="flex flex-col">
-                          <p className="text-heading-05 font-semibold">
-                            {catalogue.name}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {selectedTab === "blogs" && (
+                  <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
+                    {blogs.map((blog) => (
+                      <Link
+                        href={`/blog/${blog._id}`}
+                        key={blog._id}
+                        className="flex flex-col w-full aspect-[1/1] justify-between gap-4 p-4 bg-white rounded-lg shadow-md"
+                      >
+                        <div className="flex flex-col gap-4">
+                          <Image
+                            width={800}
+                            height={800}
+                            src={blog.coverImage[0]}
+                            alt={blog.content?.title || "Blog cover image"}
+                            className="w-full object-cover rounded-lg"
+                          />
+
+                          <div className="flex flex-wrap gap-2 items-center">
+                            {blog.tags.slice(0, 3).map((tag) => (
+                              <span
+                                key={tag}
+                                className="px-2 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-semibold"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                            <span className="text-sm text-gray-600 font-semibold">
+                              {blog.tags.length > 3 &&
+                                `+${blog.tags.length - 3} more`}
+                            </span>
+                          </div>
+                          <h2 className="text-lg font-semibold">
+                            {blog.content.title}
+                          </h2>
+                          <p className="text-sm text-gray-700 truncate">
+                            {blog.content.summary}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {new Date(blog.createdAt).toLocaleDateString()}
                           </p>
                         </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

@@ -1,54 +1,20 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
 import Link from "next/link";
 import useAuthStore from "@/authStore";
 import Loader from "@/components/loader";
 import Swal from "sweetalert2";
-import { Trash } from "lucide-react";
 import Button2 from "@/components/button2";
 
-export default function BlogCreate() {
-  const { token, photographer, isHydrated } = useAuthStore();
+export default function PhotographerBlogs() {
+  const { photographer, isHydrated } = useAuthStore();
   const router = useRouter();
-  const [error, setError] = useState(null);
   const [blogs, setBlogs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  const handleDelete = async (id) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3e3e3e",
-      confirmButtonText: "Yes, delete it!",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await axios.delete(
-            `${process.env.NEXT_PUBLIC_SERVER}/api/blog/delete-blog?blogId=${id}`,
-            {
-              headers: { "x-auth-token": token },
-            }
-          );
-          toast.success("Blog deleted successfully!");
-          setBlogs((prev) => prev.filter((blog) => blog._id !== id));
-        } catch (error) {
-          console.error("Error deleting blog:", error);
-          toast.error("Failed to delete blog.");
-        }
-      }
-    });
-  };
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -97,7 +63,8 @@ export default function BlogCreate() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 {blogs.map((blog) => (
-                  <div
+                  <Link
+                    href={`/profile/blog/edit/${blog._id}`}
                     key={blog._id}
                     className="flex flex-col justify-between gap-4 p-4 bg-white rounded-lg shadow-md"
                   >
@@ -135,7 +102,7 @@ export default function BlogCreate() {
                       </p>
                     </div>
                     {/* Action Buttons */}
-                    <div className="flex items-center justify-between mt-4">
+                    {/* <div className="flex items-center justify-between mt-4">
                       <Link href={`/blog/${blog._id}`}>
                         <Button2 size="sm">Read More</Button2>
                       </Link>
@@ -145,7 +112,6 @@ export default function BlogCreate() {
                             variant="outline"
                             className="flex items-center gap-2"
                           >
-                            {/* <Pen size={16} /> */}
                             Edit
                           </Button>
                         </Link>
@@ -158,8 +124,8 @@ export default function BlogCreate() {
                           Delete
                         </Button>
                       </div>
-                    </div>
-                  </div>
+                    </div> */}
+                  </Link>
                 ))}
               </div>
             )}

@@ -30,20 +30,17 @@ import {
 import Link from "next/link";
 
 export default function ImageEdit() {
-  const { token } = useAuthStore();
   const { id } = useParams();
   const router = useRouter();
-  const { photographer } = useAuthStore();
+  const { photographer, token, isHydrated } = useAuthStore();
 
   const [photo, setPhoto] = useState();
   const [updatedPhoto, setUpdatedPhoto] = useState();
   const [categories, setCategories] = useState([]);
   const [keywordInput, setKeywordInput] = useState("");
-  // const [progr, setProgr] = useState(0);
   const [timeoutId, setTimeoutId] = useState(null);
-  // const [imageUrl, setImageUrl] = useState("");
-  // const [step, setStep] = useState("1");
   const [activePlan, setActivePlan] = useState("basic");
+  const [loading, setLoading] = useState(true);
 
   const handleDescriptionChange = (e) => {
     const newValue = e.target.value;
@@ -55,7 +52,6 @@ export default function ImageEdit() {
 
   const handleUpdate = async (event) => {
     event.preventDefault();
-    //console.log("update triggered");
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/images/update-image-in-vault`,
@@ -67,7 +63,6 @@ export default function ImageEdit() {
           },
         }
       );
-      //console.log(response.data);
       toast.success("Image uploaded successfully");
       alert("Image updated successfully. Please check your profile.");
       router.push("/profile");
@@ -77,53 +72,6 @@ export default function ImageEdit() {
       toast.error("Error uploading image");
     }
   };
-
-  // const handleChange = async (event) => {
-  //   try {
-  //     const file = event.target.files[0];
-
-  //     if (!file) {
-  //       console.error("No file selected");
-  //       return;
-  //     }
-
-  //     const s3 = new S3Client({
-  //       region: "ap-south-1",
-  //       credentials: {
-  //         accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
-  //         secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
-  //       },
-  //     });
-
-  //     const target = {
-  //       Bucket: "clickedart-bucket",
-  //       Key: `images/${file.name}`,
-  //       Body: file,
-  //     };
-
-  //     const upload = new Upload({
-  //       client: s3,
-  //       params: target,
-  //     });
-
-  //     upload.on("httpUploadProgress", (progress) => {
-  //       const percentCompleted = Math.round(
-  //         (progress.loaded / progress.total) * 100
-  //       );
-  //       setProgr(percentCompleted);
-  //       //console.log(`Progress: ${percentCompleted}%`);
-  //     });
-
-  //     await upload.done().then((r) => //console.log(r));
-  //     //console.log("File uploaded successfully!");
-  //     const fileUrl = `https://${target.Bucket}.s3.ap-south-1.amazonaws.com/${target.Key}`;
-  //     setImageUrl(fileUrl);
-  //     setPhoto({ ...photo, imageLinks: {} });
-  //     //console.log("File URL:", fileUrl);
-  //   } catch (error) {
-  //     console.error("Error uploading file:", error);
-  //   }
-  // };
 
   const handleDelete = async () => {
     try {
@@ -136,7 +84,6 @@ export default function ImageEdit() {
           },
         }
       );
-      //console.log(response.data);
       toast.success("Image deleted successfully");
       alert("Image deleted successfully. Please check your profile.");
       router.push("/profile");
@@ -151,9 +98,6 @@ export default function ImageEdit() {
     value: category._id,
     label: category.name,
   }));
-
-  //console.log("Photo:", updatedPhoto);
-  //console.log("Active Plan:", activePlan);
 
   const handlePriceChange = (e) => {
     const newValue = e.target.value;
@@ -208,9 +152,10 @@ export default function ImageEdit() {
           `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-image-by-id?id=${id}`
         );
         setPhoto(res.data.photo);
-        //console.log(res.data.photo);
       } catch (error) {
         console.log(error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -223,10 +168,6 @@ export default function ImageEdit() {
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/get-user-active-subscription?photographer=${photographer._id}`
         );
-        // console.log(
-        //   "Active Subscription ",
-        //   res.data.subscription?.planId?.name
-        // );
         setActivePlan(res.data.subscription?.planId?.name?.toLowerCase());
         if (res.data.subscription?.planId?.name?.toLowerCase() === "basic") {
           setLimit(10);
@@ -267,6 +208,32 @@ export default function ImageEdit() {
       }));
     }
   }, [photo]);
+
+  if (!photographer) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
+        {isHydrated ? (
+          <>
+            <h1 className="text-3xl font-bold text-center text-gray-800">
+              You need to be a photographer to create a blog.
+            </h1>
+          </>
+        ) : (
+          <Loader />
+        )}
+      </div>
+    );
+  }
+
+  if (photographer && photo && photo.photographer?._id !== photographer._id) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
+        <h1 className="text-3xl font-bold text-center text-gray-800">
+          You are not authorized to view this page.
+        </h1>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -559,13 +526,18 @@ export default function ImageEdit() {
                   className="!text-paragraph"
                   value={updatedPhoto.location || ""}
                   onChange={(e) =>
-                    setUpdatedPhoto({ ...updatedPhoto, location: e.target.value })
+                    setUpdatedPhoto({
+                      ...updatedPhoto,
+                      location: e.target.value,
+                    })
                   }
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <Link href="/profile">
-                  <button className="w-full bg-primary h-full rounded-lg text-white font-semibold hover:bg-primary-dark">Back</button>
+                  <button className="w-full bg-primary h-full rounded-lg text-white font-semibold hover:bg-primary-dark">
+                    Back
+                  </button>
                 </Link>
                 <Button2 onClick={handleUpdate}>Update</Button2>
               </div>
@@ -574,7 +546,7 @@ export default function ImageEdit() {
         </div>
       ) : (
         <div className="flex justify-center items-center h-screen">
-          {photo ? <Loader /> : "Not found"}
+          {loading ? <Loader /> : "Not found"}
         </div>
       )}
     </>
