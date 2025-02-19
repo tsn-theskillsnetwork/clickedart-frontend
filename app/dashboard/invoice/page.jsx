@@ -26,7 +26,7 @@ import axios from "axios";
 // };
 
 export default function Page() {
-  const { photographer } = useAuthStore();
+  const { photographer, isHydrated } = useAuthStore();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -50,6 +50,22 @@ export default function Page() {
   useEffect(() => {
     if (photographer) fetchStats();
   }, [photographer]);
+
+  if (!isHydrated) {
+    return (
+      <div className="flex items-center justify-center h-[80vh]">
+        <Loader />;
+      </div>
+    );
+  }
+
+  if (!photographer) {
+    return (
+      <div className="flex items-center justify-center h-[80vh]">
+        <h1 className="text-3xl font-semibold">UNAUTHORIZED</h1>
+      </div>
+    );
+  }
 
   return (
     <SidebarProvider>

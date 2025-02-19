@@ -133,6 +133,22 @@ export default function DashboardPage() {
     ],
   };
 
+    if (!isHydrated) {
+      return (
+        <div className="flex items-center justify-center h-[80vh]">
+          <Loader />;
+        </div>
+      );
+    }
+  
+    if (!photographer) {
+      return (
+        <div className="flex items-center justify-center h-[80vh]">
+          <h1 className="text-3xl font-semibold">UNAUTHORIZED</h1>
+        </div>
+      );
+    }
+
   return (
     <>
       {photographer && photographer.isMonetized ? (
