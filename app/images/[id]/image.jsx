@@ -338,40 +338,44 @@ export default function ImagePage({ image }) {
       <div className="flex flex-col gap-10">
         {mode === "print" && (
           <>
-            <Select
-              className="w-36"
-              onValueChange={(value) => {
-                setSelectedPaper(value);
-                handlePaperChange(value);
-              }}
-            >
-              <SelectTrigger className="w-full font-medium !text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between">
-                <SelectValue
-                  placeholder={selectedPaper?.name || "Select Paper"}
-                />
-                <p className="sr-only">Paper</p>
-              </SelectTrigger>
-              <SelectContent>
-                {papers.map((paper) => (
-                  <SelectItem
-                    className="!text-paragraph"
-                    key={paper._id}
-                    value={paper}
-                  >
-                    {paper.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex flex-col gap-2">
+              <Label>Media Type</Label>
+              <Select
+                className="w-36"
+                onValueChange={(value) => {
+                  setSelectedPaper(value);
+                  handlePaperChange(value);
+                }}
+              >
+                <SelectTrigger className="w-full font-medium !text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between">
+                  <SelectValue
+                    placeholder={selectedPaper?.name || "Select Paper"}
+                  />
+                  <p className="sr-only">Paper</p>
+                </SelectTrigger>
+                <SelectContent>
+                  {papers.map((paper) => (
+                    <SelectItem
+                      className="!text-paragraph"
+                      key={paper._id}
+                      value={paper}
+                    >
+                      {paper.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <a
+                href="/support/printing-guide"
+                target="_blank"
+                className="text-blue-600 "
+              >
+                Printing Guide
+              </a>
+            </div>
 
-            <a
-              href="/support/printing-guide"
-              target="_blank"
-              className="text-blue-600 -mt-8"
-            >
-              Printing Guide
-            </a>
-            <div>
+            <div className="flex flex-col gap-2">
+              <Label>Size</Label>
               <Select
                 className="w-36"
                 value={JSON.stringify(selectedSize)} // Serialized value
@@ -475,32 +479,34 @@ export default function ImagePage({ image }) {
                 </DialogContent>
               </Dialog>
             </div>
-
-            <Select
-              className="w-36"
-              onValueChange={(value) => {
-                setSelectedFrame(value);
-              }}
-            >
-              <SelectTrigger className="w-full font-medium !text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between">
-                <SelectValue
-                  placeholder={selectedFrame?.name || "Select Frame"}
-                />
-                <p className="sr-only">Frame</p>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={null}>No Frame</SelectItem>
-                {selectedPaper && (
-                  <>
-                    {frames.map((frame) => (
-                      <SelectItem key={frame._id} value={frame}>
-                        {frame.name}
-                      </SelectItem>
-                    ))}
-                  </>
-                )}
-              </SelectContent>
-            </Select>
+            <div className="flex flex-col gap-2">
+              <Label>Frame</Label>
+              <Select
+                className="w-36"
+                onValueChange={(value) => {
+                  setSelectedFrame(value);
+                }}
+              >
+                <SelectTrigger className="w-full font-medium !text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between">
+                  <SelectValue
+                    placeholder={selectedFrame?.name || "Select Frame"}
+                  />
+                  <p className="sr-only">Frame</p>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={null}>No Frame</SelectItem>
+                  {selectedPaper && (
+                    <>
+                      {frames.map((frame) => (
+                        <SelectItem key={frame._id} value={frame}>
+                          {frame.name}
+                        </SelectItem>
+                      ))}
+                    </>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
           </>
         )}
         {mode === "digital" && (
@@ -732,23 +738,30 @@ export default function ImagePage({ image }) {
                           </p>
                           <p className="text-sm lg:text-base font-medium lg:font-semibold text-surface-600">
                             DPI:{" "}
-                            {image?.resolutions?.thumbnail?.width >
-                            image?.resolutions?.thumbnail?.height
-                              ? Math.floor(
-                                  (image?.resolutions?.thumbnail?.width /
-                                    selectedSize?.width) *
-                                    100
-                                ) / 100
-                              : Math.floor(
-                                  (image?.resolutions?.thumbnail?.height /
-                                    selectedSize?.height) *
-                                    100
-                                ) / 100}
-                            {/* {Math.floor((image?.resolutions.original?.width /
-                              selectedSize?.width +
-                              image?.resolutions.original?.height /
-                                selectedSize?.height) /
-                              2)} */}
+                            {Math.max(
+                              Math.floor(
+                                (Math.max(
+                                  image?.resolutions?.thumbnail?.width,
+                                  image?.resolutions?.thumbnail?.height
+                                ) /
+                                  Math.max(
+                                    selectedSize?.width,
+                                    selectedSize?.height
+                                  )) *
+                                  100
+                              ) / 100,
+                              Math.floor(
+                                (Math.min(
+                                  image?.resolutions?.thumbnail?.width,
+                                  image?.resolutions?.thumbnail?.height
+                                ) /
+                                  Math.min(
+                                    selectedSize?.width,
+                                    selectedSize?.height
+                                  )) *
+                                  100
+                              ) / 100
+                            )}
                           </p>
                         </div>
                       )}

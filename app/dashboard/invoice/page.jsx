@@ -19,6 +19,7 @@ import { DataTable } from "./data-table";
 import { useEffect, useState } from "react";
 import useAuthStore from "@/authStore";
 import axios from "axios";
+import Loader from "@/components/loader";
 
 // export const metadata = {
 //   title: "Invoice",
