@@ -175,7 +175,7 @@ export default function BlogEdit() {
         const data = response.data;
 
         // setBlog(data.blog);
-        setBlog({ ...data.blog, blogId: data.blog._id });
+        setBlog({ ...data.blog, blogId: data.blog._id, isActive: false });
       } catch (error) {
         console.log(error);
       } finally {
@@ -187,6 +187,8 @@ export default function BlogEdit() {
       fetchBlogs();
     }
   }, [photographer]);
+
+  console.log(blog)
 
   return (
     <div className="p-4">
