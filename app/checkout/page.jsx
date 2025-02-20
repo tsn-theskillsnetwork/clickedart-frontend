@@ -16,7 +16,7 @@ import { useRazorpay } from "react-razorpay";
 import Swal from "sweetalert2";
 
 export default function CheckoutPage() {
-  const { user, token, isHydrated } = useAuthStore();
+  const { user, photographer, token, isHydrated } = useAuthStore();
   const { cartItems, clearCart } = useCartStore();
   const router = useRouter();
   const [code, setCode] = useState("");
@@ -79,8 +79,8 @@ export default function CheckoutPage() {
   }, [items]);
 
   const validateOrder = (orderData) => {
-    if (!user) {
-      toast.error("Please login as User to continue");
+    if (!(user || photographer)) {
+      toast.error("Validation: Please login to continue");
       return false;
     }
 
@@ -124,23 +124,20 @@ export default function CheckoutPage() {
     try {
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/download/calculate-price`,
-        { items }
+        { items, photographerId: photographer?._id }
       );
-
+      console.log("Price:", res.data);
       setPrice(res.data);
     } catch (error) {
-      console.error(
-        "Error calculating price:",
-        error.response?.data || error.message
-      );
+      console.error("Error calculating price:", error);
       alert("Failed to calculate price. Please try again.");
     }
   };
 
   const handlePayment = useCallback(
     async (orderData) => {
-      if (!user) {
-        toast.error("Please login as User to continue");
+      if (!(user || photographer)) {
+        toast.error("Payment: Please login to continue");
         return;
       }
 
@@ -150,7 +147,7 @@ export default function CheckoutPage() {
         `${process.env.NEXT_PUBLIC_SERVER}/api/download/payment`,
         {
           total: orderData.finalAmount,
-          userId: user._id,
+          userId: user?._id || photographer?._id,
         }
       );
       const options = {
@@ -191,7 +188,7 @@ export default function CheckoutPage() {
       const rzpay = new Razorpay(options);
       rzpay.open();
     },
-    [Razorpay, user]
+    [Razorpay, user, photographer]
   );
 
   const createOrder = async (orderData) => {
@@ -263,7 +260,7 @@ export default function CheckoutPage() {
     // Update the order data
     setOrderData((prev) => ({
       ...prev,
-      userId: user?._id,
+      userId: (user || photographer)?._id,
       orderItems: cartItems.map((item) => ({
         imageInfo: {
           image: item.imageInfo.image,
@@ -293,13 +290,13 @@ export default function CheckoutPage() {
       })),
       shippingAddress: {
         ...prev.shippingAddress,
-        city: user?.shippingAddress?.city,
-        address: user?.shippingAddress?.address,
-        state: user?.shippingAddress?.state,
-        country: user?.shippingAddress?.country || "India",
-        email: user?.email,
-        mobile: user?.mobile,
-        pincode: user?.shippingAddress?.pincode,
+        city: (user || photographer)?.shippingAddress?.city,
+        address: (user || photographer)?.shippingAddress?.address,
+        state: (user || photographer)?.shippingAddress?.state,
+        country: (user || photographer)?.shippingAddress?.country || "India",
+        email: (user || photographer)?.email,
+        mobile: (user || photographer)?.mobile,
+        pincode: (user || photographer)?.shippingAddress?.pincode,
       },
       finalAmount: finalAmount.toFixed(2),
       discount: discountAmount.toFixed(2),
@@ -315,7 +312,11 @@ export default function CheckoutPage() {
     try {
       setLoading(true);
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/coupon/apply-coupon?code=${code}&userId=${user?._id}&type=user`
+        `${
+          process.env.NEXT_PUBLIC_SERVER
+        }/api/coupon/apply-coupon?code=${code}&userId=${
+          (user || photographer)?._id
+        }&type=${user ? "user" : "photographer"}`
       );
 
       toast.success("Coupon applied successfully");
@@ -361,15 +362,15 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (!isHydrated) return;
 
-    if (!user && !toastShownRef.current) {
+    if (!(user || photographer) && !toastShownRef.current) {
       toastShownRef.current = true;
-      toast("Please Login as User to continue", {
+      toast("Please Login to continue", {
         duration: 4000,
         position: "top-center",
       });
       router.push("/signin");
     }
-  }, [isHydrated, user, router]);
+  }, [isHydrated, user, photographer, router]);
 
   return (
     <div>
@@ -422,8 +423,8 @@ export default function CheckoutPage() {
                         <Input
                           type="text"
                           placeholder="Full Name"
-                          value={`${user?.firstName || ""} ${
-                            user?.lastName || ""
+                          value={`${(user || photographer)?.firstName || ""} ${
+                            (user || photographer)?.lastName || ""
                           }`}
                           disabled
                         />

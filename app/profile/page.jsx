@@ -586,17 +586,14 @@ const ProfilePage = () => {
                         }}
                         className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear cursor-pointer"
                       />
-
-                      {/* <div className="">
-                        <div className="flex justify-between px-2 pt-2">
-                          <div className="">
-                            <div className="bg-white px-2 text-paragraph bg-opacity-75 w-fit transition-all duration-200 ease-linear cursor-default">
-                            </div>
-                          </div>
-                        </div>
-                        
-                      </div> */}
-
+                      <button
+                        onClick={() => {
+                          router.push(`/profile/print/${image._id}`);
+                        }}
+                        className="z-50 absolute top-2 right-2 font-semibold text-white bg-black bg-opacity-50 px-1 rounded-md"
+                      >
+                        Print
+                      </button>
                       <div className="text-black flex justify-between items-start px-4">
                         <div className="text-heading-05 font-semibold capitalize">
                           {image.title || "Untitled"}

@@ -2,12 +2,11 @@ import Image from "next/image";
 import React from "react";
 
 export default function ImageSection({ selectedFrame, image }) {
-  console.log(image);
   return (
     <div
       className={`relative flex h-full w-full ${
         selectedFrame ? "p-[2px] sm:p-1" : "p-0"
-      } bg-white transition-all  duration-300 ease-in-out`}
+      } bg-transparent transition-all  duration-300 ease-in-out`}
     >
       <div className="relative w-full h-full  inner-shadow-3 z-10">
         <Image

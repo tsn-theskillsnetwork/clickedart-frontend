@@ -46,9 +46,10 @@ export default function GoogleReviews() {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const response = await axios.get(`/api/fetchReviews`);
-        console.log(response.data.result.reviews);
-        const fiveStarReviews = response.data.result.reviews.filter(
+        const response = await axios.get(`
+          ${process.env.NEXT_PUBLIC_SERVER}/api/layout/get-google-reviews`);
+        console.log(response.data.data.result.reviews);
+        const fiveStarReviews = response.data.data.result.reviews.filter(
           (review) => review.rating === 5
         );
         setReviews(fiveStarReviews);
