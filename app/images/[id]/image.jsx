@@ -34,11 +34,13 @@ import RecommendedSection from "@/components/image/recommendedSection";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import ImageSkeleton from "./imageSkeleton";
+import useWishlistStore from "@/store/wishlist";
 
 export default function ImagePage({ image }) {
   const id = useParams().id;
-  const { isHydrated } = useAuthStore();
+  const { isHydrated, user, photographer } = useAuthStore();
   const { addItemToCart, removeItemFromCart, isItemInCart } = useCartStore();
+  const { wishlist, fetchWishlist } = useWishlistStore();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -57,6 +59,60 @@ export default function ImagePage({ image }) {
     width: 0,
     height: 0,
   });
+
+  const addImageToWishlist = async (imageId) => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/wishlist/add-images-in-wishlist`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: user?._id,
+            imageIds: [imageId],
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to add image to wishlist");
+      }
+      fetchWishlist((user || photographer)?._id);
+    } catch (error) {
+      console.error("Error adding image to wishlist:", error);
+    }
+  };
+
+  const removeImageFromWishlist = async (imageId) => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/wishlist/remove-images-from-wishlist`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: user?._id,
+            imageIds: [imageId],
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to remove image from wishlist");
+      }
+      fetchWishlist((user || photographer)?._id);
+    } catch (error) {
+      console.error("Error removing image from wishlist:", error);
+    }
+  };
 
   const onAddToCart = () => {
     if (mode === "print" && !selectedPaper) {
@@ -299,10 +355,10 @@ export default function ImagePage({ image }) {
 
   const buySection = (
     <div className="flex flex-col">
-      <h5 className="text-heading-05 uppercase font-bold text-surface-600">
+      <h5 className="text-paragraph md:text-heading-05 uppercase font-bold text-surface-600">
         ₹ {subTotal}
       </h5>
-      <div className="flex flex-row relative items-center justify-between w-full py-5 my-10 rounded-full">
+      <div className="flex flex-row relative items-center justify-between w-full py-4 sm:py-5 my-5 rounded-full">
         <div
           className={`absolute inset-0 bg-primary-100 shadow-inner inner-shadow rounded-full`}
         ></div>
@@ -317,7 +373,7 @@ export default function ImagePage({ image }) {
             setMode("digital");
             handleDigital();
           }}
-          className={`text-base md:text-paragraph lg:text-base xl:text-heading-06 drop-shadow-md z-10 font-bold ${
+          className={`text-sm md:text-base xl:text-heading-06 drop-shadow-md z-10 font-bold ${
             mode === "print" ? "text-surface-500" : "text-zinc-100"
           } text-center w-full cursor-pointer transition-colors duration-200 ease-in-out`}
         >
@@ -328,14 +384,54 @@ export default function ImagePage({ image }) {
             setMode("print");
             handleMockup();
           }}
-          className={`text-base md:text-paragraph lg:text-base xl:text-heading-06 drop-shadow-md z-10 font-bold ${
+          className={`text-sm md:text-base xl:text-heading-06 drop-shadow-md z-10 font-bold ${
             mode === "digital" ? "text-surface-500" : "text-zinc-100"
           } text-center w-full cursor-pointer transition-colors duration-200 ease-in-out`}
         >
           Ready to Hang
         </p>
       </div>
-      <div className="flex flex-col gap-10">
+      <div className="mb-5">
+        {mode === "digital" ? (
+          <p className="text-sm lg:text-base font-medium lg:font-semibold text-surface-600">
+            {image?.resolutions[selectedSize]?.width} x{" "}
+            {image?.resolutions[selectedSize]?.height}px
+          </p>
+        ) : (
+          <div>
+            <p className="text-sm lg:text-base font-medium lg:font-semibold text-surface-600">
+              {image?.resolutions?.thumbnail?.width} x{" "}
+              {image?.resolutions?.thumbnail?.height} px
+            </p>
+            <p className="text-sm lg:text-base font-medium lg:font-semibold text-surface-600">
+              Size: {selectedSize?.width} x {selectedSize?.height} in
+            </p>
+            <p className="text-sm lg:text-base font-medium lg:font-semibold text-surface-600">
+              DPI:{" "}
+              {Math.max(
+                Math.floor(
+                  (Math.max(
+                    image?.resolutions?.thumbnail?.width,
+                    image?.resolutions?.thumbnail?.height
+                  ) /
+                    Math.max(selectedSize?.width, selectedSize?.height)) *
+                    100
+                ) / 100,
+                Math.floor(
+                  (Math.min(
+                    image?.resolutions?.thumbnail?.width,
+                    image?.resolutions?.thumbnail?.height
+                  ) /
+                    Math.min(selectedSize?.width, selectedSize?.height)) *
+                    100
+                ) / 100
+              )}
+            </p>
+          </div>
+        )}
+        <hr />
+      </div>
+      <div className="flex flex-col gap-5 sm:gap-10">
         {mode === "print" && (
           <>
             <div className="flex flex-col gap-2">
@@ -347,7 +443,7 @@ export default function ImagePage({ image }) {
                   handlePaperChange(value);
                 }}
               >
-                <SelectTrigger className="w-full font-medium !text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between">
+                <SelectTrigger className="w-full font-medium text-xs sm:text-sm md:!text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between">
                   <SelectValue
                     placeholder={selectedPaper?.name || "Select Paper"}
                   />
@@ -356,7 +452,7 @@ export default function ImagePage({ image }) {
                 <SelectContent>
                   {papers.map((paper) => (
                     <SelectItem
-                      className="!text-paragraph"
+                      className="text-xs sm:text-sm md:!text-paragraph"
                       key={paper._id}
                       value={paper}
                     >
@@ -368,7 +464,7 @@ export default function ImagePage({ image }) {
               <a
                 href="/support/printing-guide"
                 target="_blank"
-                className="text-blue-600 "
+                className="text-blue-600 text-sm sm:text-base"
               >
                 Printing Guide
               </a>
@@ -383,7 +479,7 @@ export default function ImagePage({ image }) {
                   setSelectedSize(JSON.parse(value)); // Deserialize value on change
                 }}
               >
-                <SelectTrigger className="w-full font-medium !text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between">
+                <SelectTrigger className="w-full font-medium text-xs sm:text-sm md:!text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between">
                   {/* Manually display selectedSize */}
                   <span>
                     {selectedSize?.width && selectedSize?.height
@@ -395,7 +491,7 @@ export default function ImagePage({ image }) {
                 <SelectContent>
                   {selectedPaper?.customDimensions.map((size) => (
                     <SelectItem
-                      className="!text-paragraph"
+                      className="sm:!text-paragraph"
                       key={size._id}
                       value={JSON.stringify(size)} // Serialize options
                     >
@@ -406,7 +502,7 @@ export default function ImagePage({ image }) {
               </Select>
 
               <Dialog>
-                <DialogTrigger className="w-full pl-2 !text-paragraph rounded-lg h-12 flex items-center justify-between">
+                <DialogTrigger className="w-full pl-2 text-sm sm:!text-paragraph rounded-lg h-5 flex items-center justify-between">
                   Custom Size
                 </DialogTrigger>
                 <DialogContent>
@@ -487,18 +583,27 @@ export default function ImagePage({ image }) {
                   setSelectedFrame(value);
                 }}
               >
-                <SelectTrigger className="w-full font-medium !text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between">
+                <SelectTrigger className="w-full font-medium text-xs sm:text-sm md:!text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between">
                   <SelectValue
                     placeholder={selectedFrame?.name || "Select Frame"}
                   />
                   <p className="sr-only">Frame</p>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={null}>No Frame</SelectItem>
+                  <SelectItem
+                    className="text-xs sm:text-sm md:text-paragraph"
+                    value={null}
+                  >
+                    No Frame
+                  </SelectItem>
                   {selectedPaper && (
                     <>
                       {frames.map((frame) => (
-                        <SelectItem key={frame._id} value={frame}>
+                        <SelectItem
+                          className="text-xs sm:text-sm md:text-paragraph"
+                          key={frame._id}
+                          value={frame}
+                        >
                           {frame.name}
                         </SelectItem>
                       ))}
@@ -518,7 +623,7 @@ export default function ImagePage({ image }) {
                 setSelectedSize(value);
               }}
             >
-              <SelectTrigger className="w-full font-medium !text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between capitalize">
+              <SelectTrigger className="w-full font-medium text-xs sm:text-sm md:text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between capitalize">
                 <SelectValue placeholder={"Select Size"} />
                 <p className="sr-only">Size</p>
               </SelectTrigger>
@@ -529,7 +634,7 @@ export default function ImagePage({ image }) {
 
                     return resolution ? (
                       <SelectItem
-                        className="!text-paragraph text-surface-500"
+                        className="text-xs sm:text-sm md:text-paragraph text-surface-500"
                         key={key}
                         value={key}
                       >
@@ -550,12 +655,12 @@ export default function ImagePage({ image }) {
           </>
         )}
       </div>
-      <div className="mt-10 flex items-center w-full gap-2 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-10">
+      <div className="hidden lg:flex mt-10 items-center w-full gap-2 sm:gap-4 md:gap-6">
         {inCart ? (
           <>
             <Link
               href="/cart"
-              className={`border-primary bg-white text-primary-dark hover:bg-primary-100 flex w-full items-center gap-4 justify-center border-2 py-4 rounded-lg text-base sm:text-paragraph md:text-heading-05 lg:text-paragraph xl:text-heading-05 font-semibold transition-all duration-300 ease-in-out`}
+              className={`border-primary bg-white text-primary-dark hover:bg-primary-100 flex w-full items-center gap-4 justify-center border-2 py-4 rounded-lg text-base sm:text-paragraph md:text-heading-05 lg:text-paragraph font-semibold transition-all duration-300 ease-in-out`}
             >
               <span className="flex justify-center items-center gap-2">
                 <p className="w-fit">Visit Cart</p>
@@ -564,7 +669,7 @@ export default function ImagePage({ image }) {
             </Link>
             <Link
               href="/images"
-              className={`border-primary bg-white text-primary-dark hover:bg-primary-100 flex w-full items-center gap-4 justify-center border-2 py-4 rounded-lg text-base sm:text-paragraph md:text-heading-05 lg:text-paragraph xl:text-heading-05 font-semibold transition-all duration-300 ease-in-out`}
+              className={`border-primary bg-white text-primary-dark hover:bg-primary-100 flex w-full items-center gap-4 justify-center border-2 py-4 rounded-lg text-base sm:text-paragraph md:text-heading-05 lg:text-paragraph font-semibold transition-all duration-300 ease-in-out`}
             >
               <span className="flex justify-center items-center gap-2">
                 <p className="w-fit">Browse More</p>
@@ -576,7 +681,7 @@ export default function ImagePage({ image }) {
             onClick={() => {
               inCart ? onRemoveFromCart(id) : onAddToCart();
             }}
-            className={`border-primary bg-primary text-white hover:bg-primary-dark flex w-full items-center gap-4 justify-center border-2 py-4 rounded-lg text-base sm:text-paragraph md:text-heading-05 lg:text-paragraph xl:text-heading-05 font-semibold transition-all duration-300 ease-in-out`}
+            className={`border-primary bg-primary text-white hover:bg-primary-dark flex w-full items-center gap-4 justify-center border-2 py-4 rounded-lg text-base sm:text-paragraph md:text-heading-05 lg:text-paragraph font-semibold transition-all duration-300 ease-in-out`}
           >
             <span className="flex justify-center items-center gap-2">
               <p className="w-fit">Add to Cart</p>
@@ -584,10 +689,27 @@ export default function ImagePage({ image }) {
             </span>
           </button>
         )}
-        <button className="btn-secondary flex-shrink-0 p-4 border-2 border-primary rounded-2xl h-full aspect-[1/1] flex items-center justify-center group">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+
+            wishlist?.some((item) => item._id === image._id)
+              ? removeImageFromWishlist(image._id)
+              : addImageToWishlist(image._id);
+          }}
+          className={`${
+            wishlist?.some((item) => item._id === image._id)
+              ? "bg-red-200 border-red-500"
+              : "bg-white border-primary"
+          } btn-secondary flex-shrink-0 p-4 border-2  rounded-2xl h-full aspect-[1/1] flex items-center justify-center group`}
+        >
           <Heart
-            size={32}
-            className="text-primary group-active:text-red-500 group-active:fill-red-500 group-hover:text-red-500 group-hover:scale-110 transition-all duration-300 ease-in-out"
+            size={24}
+            className={`${
+              wishlist?.some((item) => item._id === image._id)
+                ? "text-red-500 fill-red-500"
+                : "text-primary"
+            } group-hover:text-red-500 group-hover:scale-110 transition-all duration-300 ease-in-out`}
           />
         </button>
       </div>
@@ -615,7 +737,7 @@ export default function ImagePage({ image }) {
       ) : (
         <>
           {image.length !== 0 ? (
-            <div className={`px-5 lg:px-20`}>
+            <div className={`px-5 lg:px-20 pb-5`}>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-16 pt-10 bg-[#FBFBFB] -mt-2">
                 <div className="lg:col-span-2 flex flex-col gap-10  h-full">
                   <motion.div
@@ -720,83 +842,12 @@ export default function ImagePage({ image }) {
                           image.photographer?.lastName
                         : image.photographer?.name || "Photographer name"}
                     </h5>
-                    <div>
-                      {mode === "digital" ? (
-                        <p className="text-sm lg:text-base font-medium lg:font-semibold text-surface-600">
-                          {image?.resolutions[selectedSize]?.width} x{" "}
-                          {image?.resolutions[selectedSize]?.height}px
-                        </p>
-                      ) : (
-                        <div>
-                          <p className="text-sm lg:text-base font-medium lg:font-semibold text-surface-600">
-                            {image?.resolutions?.thumbnail?.width} x{" "}
-                            {image?.resolutions?.thumbnail?.height} px
-                          </p>
-                          <p className="text-sm lg:text-base font-medium lg:font-semibold text-surface-600">
-                            Size: {selectedSize?.width} x {selectedSize?.height}{" "}
-                            in
-                          </p>
-                          <p className="text-sm lg:text-base font-medium lg:font-semibold text-surface-600">
-                            DPI:{" "}
-                            {Math.max(
-                              Math.floor(
-                                (Math.max(
-                                  image?.resolutions?.thumbnail?.width,
-                                  image?.resolutions?.thumbnail?.height
-                                ) /
-                                  Math.max(
-                                    selectedSize?.width,
-                                    selectedSize?.height
-                                  )) *
-                                  100
-                              ) / 100,
-                              Math.floor(
-                                (Math.min(
-                                  image?.resolutions?.thumbnail?.width,
-                                  image?.resolutions?.thumbnail?.height
-                                ) /
-                                  Math.min(
-                                    selectedSize?.width,
-                                    selectedSize?.height
-                                  )) *
-                                  100
-                              ) / 100
-                            )}
-                          </p>
-                        </div>
-                      )}
-                      <hr />
-                    </div>
-                    <h5 className="lg:hidden text-paragraph lg:text-heading-05 uppercase font-semibold lg:font-bold text-surface-600">
-                      ₹ {subTotal}
-                    </h5>
                   </div>
-                  {/* Mobile Desc */}
-                  <div className="lg:hidden">{descriptionSection}</div>
-                  {
-                    <>
-                      <div className="flex justify-center mt-10 lg:hidden">
-                        {buySectionActive && (
-                          <div className="fixed top-0 lg:hidden bg-white z-50 h-screen pt-20 px-4 w-screen">
-                            <button
-                              onClick={() => {
-                                setBuySectionActive(false);
-                              }}
-                              className="absolute top-4 right-4 font-extrabold"
-                            >
-                              X
-                            </button>
-                            {buySection}
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  }
-                  <div className="hidden lg:block">{buySection}</div>
+                  <div className="block">{buySection}</div>
                 </div>
               </div>
               {/* Desktop Desc */}
-              <div className="hidden lg:block">{descriptionSection}</div>
+              <div className="block">{descriptionSection}</div>
               <RecommendedSection category={image.category[0].name} id={id} />
             </div>
           ) : (
@@ -804,15 +855,65 @@ export default function ImagePage({ image }) {
               <p>Image not Found</p>
             </div>
           )}
-          <div className="lg:hidden w-full p-4 sticky bottom-0 z-20">
-            <button
-              onClick={() => {
-                setBuySectionActive(!buySectionActive);
-              }}
-              className="bg-primary w-full rounded-md shadow-[2px_2px_4px_rgba(0,0,0,0.4)] text-white p-2 font-medium hover:bg-primary-dark active:bg-primary-darker"
-            >
-              Buy Now
-            </button>
+          <div className="lg:hidden w-full p-4 sticky bottom-0 z-20 bg-white bg-opacity-30 backdrop-blur-sm">
+            <div className="flex items-center w-full gap-2 xl:gap-10">
+              {inCart ? (
+                <>
+                  <Link
+                    href="/cart"
+                    className={`border-primary bg-white text-primary-dark hover:bg-primary-100 flex w-full items-center gap-4 justify-center border-2 py-4 rounded-lg text-sm font-semibold transition-all duration-300 ease-in-out`}
+                  >
+                    <span className="flex justify-center items-center gap-2">
+                      <p className="w-fit">Visit Cart</p>
+                      <ShoppingCart className="" strokeWidth={3} />
+                    </span>
+                  </Link>
+                  <Link
+                    href="/images"
+                    className={`border-primary bg-white text-primary-dark hover:bg-primary-100 flex w-full items-center gap-4 justify-center border-2 py-4 rounded-lg text-sm font-semibold transition-all duration-300 ease-in-out`}
+                  >
+                    <span className="flex justify-center items-center gap-2">
+                      <p className="w-fit">Browse More</p>
+                    </span>
+                  </Link>
+                </>
+              ) : (
+                <button
+                  onClick={() => {
+                    inCart ? onRemoveFromCart(id) : onAddToCart();
+                  }}
+                  className={`border-primary bg-primary text-white hover:bg-primary-dark flex w-full items-center gap-4 justify-center border-2 py-4 rounded-lg text-sm font-semibold transition-all duration-300 ease-in-out`}
+                >
+                  <span className="flex justify-center items-center gap-2">
+                    <p className="w-fit">Add to Cart</p>
+                    <ShoppingCart className="" strokeWidth={3} />
+                  </span>
+                </button>
+              )}
+              <button
+          onClick={(e) => {
+            e.stopPropagation();
+
+            wishlist?.some((item) => item._id === image._id)
+              ? removeImageFromWishlist(image._id)
+              : addImageToWishlist(image._id);
+          }}
+          className={`${
+            wishlist?.some((item) => item._id === image._id)
+              ? "bg-red-200 border-red-500"
+              : "bg-white border-primary"
+          } btn-secondary flex-shrink-0 p-4 border-2  rounded-2xl h-full aspect-[1/1] flex items-center justify-center group`}
+        >
+          <Heart
+            size={18}
+            className={`${
+              wishlist?.some((item) => item._id === image._id)
+                ? "text-red-500 fill-red-500"
+                : "text-primary"
+            } group-hover:text-red-500 group-hover:scale-110 transition-all duration-300 ease-in-out`}
+          />
+        </button>
+            </div>
           </div>
         </>
       )}

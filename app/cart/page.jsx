@@ -45,7 +45,7 @@ export default function CartPage() {
           >
             <div className="sm:w-2/5 flex flex-col sm:flex-row gap-4">
               <div className="sm:w-1/3 flex flex-col gap-2">
-                <Link href={`/images/${product._id}`} passHref>
+                <Link href={`/images/${product.imageInfo?.image}`} passHref>
                   <img
                     src={
                       product.imageInfo?.thumbnail || "/assets/images/img6.jpg"

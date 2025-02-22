@@ -51,9 +51,16 @@ export default function RecommendedSection({ category, id }) {
     fetchImages();
   }, [category]);
 
+  if (
+    images.filter(
+      (image) => image.isActive && image.photographer && image._id !== id
+    ).length === 0
+  )
+    return null;
+
   return (
     <div className="mb-5">
-      <div className="flex flex-cols gap-5 my-5">
+      <div className="flex flex-col gap-5 my-5">
         <p className="text-paragraph sm:text-heading-06 md:text-heading-04 lg:text-heading-03 font-semibold">
           Recommended for You
         </p>

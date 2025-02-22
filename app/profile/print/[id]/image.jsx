@@ -34,10 +34,12 @@ import RecommendedSection from "@/components/image/recommendedSection";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import ImageSkeleton from "./imageSkeleton";
+import Signout from "@/components/auth/signout";
+import PhotographerOnly from "@/components/auth/photographerOnly";
 
 export default function ImagePage({ image }) {
   const id = useParams().id;
-  const { isHydrated } = useAuthStore();
+  const { isHydrated, photographer, user } = useAuthStore();
   const { addItemToCart, removeItemFromCart, isItemInCart } = useCartStore();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -74,7 +76,8 @@ export default function ImagePage({ image }) {
         title: image.title,
         photographer: image.photographer,
         resolution: selectedSize,
-        price: image.price?.original,
+        price: image.price?.original.toFixed(2) || 0,
+        thumbnail: image.imageLinks?.thumbnail || image.imageLinks?.original,
       },
       paperInfo: {
         paper: selectedPaper._id,
@@ -287,16 +290,16 @@ export default function ImagePage({ image }) {
               handlePaperChange(value);
             }}
           >
-            <SelectTrigger className="w-full font-medium !text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between">
+            <SelectTrigger className="w-full font-medium text-xs sm:text-sm md:!text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between">
               <SelectValue
-                placeholder={selectedPaper?.name || "Select Media Type"}
+                placeholder={selectedPaper?.name || "Select Paper"}
               />
               <p className="sr-only">Paper</p>
             </SelectTrigger>
             <SelectContent>
               {papers.map((paper) => (
                 <SelectItem
-                  className="!text-paragraph"
+                  className="text-xs sm:text-sm md:!text-paragraph"
                   key={paper._id}
                   value={paper}
                 >
@@ -308,7 +311,7 @@ export default function ImagePage({ image }) {
           <a
             href="/support/printing-guide"
             target="_blank"
-            className="text-blue-600 "
+            className="text-blue-600 text-sm sm:text-base"
           >
             Printing Guide
           </a>
@@ -323,7 +326,7 @@ export default function ImagePage({ image }) {
               setSelectedSize(JSON.parse(value)); // Deserialize value on change
             }}
           >
-            <SelectTrigger className="w-full font-medium !text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between">
+            <SelectTrigger className="w-full font-medium text-xs sm:text-sm md:!text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between">
               {/* Manually display selectedSize */}
               <span>
                 {selectedSize?.width && selectedSize?.height
@@ -335,7 +338,7 @@ export default function ImagePage({ image }) {
             <SelectContent>
               {selectedPaper?.customDimensions.map((size) => (
                 <SelectItem
-                  className="!text-paragraph"
+                  className="sm:!text-paragraph"
                   key={size._id}
                   value={JSON.stringify(size)} // Serialize options
                 >
@@ -346,7 +349,7 @@ export default function ImagePage({ image }) {
           </Select>
 
           <Dialog>
-            <DialogTrigger className="w-full pl-2 !text-paragraph rounded-lg h-12 flex items-center justify-between">
+            <DialogTrigger className="w-full pl-2 text-sm sm:!text-paragraph rounded-lg h-5 flex items-center justify-between">
               Custom Size
             </DialogTrigger>
             <DialogContent>
@@ -427,18 +430,27 @@ export default function ImagePage({ image }) {
               setSelectedFrame(value);
             }}
           >
-            <SelectTrigger className="w-full font-medium !text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between">
+            <SelectTrigger className="w-full font-medium text-xs sm:text-sm md:!text-paragraph bg-[#E8E8E8] rounded-lg h-12 flex items-center justify-between">
               <SelectValue
                 placeholder={selectedFrame?.name || "Select Frame"}
               />
               <p className="sr-only">Frame</p>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={null}>No Frame</SelectItem>
+              <SelectItem
+                className="text-xs sm:text-sm md:text-paragraph"
+                value={null}
+              >
+                No Frame
+              </SelectItem>
               {selectedPaper && (
                 <>
                   {frames.map((frame) => (
-                    <SelectItem key={frame._id} value={frame}>
+                    <SelectItem
+                      className="text-xs sm:text-sm md:text-paragraph"
+                      key={frame._id}
+                      value={frame}
+                    >
                       {frame.name}
                     </SelectItem>
                   ))}
@@ -448,24 +460,16 @@ export default function ImagePage({ image }) {
           </Select>
         </div>
       </div>
-      <div className="hidden lg:flex mt-10 items-center w-full gap-2 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-10">
+      <div className="hidden lg:flex mt-10 items-center w-full gap-2 sm:gap-4 md:gap-6">
         {inCart ? (
           <>
             <Link
               href="/cart"
-              className={`border-primary bg-white text-primary-dark hover:bg-primary-100 flex w-full items-center gap-4 justify-center border-2 py-4 rounded-lg text-base sm:text-paragraph md:text-heading-05 lg:text-paragraph xl:text-heading-05 font-semibold transition-all duration-300 ease-in-out`}
+              className={`border-primary bg-white text-primary-dark hover:bg-primary-100 flex w-full items-center gap-4 justify-center border-2 py-4 rounded-lg text-base sm:text-paragraph md:text-heading-05 lg:text-paragraph font-semibold transition-all duration-300 ease-in-out`}
             >
               <span className="flex justify-center items-center gap-2">
                 <p className="w-fit">Visit Cart</p>
                 <ShoppingCart className="" strokeWidth={3} />
-              </span>
-            </Link>
-            <Link
-              href="/images"
-              className={`border-primary bg-white text-primary-dark hover:bg-primary-100 flex w-full items-center gap-4 justify-center border-2 py-4 rounded-lg text-base sm:text-paragraph md:text-heading-05 lg:text-paragraph xl:text-heading-05 font-semibold transition-all duration-300 ease-in-out`}
-            >
-              <span className="flex justify-center items-center gap-2">
-                <p className="w-fit">Browse More</p>
               </span>
             </Link>
           </>
@@ -474,7 +478,7 @@ export default function ImagePage({ image }) {
             onClick={() => {
               inCart ? onRemoveFromCart(id) : onAddToCart();
             }}
-            className={`border-primary bg-primary text-white hover:bg-primary-dark flex w-full items-center gap-4 justify-center border-2 py-4 rounded-lg text-base sm:text-paragraph md:text-heading-05 lg:text-paragraph xl:text-heading-05 font-semibold transition-all duration-300 ease-in-out`}
+            className={`border-primary bg-primary text-white hover:bg-primary-dark flex w-full items-center gap-4 justify-center border-2 py-4 rounded-lg text-base sm:text-paragraph md:text-heading-05 lg:text-paragraph font-semibold transition-all duration-300 ease-in-out`}
           >
             <span className="flex justify-center items-center gap-2">
               <p className="w-fit">Add to Cart</p>
@@ -482,12 +486,6 @@ export default function ImagePage({ image }) {
             </span>
           </button>
         )}
-        <button className="btn-secondary flex-shrink-0 p-4 border-2 border-primary rounded-2xl h-full aspect-[1/1] flex items-center justify-center group">
-          <Heart
-            size={32}
-            className="text-primary group-active:text-red-500 group-active:fill-red-500 group-hover:text-red-500 group-hover:scale-110 transition-all duration-300 ease-in-out"
-          />
-        </button>
       </div>
     </div>
   );
@@ -505,6 +503,31 @@ export default function ImagePage({ image }) {
     selectedPaper && selectedSize ? 22 + dynamicHeight * (35 - 22) : 100;
 
   const height = clampedHeight + "%";
+
+  if (isHydrated && !photographer) {
+    return <PhotographerOnly />;
+  }
+
+  if (isHydrated && photographer && !image) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[90vh]">
+        <p>Image not found</p>
+      </div>
+    );
+  }
+
+  if (isHydrated && photographer?._id !== image?.photographer?._id) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[90vh]">
+        <h6 className="text-heading-06 font-semibold text-surface-600">
+          UNAUTHORISED ACCESS
+        </h6>
+        <p className="text-paragraph text-surface-600">
+          You are not authorised to view this page
+        </p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -666,25 +689,17 @@ export default function ImagePage({ image }) {
               <p>Image not Found</p>
             </div>
           )}
-          <div className="lg:hidden w-full p-4 sticky bottom-0 z-20">
-            <div className="mt-10 flex items-center w-full gap-2 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-10">
+          <div className="lg:hidden w-full p-4 sticky bottom-0 z-20 bg-white bg-opacity-30 backdrop-blur-sm">
+            <div className="flex items-center w-full gap-2 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-10">
               {inCart ? (
                 <>
                   <Link
                     href="/cart"
-                    className={`border-primary bg-white text-primary-dark hover:bg-primary-100 flex w-full items-center gap-4 justify-center border-2 py-4 rounded-lg text-base sm:text-paragraph md:text-heading-05 lg:text-paragraph xl:text-heading-05 font-semibold transition-all duration-300 ease-in-out`}
+                    className={`border-primary bg-white text-primary-dark hover:bg-primary-100 flex w-full items-center gap-4 justify-center border-2 py-4 rounded-lg font-semibold transition-all duration-300 ease-in-out`}
                   >
                     <span className="flex justify-center items-center gap-2">
                       <p className="w-fit">Visit Cart</p>
                       <ShoppingCart className="" strokeWidth={3} />
-                    </span>
-                  </Link>
-                  <Link
-                    href="/images"
-                    className={`border-primary bg-white text-primary-dark hover:bg-primary-100 flex w-full items-center gap-4 justify-center border-2 py-4 rounded-lg text-base sm:text-paragraph md:text-heading-05 lg:text-paragraph xl:text-heading-05 font-semibold transition-all duration-300 ease-in-out`}
-                  >
-                    <span className="flex justify-center items-center gap-2">
-                      <p className="w-fit">Browse More</p>
                     </span>
                   </Link>
                 </>
@@ -693,7 +708,7 @@ export default function ImagePage({ image }) {
                   onClick={() => {
                     inCart ? onRemoveFromCart(id) : onAddToCart();
                   }}
-                  className={`border-primary bg-primary text-white hover:bg-primary-dark flex w-full items-center gap-4 justify-center border-2 py-4 rounded-lg text-base sm:text-paragraph md:text-heading-05 lg:text-paragraph xl:text-heading-05 font-semibold transition-all duration-300 ease-in-out`}
+                  className={`border-primary bg-primary text-white hover:bg-primary-dark flex w-full items-center gap-4 justify-center border-2 py-4 rounded-lg font-semibold transition-all duration-300 ease-in-out`}
                 >
                   <span className="flex justify-center items-center gap-2">
                     <p className="w-fit">Add to Cart</p>
@@ -701,12 +716,6 @@ export default function ImagePage({ image }) {
                   </span>
                 </button>
               )}
-              <button className="btn-secondary bg-white flex-shrink-0 p-4 border-2 border-primary rounded-2xl h-full aspect-[1/1] flex items-center justify-center group">
-                <Heart
-                  size={32}
-                  className=" text-primary group-active:text-red-500 group-active:fill-red-500 group-hover:text-red-500 group-hover:scale-110 transition-all duration-300 ease-in-out"
-                />
-              </button>
             </div>
           </div>
         </>
