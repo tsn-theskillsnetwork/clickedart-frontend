@@ -253,7 +253,7 @@ const ProfilePage = () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-images-by-photographer?photographer=${photographer._id}`
+        `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-images-by-photographer?photographer=${photographer._id}&pageSize=1000`
       );
       setPhotos(res.data.photos);
     } catch (error) {
@@ -266,7 +266,7 @@ const ProfilePage = () => {
   const fetchCatalogues = async () => {
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/catalogue/get-catalogues-by-photographer?photographer=${photographer?._id}`
+        `${process.env.NEXT_PUBLIC_SERVER}/api/catalogue/get-catalogues-by-photographer?photographer=${photographer?._id}&pageSize=1000`
       );
       setCatalogues(res.data.catalogues);
     } catch (err) {
@@ -277,7 +277,7 @@ const ProfilePage = () => {
   const fetchBlogs = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/blog/get-my-blogs?author=${photographer._id}`
+        `${process.env.NEXT_PUBLIC_SERVER}/api/blog/get-my-blogs?author=${photographer._id}&pageSize=1000`
       );
       const data = response.data;
 
@@ -590,7 +590,7 @@ const ProfilePage = () => {
                         onClick={() => {
                           router.push(`/profile/print/${image._id}`);
                         }}
-                        className="z-50 absolute top-2 right-2 font-semibold text-white bg-black bg-opacity-50 px-1 rounded-md"
+                        className="z-20 absolute top-2 right-2 font-semibold text-white bg-black bg-opacity-50 px-2 py-1 rounded-md"
                       >
                         Print
                       </button>
@@ -708,7 +708,7 @@ const ProfilePage = () => {
                               {catalogue.images?.length > 0 ? (
                                 <>
                                   {/* //map only 4 images */}
-                                  {catalogue.images.slice(0, 4).map((image) => (
+                                  {catalogue.images.slice(0, 3).map((image) => (
                                     <div
                                       key={image._id}
                                       className="shadow-[0_2px_6px_rgba(0,0,0,0.2)] aspect-[1/1] rounded-md overflow-hidden"
@@ -735,6 +735,15 @@ const ProfilePage = () => {
                                   </p>
                                 </div>
                               )}
+                              {catalogue.images?.length > 3 && (
+                              <div className="shadow-[0_2px_6px_rgba(0,0,0,0.2)] aspect-[1/1] rounded-md overflow-hidden">
+                                <div className="bg-black bg-opacity-10 w-full h-full flex items-center justify-center">
+                                  <p className="text-paragraph font-medium text-center">
+                                    +{catalogue.images?.length - 3}
+                                  </p>
+                                </div>
+                              </div>
+                            )}
                             </Link>
                             <div className=" px-4 bottom-0 flex justify-between items-center mt-0">
                               <div className="flex flex-col">

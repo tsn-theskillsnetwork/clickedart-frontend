@@ -239,11 +239,11 @@ export default function CataloguesPage() {
                 className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear"
               />
               <div className="text-white absolute bottom-0 p-4 pt-6 bg-gradient-to-t from-black to-transparent inset-x-0 bg-opacity-50 opacity-0 group-hover:opacity-100 transition-all duration-200 ease-linear">
-                <h2 className="text-heading-05 font-semibold">
+                <h2 className="text-heading-06 font-semibold">
                   {image.title || "Untitled"}
                 </h2>
                 <p className="font-medium text-surface-200">
-                  {image.category?.name}
+                  {image.category?.map((category) => category.name).join(", ")}
                 </p>
               </div>
             </Link>

@@ -62,7 +62,7 @@ export default function ProfilePage({ photographer }) {
     try {
       setLoading(true);
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-images-by-photographer?photographer=${id}`
+        `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-images-by-photographer?photographer=${id}&pageSize=1000`
       );
       // //console.log(res.data);
       setPhotos(res.data.photos);
@@ -90,7 +90,7 @@ export default function ProfilePage({ photographer }) {
   const fetchCatalogues = async () => {
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/catalogue/get-catalogues-by-photographer?photographer=${id}`
+        `${process.env.NEXT_PUBLIC_SERVER}/api/catalogue/get-catalogues-by-photographer?photographer=${id}&pageSize=1000`
       );
       setCatalogues(res.data.catalogues);
     } catch (err) {
@@ -101,7 +101,7 @@ export default function ProfilePage({ photographer }) {
   const fetchBlogs = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/blog/get-my-blogs?author=${photographer._id}`
+        `${process.env.NEXT_PUBLIC_SERVER}/api/blog/get-my-blogs?author=${photographer._id}&pageSize=1000`
       );
       const data = response.data;
 
@@ -333,7 +333,7 @@ export default function ProfilePage({ photographer }) {
                           >
                             {catalogue.images?.length > 0 ? (
                               <>
-                                {catalogue.images?.map((image) => (
+                                {catalogue.images?.slice(0, 3).map((image) => (
                                   <div
                                     key={image._id}
                                     className="shadow-[0_2px_6px_rgba(0,0,0,0.2)] aspect-[1/1] rounded-md overflow-hidden"
@@ -359,6 +359,15 @@ export default function ProfilePage({ photographer }) {
                                 <p className="text-paragraph font-medium">
                                   No images in this catalogue
                                 </p>
+                              </div>
+                            )}
+                            {catalogue.images?.length > 3 && (
+                              <div className="shadow-[0_2px_6px_rgba(0,0,0,0.2)] aspect-[1/1] rounded-md overflow-hidden">
+                                <div className="bg-black bg-opacity-10 w-full h-full flex items-center justify-center">
+                                  <p className="text-paragraph font-medium text-center">
+                                    +{catalogue.images?.length - 3}
+                                  </p>
+                                </div>
                               </div>
                             )}
                           </Link>
