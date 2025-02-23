@@ -505,7 +505,10 @@ const ProfilePage = () => {
             )}
           </div>
           {photographer && (
-            <div className="relative flex gap-10 text-base lg:text-heading-03 px-4 lg:px-24 py-4">
+            <div
+              id="main"
+              className="relative flex gap-10 text-base lg:text-heading-03 px-4 lg:px-24 py-4"
+            >
               <button
                 onClick={() => handleTabClick("photos")}
                 className={`${
@@ -736,14 +739,14 @@ const ProfilePage = () => {
                                 </div>
                               )}
                               {catalogue.images?.length > 3 && (
-                              <div className="shadow-[0_2px_6px_rgba(0,0,0,0.2)] aspect-[1/1] rounded-md overflow-hidden">
-                                <div className="bg-black bg-opacity-10 w-full h-full flex items-center justify-center">
-                                  <p className="text-paragraph font-medium text-center">
-                                    +{catalogue.images?.length - 3}
-                                  </p>
+                                <div className="shadow-[0_2px_6px_rgba(0,0,0,0.2)] aspect-[1/1] rounded-md overflow-hidden">
+                                  <div className="bg-black bg-opacity-10 w-full h-full flex items-center justify-center">
+                                    <p className="text-paragraph font-medium text-center">
+                                      +{catalogue.images?.length - 3}
+                                    </p>
+                                  </div>
                                 </div>
-                              </div>
-                            )}
+                              )}
                             </Link>
                             <div className=" px-4 bottom-0 flex justify-between items-center mt-0">
                               <div className="flex flex-col">

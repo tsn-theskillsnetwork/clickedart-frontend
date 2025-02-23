@@ -149,7 +149,7 @@ export default function CataloguesPage() {
       )}
 
       <div className="flex flex-col gap-10">
-        <Link href="/profile">
+        <Link href="/profile?section=catalogues#main">
           <p className="flex items-center gap-2 text-heading-06 font-semibold">
             <ArrowLeftIcon className="w-6 h-6" />
             Back
