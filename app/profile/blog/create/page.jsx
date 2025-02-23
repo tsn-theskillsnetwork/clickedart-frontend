@@ -14,6 +14,7 @@ import Link from "next/link";
 import useAuthStore from "@/authStore";
 import Loader from "@/components/loader";
 import Swal from "sweetalert2";
+import { ArrowLeftIcon } from "lucide-react";
 
 // Dynamic import for ReactQuill to avoid SSR issues
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
@@ -199,8 +200,19 @@ export default function BlogCreate() {
       {photographer ? (
         <form
           onSubmit={handleSubmit}
-          className="max-w-4xl mx-auto mt-5 min-h-screen"
+          className="max-w-4xl mx-auto min-h-screen"
         >
+          <div className="flex items-center gap-2 mb-5 text-heading-06 font-semibold">
+            <div
+              onClick={() => router.back()}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              <span>
+                <ArrowLeftIcon className="w-6 h-6" />
+              </span>
+              Back
+            </div>
+          </div>
           {/* <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
             Create Blog
           </h1> */}

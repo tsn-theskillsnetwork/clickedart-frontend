@@ -5,7 +5,7 @@ import useAuthStore from "@/authStore";
 import Button from "@/components/button";
 import Button2 from "@/components/button2";
 import Link from "next/link";
-import { Plus, TextIcon, UploadIcon } from "lucide-react";
+import { ArrowLeftIcon, Plus, TextIcon, UploadIcon } from "lucide-react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
@@ -465,6 +465,17 @@ const ProfilePage = () => {
       {photographer ? (
         <div className="flex flex-col min-h-screen pb-20">
           <div className="flex flex-col px-2 lg:px-24 py-10 items-center">
+            <div className="flex items-start w-full text-heading-06 font-semibold">
+              <div
+                onClick={() => router.back()}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <span>
+                  <ArrowLeftIcon className="w-6 h-6" />
+                </span>
+                Back
+              </div>
+            </div>
             <div className="relative flex justify-around w-full">
               <hr className="absolute z-0 border-primary w-[50%] top-8 lg:top-12" />
               <div className="flex flex-col items-center gap-4 z-10">
@@ -530,17 +541,17 @@ const ProfilePage = () => {
                   <>
                     {imageUrl ? (
                       <div className="flex flex-col items-center">
-                      <img
-                        src={imageUrl}
-                        alt="Uploaded Image"
-                        className="max-h-[80vh] mx-auto"
-                      />
-                      <button
-                        onClick={() => setImageUrl("")}
-                        className="bg-black text-white py-2 px-4 rounded-full mt-5"
-                      >
-                        Change Image
-                      </button>
+                        <img
+                          src={imageUrl}
+                          alt="Uploaded Image"
+                          className="max-h-[80vh] mx-auto"
+                        />
+                        <button
+                          onClick={() => setImageUrl("")}
+                          className="bg-black text-white py-2 px-4 rounded-full mt-5"
+                        >
+                          Change Image
+                        </button>
                       </div>
                     ) : (
                       <div className="w-full mx-auto rounded-lg overflow-hidden">

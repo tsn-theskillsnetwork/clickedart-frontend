@@ -27,10 +27,11 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeftIcon, Plus, Tag, Trash2Icon } from "lucide-react";
 import Image from "next/image";
 import toast from "react-hot-toast";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 export default function CataloguesPage() {
   const id = useParams().id;
+  const router = useRouter();
   const { photographer, token } = useAuthStore();
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -149,12 +150,17 @@ export default function CataloguesPage() {
       )}
 
       <div className="flex flex-col gap-10">
-        <Link href="/profile?section=catalogues#main">
-          <p className="flex items-center gap-2 text-heading-06 font-semibold">
-            <ArrowLeftIcon className="w-6 h-6" />
+        <div className="flex items-center gap-2 text-heading-06 font-semibold">
+          <div
+          onClick={() => router.back()}
+          className="flex items-center gap-2 cursor-pointer">
+            <span>
+              <ArrowLeftIcon className="w-6 h-6" />
+            </span>
             Back
-          </p>
-        </Link>
+          </div>
+        </div>
+
         <div className="flex flex-col">
           <p className="text-heading-03 font-semibold">{catalogue.name}</p>
           <p className="text-base -mt-1">{catalogue.description}</p>
@@ -231,10 +237,7 @@ export default function CataloguesPage() {
                 width={800}
                 height={800}
                 priority
-                src={
-                  image.imageLinks.thumbnail ||
-                  image.imageLinks.original
-                }
+                src={image.imageLinks.thumbnail || image.imageLinks.original}
                 alt={image.description}
                 className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear"
               />
