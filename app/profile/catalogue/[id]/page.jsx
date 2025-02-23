@@ -127,7 +127,7 @@ export default function CataloguesPage() {
     const fetchImages = async () => {
       try {
         const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-images-by-photographer?photographer=${photographer?._id}`
+          `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-images-by-photographer?photographer=${photographer?._id}&pageSize=1000`
         );
         //console.log("res", res.data);
         setImages(res.data.photos);
@@ -199,9 +199,11 @@ export default function CataloguesPage() {
                   {images?.map((image) => (
                     <SelectItem key={image._id} value={image?._id}>
                       <div className="flex items-center gap-2">
-                        <img
-                          src={image.imageLinks.original}
-                          alt={image.name}
+                        <Image
+                          src={image.imageLinks.thumbnail}
+                          alt={image.title}
+                          width={80}
+                          height={80}
                           className="w-20 h-20 object-cover rounded-md"
                         />
                         {image.title}
@@ -231,8 +233,6 @@ export default function CataloguesPage() {
                 priority
                 src={
                   image.imageLinks.thumbnail ||
-                  image.imageLinks.small ||
-                  image.imageLinks.medium ||
                   image.imageLinks.original
                 }
                 alt={image.description}
