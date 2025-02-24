@@ -324,7 +324,7 @@ export default function ExplorePage() {
       </div>
       <div
         id="supportVideo"
-        className="flex flex-col w-full items-center mt-5 pt-20 sm:pt-24 -mb-20 sm:-mb-24"
+        className="flex flex-col w-full items-center mt-5 pt-20 sm:pt-24 z-20 -mb-20 sm:-mb-24"
       >
         <h1 className="text-center text-heading-06 sm:text-heading-05 md:text-heading-04 lg:text-heading-03 xl:text-heading-02 font-bold mb-5 mx-auto">
           Support Videos
