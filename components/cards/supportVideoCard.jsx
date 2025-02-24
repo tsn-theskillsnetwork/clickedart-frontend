@@ -24,7 +24,7 @@ export default function SupportVideoCard({ video }) {
               title={video.title}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
-            ></iframe>
+            ></iframe>  
           ) : (
             <p>Invalid video URL</p>
           )}
