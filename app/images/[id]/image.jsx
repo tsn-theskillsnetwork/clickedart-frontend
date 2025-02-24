@@ -61,6 +61,10 @@ export default function ImagePage({ image }) {
   });
 
   const addImageToWishlist = async (imageId) => {
+    if(!user && !photographer) {
+      toast.error("Please login to add image to wishlist");
+      return;
+    }
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER}/api/wishlist/add-images-in-wishlist`,
@@ -70,7 +74,7 @@ export default function ImagePage({ image }) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userId: user?._id,
+            userId: (user || photographer)?._id,
             imageIds: [imageId],
           }),
         }
@@ -97,7 +101,7 @@ export default function ImagePage({ image }) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userId: user?._id,
+            userId: (user || photographer)?._id,
             imageIds: [imageId],
           }),
         }

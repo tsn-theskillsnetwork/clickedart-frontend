@@ -44,7 +44,7 @@ export default function WishlistPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userId: user?._id,
+            userId: (user || photographer)?._id,
             imageIds: [imageId],
           }),
         }

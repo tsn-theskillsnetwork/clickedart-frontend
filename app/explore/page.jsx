@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/accordion";
 import { useSearchParams } from "next/navigation";
 import ContactUs from "../../components/contact/contactUs";
+import useLayoutStore from "@/store/layout";
+import SupportVideoCard from "@/components/cards/supportVideoCard";
 
 const faqs1 = [
   {
@@ -235,6 +237,8 @@ const faqs2 = [
 
 export default function ExplorePage() {
   const isContact = useSearchParams().has("contact");
+  const { layout } = useLayoutStore();
+  console.log(layout);
 
   const [faqType, setFaqType] = useState("user");
 
@@ -265,9 +269,9 @@ export default function ExplorePage() {
           </h4>
         </div>
       </div>
-      <div className="-mb-16 sm:-mb-20 z-10">
+      <div className="-mb-20 sm:-mb-24 z-10">
         <div className="flex flex-col w-full items-center">
-          <h1 className="text-heading-06 sm:text-heading-04 md:text-heading-03 lg:text-heading-02 xl:text-heading-01 font-bold mb-5 mx-auto">
+          <h1 className="text-center text-heading-06 sm:text-heading-05 md:text-heading-04 lg:text-heading-03 xl:text-heading-02 font-bold mb-5 mx-auto">
             Frequently Asked Questions
           </h1>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 md:gap-10 py-3 sm:py-4 w-full md:py-4 lg:py-5 mb-10">
@@ -318,7 +322,20 @@ export default function ExplorePage() {
           </Accordion>
         </div>
       </div>
-      <div className="w-full pt-16 z-0 sm:pt-20" id="contact">
+      <div
+        id="supportVideo"
+        className="flex flex-col w-full items-center mt-5 pt-20 sm:pt-24 -mb-20 sm:-mb-24"
+      >
+        <h1 className="text-center text-heading-06 sm:text-heading-05 md:text-heading-04 lg:text-heading-03 xl:text-heading-02 font-bold mb-5 mx-auto">
+          Support Videos
+        </h1>
+        <div className="grid gap-4 items grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 w-full">
+          {layout?.support?.map((video, index) => (
+            <SupportVideoCard key={index} video={video} />
+          ))}
+        </div>
+      </div>
+      <div className="w-full pt-20 z-0 sm:pt-24" id="contact">
         <ContactUs />
       </div>
     </div>

@@ -32,7 +32,7 @@ import Loader from "@/components/loader";
 
 export default function OrdersPage() {
   const searchParams = useSearchParams();
-  const { user } = useAuthStore();
+  const { user, photographer } = useAuthStore();
   const router = useRouter();
   const page = Number(searchParams.get("page") || 1);
   // const [selectedTab, setSelectedTab] = useState("downloads");
@@ -92,15 +92,20 @@ export default function OrdersPage() {
   };
 
   useEffect(() => {
-    if (!user) return;
+    if (!(user || photographer)) return;
 
     const fetchOrders = async () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/download/get-my-orders?userId=${user?._id}&pageNumber=${page}&pageSize=${pageSize}`
+          `${
+            process.env.NEXT_PUBLIC_SERVER
+          }/api/download/get-my-orders?userId=${
+            (user || photographer)?._id
+          }&pageNumber=${page}&pageSize=${pageSize}`
         );
         //console.log(response.data);
+        console.log(response.data);
         setOrders(response.data.orders);
         setPageCount(response.data.pageCount);
       } catch (error) {
@@ -112,10 +117,10 @@ export default function OrdersPage() {
     };
 
     fetchOrders();
-  }, [user, page]);
+  }, [user, photographer, page]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!(user || photographer)) return;
     if (
       orderSupport.userInfo.user === "" ||
       orderSupport.userInfo.userType === ""
@@ -123,12 +128,12 @@ export default function OrdersPage() {
       setOrderSupport((prev) => ({
         ...prev,
         userInfo: {
-          user: user?._id,
-          userType: user?.type,
+          user: (user || photographer)?._id,
+          userType: (user || photographer)?.type,
         },
       }));
     }
-  }, [user]);
+  }, [user, photographer]);
 
   return (
     <div className="flex flex-col px-4 sm:px-8 md:px-12 lg:px-20 xl:px-32 gap-10 py-20">
@@ -270,7 +275,15 @@ export default function OrdersPage() {
                         <>
                           <p className="font-medium">Print Status:</p>
                           <div
-                            className={`flex items-center p-1 pr-3 bg-green-100 text-green-600 rounded-full `}
+                            className={`flex items-center p-1 pr-3 ${
+                              order.printStatus === "delivered"
+                                ? "bg-green-100 text-green-600"
+                                : order.printStatus === "processing"
+                                ? "bg-orange-100 text-orange-600"
+                                : order.printStatus === "returned"
+                                ? "bg-red-100 text-red-600"
+                                : "bg-blue-100 text-blue-600"
+                            } rounded-full `}
                           >
                             <Dot strokeWidth={6} />
                             <p className="text-base font-semibold capitalize">

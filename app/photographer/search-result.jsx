@@ -1,44 +1,22 @@
 "use client";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ChevronDown, Heart, Search, Tag } from "lucide-react";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import useCartStore from "@/store/cart";
-import useAuthStore from "@/authStore";
-import useWishlistStore from "@/store/wishlist";
 import Link from "next/link";
-import toast from "react-hot-toast";
 import Button from "@/components/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Icon } from "@iconify/react";
+import PhotographerSearch from "@/components/search/photographerSearch";
 
 export default function SearchResultPage() {
   const searchParams = useSearchParams();
-  const router = useRouter();
 
   const [images, setImages] = useState([]);
   const page = searchParams.get("page") || "1";
   const searchValue = searchParams.get("search") || "";
   const [pageCount, setPageCount] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-
-  const handleSearch = () => {
-    router.push(`/photographer?search=${search}`);
-  };
-
-  useEffect(() => {
-    setSearch(searchValue);
-  }, [searchValue]);
 
   useEffect(() => {
     const fetchPhotographer = async () => {
@@ -104,30 +82,7 @@ export default function SearchResultPage() {
         >
           <div>
             <div className="px-10 sm:px-10 md:px-10 lg:px-20">
-              <div className="mt-4 flex flex-row bg-white text-black shadow-[0_0_8px_rgba(0,0,0,0.4)] px-5 group rounded-lg items-center gap-2 w-full md:w-1/2 focus-within:outline focus-within:outline-blue-500 mx-auto">
-                <div className="h-full aspect-[1/1] flex justify-center items-center shrink-0">
-                  <Search size={30} color="black" className="mx-auto" />
-                </div>
-                <input
-                  type="text"
-                  placeholder={`Search for Photographer`}
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                  className="py-3 text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-semibold w-full focus:outline-none"
-                />
-                <button
-                  onClick={handleSearch}
-                  className="h-full text-black rounded-r-lg flex justify-center items-center shrink-0"
-                >
-                  <p className="sr-only">Search</p>
-                  <Icon
-                    icon="mdi:user-search"
-                    className="mx-auto"
-                    style={{ fontSize: "2rem" }}
-                  />
-                </button>
-              </div>
+              <PhotographerSearch />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20">
               {images.map((image, index) => (

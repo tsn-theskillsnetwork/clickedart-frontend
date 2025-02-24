@@ -20,6 +20,7 @@ import toast from "react-hot-toast";
 import Button from "@/components/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Icon } from "@iconify/react";
+import ImageSearch from "@/components/search/imageSearch";
 
 export default function SearchResultPage() {
   const { user } = useAuthStore();
@@ -50,6 +51,8 @@ export default function SearchResultPage() {
 
   useEffect(() => {
     setSearch(searchValue);
+    setTheme(themeValue);
+    setSort(sortValue);
   }, [searchValue]);
 
   const addImageToWishlist = async (imageId) => {
@@ -99,7 +102,6 @@ export default function SearchResultPage() {
       );
 
       const data = await res.json();
-      //console.log(data);
 
       if (!res.ok) {
         throw new Error(data.message || "Failed to remove image from wishlist");
@@ -118,7 +120,7 @@ export default function SearchResultPage() {
 
   const sortedImages = [...images]
     .filter((image) =>
-      theme === "all" ? true : image.category.some((cat) => cat.name === theme)
+      theme === "all" ? true : image.category.some((cat) => cat.name.toLowerCase() === theme.toLowerCase())
     )
     .sort((a, b) => {
       if (sort === "price") return a.price?.original - b.price?.original;
@@ -166,7 +168,6 @@ export default function SearchResultPage() {
           }
         );
         const data = await res.json();
-        console.log(data);
         setImages(data.results);
         setPageCount(data.pageCount);
       } catch (error) {
@@ -214,30 +215,7 @@ export default function SearchResultPage() {
         className="flex my-10 flex-col min-h-screen"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 px-4 sm:px-10 lg:px-20 justify-between items-start gap-5">
-          <div className="mt-4 flex flex-row bg-white text-black shadow-[0_0_8px_rgba(0,0,0,0.4)] px-5 group rounded-lg items-center gap-2 w-full focus-within:outline focus-within:outline-blue-500 mx-auto">
-            <div className="h-full aspect-[1/1] flex justify-center items-center shrink-0">
-              <Search size={30} color="black" className="mx-auto" />
-            </div>
-            <input
-              type="text"
-              placeholder={`Search for Images`}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              className="py-3 text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-semibold w-full focus:outline-none"
-            />
-            <button
-              onClick={handleSearch}
-              className="h-full text-black rounded-r-lg flex justify-center items-center shrink-0"
-            >
-              <p className="sr-only">Search</p>
-              <Icon
-                icon="mdi:image-search"
-                className="mx-auto"
-                style={{ fontSize: "2rem" }}
-              />
-            </button>
-          </div>
+          <ImageSearch />
           <div className="grid grid-cols-2 2xl:w-1/2 gap-4 md:ml-auto md:justify-end">
             <div className="flex flex-col">
               <p className="font-semibold text-primary-dark text-paragraph">
@@ -245,11 +223,11 @@ export default function SearchResultPage() {
               </p>
               <Select
                 className="w-full"
-                defaultValue={theme}
+                value={theme}
                 onValueChange={(value) => {
                   setTheme(value);
                   router.push(
-                    `/images?theme=${value}&sort=${sort}${
+                    `/search?theme=${value}&sort=${sort}${
                       search && `&search=${search}`
                     }`
                   );
@@ -276,11 +254,11 @@ export default function SearchResultPage() {
                 </p>
                 <Select
                   className="w-full"
-                  defaultValue={sort}
+                  value={sort}
                   onValueChange={(value) => {
                     setSort(value);
                     router.push(
-                      `/images?theme=${theme}&sort=${value}${
+                      `/search?theme=${theme}&sort=${value}${
                         search && `&search=${search}`
                       }`
                     );
@@ -342,7 +320,7 @@ export default function SearchResultPage() {
                       style={{
                         textShadow: "-1px 1px 2px #666, 1px 1px 2px #666",
                       }}
-                      className="text-white font-semibold text-xs sm:text-sm"
+                      className="text-white font-semibold text-xs"
                     >
                       {image.title || "Untitled"}
                     </p>
@@ -369,7 +347,7 @@ export default function SearchResultPage() {
                       />
                     </div> */}
                   </div>
-                  <div className="flex justify-between items-center drop-shadow-md">
+                  {/* <div className="flex justify-between items-center drop-shadow-md">
                     <p className="text-white font-medium text-xs sm:text-sm">
                       {image.photographer?.firstName
                         ? image.photographer?.firstName +
@@ -385,7 +363,7 @@ export default function SearchResultPage() {
                     >
                       ₹ {image.price?.original?.toLocaleString()}
                     </p>
-                  </div>
+                  </div> */}
                 </div>
               </Link>
             </div>

@@ -18,6 +18,7 @@ import toast from "react-hot-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
+import ImageSearch from "@/components/search/imageSearch";
 
 export default function ThemesResultPage() {
   const { user } = useAuthStore();
@@ -41,9 +42,6 @@ export default function ThemesResultPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  const handleSearch = () => {
-    router.push(`/search?search=${search}`);
-  };
 
   useEffect(() => {
     setSearch(searchValue);
@@ -202,30 +200,7 @@ export default function ThemesResultPage() {
         className="flex my-10 flex-col min-h-screen"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 px-4 sm:px-10 lg:px-20 justify-between items-start gap-5">
-          <div className="mt-4 flex flex-row bg-white text-black shadow-[0_0_8px_rgba(0,0,0,0.4)] px-5 group rounded-lg items-center gap-2 w-full focus-within:outline focus-within:outline-blue-500 mx-auto">
-            <div className="h-full aspect-[1/1] flex justify-center items-center shrink-0">
-              <Search size={30} color="black" className="mx-auto" />
-            </div>
-            <input
-              type="text"
-              placeholder={`Search for Images`}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              className="py-3 text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-semibold w-full focus:outline-none"
-            />
-            <button
-              onClick={handleSearch}
-              className="h-full aspect-[1/1] text-black rounded-r-lg flex justify-center items-center shrink-0"
-            >
-              <p className="sr-only">Search</p>
-              <Icon
-                icon="mdi:image-search"
-                className="mx-auto"
-                style={{ fontSize: "2rem" }}
-              />
-            </button>
-          </div>
+          <ImageSearch />
           <div className="grid grid-cols-2 2xl:w-1/2 gap-4 md:ml-auto md:justify-end">
             <div className="flex flex-col">
               <p className="font-semibold text-primary-dark text-paragraph">
@@ -327,7 +302,7 @@ export default function ThemesResultPage() {
                       style={{
                         textShadow: "-1px 1px 2px #666, 1px 1px 2px #666",
                       }}
-                      className="text-white font-medium text-xs sm:text-sm"
+                      className="text-white font-medium text-xs"
                     >
                       {image.title || "Untitled"}
                     </p>
@@ -354,7 +329,7 @@ export default function ThemesResultPage() {
                       />
                     </div> */}
                   </div>
-                  <div className="flex justify-between items-center">
+                  {/* <div className="flex justify-between items-center">
                     <p className="text-white font-medium text-xs sm:text-sm">
                       {image.photographer?.firstName
                         ? image.photographer?.firstName +
@@ -362,9 +337,9 @@ export default function ThemesResultPage() {
                           image.photographer?.lastName
                         : image.photographer?.name}
                     </p>
-                    {/* <p className="text-white font-medium text-paragraph">
+                    <p className="text-white font-medium text-paragraph">
                     {image.category?.name}
-                    </p> */}
+                    </p>
                     <p
                       style={{
                         textShadow: "-1px 1px 2px #666, 1px 1px 2px #666",
@@ -373,7 +348,7 @@ export default function ThemesResultPage() {
                     >
                       ₹ {image.price?.original?.toLocaleString()}
                     </p>
-                  </div>
+                  </div> */}
                 </div>
               </Link>
             </div>

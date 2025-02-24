@@ -101,6 +101,9 @@ export default function Footer() {
             <Link href="/verify" className="text-sm font-medium">
               Verify Email
             </Link>
+            <Link href="/explore#supportVideo" className="text-sm font-medium">
+              Support Videos
+            </Link>
           </div>
         </div>
         <div className="flex flex-col gap-2 items-start">
