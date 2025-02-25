@@ -163,7 +163,7 @@ export default function HeroSection() {
                 Swal.fire(
                   "Please sign in as a Photographer to sell your photos"
                 );
-              else router.push("/signin/photographer");
+              else router.push("/signin?type=photographer");
             }}
             className="border-2 bg-gradient-to-tr from-transparent to-transparent hover:from-black border-white rounded-2xl px-2 py-2 sm:px-4 sm:py-2 sm:pl-5 w-52 md:w-72 group transition-all duration-200 ease-linear"
           >

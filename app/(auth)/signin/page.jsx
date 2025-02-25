@@ -4,70 +4,28 @@ import { useEffect, useRef, useState } from "react";
 import Button from "@/components/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import useAuthStore from "@/authStore";
 import Link from "next/link";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Loader from "@/components/loader";
+import UserSignInPage from "./User";
+import PhotographerSignInPage from "./Photographer";
 
 const SignInPage = () => {
-  const { signin, setUser, user, photographer, isHydrated } = useAuthStore();
-
+  const searchParams = useSearchParams();
+  const type = searchParams.get("type");
+  const { user, photographer, isHydrated } = useAuthStore();
   const router = useRouter();
-
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMessage("");
-    setError("");
-
-    try {
-      setLoading(true);
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/user/login`,
-        formData,
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-
-      const data = response.data;
-      setUser(data.user);
-      signin(data.token);
-      setMessage("Sign in successful.");
-      toast("Sign in successful.", {
-        duration: 4000,
-        position: "top-center",
-      });
-      router.push("/");
-    } catch (err) {
-      if (err.response && err.response.data) {
-        setError(
-          err.response.data.message || "Invalid credentials. Please try again."
-        );
-      } else {
-        setError("An error occurred. Please try again later.");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const toastShownRef = useRef(false);
+  const [userType, setUserType] = useState("user");
+
+  useEffect(() => {
+    if (type && (type === "user" || type === "photographer")) {
+      setUserType(type);
+    }
+  }, [type]);
 
   useEffect(() => {
     if (!isHydrated) return;
@@ -78,78 +36,55 @@ const SignInPage = () => {
     }
   }, [isHydrated, user, router]);
 
+  if (!isHydrated) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[70vh]">
+        <Loader />
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-[50vh] mt-5 mb-10">
-      {user || photographer || !isHydrated ? (
-        <div className="flex flex-col items-center justify-center min-h-[50vh]">
-          <Loader />
-        </div>
-      ) : (
-        <>
-          <form
-            onSubmit={handleSubmit}
-            className="flex flex-col w-full md:w-1/2 gap-4 px-5"
+    <div className="flex flex-col justify-center min-h-[80vh] w-full mt-5 mb-10 px-4">
+      <div className="space-y-5 mx-auto w-full max-w-3xl rounded-lg p-5 shadow-[0_4px_8px_rgba(0,0,0,0.4)] bg-white">
+        <p
+          className={`text-center text-paragraph sm:text-heading-06 md:text-heading-05 lg:text-heading-04 font-semibold capitalize`}
+        >
+          <span className={userType === "photographer" ? "text-blue-600" : "text-primary"}>{userType} </span>
+          Sign In
+        </p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 md:gap-10">
+          <button
+            onClick={() => {
+              setUserType("user");
+            }}
+            className={`text-xs sm:text-sm drop-shadow-md z-10 font-bold ${
+              userType === "user"
+                ? "bg-primary-dark text-white"
+                : "bg-primary-100 text-primary-dark hover:bg-white"
+            } text-center cursor-pointer transition-colors duration-200 ease-in-out p-3 w-40 rounded-full border-2 border-primary`}
           >
-            <h2 className="text-heading-04 font-medium text-center">
-              User Sign In
-            </h2>
-            {message && <p className="text-green-500">{message}</p>}
-            {error && <p className="text-red-500">{error}</p>}
+            User
+          </button>
+          <button
+            onClick={() => {
+              setUserType("photographer");
+            }}
+            className={`text-xs sm:text-sm drop-shadow-md z-10 font-bold ${
+              userType === "photographer"
+                ? "bg-primary-dark text-white"
+                : "bg-primary-100 text-primary-dark hover:bg-white"
+            } text-center cursor-pointer transition-colors duration-200 ease-in-out p-3 w-40 rounded-full border-2 border-primary`}
+          >
+            Photographer
+          </button>
+        </div>
 
-            <div>
-              <Label>Email</Label>
-              <Input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-
-            <div>
-              <Label>Password</Label>
-              <Input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                required
-              />
-              <p className="text-sm text-right">
-                <Link
-                  className="text-blue-500"
-                  href={`/reset-pass?type=user${
-                    formData.email ? `&email=${formData.email}` : ""
-                  }`}
-                >
-                  Forgot Password?
-                </Link>
-              </p>
-            </div>
-
-            <div className="flex flex-col items-center">
-              <Button disabled={loading} type="submit">
-                {loading ? "Signing in..." : "Sign In"}
-              </Button>
-            </div>
-          </form>
-        </>
-      )}
-
-      <div className="flex flex-col items-center mt-4">
-        <p>
-          Don't have an account?{" "}
-          <Link className="underline" href="/signup">
-            Sign Up
-          </Link>
-        </p>
-        <p>
-          or{" "}
-          <Link className="underline" href="/signin/photographer">
-            Sign In as Photographer
-          </Link>
-        </p>
+        {userType === "photographer" ? (
+          <PhotographerSignInPage />
+        ) : (
+          <UserSignInPage />
+        )}
       </div>
     </div>
   );
