@@ -41,6 +41,7 @@ import { Icon } from "@iconify/react";
 const ProfilePage = () => {
   const router = useRouter();
   const { photographer, user } = useAuthStore();
+  console.log(photographer)
   const searchParams = useSearchParams();
   const section = searchParams.get("section");
 

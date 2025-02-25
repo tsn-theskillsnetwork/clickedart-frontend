@@ -35,8 +35,7 @@ import {
 import Button2 from "@/components/button2";
 
 const ProfileEditPage = () => {
-  const { user, token, photographer, setUser, setPhotographer } =
-    useAuthStore();
+  const { user, token, photographer, fetchUserProfile } = useAuthStore();
 
   const router = useRouter();
 
@@ -339,11 +338,7 @@ const ProfileEditPage = () => {
       if (res.ok) {
         setMessage(data.message);
         setError("");
-        if (photographer) {
-          setPhotographer(data.photographer);
-        } else {
-          setUser(data.user);
-        }
+        fetchUserProfile();
         router.push("/profile");
         toast.success("Profile updated successfully!", { id: toastId });
       } else {

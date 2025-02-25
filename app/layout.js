@@ -4,7 +4,6 @@ import { Toaster } from "react-hot-toast";
 import Navbar from "@/components/navbar";
 import Image from "next/image";
 import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 
 //import font
 
@@ -64,7 +63,6 @@ export default async function RootLayout({ children }) {
             <Navbar />
             <div className="pt-20 sm:pt-24">{children}</div>
             <Analytics />
-            <SpeedInsights />
             <Footer />
           </>
         )}
