@@ -137,8 +137,8 @@ export default function Navbar() {
   };
 
   useEffect(() => {
-    user && fetchWishlist(user?._id);
-  }, [user]);
+    (user || photographer) && fetchWishlist((user || photographer)?._id);
+  }, [user, photographer]);
 
   if (pathname.startsWith("/invoice") || pathname.startsWith("/bill"))
     return null;

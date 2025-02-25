@@ -11,28 +11,8 @@ import { Heart } from "lucide-react";
 import Link from "next/link";
 
 export default function WishlistPage() {
-  const { user } = useAuthStore();
-  const { wishlist, fetchWishlist, loading, error } = useWishlistStore();
-  const { addItemToCart, isItemInCart, removeItemFromCart } = useCartStore();
-
-  const onAddToCart = (image) => {
-    const productToAdd = {
-      ...image,
-      mode: "digital",
-      selectedSize: "original",
-      subTotal: image.price.original,
-    };
-
-    addItemToCart(productToAdd);
-    toast.success("Added to cart!");
-  };
-
-  const onRemoveFromCart = (id) => {
-    removeItemFromCart(id);
-    toast.success("Removed from cart!");
-  };
-
-  //console.log({ wishlist, loading, error });
+  const { user, photographer } = useAuthStore();
+  const { wishlist, fetchWishlist } = useWishlistStore();
 
   const removeImageFromWishlist = async (imageId) => {
     try {
@@ -50,13 +30,11 @@ export default function WishlistPage() {
         }
       );
 
-      const data = await res.json();
-
       if (!res.ok) {
         toast.error("Error removing image from wishlist");
       }
       toast.success("Image removed from wishlist");
-      fetchWishlist(user?._id);
+      fetchWishlist((user || photographer)?._id);
     } catch (error) {
       console.error("Error removing image from wishlist:", error);
     }

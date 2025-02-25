@@ -21,7 +21,7 @@ import Link from "next/link";
 import ImageSearch from "@/components/search/imageSearch";
 
 export default function ThemesResultPage() {
-  const { user } = useAuthStore();
+  const { user, photographer } = useAuthStore();
   const { wishlist, fetchWishlist } = useWishlistStore();
 
   const searchParams = useSearchParams();
@@ -57,7 +57,7 @@ export default function ThemesResultPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userId: user?._id,
+            userId: user?._id || photographer?._id,
             imageIds: [imageId],
           }),
         }
@@ -68,7 +68,7 @@ export default function ThemesResultPage() {
       if (!res.ok) {
         throw new Error(data.message || "Failed to add image to wishlist");
       }
-      fetchWishlist(user?._id);
+      fetchWishlist(user?._id || photographer?._id);
     } catch (error) {
       console.error("Error adding image to wishlist:", error);
     }
@@ -84,7 +84,7 @@ export default function ThemesResultPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userId: user?._id,
+            userId: user?._id || photographer?._id,
             imageIds: [imageId],
           }),
         }
@@ -95,7 +95,7 @@ export default function ThemesResultPage() {
       if (!res.ok) {
         throw new Error(data.message || "Failed to remove image from wishlist");
       }
-      fetchWishlist(user?._id);
+      fetchWishlist(user?._id || photographer?._id);
     } catch (error) {
       console.error("Error removing image from wishlist:", error);
     }
@@ -306,18 +306,19 @@ export default function ThemesResultPage() {
                     >
                       {image.title || "Untitled"}
                     </p>
-                    {/* <div className="flex gap-2">
+                    <div className="flex gap-2">
                       <Heart
                         size={24}
                         onClick={(e) => {
+                          e.preventDefault();
                           e.stopPropagation();
-                          if (user) {
+                          if (user || photographer) {
                             wishlist?.some((item) => item._id === image._id)
                               ? removeImageFromWishlist(image._id)
                               : addImageToWishlist(image._id);
                           } else {
                             toast.error(
-                              "Please login as User to add to wishlist"
+                              "Please login to add to wishlist"
                             );
                           }
                         }}
@@ -325,9 +326,9 @@ export default function ThemesResultPage() {
                           wishlist?.some((item) => item._id === image._id)
                             ? "text-red-400 fill-red-500"
                             : "text-white"
-                        }  transition-all duration-200 ease-linear cursor-pointer`}
+                        } transition-all duration-200 ease-linear cursor-pointer`}
                       />
-                    </div> */}
+                    </div>
                   </div>
                   {/* <div className="flex justify-between items-center">
                     <p className="text-white font-medium text-xs sm:text-sm">
