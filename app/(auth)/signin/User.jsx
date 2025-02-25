@@ -12,7 +12,7 @@ import toast from "react-hot-toast";
 
 const UserSignInPage = () => {
   const router = useRouter();
-  const { signin, setUser } = useAuthStore();
+  const { signin, setUserType } = useAuthStore();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -44,22 +44,17 @@ const UserSignInPage = () => {
       );
 
       const data = response.data;
-      setUser(data.user);
       signin(data.token);
+      setUserType("User");
       setMessage("Sign in successful.");
       toast("Sign in successful.", {
         duration: 4000,
         position: "top-center",
       });
+
       router.push("/");
     } catch (err) {
-      if (err.response && err.response.data) {
-        setError(
-          err.response.data.message || "Invalid credentials. Please try again."
-        );
-      } else {
-        setError("An error occurred. Please try again later.");
-      }
+      setError(err.response?.data?.message);
     } finally {
       setLoading(false);
     }

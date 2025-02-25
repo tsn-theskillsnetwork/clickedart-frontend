@@ -10,7 +10,7 @@ import Link from "next/link";
 import axios from "axios";
 
 const PhotographerSignInPage = () => {
-  const { signin, setPhotographer } = useAuthStore();
+  const { signin, setUserType } = useAuthStore();
 
   const router = useRouter();
 
@@ -46,11 +46,10 @@ const PhotographerSignInPage = () => {
       const data = response.data;
       //console.log(data);
 
+      signin(data.token);
+      setUserType("Photographer");
       setMessage("Sign-in successful!");
       setError("");
-
-      signin(data.token);
-      setPhotographer(data.photographer);
 
       router.push("/profile");
     } catch (err) {
