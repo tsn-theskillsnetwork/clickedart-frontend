@@ -30,7 +30,7 @@ export default function ImageSection({ selectedFrame, image }) {
             priority
             width={800}
             height={800}
-            className="absolute object-cover z-10 inset-0 h-full w-2"
+            className="absolute object-cover z-10 inset-0 h-full w-1 sm:w-2"
             src={selectedFrame.image[0]}
             alt={selectedFrame.name}
           />
@@ -38,7 +38,7 @@ export default function ImageSection({ selectedFrame, image }) {
             priority
             width={800}
             height={800}
-            className="absolute object-cover z-10 rotate-180 right-0 inset-y-0 h-full w-2"
+            className="absolute object-cover z-10 rotate-180 right-0 inset-y-0 h-full w-1 sm:w-2"
             src={selectedFrame.image[0]}
             alt={selectedFrame.name}
           />
@@ -46,7 +46,7 @@ export default function ImageSection({ selectedFrame, image }) {
             priority
             width={800}
             height={800}
-            className="absolute object-cover z-20 inset-0 w-full h-2"
+            className="absolute object-cover z-20 inset-0 w-full h-1 sm:h-2"
             src={selectedFrame.image[1]}
             alt={selectedFrame.name}
           />
@@ -54,7 +54,7 @@ export default function ImageSection({ selectedFrame, image }) {
             priority
             width={800}
             height={800}
-            className="absolute object-cover z-20 rotate-180 bottom-0 inset-x-0 w-full h-2"
+            className="absolute object-cover z-20 rotate-180 bottom-0 inset-x-0 w-full h-1 sm:h-2"
             src={selectedFrame.image[1]}
             alt={selectedFrame.name}
           />
