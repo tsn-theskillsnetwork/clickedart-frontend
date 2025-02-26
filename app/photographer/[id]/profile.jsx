@@ -384,7 +384,7 @@ export default function ProfilePage({ photographer }) {
                   </div>
                 )}
                 {selectedTab === "blogs" && (
-                  <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
                     {blogs.map((blog) => (
                       <Link
                         href={`/blog/${blog._id}`}
@@ -400,6 +400,15 @@ export default function ProfilePage({ photographer }) {
                             className="w-full object-cover rounded-lg"
                           />
 
+                          <h2 className="text-lg font-semibold">
+                            {blog.content.title}
+                          </h2>
+                          <p className="text-sm text-gray-700 truncate">
+                            {blog.content.summary}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {new Date(blog.createdAt).toLocaleDateString()}
+                          </p>
                           <div className="flex flex-wrap gap-2 items-center">
                             {blog.tags.slice(0, 3).map((tag) => (
                               <span
@@ -414,15 +423,6 @@ export default function ProfilePage({ photographer }) {
                                 `+${blog.tags.length - 3} more`}
                             </span>
                           </div>
-                          <h2 className="text-lg font-semibold">
-                            {blog.content.title}
-                          </h2>
-                          <p className="text-sm text-gray-700 truncate">
-                            {blog.content.summary}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {new Date(blog.createdAt).toLocaleDateString()}
-                          </p>
                         </div>
                       </Link>
                     ))}

@@ -852,7 +852,7 @@ const ProfilePage = () => {
                     </div>
                   )}
                   {section === "blogs" && (
-                    <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
                       <Link
                         href="/profile/blog/create"
                         className="relative group w-full min-h-60 shadow-[2px_2px_6px_rgba(0,0,0,0.4)]"
@@ -879,6 +879,15 @@ const ProfilePage = () => {
                               className="w-full object-cover rounded-lg"
                             />
 
+                            <h2 className="text-lg font-semibold">
+                              {blog.content.title}
+                            </h2>
+                            <p className="text-sm text-gray-700 truncate">
+                              {blog.content.summary}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {new Date(blog.createdAt).toLocaleDateString()}
+                            </p>
                             <div className="flex flex-wrap gap-2 items-center">
                               {blog.tags.slice(0, 3).map((tag) => (
                                 <span
@@ -893,15 +902,6 @@ const ProfilePage = () => {
                                   `+${blog.tags.length - 3} more`}
                               </span>
                             </div>
-                            <h2 className="text-lg font-semibold">
-                              {blog.content.title}
-                            </h2>
-                            <p className="text-sm text-gray-700 truncate">
-                              {blog.content.summary}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              {new Date(blog.createdAt).toLocaleDateString()}
-                            </p>
                           </div>
                         </Link>
                       ))}
