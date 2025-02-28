@@ -20,18 +20,40 @@ export async function generateMetadata({ params }) {
     const blog = await fetchBlogData(id);
     return {
       title: blog.content.title,
-      description: blog.content.summary?.substring(0, 160) || "Read this amazing blog on our platform.",
+      description:
+        blog.content.summary?.substring(0, 160) ||
+        "Read this amazing blog on our platform.",
       openGraph: {
         title: blog.content.title,
         description: blog.content.summary,
         url: `${process.env.NEXT_PUBLIC_URL}/blog/${id}`,
-        image: blog.coverImage,
+        images: [
+          {
+            url: blog.coverImage,
+            width: 1200,
+            height: 630,
+            alt: blog.content.title,
+          },
+        ],
       },
     };
   } catch (error) {
     return {
       title: "Blog Not Found",
       description: "No blog found with the given ID.",
+      openGraph: {
+        title: "Blog Not Found",
+        description: "No blog found with the given ID.",
+        url: `${process.env.NEXT_PUBLIC_URL}/blog/${id}`,
+        images: [
+          {
+            url: "/assets/placeholders/image.webp",
+            width: 1200,
+            height: 630,
+            alt: "Blog Not Found",
+          },
+        ],
+      },
     };
   }
 }

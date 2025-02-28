@@ -41,7 +41,7 @@ export async function generateMetadata({ params }) {
         images: [
           {
             url:
-            image.imageLinks?.ogImage || image.imageLinks?.thumbnail || `/assets/placeholders/image.webp`,
+            image.imageLinks?.thumbnail || `/assets/placeholders/image.webp`,
             width: 1200,
             height: 630,
             alt: image.title || "Untitled",
