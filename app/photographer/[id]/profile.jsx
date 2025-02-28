@@ -128,7 +128,7 @@ export default function ProfilePage({ photographer }) {
               alt="bg1"
               width={1920}
               height={800}
-              className="object-cover w-full h-40 lg:h-96"
+              className="object-cover w-full h-40 lg:h-80"
             />
           </div>
           <div className="relative flex flex-col items-center -mt-16 lg:-mt-28">
@@ -144,18 +144,18 @@ export default function ProfilePage({ photographer }) {
             <p className="px-4 py-2 rounded-full capitalize bg-black font-medium text-white -mt-6">
               {photographer?.rank}
             </p>
-            <p className="text-heading-06 lg:text-heading-01 font-semibold lg:font-medium">
+            <p className="text-heading-06 lg:text-heading-02 font-semibold lg:font-medium">
               {photographer.firstName
                 ? photographer?.firstName + " " + photographer?.lastName
                 : photographer?.name}
             </p>
-            <p className="text-sm lg:text-heading-03 font-medium lg:font-normal text-surface-500 lg:-mt-4">
+            <p className="text-sm lg:text-heading-05 font-medium lg:font-normal text-surface-500 lg:-mt-4">
               {photographer.shippingAddress &&
                 photographer.shippingAddress?.city +
                   ", " +
                   photographer.shippingAddress?.country}
             </p>
-            <p className="font-normal lg:font-medium text-xs lg:text-heading-05 text-surface-500 mt-2 lg:mt-4 text-center max-w-2xl">
+            <p className="font-normal lg:font-medium text-xs lg:text-heading-06 text-surface-500 mt-2 lg:mt-4 text-center max-w-2xl">
               {photographer?.bio}
             </p>
 

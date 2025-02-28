@@ -312,7 +312,7 @@ const ProfilePage = () => {
                 alt="bg1"
                 width={1920}
                 height={800}
-                className="object-cover w-full h-40 lg:h-96"
+                className="object-cover w-full h-40 lg:h-80"
               />
             </div>
           )}
@@ -342,13 +342,13 @@ const ProfilePage = () => {
               href={"/profile/edit"}
               className="absolute top-12 lg:top-20 right-[4%] sm:right-[8%] lg:right-[30%] text-surface-500 bg-white rounded-full p-2 cursor-pointer shadow-[1px_1px_2px_rgba(0,0,0,0.25)]"
             >
-              <Pencil strokeWidth={2} className="size-4 lg:size-14" />
+              <Pencil strokeWidth={2} className="size-4 lg:size-12" />
             </Link>
             {photographer && (
               <div className="absolute top-12 lg:top-20 right-[15%] sm:right-[15%] lg:right-[23%] text-surface-500 bg-white rounded-full p-2 cursor-pointer shadow-[1px_1px_2px_rgba(0,0,0,0.25)]">
                 <Share2Icon
                   strokeWidth={2}
-                  className="size-4 lg:size-14"
+                  className="size-4 lg:size-12"
                   onClick={() => {
                     navigator.clipboard.writeText(
                       `${process.env.NEXT_PUBLIC_CLIENT}/photographer/${photographer._id}`
@@ -358,12 +358,12 @@ const ProfilePage = () => {
                 />
               </div>
             )}
-            <p className="text-heading-06 lg:text-heading-01 font-semibold lg:font-medium">
+            <p className="text-heading-06 lg:text-heading-02 font-semibold lg:font-medium">
               {(user || photographer)?.firstName +
                 " " +
                 (user || photographer)?.lastName}
             </p>
-            <p className="text-sm lg:text-heading-03 font-medium lg:font-normal text-surface-500 lg:-mt-4">
+            <p className="text-sm lg:text-heading-05 font-medium lg:font-normal text-surface-500 lg:-mt-4">
               {photographer
                 ? photographer.shippingAddress?.city +
                   ", " +
@@ -372,7 +372,7 @@ const ProfilePage = () => {
                   ", " +
                   user.shippingAddress?.country}
             </p>
-            <p className="font-normal lg:font-medium text-xs lg:text-heading-05 text-surface-500 mt-2 lg:mt-4 text-center max-w-2xl">
+            <p className="font-normal lg:font-medium text-xs lg:text-heading-06 text-surface-500 mt-2 lg:mt-4 text-center max-w-2xl">
               {photographer?.bio || user?.bio}
             </p>
 
@@ -418,12 +418,12 @@ const ProfilePage = () => {
             )}
             {photographer && (
               <div className="flex gap-4 mt-4">
-                <Button
-                  className="bg-primary text-white"
-                  onClick={() => router.push("/dashboard")}
+                <Link
+                  className="bg-primary hover:bg-primary-dark active:bg-primary-darker font-semibold text-white px-3 py-2 rounded-md shadow-md transition-all duration-100 ease-in-out"
+                  href={`/dashboard`}
                 >
                   Dashboard
-                </Button>
+                </Link>
               </div>
             )}
 
@@ -465,7 +465,7 @@ const ProfilePage = () => {
             {/* Active Plan Show */}
             {photographer && (
               <div className="flex flex-col items-center mt-4">
-                <div className="text-heading-05 font-semibold capitalize flex gap-4 items-center">
+                <div className="text-xs sm:text-base md:text-heading-05 font-semibold capitalize flex gap-4 items-center">
                   Active Plan: {activePlan}{" "}
                   {activePlan.toLowerCase() !== "premium" && (
                     <Link href="/membership">
@@ -479,7 +479,12 @@ const ProfilePage = () => {
                     </Link>
                   )}
                 </div>
-                <Link className="font-medium text-blue-600 text-sm bg-blue-200 px-2 py-1 rounded-lg shadow-md shadow-zinc-300 border border-blue-300" href="/profile/subscription">Manage</Link>
+                <Link
+                  className="font-medium text-blue-600 text-sm bg-blue-200 px-2 py-1 rounded-lg shadow-md shadow-zinc-300 border border-blue-300"
+                  href="/profile/subscription"
+                >
+                  Manage
+                </Link>
               </div>
             )}
 
