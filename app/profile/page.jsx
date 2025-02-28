@@ -430,15 +430,15 @@ const ProfilePage = () => {
             {photographer && (
               <div className="grid grid-cols-3 gap-2 lg:gap-8 mt-4 px-4 max-w-2xl">
                 <div className="flex flex-col items-center text-center border-r-2 border-surface-500 pr-2 lg:pr-8">
-                  <p className="text-paragraph lg:text-heading-01 font-normal">
+                  <p className="text-paragraph lg:text-heading-03 font-medium">
                     {photos?.length}
                   </p>
-                  <p className="text-xs lg:text-heading-04 font-semibold text-surface-500">
+                  <p className="text-xs lg:text-heading-06 font-medium text-surface-500">
                     Gallery Items
                   </p>
                 </div>
                 <div className="flex flex-col items-center text-center">
-                  <p className="text-paragraph lg:text-heading-01 font-normal">
+                  <p className="text-paragraph lg:text-heading-03 font-medium">
                     {photos
                       ?.filter((photo) => photo.imageAnalytics?.views)
                       .reduce(
@@ -447,15 +447,15 @@ const ProfilePage = () => {
                         0
                       )}
                   </p>
-                  <p className="text-xs lg:text-heading-04 font-semibold text-surface-500">
+                  <p className="text-xs lg:text-heading-06 font-medium text-surface-500">
                     Impressions This Month
                   </p>
                 </div>
                 <div className="flex flex-col items-center text-center border-l-2 border-surface-500 pl-2 lg:pl-8">
-                  <p className="text-paragraph lg:text-heading-01 font-normal">
+                  <p className="text-paragraph lg:text-heading-03 font-medium">
                     {stats?.downloads || 0}
                   </p>
-                  <p className="text-xs lg:text-heading-04 font-semibold text-surface-500">
+                  <p className="text-xs lg:text-heading-06 font-medium text-surface-500">
                     Downloads
                   </p>
                 </div>
@@ -465,7 +465,7 @@ const ProfilePage = () => {
             {/* Active Plan Show */}
             {photographer && (
               <div className="flex flex-col items-center mt-4">
-                <div className="text-xs sm:text-base md:text-heading-05 font-semibold capitalize flex gap-4 items-center">
+                <div className="text-xs sm:text-base md:text-heading-05 font-medium capitalize flex gap-4 items-center">
                   Active Plan: {activePlan}{" "}
                   {activePlan.toLowerCase() !== "premium" && (
                     <Link href="/membership">
