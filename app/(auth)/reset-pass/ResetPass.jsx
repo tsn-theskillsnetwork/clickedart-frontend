@@ -40,7 +40,7 @@ export default function ResetPassPage() {
         confirmButtonText: "Ok",
       }).then(() => {
         if (userType === "user") router.push("/signin");
-        else router.push("/signin/photographer");
+        else router.push("/signin?type=photographer");
       });
     } catch (error) {
       toast.error("Something went wrong");

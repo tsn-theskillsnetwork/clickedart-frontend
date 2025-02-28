@@ -44,7 +44,7 @@ export default function VerifyPage() {
       setLoading(false);
       toast.success("Account verified successfully.");
       if (userType === "user") router.push("/signin");
-      else router.push("/signin/photographer");
+      else router.push("/signin?type=photographer");
     } catch (error) {
       setError(error.message);
       setLoading(false);

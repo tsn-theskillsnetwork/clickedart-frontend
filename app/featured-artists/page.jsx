@@ -383,7 +383,7 @@ export default function page() {
                   Swal.fire(
                     "Please sign in as a Photographer to sell your photos"
                   );
-                else router.push("/signin/photographer");
+                else router.push("/signin?type=photographer");
               }}
               className="bg-white text-primary rounded-lg font-semibold p-2 sm:p-4 text-heading-06 sm:text-heading-05 hover:bg-primary hover:text-white transition-all duration-200 ease-linear active:bg-primary-200 active:text-white"
             >

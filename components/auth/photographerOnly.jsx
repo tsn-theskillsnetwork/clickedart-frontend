@@ -13,7 +13,7 @@ export default function PhotographerOnly() {
           <Signout variant="text" />
         </div>
       ) : (
-        <Link href="/signin/photographer">
+        <Link href="/signin?type=photographer">
           <button className="bg-blue-100 text-blue-500 font-semibold px-4 py-2 rounded-md shadow-md mt-4">
             Login
           </button>

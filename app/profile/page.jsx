@@ -479,6 +479,7 @@ const ProfilePage = () => {
                     </Link>
                   )}
                 </div>
+                <Link className="font-medium text-blue-600 text-sm bg-blue-200 px-2 py-1 rounded-lg shadow-md shadow-zinc-300 border border-blue-300" href="/profile/subscription">Manage</Link>
               </div>
             )}
 
