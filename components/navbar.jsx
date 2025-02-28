@@ -150,7 +150,7 @@ export default function Navbar() {
           scrollLocation > 50 || pathname !== "/"
             ? "bg-white shadow-[0px_4px_4px_rgba(0,0,0,0.25)] "
             : "bg-transparent shadow-none"
-        } h-20 sm:h-24 z-50 w-full`}
+        } h-20 sm:h-24 z-50 w-full transition-all duration-100 ease-in-out`}
       >
         <Link href={"/"} className="hidden lg:block">
           {scrollLocation > 50 || pathname !== "/" ? (
@@ -279,15 +279,18 @@ export default function Navbar() {
                 <>
                   <Link onClick={() => setIsMenuOpen(false)} href="/profile">
                     <User2 />
+                    <p className="sr-only">User</p>
                   </Link>
                   <Signout
                     onClick={() => setIsMenuOpen(false)}
                     variant="icon"
+                    aria-label="Sign Out"
                   />
                 </>
               ) : (
                 <Link onClick={() => setIsMenuOpen(false)} href="/signin">
                   <User2 />
+                  <p className="sr-only">Sign In</p>
                 </Link>
               )}
 
@@ -300,6 +303,7 @@ export default function Navbar() {
                     </p>
                   </div>
                 )}
+                <p className="sr-only">Wishlist</p>
               </Link>
               <Link onClick={() => setIsMenuOpen(false)} href="/cart">
                 <ShoppingCart />
@@ -314,6 +318,7 @@ export default function Navbar() {
               <Dialog>
                 <DialogTrigger>
                   <Search />
+                  <p className="sr-only">Search</p>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>

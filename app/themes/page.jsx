@@ -67,6 +67,7 @@ export default function ThemesPage() {
                     height={300}
                     src={theme.coverImage || "/assets/placeholders/image.webp"}
                     alt={theme.name}
+                    priority={true}
                     className={`object-cover h-full w-full aspect-[16/9] group-hover:scale-125 transition-all duration-300 ease-in-out`}
                   />
                 </div>
@@ -82,7 +83,7 @@ export default function ThemesPage() {
             {pageCount > page && (
               <div
                 onClick={() => setPageSize((prev) => prev + 12)}
-                className="flex items-center justify-center px-4 rounded-lg mb-10 py-4 bg-primary text-white font-semibold text-heading-06 uppercase cursor-pointer hover:bg-primary-dark transition-all duration-300 ease-in-out"
+                className="flex items-center justify-center px-4 rounded-lg mb-10 py-3 bg-primary-dark text-white font-semibold text-sm uppercase cursor-pointer hover:bg-primary-dark transition-all duration-300 ease-in-out"
               >
                 View More <ChevronDown size={24} className="ml-2" />
               </div>

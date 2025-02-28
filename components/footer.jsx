@@ -27,8 +27,8 @@ export default function Footer() {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 py-5 gap-y-5 gap-x-10 w-full">
         <div className="flex flex-col gap-2 w-full">
           <Image
-            width={800}
-            height={400}
+            width={200}
+            height={100}
             onClick={() => {
               router.push("/");
             }}

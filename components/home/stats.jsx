@@ -10,8 +10,8 @@ export default function Stats() {
     <div>
       <div className="relative">
         <Image
-          width={1600}
-          height={900}
+          width={800}
+          height={400}
           src={
             layout?.footerDetails?.footerImage ||
             "/assets/Strathmore Clean White 300gsm.png"
