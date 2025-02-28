@@ -245,7 +245,40 @@ export default function page() {
             ))}
           </div>
         )}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-10 px-2 sm:px-5 md:px-10 lg:px-20 xl:px-60">
+        <div className="sm:columns-2 lg:columns-3 gap-4 mt-10 px-4 sm:px-10 md:px-10 lg:px-20">
+          {images.map((image, index) => (
+            <div
+              key={index}
+              className="relative w-full mb-6 shadow-[0px_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out"
+            >
+              <Link href={`/images/${image._id}`} className="cursor-pointer">
+                <Image
+                  src={
+                    image.imageLinks.thumbnail ||
+                    "/assets/placeholders/image.webp"
+                  }
+                  width={500}
+                  height={500}
+                  alt={image.description}
+                  className="w-full"
+                />
+                <div className="absolute inset-0 flex flex-col justify-between py-2 px-4 transition-all duration-200 ease-linear">
+                  <div className="flex justify-between items-center">
+                    <p
+                      style={{
+                        textShadow: "-1px 1px 2px #666, 1px 1px 2px #666",
+                      }}
+                      className="text-white font-medium text-xs"
+                    >
+                      {image.title || "Untitled"}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            </div>
+          ))}
+        </div>
+        {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-10 px-2 sm:px-5 md:px-10 lg:px-20 xl:px-60">
           {images?.map((image, index) => (
             <div
               key={index}
@@ -318,7 +351,7 @@ export default function page() {
               </div>
             </div>
           ))}
-        </div>
+        </div> */}
       </div>
       <div className="w-full relative">
         <Image

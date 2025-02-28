@@ -35,21 +35,7 @@ export async function generateMetadata({ params }) {
           lastName: photographer.lastName,
         },
         url: `${process.env.NEXT_PUBLIC_URL}/photographer/${id}`,
-        images: [
-          {
-            url:
-              photographer.profileImage || `/assets/placeholders/profile.jpg`,
-            width: 1200,
-            height: 630,
-            alt: `${photographer.firstName} ${photographer.lastName}'s Profile Image`,
-          },
-          {
-            url: photographer.coverImage || `/assets/placeholders/image.webp`,
-            width: 1200,
-            height: 630,
-            alt: `${photographer.firstName} ${photographer.lastName}'s Cover Image`,
-          },
-        ],
+        image: photographer.profileImage || "/assets/placeholders/profile.jpg",
       },
     };
   } catch (error) {
@@ -59,14 +45,9 @@ export async function generateMetadata({ params }) {
       openGraph: {
         title: "Photographer not found",
         description: "Photographer not found",
-        images: [
-          {
-            url: `/assets/placeholders/profile.jpg`,
-            width: 1200,
-            height: 630,
-            alt: "Default profile image",
-          },
-        ],
+        type: "profile",
+        url: `${process.env.NEXT_PUBLIC_URL}/photographer/${id}`,
+        image: "/assets/placeholders/profile.jpg",
       },
     };
   }
