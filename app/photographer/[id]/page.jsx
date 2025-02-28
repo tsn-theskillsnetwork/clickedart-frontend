@@ -35,7 +35,14 @@ export async function generateMetadata({ params }) {
           lastName: photographer.lastName,
         },
         url: `${process.env.NEXT_PUBLIC_URL}/photographer/${id}`,
-        image: photographer.profileImage || "/assets/placeholders/profile.jpg",
+        images: [
+          {
+            url: photographer.profileImage || "/assets/placeholders/profile.jpg",
+            width: 800, // optional
+            height: 800, // optional
+            alt: `${photographer.firstName} ${photographer.lastName}`,
+          },
+        ],
       },
     };
   } catch (error) {
@@ -47,7 +54,14 @@ export async function generateMetadata({ params }) {
         description: "Photographer not found",
         type: "profile",
         url: `${process.env.NEXT_PUBLIC_URL}/photographer/${id}`,
-        image: "/assets/placeholders/profile.jpg",
+        images: [
+          {
+            url: "/assets/placeholders/profile.jpg",
+            width: 800, // optional
+            height: 800, // optional
+            alt: "Photographer not found",
+          },
+        ],
       },
     };
   }
