@@ -189,38 +189,37 @@ export default function ProfilePage({ photographer }) {
               </div>
             )}
 
-<div className="grid grid-cols-3 gap-2 lg:gap-8 mt-4 px-4 max-w-2xl">
-                <div className="flex flex-col items-center text-center border-r-2 border-surface-500 pr-2 lg:pr-8">
-                  <p className="text-paragraph lg:text-heading-03 font-medium">
-                    {photos?.length}
-                  </p>
-                  <p className="text-xs lg:text-heading-06 font-medium text-surface-500">
-                    Gallery Items
-                  </p>
-                </div>
-                <div className="flex flex-col items-center text-center">
-                  <p className="text-paragraph lg:text-heading-03 font-medium">
-                    {photos
-                      ?.filter((photo) => photo.imageAnalytics?.views)
-                      .reduce(
-                        (acc, photo) =>
-                          acc + (photo.imageAnalytics?.views || 0),
-                        0
-                      )}
-                  </p>
-                  <p className="text-xs lg:text-heading-06 font-medium text-surface-500">
-                    Impressions This Month
-                  </p>
-                </div>
-                <div className="flex flex-col items-center text-center border-l-2 border-surface-500 pl-2 lg:pl-8">
-                  <p className="text-paragraph lg:text-heading-03 font-medium">
-                    {stats?.downloads || 0}
-                  </p>
-                  <p className="text-xs lg:text-heading-06 font-medium text-surface-500">
-                    Downloads
-                  </p>
-                </div>
+            <div className="grid grid-cols-3 gap-2 lg:gap-8 mt-4 px-4 max-w-2xl">
+              <div className="flex flex-col items-center text-center border-r-2 border-surface-500 pr-2 lg:pr-8">
+                <p className="text-paragraph lg:text-heading-03 font-medium">
+                  {photos?.length}
+                </p>
+                <p className="text-xs lg:text-heading-06 font-medium text-surface-500">
+                  Gallery Items
+                </p>
               </div>
+              <div className="flex flex-col items-center text-center">
+                <p className="text-paragraph lg:text-heading-03 font-medium">
+                  {photos
+                    ?.filter((photo) => photo.imageAnalytics?.views)
+                    .reduce(
+                      (acc, photo) => acc + (photo.imageAnalytics?.views || 0),
+                      0
+                    )}
+                </p>
+                <p className="text-xs lg:text-heading-06 font-medium text-surface-500">
+                  Impressions This Month
+                </p>
+              </div>
+              <div className="flex flex-col items-center text-center border-l-2 border-surface-500 pl-2 lg:pl-8">
+                <p className="text-paragraph lg:text-heading-03 font-medium">
+                  {stats?.downloads || 0}
+                </p>
+                <p className="text-xs lg:text-heading-06 font-medium text-surface-500">
+                  Downloads
+                </p>
+              </div>
+            </div>
           </div>
           <div className="relative flex gap-10 text-base lg:text-heading-03 px-4 lg:px-24 py-4">
             <p
@@ -275,11 +274,13 @@ export default function ProfilePage({ photographer }) {
               <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
                 {photos.map((image) => (
                   <div
-                    // href={`/images/${image._id}`}
-                    className="relative group shadow-[2px_2px_6px_rgba(0,0,0,0.4)]"
+                    className="relative group shadow-md hover:shadow-lg rounded-lg overflow-hidden transition-all duration-300"
                     key={image._id}
                   >
-                    <Link href={`/images/${image._id}`}>
+                    <Link
+                      href={`/images/${image._id}`}
+                      className="block overflow-hidden"
+                    >
                       <Image
                         width={800}
                         height={800}
@@ -289,31 +290,20 @@ export default function ProfilePage({ photographer }) {
                           image.imageLinks.thumbnail ||
                           "/assets/placeholders/broken-image.png"
                         }
-                        alt={image.description}
-                        // onClick={() => {
-                        //   router.push(`/images/${image._id}`);
-                        // }}
-                        className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear"
+                        alt={image.description || "Image"}
+                        className="object-cover w-full aspect-[1/1] transition-transform duration-300 hover:scale-[1.02]"
                       />
                     </Link>
 
-                    {/* <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 ease-linear">
-                      <div className="flex justify-between px-2 pt-2">
-                        <div className="">
-                          <div className="bg-white px-2 text-paragraph bg-opacity-75 w-fit transition-all duration-200 ease-linear cursor-default">
-
-                          </div>
-                        </div>
-                      </div>
-                    </div> */}
-
-                    <div className="text-black flex justify-between items-start px-4">
-                      <div className="text-heading-05 font-semibold capitalize">
+                    <div className="p-4 bg-white flex flex-col gap-1">
+                      <h3 className="text-lg font-semibold text-zinc-900 capitalize">
                         {image.title || "Untitled"}
-                        <p className="text-base font-medium text-surface-500">
-                          {image.category?.map((cat) => cat.name).join(", ")}
+                      </h3>
+                      {image.category?.length > 0 && (
+                        <p className="text-sm font-medium text-zinc-500">
+                          {image.category.map((cat) => cat.name).join(", ")}
                         </p>
-                      </div>
+                      )}
                     </div>
                   </div>
                 ))}

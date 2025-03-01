@@ -84,31 +84,40 @@ export default function SearchResultPage() {
             <div className="px-10 sm:px-10 md:px-10 lg:px-20">
               <PhotographerSearch />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-16 px-6 sm:px-8 md:px-10 lg:px-16">
               {images.map((image, index) => (
-                <div key={index} className="keen-slider__slide">
-                  <div className="w-full  flex flex-col mx-auto items-center justify-center gap-2 bg-white shadow-md shadow-zinc-400">
-                    <Image
-                      width={256}
-                      height={256}
-                      src={
-                        image.profileImage || "/assets/placeholders/profile.jpg"
-                      }
-                      alt={image.firstName}
-                      className=" object-cover object-top w-full aspect-[1/1]"
-                    />
-                    <div className="flex flex-col items-center justify-center gap-2 pb-5">
-                      <p className="text-heading-04 font-semibold text-black">
-                        {`${image.firstName} ${image.lastName}`}
-                      </p>
-                      <p className="text-paragraph font-medium text-black lowercase">
-                        {`@${image.username}`}
-                      </p>
-                      <Link href={`/photographer/${image._id}`}>
-                        <Button size="lg">View Profile</Button>
-                      </Link>
+                <div
+                  key={index}
+                  className="w-full flex flex-col justify-between items-center bg-gradient-to-b from-zinc-100 to-white shadow-lg hover:shadow-xl border border-zinc-200 rounded-2xl overflow-hidden transition-all duration-300 ease-in-out transform hover:scale-[1.02]"
+                >
+                  <div className="w-full">
+                    <div className="w-full">
+                      <Image
+                        width={300}
+                        height={300}
+                        src={
+                          image.profileImage ||
+                          "/assets/placeholders/profile.jpg"
+                        }
+                        alt={image.firstName}
+                        className="w-full aspect-square object-cover rounded-t-2xl"
+                      />
+                    </div>
+
+                    <div className="flex flex-col items-center p-4 text-center">
+                      <h3 className="text-lg font-semibold text-zinc-900">{`${image.firstName} ${image.lastName}`}</h3>
+                      <p className="text-sm text-zinc-500">@{image.username}</p>
                     </div>
                   </div>
+
+                  <Link
+                    href={`/photographer/${image._id}`}
+                    className="w-full px-4 pb-4"
+                  >
+                    <button className="w-full bg-gradient-to-r from-primary-300 to-primary text-white font-medium py-2 rounded-xl hover:from-primary hover:to-primary-dark transition-all duration-300">
+                      View Profile
+                    </button>
+                  </Link>
                 </div>
               ))}
             </div>

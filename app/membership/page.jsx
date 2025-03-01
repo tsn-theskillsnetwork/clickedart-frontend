@@ -13,14 +13,15 @@ import useAuthStore from "@/authStore";
 import { useRazorpay } from "react-razorpay";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
+import Loader from "@/components/loader";
 
 export default function MembershipPage() {
-  const { photographer, token } = useAuthStore();
+  const { photographer, token, isHydrated } = useAuthStore();
   const [active, setActive] = useState(0);
   const [plans, setPlans] = useState([]);
   const [userPlan, setUserPlan] = useState("Basic");
   const [selectedPlan, setSelectedPlan] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   //razorpay
   const { Razorpay } = useRazorpay();
@@ -29,6 +30,7 @@ export default function MembershipPage() {
   const [selectedPlanId, setSelectedPlanId] = useState();
   const [selectedPlanPrice, setSelectedPlanPrice] = useState();
   const [selectedPlanDuration, setSelectedPlanDuration] = useState();
+  const [subscriptions, setSubscriptions] = useState([]);
 
   const handlePayment = useCallback(
     async (planId, price, duration) => {
@@ -106,36 +108,47 @@ export default function MembershipPage() {
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_SERVER}/api/plans/get-all-plans`
         );
-        //console.log(response.data);
         setPlans(response.data.plans);
-        setActive(response.data.plans[0]._id);
+        setActive(response.data.plans[0]?._id);
       } catch (error) {
         console.error(error);
       }
     };
 
-    const fetchActivePlan = async () => {
+    const fetchSubscriptionsAndActivePlan = async () => {
       if (!photographer || !photographer._id) {
         console.log("Photographer data is missing");
         return;
       }
+
       try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/get-user-active-subscription?photographer=${photographer._id}`
-        );
-        // console.log(
-        //   "Active Subscription ",
-        //   res.data.subscription?.planId?.name
-        // );
-        setUserPlan(res.data.subscription?.planId?.name);
+        const [subsRes, activePlanRes] = await Promise.all([
+          axios.get(
+            `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/get-user-subscription?userId=${photographer._id}`
+          ),
+          axios.get(
+            `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/get-user-active-subscription?photographer=${photographer._id}`
+          ),
+        ]);
+
+        setSubscriptions(subsRes.data.subscriptions);
+        setUserPlan(activePlanRes.data.subscription?.planId?.name);
       } catch (error) {
-        console.log(error.response ? error.response.data : error.message);
+        console.error(error.response ? error.response.data : error.message);
+      } finally {
+        setLoading(false);
       }
     };
 
+    setLoading(true);
     fetchPlans();
-    fetchActivePlan();
-  }, [photographer] || []);
+
+    if (photographer) {
+      fetchSubscriptionsAndActivePlan();
+    } else {
+      setLoading(false);
+    }
+  }, [photographer]);
 
   const handleTrial = async (planId, duration) => {
     if (!photographer) {
@@ -213,19 +226,23 @@ export default function MembershipPage() {
         title: "Subscription Successful",
         text: "You have successfully subscribed to the plan. It will be activated under 24 hours.",
       });
-      console.log(response.data);
     } catch (error) {
       console.error(error);
     }
   };
-  //console.log(selectedPlanId, selectedPlanPrice, selectedPlanDuration);
 
   useEffect(() => {
     if (paymentStatus === true) {
-      //console.log(selectedPlanId, selectedPlanPrice, selectedPlanDuration);
       handleSubscribe(selectedPlanId, selectedPlanPrice, selectedPlanDuration);
     }
   }, [selectedPlanDuration]);
+
+  if (!isHydrated || loading)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader />
+      </div>
+    );
 
   return (
     <div className="flex flex-col -mt-4 mb-20">
@@ -244,11 +261,11 @@ export default function MembershipPage() {
           <h1 className="text-heading-05 sm:text-heading-04 md:text-heading-03 lg:text-heading-02 font-semibold text-white text-shadow">
             Choose your Membership Plan
           </h1>
-          <p className="text-paragraph sm:text-heading-06 md:text-heading-05 lg:text-heading-03 font-semibold text-white text-shadow">
+          <p className="text-paragraph sm:text-heading-06 md:text-heading-05 lg:text-heading-04 font-semibold text-white text-shadow">
             Unlock exclusive features to showcase your creativity and boost your
             sales!
           </p>
-          {userPlan !== "Premium" && (
+          {subscriptions.every((sub) => sub.planId.name !== "Premium") && (
             <button
               onClick={() => handleTrial("67853b3d25457a993c90b1a1", "monthly")}
               className="bg-white text-primary text-xs mx-auto md:mx-0 sm:text-paragraph lg:text-heading-05 font-semibold rounded-lg py-2.5 px-3 mt-2"

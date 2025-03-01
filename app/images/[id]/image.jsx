@@ -408,7 +408,7 @@ export default function ImagePage({ image }) {
               {image?.resolutions?.thumbnail?.height} px
             </p>
             <p className="text-sm lg:text-base font-medium lg:font-semibold text-surface-600">
-              Size: {selectedSize?.width} x {selectedSize?.height} in
+              Size: {selectedSize?.width} x {selectedSize?.height} inch
             </p>
             <p className="text-sm lg:text-base font-medium lg:font-semibold text-surface-600">
               DPI:{" "}
@@ -487,7 +487,7 @@ export default function ImagePage({ image }) {
                   {/* Manually display selectedSize */}
                   <span>
                     {selectedSize?.width && selectedSize?.height
-                      ? `${selectedSize.width} x ${selectedSize.height} in`
+                      ? `${selectedSize.width} x ${selectedSize.height} inch`
                       : "Select Size"}
                   </span>
                   <p className="sr-only">Size</p>
@@ -499,7 +499,7 @@ export default function ImagePage({ image }) {
                       key={size._id}
                       value={JSON.stringify(size)} // Serialize options
                     >
-                      {size.width} x {size.height} in
+                      {size.width} x {size.height} inch
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -521,7 +521,7 @@ export default function ImagePage({ image }) {
                               selectedPaper?.customDimensions.length - 1
                             ]?.width
                           }{" "}
-                          in)
+                          inch)
                         </Label>
                         <Input
                           type="number"
@@ -541,7 +541,7 @@ export default function ImagePage({ image }) {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label>Height (max. 80 in)</Label>
+                        <Label>Height (max. 80 inch)</Label>
                         <Input
                           type="number"
                           placeholder="Height"

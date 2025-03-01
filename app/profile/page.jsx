@@ -565,7 +565,7 @@ const ProfilePage = () => {
                 <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
                   <Link
                     href="/profile/upload"
-                    className="relative group w-full min-h-60 shadow-[2px_2px_6px_rgba(0,0,0,0.4)]"
+                    className="relative group w-full min-h-60 shadow-[2px_2px_6px_rgba(0,0,0,0.4)] rounded-lg overflow-hidden"
                   >
                     <div className="h-full w-full flex flex-col items-center justify-center bg-white cursor-pointer">
                       <Plus className="w-20 h-20 text-surface-400" />
@@ -576,10 +576,10 @@ const ProfilePage = () => {
                   </Link>
                   {photos.map((image) => (
                     <div
-                      // href={`/images/${image._id}`}
-                      className="relative group shadow-[2px_2px_6px_rgba(0,0,0,0.4)]"
+                      className="relative group shadow-md hover:shadow-lg rounded-lg overflow-hidden transition-all duration-300 "
                       key={image._id}
                     >
+                      <div className="block aspect-[1/1] overflow-hidden">
                       <Image
                         width={800}
                         height={800}
@@ -589,43 +589,47 @@ const ProfilePage = () => {
                           image.imageLinks.original ||
                           image.imageLinks.thumbnail
                         }
-                        alt={image.description}
-                        onClick={() => {
-                          router.push(`/images/${image._id}`);
-                        }}
-                        className="object-cover w-full aspect-[1/1] transition-all duration-200 ease-linear cursor-pointer"
+                        alt={image.description || "Image"}
+                        onClick={() => router.push(`/images/${image._id}`)}
+                        className="object-cover w-full aspect-[1/1] transition-transform duration-300 hover:scale-[1.02] cursor-pointer"
                       />
+                      </div>
                       <button
-                        onClick={() => {
-                          router.push(`/profile/print/${image._id}`);
-                        }}
-                        className="z-20 absolute top-2 right-2 font-semibold text-white bg-black bg-opacity-50 px-2 py-1 rounded-md"
+                        onClick={() =>
+                          router.push(`/profile/print/${image._id}`)
+                        }
+                        className="absolute top-3 right-3 z-20 text-white bg-black bg-opacity-50 px-3 py-1 rounded-md text-sm font-medium hover:bg-opacity-70 transition-all"
                       >
                         Print
                       </button>
-                      <div className="text-black flex justify-between items-start px-4">
-                        <div className="text-heading-05 font-semibold capitalize">
-                          {image.title || "Untitled"}
-                          <p className="text-base font-medium text-surface-500">
-                            {image.category?.map((cat) => cat.name).join(", ")}
-                          </p>
+
+                      <div className="p-4 bg-white flex justify-between items-start">
+                        <div>
+                          <h3 className="text-lg font-semibold text-zinc-900 capitalize">
+                            {image.title || "Untitled"}
+                          </h3>
+                          {image.category?.length > 0 && (
+                            <p className="text-sm font-medium text-zinc-500">
+                              {image.category.map((cat) => cat.name).join(", ")}
+                            </p>
+                          )}
                         </div>
+
                         <Popover>
                           <PopoverTrigger>
-                            <EllipsisIcon className="w-6 h-6 text-black" />
+                            <EllipsisIcon className="w-6 h-6 text-zinc-700 hover:text-black cursor-pointer transition-all" />
                           </PopoverTrigger>
-                          <PopoverContent className="w-min">
-                            <div className="flex flex-col items-center">
-                              <Button
-                                className="text-orange-500"
-                                variant="ghost"
-                                size="sm"
-                              >
-                                <Link href={`/profile/edit/${image._id}`}>
-                                  Edit
-                                </Link>
-                              </Button>
-                            </div>
+                          <PopoverContent className="w-32 bg-white shadow-md rounded-md p-2">
+                            <Button
+                              className="text-orange-500 w-full"
+                              variant="ghost"
+                              size="sm"
+                              asChild
+                            >
+                              <Link href={`/profile/edit/${image._id}`}>
+                                Edit
+                              </Link>
+                            </Button>
                           </PopoverContent>
                         </Popover>
                       </div>
