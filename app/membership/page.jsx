@@ -102,52 +102,54 @@ export default function MembershipPage() {
     [Razorpay, photographer]
   );
 
-  useEffect(() => {
-    const fetchPlans = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/plans/get-all-plans`
-        );
-        setPlans(response.data.plans);
-        setActive(response.data.plans[0]?._id);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+  const fetchPlans = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/plans/get-all-plans`
+      );
+      setPlans(response.data.plans);
+      setActive(response.data.plans[0]._id);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-    const fetchSubscriptionsAndActivePlan = async () => {
-      if (!photographer || !photographer._id) {
-        console.log("Photographer data is missing");
-        return;
-      }
+  const fetchSubscriptions = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/get-user-subscription?userId=${photographer?._id}`
+      );
+      setSubscriptions(res.data.subscriptions);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-      try {
-        const [subsRes, activePlanRes] = await Promise.all([
-          axios.get(
-            `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/get-user-subscription?userId=${photographer._id}`
-          ),
-          axios.get(
-            `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/get-user-active-subscription?photographer=${photographer._id}`
-          ),
-        ]);
-
-        setSubscriptions(subsRes.data.subscriptions);
-        setUserPlan(activePlanRes.data.subscription?.planId?.name);
-      } catch (error) {
-        console.error(error.response ? error.response.data : error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    setLoading(true);
-    fetchPlans();
-
-    if (photographer) {
-      fetchSubscriptionsAndActivePlan();
-    } else {
+  const fetchActivePlan = async () => {
+    if (!photographer || !photographer._id) {
+      console.log("Photographer data is missing");
+      return;
+    }
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/get-user-active-subscription?photographer=${photographer._id}`
+      );
+      setUserPlan(res.data.subscription?.planId?.name);
+    } catch (error) {
+      console.log(error.response ? error.response.data : error.message);
+    } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    fetchPlans();
+  }, []);
+
+  useEffect(() => {
+    if (!photographer) return;
+    fetchSubscriptions();
+    fetchActivePlan();
   }, [photographer]);
 
   const handleTrial = async (planId, duration) => {
@@ -164,6 +166,15 @@ export default function MembershipPage() {
         icon: "error",
         title: "Oops...",
         text: "Please complete your Monetization from your Profile to continue",
+      });
+      return;
+    }
+    console.log(subscriptions);
+    if (subscriptions.some((sub) => sub.planId.name === "Premium")) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "You were already subscribed to the Premium Plan",
       });
       return;
     }
@@ -198,6 +209,7 @@ export default function MembershipPage() {
             title: "Subscription Successful",
             text: "You have successfully subscribed to the plan. It will be activated under 24 hours.",
           });
+          fetchActivePlan();
         } catch (error) {
           console.error(error);
         }
@@ -237,12 +249,13 @@ export default function MembershipPage() {
     }
   }, [selectedPlanDuration]);
 
-  if (!isHydrated || loading)
+  if (!isHydrated) {
     return (
       <div className="flex items-center justify-center h-screen">
         <Loader />
       </div>
     );
+  }
 
   return (
     <div className="flex flex-col -mt-4 mb-20">
@@ -261,18 +274,21 @@ export default function MembershipPage() {
           <h1 className="text-heading-05 sm:text-heading-04 md:text-heading-03 lg:text-heading-02 font-semibold text-white text-shadow">
             Choose your Membership Plan
           </h1>
-          <p className="text-paragraph sm:text-heading-06 md:text-heading-05 lg:text-heading-04 font-semibold text-white text-shadow">
+          <p className="text-paragraph sm:text-heading-06 md:text-heading-05 lg:text-heading-03 font-semibold text-white text-shadow">
             Unlock exclusive features to showcase your creativity and boost your
             sales!
           </p>
-          {subscriptions.every((sub) => sub.planId.name !== "Premium") && (
-            <button
-              onClick={() => handleTrial("67853b3d25457a993c90b1a1", "monthly")}
-              className="bg-white text-primary text-xs mx-auto md:mx-0 sm:text-paragraph lg:text-heading-05 font-semibold rounded-lg py-2.5 px-3 mt-2"
-            >
-              Start with a free 1-month trial of the Premium Plan
-            </button>
-          )}
+          {userPlan !== "Premium" &&
+            ((photographer && !loading) || !photographer) && (
+              <button
+                onClick={() =>
+                  handleTrial("67853b3d25457a993c90b1a1", "monthly")
+                }
+                className="bg-white text-primary text-xs mx-auto md:mx-0 sm:text-paragraph lg:text-heading-05 font-semibold rounded-lg py-2.5 px-3 mt-2"
+              >
+                Start with a free 1-month trial of the Premium Plan
+              </button>
+            )}
         </div>
       </div>
       <div className="flex flex-col gap-10 px-5 mt-8 sm:mt-12 md:mt-16 lg:mt-20">
