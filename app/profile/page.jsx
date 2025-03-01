@@ -9,6 +9,7 @@ import Button2 from "@/components/button2";
 import {
   ArrowUpCircle,
   ArrowUpCircleIcon,
+  ClockIcon,
   EllipsisIcon,
   ExternalLink,
   IndianRupeeIcon,
@@ -52,6 +53,7 @@ const ProfilePage = () => {
   const [selectedImage, setSelectedImage] = useState([]);
   const [selectedCatelogue, setSelectedCatelogue] = useState([]);
   const [photos, setPhotos] = useState([]);
+  const [pendingPhotos, setPendingPhotos] = useState([]);
   const [catalogues, setCatalogues] = useState([]);
   const [activePlan, setActivePlan] = useState("Basic");
   const [limit, setLimit] = useState(1);
@@ -263,6 +265,21 @@ const ProfilePage = () => {
     }
   };
 
+  const fetchPendingPhotos = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/photographer/get-pending-images-by-photographer?photographer=${photographer._id}`
+      );
+      console.log(res.data);
+      setPendingPhotos(res.data.pendingImages);
+      setLoading(false);
+    } catch (error) {
+      setError(error);
+      setLoading(false);
+    }
+  };
+
   const fetchCatalogues = async () => {
     try {
       const res = await axios.get(
@@ -292,6 +309,7 @@ const ProfilePage = () => {
 
     fetchStats();
     fetchPhotos();
+    fetchPendingPhotos();
     fetchCatalogues();
     fetchBlogs();
     fetchActivePlan();
@@ -574,25 +592,62 @@ const ProfilePage = () => {
                       </p>
                     </div>
                   </Link>
+                  {pendingPhotos.map((image) => (
+                    <div
+                      className="relative group shadow-md hover:shadow-lg rounded-lg opacity-60 cursor-default overflow-hidden transition-all duration-300 "
+                      key={image._id}
+                    >
+                      <div className="relative aspect-[1/1] overflow-hidden">
+                        <Image
+                          width={800}
+                          height={800}
+                          priority
+                          onContextMenu={(e) => e.preventDefault()}
+                          src={
+                            image.imageLinks.original ||
+                            image.imageLinks.thumbnail
+                          }
+                          alt={image.description || "Image"}
+                          className="object-cover w-full aspect-[1/1]"
+                        />
+                        <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 flex flex-col items-center justify-center">
+                          <ClockIcon className="w-20 h-20 text-white text-shadow" />
+                        </div>
+                      </div>
+
+                      <div className="p-4 bg-white flex justify-between items-start">
+                        <div>
+                          <h3 className="text-lg font-semibold text-zinc-900 capitalize">
+                            {image.title || "Untitled"}
+                          </h3>
+                          {image.category?.length > 0 && (
+                            <p className="text-sm font-medium text-zinc-500">
+                              {image.category.map((cat) => cat.name).join(", ")}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                   {photos.map((image) => (
                     <div
                       className="relative group shadow-md hover:shadow-lg rounded-lg overflow-hidden transition-all duration-300 "
                       key={image._id}
                     >
                       <div className="block aspect-[1/1] overflow-hidden">
-                      <Image
-                        width={800}
-                        height={800}
-                        priority
-                        onContextMenu={(e) => e.preventDefault()}
-                        src={
-                          image.imageLinks.original ||
-                          image.imageLinks.thumbnail
-                        }
-                        alt={image.description || "Image"}
-                        onClick={() => router.push(`/images/${image._id}`)}
-                        className="object-cover w-full aspect-[1/1] transition-transform duration-300 hover:scale-[1.02] cursor-pointer"
-                      />
+                        <Image
+                          width={800}
+                          height={800}
+                          priority
+                          onContextMenu={(e) => e.preventDefault()}
+                          src={
+                            image.imageLinks.original ||
+                            image.imageLinks.thumbnail
+                          }
+                          alt={image.description || "Image"}
+                          onClick={() => router.push(`/images/${image._id}`)}
+                          className="object-cover w-full aspect-[1/1] transition-transform duration-300 hover:scale-[1.02] cursor-pointer"
+                        />
                       </div>
                       <button
                         onClick={() =>
