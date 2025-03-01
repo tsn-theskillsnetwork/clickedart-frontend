@@ -68,6 +68,9 @@ export default function GoogleReviews() {
       </div>
     );
   }
+  if (reviews.length === 0) {
+    return null;
+  }
   const combinedReviews = [...reviews, ...(layout?.testimonials || [])];
 
   return (
