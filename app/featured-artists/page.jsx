@@ -211,10 +211,10 @@ export default function page() {
         {/* <div className="my-5"> */}
         <Featured photographers={photographers} loading={artistLoading} />
         {/* </div> */}
-        <Link className="my-2" href="/photographer">
-          <Button2 color="primary" size="lg" className="mt-10">
+        <Link className="my-5" href="/photographer">
+          <button className="bg-gradient-to-r from-primary-300 to-primary text-white font-medium px-5 py-2 rounded-lg hover:from-primary hover:to-primary-dark transition-all duration-300">
             See All Artists
-          </Button2>
+          </button>
         </Link>
       </div>
       <div className="w-full flex flex-col items-center my-10 min-h-20 px-4">

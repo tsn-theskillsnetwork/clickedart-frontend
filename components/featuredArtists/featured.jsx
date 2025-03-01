@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "../ui/skeleton";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Image from "next/image";
 
 export default function Featured({ photographers, loading }) {
   const sliderRef = useRef(null);
@@ -50,24 +51,35 @@ export default function Featured({ photographers, loading }) {
     <div className="w-full relative">
       <Slider className="w-11/12 mx-auto" ref={sliderRef} {...settings}>
         {sortedPhotographers?.map((photographer, index) => (
-          <div key={index} className="p-6 h-full">
-            <div className=" flex flex-col mx-auto items-center justify-center gap-2 bg-white shadow-md shadow-zinc-400 rounded-md overflow-hidden hover:scale-105 transition-all duration-300 ease-in-out">
-              <img
-                onClick={() => router.push(`/photographer/${photographer._id}`)}
-                src={
-                  photographer.profileImage ||
-                  "/assets/placeholders/profile.jpg"
-                }
-                alt={photographer.firstName || `Slide ${index + 1}`}
-                className=" object-cover object-top w-full aspect-[1/1]"
-              />
-              <div className="flex flex-col items-center justify-center gap-2 pb-5 px-2">
-                <p className="text-heading-04 font-semibold text-black text-center">
+          <div key={index} className="p-4 h-full">
+            <div className="flex flex-col items-center bg-gradient-to-b from-zinc-100 to-white shadow-lg hover:shadow-xl border border-zinc-200 rounded-2xl overflow-hidden transition-all duration-300 ease-in-out transform">
+              {/* Clickable Image */}
+              <div className="w-full overflow-hidden">
+                <Image
+                  onClick={() =>
+                    router.push(`/photographer/${photographer._id}`)
+                  }
+                  width={300}
+                  height={300}
+                  src={
+                    photographer.profileImage ||
+                    "/assets/placeholders/profile.jpg"
+                  }
+                  alt={photographer.firstName || `Slide ${index + 1}`}
+                  className="w-full aspect-[1/1] object-cover rounded-t-2xl cursor-pointer hover:opacity-90 transition-all duration-300 ease-in-out hover:scale-[1.02]"
+                />
+              </div>
+
+              {/* Content */}
+              <div className="flex flex-col items-center gap-2 py-4 px-3 text-center">
+                <h3 className="text-lg font-semibold text-zinc-900">
                   {`${photographer.firstName} ${photographer.lastName}`}
-                </p>
+                </h3>
+
+                {/* View Profile Button */}
                 <Link
                   href={`/photographer/${photographer._id}`}
-                  className="bg-primary text-white px-4 py-2 rounded-lg"
+                  className="bg-gradient-to-r from-primary-300 to-primary text-white font-medium px-5 py-2 rounded-xl hover:from-primary hover:to-primary-dark transition-all duration-300"
                 >
                   View Profile
                 </Link>
