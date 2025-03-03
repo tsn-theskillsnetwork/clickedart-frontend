@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import Button from "../button";
-import toast from "react-hot-toast";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -18,6 +17,8 @@ export default function DiscoverMobile({ stories }) {
               <Image
                 width={300}
                 height={200}
+                quality={50}
+                priority
                 src={story.media_url}
                 alt={story.title || `Story ${index + 1}`}
                 className="w-full h-40 object-cover"

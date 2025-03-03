@@ -66,13 +66,6 @@ export default function GoogleReviews() {
     fetchReviews();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-20">
-        <Loader />
-      </div>
-    );
-  }
   if (reviews.length === 0) {
     return null;
   }

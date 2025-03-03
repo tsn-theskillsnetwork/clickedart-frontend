@@ -8,7 +8,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ThemesPage() {
-  const page = useSearchParams().get("page") || 1;
   const router = useRouter();
 
   const [themes, setThemes] = useState([]);
@@ -18,10 +17,15 @@ export default function ThemesPage() {
 
   useEffect(() => {
     const fetchThemes = async () => {
+      setLoading(true);
       try {
+        const start = performance.now();
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/category/get?pageNumber=${page}&pageSize=${pageSize}`
+          `${process.env.NEXT_PUBLIC_SERVER}/api/category/get?pageSize=${pageSize}`
         );
+        const end = performance.now();
+        console.log("API Response Time:", end - start, "ms");
+
         const data = await response.json();
         setThemes(data.categories);
         setPageCount(data.pageCount);
@@ -63,12 +67,12 @@ export default function ThemesPage() {
               >
                 <div className="overflow-hidden shadow-[rgba(0,0,15,0.3)_5px_5px_4px_0px] group-hover:shadow-none transition-all duration-300 ease-in-out">
                   <Image
-                    width={600}
-                    height={300}
+                    width={320}
+                    height={180}
                     src={theme.coverImage || "/assets/placeholders/image.webp"}
                     alt={theme.name}
-                    priority={true}
-                    className={`object-cover h-full w-full aspect-[16/9] group-hover:scale-125 transition-all duration-300 ease-in-out`}
+                    priority
+                    className="object-cover h-full w-full aspect-[16/9] group-hover:scale-125 transition-all duration-300 ease-in-out"
                   />
                 </div>
                 <div className="absolute inset-x-0 bottom-0 px-3">
@@ -80,7 +84,7 @@ export default function ThemesPage() {
             ))}
           </div>
           <div className="w-full flex justify-center items-center">
-            {pageCount > page && (
+            {pageCount > 1 && (
               <div
                 onClick={() => setPageSize((prev) => prev + 12)}
                 className="flex items-center justify-center px-4 rounded-lg mb-10 py-3 bg-primary-dark text-white font-semibold text-sm uppercase cursor-pointer hover:bg-primary-dark transition-all duration-300 ease-in-out"

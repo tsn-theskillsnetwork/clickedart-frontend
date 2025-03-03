@@ -1,11 +1,11 @@
-import Footer from "@/components/footer";
+import {montserrat} from './fonts'
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import Navbar from "@/components/navbar";
+import Footer from "@/components/footer";
 import Image from "next/image";
 import { Analytics } from "@vercel/analytics/react";
-
-//import font
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata = {
   title: "ClickedArt",
@@ -27,7 +27,7 @@ export const metadata = {
 export default async function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`antialiased overflow-x-hidden`}>
+      <body className={`antialiased overflow-x-hidden ${montserrat.className}`}>
         {process.env.NEXT_PUBLIC_MAINTAINANCE === "true" ? (
           <section className="bg-white dark:bg-gray-900">
             <div className="py-8 px-4 mx-auto max-w-screen-md text-center lg:py-16 lg:px-12">
@@ -62,10 +62,11 @@ export default async function RootLayout({ children }) {
             <Toaster />
             <Navbar />
             <div className="pt-20 sm:pt-24">{children}</div>
-            <Analytics />
             <Footer />
           </>
         )}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

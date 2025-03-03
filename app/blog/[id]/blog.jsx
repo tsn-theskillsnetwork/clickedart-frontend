@@ -41,10 +41,10 @@ export default function BlogPageComponent({ blog }) {
           <div className="flex flex-col sm:flex-row justify-center">
             <div className="flex flex-col gap-4 sm:w-8/12 px-4">
               <div className="flex flex-col">
-                <h2 className="text-heading-02 text-primary font-bold">
+                <h2 className="text-heading-06 sm:text-heading-05 md:text-heading-04 lg:text-heading-03 text-primary font-bold">
                   {blog.content.title}
                 </h2>
-                <p className="text-paragraph text-primary font-medium">
+                <p className="mt-2 text-sm sm:text-base md:text-paragraph text-primary font-medium">
                   {blog.content.summary}
                 </p>
               </div>

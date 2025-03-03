@@ -11,6 +11,7 @@ export default function ProductCategoriesMobile() {
   const router = useRouter();
 
   const [themes, setThemes] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [active1, setActive1] = useState(0);
   const [active2, setActive2] = useState(1);
@@ -26,11 +27,46 @@ export default function ProductCategoriesMobile() {
         setThemes(data.categories);
       } catch (error) {
         console.log(error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchThemes();
   }, []);
 
+  if (loading) {
+    return (
+      <div className="flex flex-col justify-center items-center">
+        {[...Array(3).keys()].map((mainIndex) => (
+          <div
+            key={mainIndex}
+            className="flex mx-2 mt-2 sm:mt-5 gap-2 sm:gap-4 justify-end"
+          >
+            {[...Array(3).keys()].map((index) => (
+              <div
+                key={index}
+                className={`${
+                  mainIndex === index ? "aspect-[16/9]" : "aspect-[1/1]"
+                } h-[24.5vw] relative flex flex-row gap-4 shadow-xl shadow-zinc-300 rounded-2xl justify-center overflow-hidden transition-all duration-300 ease-in-out`}
+              >
+                <div className="absolute bottom-2">
+                  <div
+                    className={`animate-pulse bg-gray-300 h-4 ${
+                      mainIndex === index ? "w-[24vw]" : "w-[18vw]"
+                    }`}
+                  ></div>
+                </div>
+                <div className="animate-pulse bg-gray-300 w-full h-full object-cover rounded-2xl"></div>
+              </div>
+            ))}
+          </div>
+        ))}
+        <Link className="mt-5" href="/themes">
+          <Button>View All Themes</Button>
+        </Link>
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col justify-center items-center">
       <div className="flex mx-2 mt-2 sm:mt-5 gap-2 sm:gap-4 justify-end">
@@ -134,9 +170,7 @@ export default function ProductCategoriesMobile() {
       </div>
       {themes.length > 6 && (
         <Link className="mt-5" href="/themes">
-          <Button>
-            View All Themes
-          </Button>
+          <Button>View All Themes</Button>
         </Link>
       )}
     </div>

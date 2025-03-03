@@ -48,7 +48,7 @@ export default function StoryPageComponent({ story }) {
           <div className="flex flex-col sm:flex-row justify-center">
             <div className="flex flex-col gap-4 sm:w-3/5 px-4">
               <div className="flex flex-col">
-                <h2 className="text-heading-02 text-primary font-bold">
+              <h2 className="text-heading-06 sm:text-heading-05 md:text-heading-04 lg:text-heading-03 text-primary font-bold">
                   {story.title}
                 </h2>
               </div>
@@ -60,12 +60,12 @@ export default function StoryPageComponent({ story }) {
                 alt="placeholder"
               />
 
-              <div
+              {/* <div
                 className="prose max-w-full space-y-0"
                 dangerouslySetInnerHTML={{
                   __html: story.description,
                 }}
-              />
+              /> */}
               {/* <p className="text-lg text-justify">{story.description}</p> */}
               <h5 className="text-heading-05 font-semibold text-primary-400">
                 Inspired By

@@ -6,9 +6,9 @@ import { ChevronRight, Search } from "lucide-react";
 import { Icon } from "@iconify/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import useLayoutStore from "@/store/layout";
 import useAuthStore from "@/authStore";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 const taglines = [
   "Stunning Clicks, Premium Prints - Experience ClickedArt!",
@@ -19,11 +19,10 @@ const taglines = [
   // "ClickedArt - Where Every Image Finds Its Perfect Home, Digitally & in Print!",
 ];
 
-export default function HeroSection() {
+export default function HeroSection({ layout }) {
   const router = useRouter();
-  const { layout } = useLayoutStore();
-  const { photographer, user } = useAuthStore();
 
+  const { photographer, user } = useAuthStore();
   const [currentImage, setCurrentImage] = useState(0);
   const [search, setSearch] = useState("");
   const [searchType, setSearchType] = useState("images");
@@ -57,21 +56,18 @@ export default function HeroSection() {
             className="relative w-full h-full"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
+            exit={currentImage === 0 ? {} : { opacity: 0 }} // Skip exit on first render
+            transition={{ duration: 0.3 }} // Reduce duration
           >
-            <Image
-              src={
-                heroPhotos[currentImage] ||
-                "/assets/Hahnemuhle Museum Etching.png"
-              }
-              alt={"hero-image"}
-              fill
-              priority
-              loading="eager"
-              quality={80}
-              className="object-cover"
-            />
+            {heroPhotos[currentImage] && (
+              <Image
+                src={heroPhotos[currentImage]}
+                alt="hero-image"
+                fill
+                priority
+                className="object-cover"
+              />
+            )}
           </motion.div>
         </AnimatePresence>
       </div>

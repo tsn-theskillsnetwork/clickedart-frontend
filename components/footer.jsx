@@ -1,11 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Button from "./button";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import axios from "axios";
 import useLayoutStore from "@/store/layout";
 import Swal from "sweetalert2";
 import useAuthStore from "@/authStore";
@@ -34,10 +33,18 @@ export default function Footer() {
             }}
             src={layout?.logo || "/assets/Logo.png"}
             alt="ClickedArt.com"
-            className="w-80 h-auto"
+            className="w-80"
           />
-          <p className="mt-5">{layout?.footerDetails?.phone}</p>
-          <p>{layout?.footerDetails?.email}</p>
+          {layout?.footerDetails?.phone ? (
+            <p className="mt-5">{layout?.footerDetails?.phone}</p>
+          ) : (
+            <div className="mt-5 animate-pulse w-24 h-5 bg-surface-300 rounded-md"></div>
+          )}
+          {layout?.footerDetails?.email ? (
+            <p>{layout?.footerDetails?.email}</p>
+          ) : (
+            <div className="animate-pulse w-24 h-5 bg-surface-300 rounded-md"></div>
+          )}
           <div className="flex gap-4 text-sm underline underline-offset-1">
             <Link href="/terms">Terms and Conditions</Link>
             <Link href="/privacy-policy">Privacy Policy</Link>
@@ -47,26 +54,38 @@ export default function Footer() {
           <div className="flex flex-col gap-2">
             <p className="font-semibold text-lg">Follow us</p>
             <div className="mt-3 flex flex-col gap-2">
-              {layout &&
-                layout.footerDetails?.footerlinks?.map((link, index) => {
-                  const formattedLink =
-                    link.accountLink?.startsWith("http://") ||
-                    link.accountLink?.startsWith("https://")
-                      ? link.accountLink
-                      : `https://${link.accountLink}`;
+              {layout ? (
+                <>
+                  {layout.footerDetails?.footerlinks?.map((link, index) => {
+                    const formattedLink =
+                      link.accountLink?.startsWith("http://") ||
+                      link.accountLink?.startsWith("https://")
+                        ? link.accountLink
+                        : `https://${link.accountLink}`;
 
-                  return (
-                    <Link
+                    return (
+                      <Link
+                        key={index}
+                        href={formattedLink || "/"}
+                        className="text-sm font-medium"
+                        target="_blank" // Optional: Opens the link in a new tab
+                        rel="noopener noreferrer" // Security best practice for external links
+                      >
+                        {link.accountName}
+                      </Link>
+                    );
+                  })}
+                </>
+              ) : (
+                <>
+                  {[...Array(4).keys()].map((index) => (
+                    <div
                       key={index}
-                      href={formattedLink || "/"}
-                      className="text-sm font-medium"
-                      target="_blank" // Optional: Opens the link in a new tab
-                      rel="noopener noreferrer" // Security best practice for external links
-                    >
-                      {link.accountName}
-                    </Link>
-                  );
-                })}
+                      className="animate-pulse w-24 h-5 bg-surface-300 rounded-md"
+                    ></div>
+                  ))}
+                </>
+              )}
             </div>
           </div>
           <div className="flex flex-col gap-2">

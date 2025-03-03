@@ -31,8 +31,9 @@ export default function BlogPage() {
           }
           className="absolute inset-0 w-full h-full z-0 object-cover"
           alt="Blog"
-          width={1800}
-          height={1400}
+          fill
+          quality={75}
+          priority
         />
         <div className="bg-[#14162466] opacity-20 absolute inset-0 z-0"></div>
         <div className="flex flex-col gap-2 my-10 items-center z-10 text-white">
