@@ -69,7 +69,7 @@ export default function ProductCategoriesMobile() {
   }
   return (
     <div className="flex flex-col justify-center items-center">
-      <div className="flex mx-2 mt-2 sm:mt-5 gap-2 sm:gap-4 justify-end">
+      <div className="flex mx-2 mt-2 sm:mt-5 gap-2 sm:gap-2 justify-end">
         {themes.slice(0, 3).map((theme, index) => (
           <motion.div
             layout
@@ -82,7 +82,7 @@ export default function ProductCategoriesMobile() {
             }}
             className={`${
               active1 === index ? "aspect-[16/9]" : "aspect-[1/1]"
-            } h-[24.5vw] relative flex flex-row gap-4 shadow-xl shadow-zinc-300 rounded-2xl justify-center cursor-pointer overflow-hidden transition-all duration-300 ease-in-out`}
+            } h-[24.5vw] relative flex flex-row gap-4 shadow-md shadow-zinc-300 rounded-2xl justify-center cursor-pointer overflow-hidden transition-all duration-300 ease-in-out`}
             onClick={() => {
               router.push(`/images?theme=${theme.name.toLowerCase()}`);
             }}
@@ -102,7 +102,7 @@ export default function ProductCategoriesMobile() {
           </motion.div>
         ))}
       </div>
-      <div className="flex mx-2 mt-2 sm:mt-5 gap-2 sm:gap-4 justify-end">
+      <div className="flex mx-2 mt-2 sm:mt-2 gap-2 sm:gap-2 justify-end">
         {themes.slice(3, 6).map((theme, index) => (
           <motion.div
             layout
@@ -115,7 +115,7 @@ export default function ProductCategoriesMobile() {
             }}
             className={`${
               active2 === index ? "aspect-[16/9]" : "aspect-[1/1]"
-            } h-[24.5vw] relative flex flex-row gap-4 shadow-xl shadow-zinc-300 rounded-2xl justify-center cursor-pointer overflow-hidden transition-all duration-300 ease-in-out`}
+            } h-[24.5vw] relative flex flex-row gap-4 shadow-md shadow-zinc-300 rounded-2xl justify-center cursor-pointer overflow-hidden transition-all duration-300 ease-in-out`}
             onClick={() => {
               router.push(`/images?theme=${theme.name.toLowerCase()}`);
             }}
@@ -135,7 +135,7 @@ export default function ProductCategoriesMobile() {
           </motion.div>
         ))}
       </div>
-      <div className="flex mx-2 mt-2 sm:mt-5 gap-2 sm:gap-4 justify-end">
+      <div className="flex mx-2 mt-2 sm:mt-2 gap-2 sm:gap-2 justify-end">
         {themes.slice(6, 9).map((theme, index) => (
           <motion.div
             layout
@@ -148,7 +148,7 @@ export default function ProductCategoriesMobile() {
             }}
             className={`${
               active3 === index ? "aspect-[16/9]" : "aspect-[1/1]"
-            } h-[24.5vw] relative flex flex-row gap-4 shadow-xl shadow-zinc-300 rounded-2xl justify-center cursor-pointer overflow-hidden transition-all duration-300 ease-in-out`}
+            } h-[24.5vw] relative flex flex-row gap-4 shadow-md shadow-zinc-300 rounded-2xl justify-center cursor-pointer overflow-hidden transition-all duration-300 ease-in-out`}
             onClick={() => {
               router.push(`/images?theme=${theme.name.toLowerCase()}`);
             }}
