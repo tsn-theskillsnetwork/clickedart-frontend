@@ -52,26 +52,7 @@ export default function Home() {
   }, []);
   return (
     <div className="-mt-24 sm:-mt-28">
-      <HeroSection layout={layout} />
-      {/* <div className="px-4 sm:px-32 mt-28 mb-0"> */}
-      {/* <p className="text-paragraph sm:text-heading-05 font-semibold text-surface-600 text-justify">
-            <span className="text-heading-04 sm:text-heading-03 font-bold">
-            ClickedART{" "}
-            </span>
-            offers an exclusive collection of large-format photographic wall
-            art, featuring breathtaking, ultra-high-resolution images by
-            celebrated artists. Customers can choose between digital downloads
-            or ready-to-display art pieces. Additionally, our platform is
-            dedicated to empowering Indian photographers, providing a
-            professional space for them to showcase and sell their exceptional
-            work.
-            </p> */}
-      {/* <Link href={"/explore"} className="pt-10">
-            <Button size="xl" variant="filled" state="default">
-            Know more about us
-            </Button>
-            </Link> */}
-      {/* </div> */}
+      <HeroSection layout={layout} loading={layoutLoading} />
       <div className="px-4 my-5">
         <ProductCategoriesMobile />
       </div>
