@@ -19,7 +19,7 @@ export default function GoogleReviews() {
 
   const settings = {
     dots: false,
-    infinite: true,
+    infinite: false,
     speed: 500,
     arrows: false,
     slidesToShow: 3,
@@ -33,6 +33,11 @@ export default function GoogleReviews() {
       { breakpoint: 768, settings: { slidesToShow: 2 } },
       { breakpoint: 480, settings: { slidesToShow: 1 } },
     ],
+    afterChange: (current) => {
+      if (current === combinedReviews.length - settings.slidesToShow) {
+        setTimeout(() => sliderRef.current?.slickGoTo(0), 3000);
+      }
+    },
   };
 
   const handlePrev = () => {
