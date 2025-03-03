@@ -74,7 +74,7 @@ export default function Navbar() {
     };
 
     return (
-      <div className="relative">
+      <div className="relative z-50">
         <button
           onClick={toggleDropdown}
           className={`text-sm md:text-md lg:text-lg xl:text-xl px-1 xl:px-4 py-2 rounded-lg text-center font-semibold ${
@@ -150,7 +150,7 @@ export default function Navbar() {
           scrollLocation > 50 || pathname !== "/"
             ? "bg-white shadow-[0px_4px_4px_rgba(0,0,0,0.25)] "
             : "bg-transparent shadow-none"
-        } h-20 sm:h-24 z-50 w-full transition-all duration-100 ease-in-out`}
+        } h-20 sm:h-24 z-[100] w-full transition-all duration-100 ease-in-out`}
       >
         <Link href={"/"} className="hidden lg:block">
           {scrollLocation > 50 || pathname !== "/" ? (
@@ -416,24 +416,11 @@ export default function Navbar() {
               </TooltipProvider>
             </>
           ) : (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Link href="/signin">
-                    <User2
-                      className={`${
-                        scrollLocation > 50 || pathname !== "/"
-                          ? "text-surface-600"
-                          : "text-white"
-                      } cursor-pointer`}
-                    />
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="text-white font-medium">Sign In</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Link className="-mr-2 w-24" href="/signin">
+              <button className="bg-black text-white px-4 py-2 rounded-lg text-sm font-semibold">
+                Sign In
+              </button>
+            </Link>
           )}
           <TooltipProvider>
             <Tooltip>

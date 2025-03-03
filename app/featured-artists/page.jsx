@@ -245,11 +245,11 @@ export default function page() {
             ))}
           </div>
         )}
-        <div className="sm:columns-2 lg:columns-3 gap-4 mt-10 px-4 sm:px-10 md:px-10 lg:px-20">
+        <div className="sm:columns-2 lg:columns-3 gap-2 mt-10 px-4 sm:px-10 md:px-10 lg:px-20">
           {images.map((image, index) => (
             <div
               key={index}
-              className="relative w-full mb-6 shadow-[0px_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out"
+              className="relative w-full mb-2 shadow-[0px_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out"
             >
               <Link href={`/images/${image._id}`} className="cursor-pointer">
                 <Image
