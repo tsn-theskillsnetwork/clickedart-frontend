@@ -43,7 +43,7 @@ export default function ResetPassPage() {
         else router.push("/signin?type=photographer");
       });
     } catch (error) {
-      toast.error("Something went wrong");
+      toast.error(error.response?.data?.message || "Something went wrong");
       console.log(error);
     } finally {
       setLoading(false);
