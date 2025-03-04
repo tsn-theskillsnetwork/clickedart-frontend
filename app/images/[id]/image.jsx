@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import "./styles.css";
 import { AnimatePresence, motion } from "framer-motion";
@@ -38,9 +38,12 @@ import useWishlistStore from "@/store/wishlist";
 
 export default function ImagePage({ image }) {
   const id = useParams().id;
+  const router = useRouter();
+
   const { isHydrated, user, photographer } = useAuthStore();
   const { addItemToCart, removeItemFromCart, isItemInCart } = useCartStore();
   const { wishlist, fetchWishlist } = useWishlistStore();
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -61,7 +64,7 @@ export default function ImagePage({ image }) {
   });
 
   const addImageToWishlist = async (imageId) => {
-    if(!user && !photographer) {
+    if (!user && !photographer) {
       toast.error("Please login to add image to wishlist");
       return;
     }
@@ -734,9 +737,15 @@ export default function ImagePage({ image }) {
 
   const height = clampedHeight + "%";
 
+  useEffect(() => {
+    if (isHydrated && photographer && image.photographer?._id === photographer._id) {
+      router.push(`/profile/print/${id}`);
+    }
+  }, [isHydrated, photographer, image]);
+
   return (
     <>
-      {loading ? (
+      {loading || !isHydrated || (photographer && image.photographer?._id === photographer._id) ? (
         <ImageSkeleton />
       ) : (
         <>
@@ -895,28 +904,28 @@ export default function ImagePage({ image }) {
                 </button>
               )}
               <button
-          onClick={(e) => {
-            e.stopPropagation();
+                onClick={(e) => {
+                  e.stopPropagation();
 
-            wishlist?.some((item) => item._id === image._id)
-              ? removeImageFromWishlist(image._id)
-              : addImageToWishlist(image._id);
-          }}
-          className={`${
-            wishlist?.some((item) => item._id === image._id)
-              ? "bg-red-200 border-red-500"
-              : "bg-white border-primary"
-          } btn-secondary flex-shrink-0 p-4 border-2  rounded-2xl h-full aspect-[1/1] flex items-center justify-center group`}
-        >
-          <Heart
-            size={18}
-            className={`${
-              wishlist?.some((item) => item._id === image._id)
-                ? "text-red-500 fill-red-500"
-                : "text-primary"
-            } group-hover:text-red-500 group-hover:scale-110 transition-all duration-300 ease-in-out`}
-          />
-        </button>
+                  wishlist?.some((item) => item._id === image._id)
+                    ? removeImageFromWishlist(image._id)
+                    : addImageToWishlist(image._id);
+                }}
+                className={`${
+                  wishlist?.some((item) => item._id === image._id)
+                    ? "bg-red-200 border-red-500"
+                    : "bg-white border-primary"
+                } btn-secondary flex-shrink-0 p-4 border-2  rounded-2xl h-full aspect-[1/1] flex items-center justify-center group`}
+              >
+                <Heart
+                  size={18}
+                  className={`${
+                    wishlist?.some((item) => item._id === image._id)
+                      ? "text-red-500 fill-red-500"
+                      : "text-primary"
+                  } group-hover:text-red-500 group-hover:scale-110 transition-all duration-300 ease-in-out`}
+                />
+              </button>
             </div>
           </div>
         </>
