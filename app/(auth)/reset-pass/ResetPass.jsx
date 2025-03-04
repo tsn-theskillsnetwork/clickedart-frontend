@@ -74,7 +74,9 @@ export default function ResetPassPage() {
         />
 
         <div className="mx-auto">
-          <Button2 onClick={handlePassReset}>Reset Password</Button2>
+          <Button2 disabled={loading} size="sm" onClick={handlePassReset}>{
+            loading ? "Loading..." : "Reset Password"
+            }</Button2>
         </div>
       </div>
     </div>
