@@ -156,19 +156,20 @@ export default function Navbar() {
           {scrollLocation > 50 || pathname !== "/" ? (
             <Image
               src="/assets/Logo.png"
-              className="h-auto w-4/5"
-              alt="logo"
+              className="h-auto w-[250px]"
               priority
               width={200}
               height={50}
+              alt="logo"
             />
           ) : (
             <Image
               src="/assets/logoWhite.png"
-              className="h-auto w-4/5"
-              alt="logo"
+              className="h-auto w-[250px]"
+              priority
               width={200}
               height={50}
+              alt="logo"
             />
           )}
         </Link>
