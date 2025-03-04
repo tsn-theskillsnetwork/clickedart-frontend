@@ -6,6 +6,7 @@ import Image from "next/image";
 import Button from "@/components/button";
 import Link from "next/link";
 import Button2 from "@/components/button2";
+import Cookies from "js-cookie";
 import {
   ArrowUpCircle,
   ArrowUpCircleIcon,
@@ -38,6 +39,7 @@ import {
 } from "@/components/ui/popover";
 import toast from "react-hot-toast";
 import { Icon } from "@iconify/react";
+import Swal from "sweetalert2";
 
 const ProfilePage = () => {
   const router = useRouter();
@@ -316,6 +318,30 @@ const ProfilePage = () => {
   }, [photographer]);
 
   //console.log("photos", photos);
+
+  useEffect(() => {
+    if (photographer) {
+      const isAlertClosed = Cookies.get("monetizationAlert");
+      if (photographer.isMonetized || isAlertClosed) {
+        return;
+      }
+
+      Swal.fire({
+        title: "Monetize Your Account",
+        text: "Monetize your account to start earning from your photos",
+        icon: "info",
+        showCancelButton: true,
+        confirmButtonText: "Monetize Now",
+        cancelButtonText: "Later",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push("/support/monetize");
+        } else {
+          Cookies.set("monetizationAlert", 1, { expires: 1 });
+        }
+      });
+    }
+  }, [photographer]);
 
   return (
     <>
