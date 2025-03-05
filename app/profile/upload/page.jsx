@@ -34,6 +34,7 @@ const ProfilePage = () => {
   const { photographer, token, isHydrated } = useAuthStore();
 
   const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState(false);
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
   const [licenses, setLicenses] = useState([]);
@@ -168,6 +169,7 @@ const ProfilePage = () => {
       );
       toast.success("Watermark added successfully");
       setWatermark(response.data.watermark);
+      setPhoto({ ...photo, imageLinks: { image: imageUrl } });
     } catch (error) {
       console.error("Error adding watermark:", error);
     }
@@ -180,6 +182,7 @@ const ProfilePage = () => {
       );
       toast.success("Watermark removed successfully");
       setWatermark("");
+      setPhoto({ ...photo, imageLinks: { image: imageUrl } });
     } catch (error) {
       console.error("Error removing watermark:", error);
     }
@@ -312,13 +315,16 @@ const ProfilePage = () => {
     }
   };
 
+  console.log("photo", photo);
+  console.log("Img Url", imageUrl);
+
   const getResolutions = async () => {
     try {
-      setLoading(true);
+      setStep("2");
+      window.scrollTo(0, 160);
+      setProcessing(true);
       toast.loading("Processing Image...");
       if (photo.imageLinks.original) {
-        setStep("2");
-        window.scrollTo(0, 160);
         return;
       }
       const response = await axios.post(
@@ -340,14 +346,14 @@ const ProfilePage = () => {
         imageLinks: data.urls,
         resolutions: data.resolutions,
       }));
-      setLoading(false);
-      setStep("2");
-      window.scrollTo(0, 160);
+      setProcessing(false);
+      setError(false);
     } catch (error) {
       console.error("Error fetching resolutions:", error);
       toast.error("Server error. Please try again later.");
+      setError(true);
     } finally {
-      setLoading(false);
+      setProcessing(false);
       toast.dismiss();
     }
   };
@@ -440,11 +446,11 @@ const ProfilePage = () => {
       try {
         setLoading(true);
         const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-images-by-photographer?photographer=${photographer._id}`
+          `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-images-by-photographer?photographer=${photographer._id}&pageSize=1000`
         );
         setPhotosLength(res.data.photos?.length);
       } catch (error) {
-        setError(error);
+        console.log(error.response ? error.response.data : error.message);
       } finally {
         setLoading(false);
       }
@@ -477,7 +483,7 @@ const ProfilePage = () => {
               </div>
             </div>
             <div className="relative flex justify-around w-full">
-              <hr className="absolute z-0 border-primary w-[50%] top-8 lg:top-12" />
+              <hr className="absolute z-0 border-primary w-[50%] top-6 lg:top-8" />
               <div className="flex flex-col items-center gap-4 z-10">
                 <div
                   className={`${
@@ -487,14 +493,12 @@ const ProfilePage = () => {
                   <UploadIcon
                     strokeWidth={1.5}
                     className={`${
-                      step === "1"
-                        ? "w-6 lg:w-16 h-6 lg:h-16 text-primary"
-                        : "w-4 lg:w-12 h-4 lg:h-12 text-surface-300"
-                    }`}
+                      step === "1" ? "text-primary" : "text-surface-300"
+                    } w-4 lg:w-8 h-4 lg:h-8`}
                   />
                 </div>
                 <p
-                  className={`text-xs font-medium lg:text-paragraph ${
+                  className={`text-xs font-medium lg:text-base ${
                     step === "1" ? "text-primary" : "text-surface-300"
                   }`}
                 >
@@ -510,14 +514,12 @@ const ProfilePage = () => {
                   <TextIcon
                     strokeWidth={1.5}
                     className={`${
-                      step === "2"
-                        ? "w-6 lg:w-16 h-6 lg:h-16 text-primary"
-                        : "w-4 lg:w-12 h-4 lg:h-12 text-surface-300"
-                    }`}
+                      step === "2" ? "text-primary" : " text-surface-300"
+                    } w-4 lg:w-8 h-4 lg:h-8`}
                   />
                 </div>
                 <p
-                  className={`text-xs font-medium lg:text-paragraph ${
+                  className={`text-xs font-medium lg:text-base ${
                     step === "2" ? "text-primary" : "text-surface-300"
                   }`}
                 >
@@ -526,7 +528,7 @@ const ProfilePage = () => {
               </div>
             </div>
             {step === "1" && (
-              <div className="mt-10">
+              <div className="mt-5">
                 {photosLength >= limit ? (
                   <div className="flex flex-col items-center gap-4">
                     <p className="text-heading-04 text-center">
@@ -557,7 +559,7 @@ const ProfilePage = () => {
                       <div className="w-full mx-auto rounded-lg overflow-hidden">
                         <div className="md:flex">
                           <div className="w-full p-3">
-                            <div className="relative h-[60vh] rounded-lg border flex justify-center items-center shadow-[0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_4px_10px_rgba(0,0,0,0.3)] transition-shadow duration-300 ease-in-out">
+                            <div className="relative w-full md:w-8/12 mx-auto aspect-[16/9] rounded-lg border flex justify-center items-center shadow-[0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_4px_10px_rgba(0,0,0,0.3)] transition-shadow duration-300 ease-in-out">
                               <div className="absolute flex flex-col items-center">
                                 <Plus className="w-12 h-12 text-surface-200" />
                                 <span className="block text-gray-500 font-semibold">
@@ -659,7 +661,13 @@ const ProfilePage = () => {
                         <Input
                           className="!text-paragraph capitalize"
                           value={customText}
-                          onChange={(e) => setCustomText(e.target.value)}
+                          onChange={(e) => {
+                            setCustomText(e.target.value);
+                            setPhoto({
+                              ...photo,
+                              imageLinks: { image: imageUrl },
+                            });
+                          }}
                         />
                       </div>
                     )}
@@ -733,8 +741,7 @@ const ProfilePage = () => {
                           (activePlan === "intermediate" && !customText) ||
                           (activePlan === "premium" &&
                             !watermark?.watermarkImage &&
-                            !customText) ||
-                          loading
+                            !customText)
                         }
                         className="bg-primary text-white py-2 px-4 rounded-full disabled:opacity-50"
                       >
@@ -746,8 +753,8 @@ const ProfilePage = () => {
               </div>
             )}
             {step === "2" && (
-              <div className="flex flex-col gap-4 mt-20 w-full">
-                <p className="text-heading-04 text-center">
+              <div className="flex flex-col gap-4 mt-5 w-full">
+                <p className="text-paragraph sm:text-heading-06 md:text-heading-05 lg:text-heading-04 text-center">
                   Add essential information to make your photos stand out.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
@@ -761,8 +768,19 @@ const ProfilePage = () => {
                       alt="Uploaded Image"
                     />
                   ) : (
-                    <div className="flex items-center justify-center w-full aspect-[1/1] bg-surface-200 rounded-lg">
-                      <Loader />
+                    <div>
+                      <div className="relative w-full">
+                        <img
+                          src={
+                            imageUrl || "/assets/placeholders/broken-image.png"
+                          }
+                          className="w-full h-auto shadow-[3px_3px_10px_rgba(0,0,0,0.5)]"
+                          alt="Uploaded Image"
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                          <Loader />
+                        </div>
+                      </div>
                     </div>
                   )}
                   <form className="flex flex-col gap-4">
@@ -1018,8 +1036,15 @@ const ProfilePage = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <Button onClick={() => setStep("1")}>Back</Button>
-                      <Button2 disabled={loading} onClick={handleUpload}>
-                        {loading ? "Uploading..." : "Upload"}
+                      <Button2
+                        onClick={handleUpload}
+                        state={loading || processing ? "loading" : "default"}
+                      >
+                        {loading
+                          ? "Uploading..."
+                          : processing
+                          ? "Processing..."
+                          : "Upload"}
                       </Button2>
                     </div>
                   </form>
