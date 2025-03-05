@@ -221,17 +221,19 @@ const ProfilePage = () => {
         return;
       }
 
+      // Check file size (in MB)
+      if (file.size > 100 * 1024 * 1024) {
+        toast.error("File size should not exceed 100 MB.");
+        return;
+      }
+
       // Detect HEIC file by extension as a fallback
       const fileExtension = file.name.split(".").pop().toLowerCase();
-      const isHEIC =
-        file.type === "image/heic" ||
-        file.type === "image/heif" ||
-        fileExtension === "heic" ||
-        fileExtension === "heif";
+      const isHEIC = fileExtension === "heic" || fileExtension === "heif";
 
       // If it's a HEIC file, convert it to JPEG
       if (isHEIC) {
-        toast.loading("Processing...");
+        const toastId = toast.loading("Processing...");
         const heic2any = (await import("heic2any")).default;
 
         try {
@@ -242,9 +244,10 @@ const ProfilePage = () => {
           file = new File([convertedBlob], `${file.name.split(".")[0]}.jpeg`, {
             type: "image/jpeg",
           });
-          toast.dismiss();
+          toast.dismiss(toastId); // Dismiss only the loading toast
         } catch (conversionError) {
           console.error("HEIC conversion failed:", conversionError);
+          toast.dismiss(toastId);
           toast.error(
             "HEIC conversion failed. Please use a supported image format."
           );
@@ -264,12 +267,6 @@ const ProfilePage = () => {
         if (megapixels < 5) {
           // Check if the image size is less than 5 megapixels
           toast.error("Image should be at least 5 MP.");
-          return;
-        }
-
-        // Check file size (in MB)
-        if (file.size > 100 * 1024 * 1024) {
-          toast.error("File size should not exceed 100 MB.");
           return;
         }
 
@@ -314,9 +311,6 @@ const ProfilePage = () => {
       console.error("Error uploading file:", error);
     }
   };
-
-  console.log("photo", photo);
-  console.log("Img Url", imageUrl);
 
   const getResolutions = async () => {
     try {
