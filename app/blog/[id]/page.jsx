@@ -35,12 +35,12 @@ export async function generateMetadata({ params }) {
     };
 
     return {
-      type: "article",
       title: blog.content.title,
       description:
-        blog.content.summary?.substring(0, 160) ||
-        "Read this amazing blog on our platform.",
+      blog.content.summary?.substring(0, 160) ||
+      "Read this amazing blog on our platform.",
       openGraph: {
+        type: "article",
         title: blog.content.title,
         description: blog.content.summary,
         url: `${process.env.NEXT_PUBLIC_CLIENT}/blog/${id}`,
@@ -59,10 +59,10 @@ export async function generateMetadata({ params }) {
     };
   } catch (error) {
     return {
-      type: "article",
       title: "Blog Not Found",
       description: "No blog found with the given ID.",
       openGraph: {
+        type: "article",
         title: "Blog Not Found",
         description: "No blog found with the given ID.",
         url: `${process.env.NEXT_PUBLIC_CLIENT}/blog/${id}`,
