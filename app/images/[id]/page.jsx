@@ -23,13 +23,24 @@ export async function generateMetadata({ params }) {
       throw new Error("Image not found");
     }
 
+    const keywords = image.keywords?.join(", ") || "Buy Digital Art, Indian Photographers Platform, Premium Archival Prints";
+
     return {
-      title: image.title || "Untitled",
-      description: image.description || "No description available",
+      title: `${image.title} | ClickedArt`,
+      description: `${image.description} - ${keywords}`,
       openGraph: {
-        title: image.title || "Untitled",
-        description: image.description || "No description available",
+        title: `${image.title} | ClickedArt`,
+        description: `${image.description} - ${keywords}`,
         type: "website",
+        url: `${process.env.NEXT_PUBLIC_CLIENT}/images/${id}`,
+        images: [
+          {
+            url: image.imageLinks?.thumbnail || `/assets/placeholders/image.webp`,
+            width: 1200,
+            height: 630,
+            alt: image.title || "Untitled",
+          },
+        ],
         additionalMetaTags: [
           {
             property: "product:price:amount",
@@ -37,24 +48,17 @@ export async function generateMetadata({ params }) {
           },
           { property: "product:price:currency", content: "INR" },
         ],
-        url: `${process.env.NEXT_PUBLIC_URL}/images/${id}`,
-        images: [
-          {
-            url:
-            image.imageLinks?.thumbnail || `/assets/placeholders/image.webp`,
-            width: 1200,
-            height: 630,
-            alt: image.title || "Untitled",
-          },
-        ],
+      },
+      alternates: {
+        canonical: `${process.env.NEXT_PUBLIC_CLIENT}/images/${id}`,
       },
     };
   } catch (error) {
     return {
-      title: "Image not found",
+      title: "Image not found | ClickedArt",
       description: "Image not found",
       openGraph: {
-        title: "Image not found",
+        title: "Image not found | ClickedArt",
         description: "Image not found",
         images: [
           {
