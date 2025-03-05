@@ -13,8 +13,8 @@ export default function Signout({ variant = "icon" }) {
   const signout = useAuthStore((state) => state.signout);
 
   const handleLogout = () => {
-    router.push("/");
     signout();
+    router.refresh();
     toast.success("Logged out successfully");
     clearCart();
   };
