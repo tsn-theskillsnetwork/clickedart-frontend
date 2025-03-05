@@ -7,7 +7,7 @@ export default function PhotographerOnly() {
   const { user } = useAuthStore();
   return (
     <div className="flex flex-col items-center justify-center min-h-[90vh]">
-      <p>Please Login as Photographer</p>
+      <p>Please Login as Photographer to access this page.</p>
       {user ? (
         <div className="bg-red-100 px-4 py-2 rounded-md shadow-md mt-4">
           <Signout variant="text" />
@@ -19,6 +19,11 @@ export default function PhotographerOnly() {
           </button>
         </Link>
       )}
+      <Link href="/">
+        <button className="bg-blue-100 text-blue-500 font-semibold px-4 py-2 rounded-md shadow-md mt-4">
+          Home
+        </button>
+      </Link>
     </div>
   );
 }

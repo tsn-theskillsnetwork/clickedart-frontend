@@ -4,13 +4,14 @@ import { useState } from "react";
 import Button from "@/components/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import useAuthStore from "@/authStore";
 import Link from "next/link";
 import axios from "axios";
 
 const PhotographerSignInPage = () => {
   const { signin, setUserType } = useAuthStore();
+  const searchParams = useSearchParams();
 
   const router = useRouter();
 
@@ -50,7 +51,10 @@ const PhotographerSignInPage = () => {
       setUserType("Photographer");
       setMessage("Sign-in successful!");
       setError("");
-
+      if (searchParams.get("redirect")) {
+        router.push(searchParams.get("redirect"));
+        return;
+      }
       router.push("/profile");
     } catch (err) {
       if (err.response && err.response.data) {

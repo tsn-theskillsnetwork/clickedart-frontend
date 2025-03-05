@@ -4,7 +4,7 @@ import { useState } from "react";
 import Button from "@/components/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import useAuthStore from "@/authStore";
 import Link from "next/link";
 import axios from "axios";
@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 
 const UserSignInPage = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { signin, setUserType } = useAuthStore();
 
   const [formData, setFormData] = useState({
@@ -51,7 +52,10 @@ const UserSignInPage = () => {
         duration: 4000,
         position: "top-center",
       });
-
+      if (searchParams.get("redirect")) {
+        router.push(searchParams.get("redirect"));
+        return;
+      }
       router.push("/");
     } catch (err) {
       setError(err.response?.data?.message);

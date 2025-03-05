@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 import useAuthStore from "@/authStore";
 import axios from "axios";
 import Loader from "@/components/loader";
+import PhotographerOnly from "@/components/auth/photographerOnly";
 
 // export const metadata = {
 //   title: "Invoice",
@@ -62,9 +63,7 @@ export default function Page() {
 
   if (!photographer) {
     return (
-      <div className="flex items-center justify-center h-[80vh]">
-        <h1 className="text-3xl font-semibold">UNAUTHORIZED</h1>
-      </div>
+      <PhotographerOnly />
     );
   }
 
