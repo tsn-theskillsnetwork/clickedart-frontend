@@ -8,7 +8,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/authStore";
 import Swal from "sweetalert2";
-import axios from "axios";
+import { Skeleton } from "../ui/skeleton";
 
 const taglines = [
   "Stunning Clicks, Premium Prints - Experience ClickedArt!",
@@ -16,10 +16,9 @@ const taglines = [
   "Photographers Create, Buyers Collect - ClickedArt Connects!",
   "Buy Original, Support Artists - ClickedArt Empowers Creativity!",
   "Discover, Download, Print - ClickedArt for Professionals & Collectors!",
-  // "ClickedArt - Where Every Image Finds Its Perfect Home, Digitally & in Print!",
 ];
 
-export default function HeroSection({ layout, layoutLoading }) {
+export default function HeroSection({ layout, loading }) {
   const router = useRouter();
 
   const { photographer, user } = useAuthStore();
@@ -35,7 +34,9 @@ export default function HeroSection({ layout, layoutLoading }) {
     }
   };
 
-  const heroPhotos = layout?.heroSectionPhotos || []; // Dynamic images array
+  console.log(loading);
+
+  const heroPhotos = layout?.heroSectionPhotos || [];
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -57,8 +58,8 @@ export default function HeroSection({ layout, layoutLoading }) {
               className="relative w-full h-full"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={currentImage === 0 ? {} : { opacity: 0 }} // Skip exit on first render
-              transition={{ duration: 0.3 }} // Reduce duration
+              exit={currentImage === 0 ? {} : { opacity: 0 }}
+              transition={{ duration: 0.3 }}
             >
               {heroPhotos[currentImage] && (
                 <Image
@@ -74,7 +75,20 @@ export default function HeroSection({ layout, layoutLoading }) {
         </div>
 
         <div className="w-full h-[28vw] mt-72">
-          <div className="absolute inset-x-0 mx-auto bottom-3 sm:bottom-5 px-2 left-0 w-[90vw] z-40 flex justify-around gap-2 items-end">
+          {loading && (
+            <div className="absolute inset-x-0 mx-auto bottom-3 sm:bottom-5 px-2 left-0 w-full z-40 flex justify-around gap-2 items-end">
+              {[...Array(4).keys()].map((index) => (
+                <div key={index}>
+                  <Skeleton
+                    className={`object-cover border-2 sm:border-4  w-[20vw] ${
+                      index === 0 ? "aspect-[6/7]" : "aspect-[7/4]"
+                    } animate-pulse`}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="absolute inset-x-0 mx-auto bottom-3 sm:bottom-5 px-2 left-0 w-full z-40 flex justify-around gap-2 items-end">
             {heroPhotos.map((image, index) => (
               <div key={index}>
                 <Image
@@ -85,7 +99,7 @@ export default function HeroSection({ layout, layoutLoading }) {
                   loading="eager"
                   quality={50}
                   onClick={() => setCurrentImage(index)}
-                  className={`object-cover border-2 sm:border-4 w-[90%] transition-all duration-500 cursor-pointer ease-in-out ${
+                  className={`object-cover border-2 sm:border-4 w-[20vw] transition-all duration-500 cursor-pointer ease-in-out ${
                     currentImage === index ? "aspect-[6/7]" : "aspect-[7/4]"
                   }`}
                 />
