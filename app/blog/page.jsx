@@ -5,22 +5,68 @@ import Image from "next/image";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import React, { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ChevronDown } from "lucide-react";
 
 export default function BlogPage() {
-  const [blogLength, setBlogLength] = useState(6);
+  const searchParams = useSearchParams();
+  const page = searchParams.get("page") || 1;
+  const [pageCount, setPageCount] = useState(1);
+  const [storyPageCount, setStoryPageCount] = useState(1);
+  const [storyPageSize, setStoryPageSize] = useState(4);
   const [blogPosts, setBlogPosts] = useState([]);
   const [successStories, setSuccessStories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchData(`blog/get-all-blogs`, "blogs", setBlogPosts, setLoading);
-    fetchData(
-      `blog/get-all-success-stories`,
-      "successstories",
-      setSuccessStories,
-      setLoading
-    );
-  }, []);
+    const fetchBlogPosts = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/blog/get-all-blogs?pageNumber=${page}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await res.json();
+        setBlogPosts(data.blogs);
+        setPageCount(data.pageCount);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlogPosts();
+  }, [page]);
+
+  useEffect(() => {
+    const fetchSuccessStories = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/blog/get-all-success-stories?pageSize=${storyPageSize}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await res.json();
+        setSuccessStories(data.successStories);
+        setStoryPageCount(data.pageCount);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchSuccessStories();
+  }, [storyPageSize]);
 
   return (
     <div className="flex flex-col px-4 lg:px-20">
@@ -50,22 +96,18 @@ export default function BlogPage() {
         <>
           <hr className="mb-5 border border-primary-100" />
           <h2 className="text-heading-04 sm:text-heading-03 lg:text-heading-02 font-bold mb-5">
-            <Skeleton className="h-10 w-[200px]" />
+            <Skeleton className="h-12 w-[200px] mt-5" />
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-10 mb-20">
-            {[1, 2, 3].map((_, index) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-10 mb-20">
+            {[1, 2, 3, 4].map((_, index) => (
               <div key={index} className="flex flex-col gap-4">
                 <Skeleton className="w-full aspect-[16/9] rounded-lg object-cover" />
                 <Skeleton className="text-heading-06 sm:text-heading-05 lg:text-heading-04 font-semibold" />
                 <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <div className="flex gap-2 text-sm md:text-base text-surface-500">
-                      <Skeleton className="font-bold border-r-2 border-[#7777778f] pr-2" />
-                      <Skeleton />
-                    </div>
-                  </div>
-                  <Skeleton className="h-8 w-4/5" />
+                  <Skeleton className="w-full h-6 -mt-2" />
+                  <Skeleton className="w-full h-6" />
                   <Skeleton className="h-4 w-1/5" />
+                  <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-full" />
                   <div className="flex gap-2 flex-wrap items-center">
                     {[1, 2, 3].map((_, index) => (
@@ -90,7 +132,7 @@ export default function BlogPage() {
                 Success Stories
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-10 mb-20">
-                {successStories.slice(0, blogLength).map((post, index) => (
+                {successStories.map((post, index) => (
                   <div key={index} className="flex flex-col gap-4">
                     <Link
                       className="flex flex-col gap-4"
@@ -107,7 +149,7 @@ export default function BlogPage() {
                         height={400}
                         className="w-full aspect-[16/9] rounded-lg object-cover"
                       />
-                      <h5 className="text-heading-sm sm:text-base lg:text-heading-06 font-semibold">
+                      <h5 className="text-heading-sm sm:text-base lg:text-heading-06 font-semibold line-clamp-2">
                         {post.content.title}
                       </h5>
                     </Link>
@@ -141,10 +183,10 @@ export default function BlogPage() {
                           </p>
                         </div>
                       </div>
-                      <p className="text-xs sm:text-sm lg:text-base font-medium text-surface-600 truncate">
+                      <p className="text-xs sm:text-sm lg:text-base font-medium text-surface-600 line-clamp-2">
                         {post.content.summary}
                       </p>
-                      <div className="flex gap-2 flex-wrap items-center">
+                      {/* <div className="flex gap-2 flex-wrap items-center">
                         {post.tags.slice(0, 3).map((tag, index) => (
                           <span
                             key={index}
@@ -157,10 +199,20 @@ export default function BlogPage() {
                           {post.tags.length > 3 &&
                             `+${post.tags.length - 3} more`}
                         </span>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 ))}
+                <div className="w-full flex justify-center items-center mt-10">
+                  {storyPageCount > 1 && (
+                    <div
+                      onClick={() => setStoryPageSize((prev) => prev + 4)}
+                      className="flex items-center justify-center px-4 rounded-lg mb-10 py-4 bg-primary text-white font-semibold text-heading-06 uppercase cursor-pointer hover:bg-primary-dark transition-all duration-300 ease-in-out"
+                    >
+                      View More <ChevronDown size={24} className="ml-2" />
+                    </div>
+                  )}
+                </div>
               </div>
             </>
           )}
@@ -169,7 +221,7 @@ export default function BlogPage() {
             Blogs
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-10 mb-20">
-            {blogPosts.slice(0, blogLength).map((post, index) => (
+            {blogPosts.map((post, index) => (
               <div
                 key={index}
                 href={`/blog/${post._id}`}
@@ -190,7 +242,7 @@ export default function BlogPage() {
                     className="w-full aspect-[16/9] rounded-lg object-cover"
                   />
 
-                  <h5 className="text-heading-sm sm:text-base lg:text-heading-06 font-semibold">
+                  <h5 className="text-heading-sm sm:text-base lg:text-heading-06 font-semibold line-clamp-2">
                     {post.content.title}
                   </h5>
                 </Link>
@@ -221,10 +273,10 @@ export default function BlogPage() {
                       </p>
                     </div>
                   </div>
-                  <p className="text-xs sm:text-sm lg:text-base font-medium text-surface-600 truncate">
+                  <p className="text-xs sm:text-sm lg:text-base font-medium text-surface-600 line-clamp-2">
                     {post.content.summary}
                   </p>
-                  <div className="flex gap-2 flex-wrap items-center">
+                  {/* <div className="flex gap-2 flex-wrap items-center">
                     {post.tags.slice(0, 3).map((tag, index) => (
                       <span
                         key={index}
@@ -236,20 +288,25 @@ export default function BlogPage() {
                     <span className="text-xs text-gray-600 font-semibold">
                       {post.tags.length > 3 && `+${post.tags.length - 3} more`}
                     </span>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             ))}
           </div>
-          <div className="flex justify-center mb-10">
-            {blogLength < blogPosts.length && (
-              <button
-                onClick={() => setBlogLength(blogLength + 3)}
-                className="bg-white text-primary font-semibold border-2 border-primary px-8 py-2 rounded-md hover:bg-primary hover:text-white transition-all duration-200"
+          <div className="w-full flex justify-center items-center mt-10 mb-5">
+            {[...Array(pageCount).keys()].map((index) => (
+              <Link
+                href={`/blog?page=${index + 1}`}
+                key={index}
+                className={`${
+                  index + 1 === parseInt(page)
+                    ? "bg-primary text-white"
+                    : "bg-secondary-100 text-white"
+                } px-4 py-2 mx-2 rounded-lg cursor-pointer`}
               >
-                Load More
-              </button>
-            )}
+                {index + 1}
+              </Link>
+            ))}
           </div>
         </>
       )}

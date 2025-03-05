@@ -18,6 +18,22 @@ export async function generateMetadata({ params }) {
 
   try {
     const blog = await fetchBlogData(id);
+    const tags = blog.tags || ["blog", "articles", "ClickedArt"];
+
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": blog.content.title,
+      "description": blog.content.summary,
+      "url": `${process.env.NEXT_PUBLIC_CLIENT}/blog/${id}`,
+      "author": {
+        "@type": "Person",
+        "name": blog.author || "Guest Author"
+      },
+      "datePublished": blog.createdAt || new Date().toISOString(),
+      "about": tags.map((tag) => ({ "@type": "Thing", "name": tag }))
+    };
+
     return {
       title: blog.content.title,
       description:
@@ -26,15 +42,18 @@ export async function generateMetadata({ params }) {
       openGraph: {
         title: blog.content.title,
         description: blog.content.summary,
-        url: `${process.env.NEXT_PUBLIC_URL}/blog/${id}`,
+        url: `${process.env.NEXT_PUBLIC_CLIENT}/blog/${id}`,
         images: [
           {
-            url: blog.coverImage,
+            url: blog.coverImage || "/assets/placeholders/image.webp",
             width: 1200,
             height: 630,
             alt: blog.content.title,
           },
         ],
+      },
+      other: {
+        "application/ld+json": JSON.stringify(structuredData),
       },
     };
   } catch (error) {
@@ -44,7 +63,7 @@ export async function generateMetadata({ params }) {
       openGraph: {
         title: "Blog Not Found",
         description: "No blog found with the given ID.",
-        url: `${process.env.NEXT_PUBLIC_URL}/blog/${id}`,
+        url: `${process.env.NEXT_PUBLIC_CLIENT}/blog/${id}`,
         images: [
           {
             url: "/assets/placeholders/image.webp",
@@ -57,6 +76,8 @@ export async function generateMetadata({ params }) {
     };
   }
 }
+
+
 
 export default async function BlogPage({ params }) {
   const { id } = await params;

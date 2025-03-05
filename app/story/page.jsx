@@ -4,16 +4,40 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { fetchData } from "@/helpers/api";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 export default function BlogPage() {
-  const [blogLength, setBlogLength] = useState(6);
+  const searchParams = useSearchParams();
+  const page = searchParams.get("page") || 1;
+  const [pageCount, setPageCount] = useState(1);
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchData(`story/get-all-story`, "stories", setStories, setLoading);
-  }, []);
+    const fetchStories = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/story/get-all-story?pageNumber=${page}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await res.json();
+        setStories(data.stories);
+        setPageCount(data.pageCount);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStories();
+  }, [page]);
 
   return (
     <div className="flex flex-col px-4 lg:px-20">
@@ -39,20 +63,21 @@ export default function BlogPage() {
         Stories
       </h2>
       {loading && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-10 mb-20">
-          {[...Array(blogLength)].map((_, index) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-10 mb-20">
+          {[...Array(8)].map((_, index) => (
             <div key={index} className="flex flex-col gap-4">
               <Skeleton className="w-full aspect-[16/9] rounded-lg" />
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
                 <Skeleton className="w-full h-6" />
-                <Skeleton className="w-1/4 h-4" />
+                <Skeleton className="w-full h-6" />
+                <Skeleton className="w-1/2 h-4 mt-2" />
               </div>
             </div>
           ))}
         </div>
       )}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-10 mb-20">
-        {stories.slice(0, blogLength).map((post, index) => (
+        {stories.map((post, index) => (
           <Link
             key={index}
             href={`/story/${post._id}`}
@@ -66,7 +91,7 @@ export default function BlogPage() {
               className="w-full aspect-[16/9] rounded-lg object-cover"
             />
             <div className="flex flex-col gap-2">
-              <h5 className="text-heading-sm sm:text-base lg:text-heading-06 font-semibold">
+              <h5 className="text-heading-sm sm:text-base lg:text-heading-06 font-semibold line-clamp-2">
                 {post.title}
               </h5>
               <div className="flex items-center gap-2">
@@ -89,15 +114,20 @@ export default function BlogPage() {
           </Link>
         ))}
       </div>
-      <div className="flex justify-center mb-10">
-        {stories < stories.length && (
-          <button
-            onClick={() => setBlogLength(stories + 3)}
-            className="bg-white text-primary font-semibold border-2 border-primary px-8 py-2 rounded-md hover:bg-primary hover:text-white transition-all duration-200"
+      <div className="w-full flex justify-center items-center mt-10 mb-5">
+        {[...Array(pageCount).keys()].map((index) => (
+          <Link
+            href={`/story?page=${index + 1}`}
+            key={index}
+            className={`${
+              index + 1 === parseInt(page)
+                ? "bg-primary text-white"
+                : "bg-secondary-100 text-white"
+            } px-4 py-2 mx-2 rounded-lg cursor-pointer`}
           >
-            Load More
-          </button>
-        )}
+            {index + 1}
+          </Link>
+        ))}
       </div>
     </div>
   );
