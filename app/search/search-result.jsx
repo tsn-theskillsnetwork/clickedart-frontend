@@ -230,11 +230,17 @@ export default function SearchResultPage() {
                 value={theme}
                 onValueChange={(value) => {
                   setTheme(value);
-                  router.push(
-                    `/search?theme=${value}&sort=${sort}${
-                      search && `&search=${search}`
-                    }`
-                  );
+                  if (searchValue) {
+                    router.push(
+                      `/search?search=${value}&sort=${sort}${
+                        search && `&search=${search}`
+                      }`
+                    );
+                  } else {
+                    router.push(
+                      `/images?theme=${value}&sort=${sort}`
+                    );
+                  }
                 }}
               >
                 <SelectTrigger className="!text-base py-5 w-full font-semibold shadow-sm bg-gray-200">
@@ -339,9 +345,7 @@ export default function SearchResultPage() {
                               ? removeImageFromWishlist(image._id)
                               : addImageToWishlist(image._id);
                           } else {
-                            toast.error(
-                              "Please login to add to wishlist"
-                            );
+                            toast.error("Please login to add to wishlist");
                           }
                         }}
                         className={` ${

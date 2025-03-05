@@ -4,8 +4,9 @@ import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import useAuthStore from "@/authStore";
 import axios from "axios";
-import { ChevronDown, Dot, Download } from "lucide-react";
+import { Dot, Download, MapIcon } from "lucide-react";
 import Button from "@/components/button";
+import { Button as ShadcnButton } from "@/components/ui/button";
 import Button2 from "@/components/button2";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -17,6 +18,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -29,17 +31,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter, useSearchParams } from "next/navigation";
 import Loader from "@/components/loader";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function OrdersPage() {
   const searchParams = useSearchParams();
   const { user, photographer } = useAuthStore();
   const router = useRouter();
   const page = Number(searchParams.get("page") || 1);
-  // const [selectedTab, setSelectedTab] = useState("downloads");
   const [orders, setOrders] = useState([]);
-  const [pageSize, setPageSize] = useState(10);
   const [pageCount, setPageCount] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [shipment, setShipment] = useState({});
+  const [trackDialogOpen, setTrackDialogOpen] = useState(false);
   const [orderSupport, setOrderSupport] = useState({
     userInfo: {
       user: "",
@@ -73,7 +76,7 @@ export default function OrdersPage() {
     if (!validateOrderSupport()) return;
 
     try {
-      const response = await axios.post(
+      await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/ordersupport/create-order-support-request`,
         updatedOrderSupport
       );
@@ -91,6 +94,19 @@ export default function OrdersPage() {
     }
   };
 
+  const fetchShipment = async (waybill) => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/delivery/track-shipment?waybill=${waybill}`
+      );
+      console.log(response.data);
+      setShipment(response.data.ShipmentData[0].Shipment);
+    } catch (error) {
+      console.log(error);
+      setShipment({});
+    }
+  };
+
   useEffect(() => {
     if (!(user || photographer)) return;
 
@@ -102,12 +118,11 @@ export default function OrdersPage() {
             process.env.NEXT_PUBLIC_SERVER
           }/api/download/get-my-orders?userId=${
             (user || photographer)?._id
-          }&pageNumber=${page}&pageSize=${pageSize}`
+          }&pageNumber=${page}&pageSize=10`
         );
-        //console.log(response.data);
         console.log(response.data);
         setOrders(response.data.orders);
-        setPageCount(response.data.pageCount);
+        setPageCount(Number(response.data.pageCount));
       } catch (error) {
         console.log(error);
         setOrders([]);
@@ -118,6 +133,9 @@ export default function OrdersPage() {
 
     fetchOrders();
   }, [user, photographer, page]);
+
+  console.log("Type of Page:", typeof page);
+  console.log("Type of PageCount:", typeof pageCount);
 
   useEffect(() => {
     if (!(user || photographer)) return;
@@ -290,6 +308,11 @@ export default function OrdersPage() {
                               {order.printStatus}
                             </p>
                           </div>
+                          {order.waybill && (
+                            <p className="font-medium">
+                              Tracking ID: {order.waybill}
+                            </p>
+                          )}
                         </>
                       )}
                     </div>
@@ -398,6 +421,100 @@ export default function OrdersPage() {
                           </form>
                         </DialogContent>
                       </Dialog>
+                      {order.printStatus !== "no-print" && order.waybill && (
+                        <>
+                          <Button
+                            onClick={() => {
+                              fetchShipment(order.waybill);
+                              setTrackDialogOpen(true);
+                            }}
+                          >
+                            Track Order
+                          </Button>
+                          <Dialog
+                            open={trackDialogOpen}
+                            onOpenChange={setTrackDialogOpen}
+                          >
+                            <DialogContent className="max-w-md w-full">
+                              <DialogHeader>
+                                <DialogTitle>Shipment Tracking</DialogTitle>
+                              </DialogHeader>
+                              <ScrollArea className="h-80">
+                                <Card>
+                                  <CardContent className="p-4 space-y-2">
+                                    <p>
+                                      <strong>AWB:</strong>{" "}
+                                      {shipment.AWB || "N/A"}
+                                    </p>
+                                    <p>
+                                      <strong>Status:</strong>{" "}
+                                      {shipment.Status?.Status || "N/A"}
+                                    </p>
+                                    <p>
+                                      <strong>Location:</strong>{" "}
+                                      {shipment.Status?.StatusLocation || "N/A"}
+                                    </p>
+                                    <p>
+                                      <strong>Pickup Date:</strong>{" "}
+                                      {shipment.PickUpDate
+                                        ? new Date(
+                                            shipment.PickUpDate
+                                          ).toLocaleString()
+                                        : "N/A"}
+                                    </p>
+                                    <p>
+                                      <strong>Expected Delivery Date:</strong>{" "}
+                                      {shipment.ExpectedDeliveryDate
+                                        ? new Date(
+                                            shipment.ExpectedDeliveryDate
+                                          ).toLocaleString()
+                                        : "N/A"}
+                                    </p>
+                                    <p>
+                                      <strong>Delivery Date:</strong>{" "}
+                                      {shipment.DeliveryDate
+                                        ? new Date(
+                                            shipment.DeliveryDate
+                                          ).toLocaleString()
+                                        : "Pending"}
+                                    </p>
+                                    <p>
+                                      <strong>Destination:</strong>{" "}
+                                      {shipment.Destination || "N/A"}
+                                    </p>
+                                    <p>
+                                      <strong>Consignee:</strong>{" "}
+                                      {shipment.Consignee?.Name || "N/A"} (
+                                      {shipment.Consignee?.City || "N/A"},{" "}
+                                      {shipment.Consignee?.PinCode || "N/A"})
+                                    </p>
+                                    <p>
+                                      <strong>Contact:</strong>{" "}
+                                      {shipment.Consignee?.Telephone1 || "N/A"}
+                                    </p>
+                                    <p>
+                                      <strong>Order Type:</strong>{" "}
+                                      {shipment.OrderType || "N/A"}
+                                    </p>
+                                    <p>
+                                      <strong>Charged Weight:</strong>{" "}
+                                      {shipment.ChargedWeight || "N/A"}
+                                    </p>
+                                    <p>
+                                      <strong>Invoice Amount:</strong>{" "}
+                                      {shipment.InvoiceAmount || "N/A"}
+                                    </p>
+                                    <p>
+                                      <strong>COD Amount:</strong>{" "}
+                                      {shipment.CODAmount || "N/A"}
+                                    </p>
+                                  </CardContent>
+                                </Card>
+                              </ScrollArea>
+                            </DialogContent>
+                          </Dialog>
+                        </>
+                      )}
                       {(order.printStatus === "no-print" ||
                         order.printStatus === "delivered") && (
                         <button
@@ -412,42 +529,27 @@ export default function OrdersPage() {
                     </div>
                   </div>
                 ))}
-                <div className="flex justify-center gap-2">
-                  <Button
-                    variant="secondary"
-                    disabled={page === 1}
+                <div className="flex items-center justify-center space-x-2 py-4 px-4">
+                  <ShadcnButton
+                    variant="outline"
+                    size="sm"
+                    disabled={page <= 1}
                     onClick={() => {
-                      if (page > 1)
-                        router.push(`/profile/orders?page=${page - 1}`);
+                      router.push(`/profile/orders?page=${Number(page - 1)}`);
                     }}
                   >
                     Previous
-                  </Button>
-                  {Array.from({ length: pageCount }).map((_, index) => (
-                    <button
-                      key={index}
-                      className={`${
-                        page === index + 1
-                          ? "bg-blue-500 text-white"
-                          : "bg-white text-blue-500 font-medium"
-                      } h-10 w-10`}
-                      onClick={() =>
-                        router.push(`/profile/orders?page=${index + 1}`)
-                      }
-                    >
-                      {index + 1}
-                    </button>
-                  ))}
-                  <Button
-                    variant="secondary"
-                    disabled={page === pageCount}
+                  </ShadcnButton>
+                  <ShadcnButton
+                    variant="outline"
+                    size="sm"
+                    disabled={page >= pageCount}
                     onClick={() => {
-                      if (page < pageCount)
-                        router.push(`/profile/orders?page=${page + 1}`);
+                      router.push(`/profile/orders?page=${Number(page + 1)}`);
                     }}
                   >
                     Next
-                  </Button>
+                  </ShadcnButton>
                 </div>
               </div>
             </div>
