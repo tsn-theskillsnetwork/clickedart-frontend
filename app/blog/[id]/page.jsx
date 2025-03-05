@@ -35,6 +35,7 @@ export async function generateMetadata({ params }) {
     };
 
     return {
+      type: "article",
       title: blog.content.title,
       description:
         blog.content.summary?.substring(0, 160) ||
@@ -58,6 +59,7 @@ export async function generateMetadata({ params }) {
     };
   } catch (error) {
     return {
+      type: "article",
       title: "Blog Not Found",
       description: "No blog found with the given ID.",
       openGraph: {

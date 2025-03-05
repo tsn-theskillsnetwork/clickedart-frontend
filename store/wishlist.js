@@ -12,11 +12,10 @@ const useWishlistStore = create((set) => ({
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/wishlist/get-my-wishlist?userId=${userId}`
       );
-      console.log("Wishlist fetched:", response.data?.wishlist?.images);
       set({ wishlist: response.data?.wishlist?.images, loading: false });
     } catch (error) {
-      set({ error: error.response.message, loading: false });
-      console.log("Error fetching wishlist:", error);
+      set({ error: error.response.data.message, loading: false });
+      console.log("Error fetching wishlist:", error.response.data.message);
     }
   },
 }));

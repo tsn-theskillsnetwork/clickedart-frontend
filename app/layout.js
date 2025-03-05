@@ -1,24 +1,25 @@
-import {montserrat} from './fonts'
+import { montserrat } from "./fonts";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Image from "next/image";
 import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from '@vercel/speed-insights/next';
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata = {
-  title: "ClickedArt",
+  title: "ClickedArt - Buy Digital Art & Premium Archival Prints",
   icons: {
     icon: "/favicon.png",
     apple: "/favicon.png",
   },
   description:
-    "ClickedArt is a platform for photographers to showcase their work.",
+    "ClickedArt is a platform for Indian photographers to showcase their work, buy digital art, and explore premium archival prints.",
   openGraph: {
-    title: "ClickedArt",
+    type: "website",
+    title: "ClickedArt - Buy Digital Art & Premium Archival Prints",
     description:
-      "ClickedArt is a platform for photographers to showcase their work.",
+      "Discover a curated collection of digital art, premium archival prints, and a thriving platform for Indian photographers.",
     url: "https://clickedart.com",
     siteName: "ClickedArt",
   },

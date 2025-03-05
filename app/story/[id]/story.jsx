@@ -18,7 +18,7 @@ export default function StoryPageComponent({ story }) {
   }, []);
   const handleShare = async () => {
     const currentUrl = window.location.origin + window.location.pathname;
-  
+
     try {
       if (navigator.share) {
         await navigator.share({
@@ -28,10 +28,8 @@ export default function StoryPageComponent({ story }) {
             "I found this interesting and wanted to share it with you.",
           url: currentUrl,
         });
-        //console.log("Shared successfully!");
       } else {
         console.warn("Web Share API not supported.");
-        // Fallback: Copy to clipboard or open a share dialog
         navigator.clipboard.writeText(currentUrl);
         alert("Link copied to clipboard!");
       }
@@ -39,7 +37,6 @@ export default function StoryPageComponent({ story }) {
       console.error("Error sharing:", error);
     }
   };
-  
 
   return (
     <>
@@ -48,7 +45,7 @@ export default function StoryPageComponent({ story }) {
           <div className="flex flex-col sm:flex-row justify-center">
             <div className="flex flex-col gap-4 sm:w-3/5 px-4">
               <div className="flex flex-col">
-              <h2 className="text-heading-06 sm:text-heading-05 md:text-heading-04 lg:text-heading-03 text-primary font-bold">
+                <h2 className="text-heading-06 sm:text-heading-05 md:text-heading-04 lg:text-heading-03 text-primary font-bold">
                   {story.title}
                 </h2>
               </div>
@@ -56,16 +53,21 @@ export default function StoryPageComponent({ story }) {
                 width={800}
                 height={800}
                 src={story.media_url}
+                priority={true}
                 className="w-4/5 border-8 border-white shadow-md shadow-zinc-500 mx-auto"
                 alt="placeholder"
               />
 
-              {/* <div
-                className="prose max-w-full space-y-0"
-                dangerouslySetInnerHTML={{
-                  __html: story.description,
-                }}
-              /> */}
+              <div className="prose max-w-full">
+                {story.description ? (
+                  <div
+                    dangerouslySetInnerHTML={{ __html: story.description }}
+                  />
+                ) : (
+                  <div className="animate-pulse bg-gray-200 rounded-md h-[200px] w-full"></div>
+                )}
+              </div>
+
               {/* <p className="text-lg text-justify">{story.description}</p> */}
               <h5 className="text-heading-05 font-semibold text-primary-400">
                 Inspired By

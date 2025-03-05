@@ -18,6 +18,7 @@ export async function generateMetadata({ params }) {
 
   try {
     const story = await fetchStoryData(id);
+    console.log("Story:", story);
     return {
       title: story.title,
       description: story.description?.substring(0, 160) || "Read this amazing story on our platform.",
