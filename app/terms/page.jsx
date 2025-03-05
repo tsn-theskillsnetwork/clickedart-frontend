@@ -2,7 +2,7 @@ import React from "react";
 
 export default function TermsConditionsPage() {
   return (
-    <div className="flex flex-col mt-4 pb-5 px-20">
+    <div className="flex flex-col mt-4 pb-5 px-4 sm:px-8 md:px-16 lg:px-32 xl:px-64 2xl:px-96">
       <h1 className="text-2xl font-bold">Terms of Use for ClickedArt.com</h1>
       <p className="font-medium mt-2">Last Updated: 26 January 2025</p>
       <p className="mt-4 text-justify">
