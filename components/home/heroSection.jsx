@@ -50,32 +50,40 @@ export default function HeroSection({ layout, loading }) {
   return (
     <div className="flex flex-col">
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 -z-50">
-          <div className="absolute inset-0 bg-black opacity-30 z-10"></div>
-          <AnimatePresence mode="popLayout">
-            <motion.div
-              key={currentImage}
-              className="relative w-full h-full"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={currentImage === 0 ? {} : { opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              {heroPhotos[currentImage] && (
-                <Image
-                  src={heroPhotos[currentImage]}
-                  alt="hero-image"
-                  fill
-                  priority
-                  className="object-cover"
-                />
-              )}
-            </motion.div>
-          </AnimatePresence>
-        </div>
+        {loading ? (
+          <>
+            <Skeleton className="absolute inset-0 -z-50">
+              <div className="absolute inset-0 bg-black opacity-30 z-10"></div>
+            </Skeleton>
+          </>
+        ) : (
+          <div className="absolute inset-0 -z-50">
+            <div className="absolute inset-0 bg-black opacity-30 z-10"></div>
+            <AnimatePresence mode="popLayout">
+              <motion.div
+                key={currentImage}
+                className="relative w-full h-full"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={currentImage === 0 ? {} : { opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {heroPhotos[currentImage] && (
+                  <Image
+                    src={heroPhotos[currentImage]}
+                    alt="hero-image"
+                    fill
+                    priority
+                    className="object-cover"
+                  />
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        )}
 
         <div className="w-full h-[28vw] mt-72">
-          {loading && (
+          {loading ? (
             <div className="absolute inset-x-0 mx-auto bottom-3 sm:bottom-5 px-2 left-0 w-full z-40 flex justify-around gap-2 items-end">
               {[...Array(4).keys()].map((index) => (
                 <div key={index}>
@@ -87,25 +95,26 @@ export default function HeroSection({ layout, loading }) {
                 </div>
               ))}
             </div>
+          ) : (
+            <div className="absolute inset-x-0 mx-auto bottom-3 sm:bottom-5 px-2 left-0 w-full z-40 flex justify-around gap-2 items-end">
+              {heroPhotos.map((image, index) => (
+                <div key={index}>
+                  <Image
+                    src={image || "/assets/placeholders/broken-image.png"}
+                    alt={`Thumbnail ${index}`}
+                    width={300}
+                    height={300}
+                    loading="eager"
+                    quality={50}
+                    onClick={() => setCurrentImage(index)}
+                    className={`object-cover border-2 sm:border-4 w-[20vw] transition-all duration-500 cursor-pointer ease-in-out ${
+                      currentImage === index ? "aspect-[6/7]" : "aspect-[7/4]"
+                    }`}
+                  />
+                </div>
+              ))}
+            </div>
           )}
-          <div className="absolute inset-x-0 mx-auto bottom-3 sm:bottom-5 px-2 left-0 w-full z-40 flex justify-around gap-2 items-end">
-            {heroPhotos.map((image, index) => (
-              <div key={index}>
-                <Image
-                  src={image || "/assets/placeholders/broken-image.png"}
-                  alt={`Thumbnail ${index}`}
-                  width={300}
-                  height={300}
-                  loading="eager"
-                  quality={50}
-                  onClick={() => setCurrentImage(index)}
-                  className={`object-cover border-2 sm:border-4 w-[20vw] transition-all duration-500 cursor-pointer ease-in-out ${
-                    currentImage === index ? "aspect-[6/7]" : "aspect-[7/4]"
-                  }`}
-                />
-              </div>
-            ))}
-          </div>
         </div>
       </div>
       <div className="z-20 flex flex-col items-center py-4 text-black bg-white bg-opacity-40">
