@@ -3,16 +3,16 @@ import React from "react";
 
 export default function TermsConditionsPage() {
   return (
-    <div className="flex flex-col gap-4 mt-4 min-h-screen px-4 sm:px-8 md:px-16 lg:px-32 xl:px-64 2xl:px-96 mb-10">
-      <h1 className="text-4xl font-bold text-center">Privacy Policy</h1>
-      <p className="text-paragraph">Effective Date: 26 January 2025</p>
-      <p className="text-paragraph font-medium">
+    <div className="flex flex-col gap-4 mt-4 min-h-screen px-4 sm:px-8 md:px-16 lg:px-20 mb-10">
+      <h1 className="text-2xl sm:text-4xl font-bold text-center">Privacy Policy</h1>
+      <p className="text-base sm:text-paragraph font-semibold">Effective Date: 26 January 2025</p>
+      <p className="text-base sm:text-paragraph font-medium">
         Welcome to ClickedArt.com. We are committed to safeguarding the privacy
         of our users, including both buyers and photographers. This Privacy
         Policy outlines how we collect, use, disclose, and protect your
         information.
       </p>
-      <h2 className="text-2xl font-bold">Information We Collect</h2>
+      <h2 className="text-xl sm:text-2xl font-bold">Information We Collect</h2>
       <ul className="list-disc list-inside">
         <li>
           Account Information: When you create an account, we collect your name,
@@ -38,7 +38,7 @@ export default function TermsConditionsPage() {
           traffic.
         </li>
       </ul>
-      <h2 className="text-2xl font-bold">How We Use Your Information</h2>
+      <h2 className="text-xl sm:text-2xl font-bold">How We Use Your Information</h2>
       <ul className="list-disc list-inside">
         <li>
           Account Management: To create and manage your account, process
@@ -61,7 +61,7 @@ export default function TermsConditionsPage() {
           fraudulent activities.
         </li>
       </ul>
-      <h2 className="text-2xl font-bold">Sharing Your Information</h2>
+      <h2 className="text-xl sm:text-2xl font-bold">Sharing Your Information</h2>
       <ul className="list-disc list-inside">
         <li>
           Service Providers: We share information with third-party vendors who
@@ -81,13 +81,13 @@ export default function TermsConditionsPage() {
           explicit consent.
         </li>
       </ul>
-      <h2 className="text-2xl font-bold">Data Security</h2>
-      <p className="text-paragraph">
+      <h2 className="text-xl sm:text-2xl font-bold">Data Security</h2>
+      <p className="text-base sm:text-paragraph">
         We implement robust security measures to protect your information.
         However, no online platform is entirely secure, and we cannot guarantee
         absolute security.
       </p>
-      <h2 className="text-2xl font-bold">Your Privacy Rights</h2>
+      <h2 className="text-xl sm:text-2xl font-bold">Your Privacy Rights</h2>
       <ul className="list-disc list-inside">
         <li>
           Access and Update: You can access and update your personal information
@@ -102,30 +102,30 @@ export default function TermsConditionsPage() {
           ask us to delete your information, subject to legal requirements.
         </li>
       </ul>
-      <h2 className="text-2xl font-bold">International Data Transfers</h2>
-      <p className="text-paragraph">
+      <h2 className="text-xl sm:text-2xl font-bold">International Data Transfers</h2>
+      <p className="text-base sm:text-paragraph">
         Your information may be transferred to and processed in countries other
         than your own. We ensure appropriate safeguards are in place to protect
         your data.
       </p>
-      <h2 className="text-2xl font-bold">Children's Privacy</h2>
-      <p className="text-paragraph">
+      <h2 className="text-xl sm:text-2xl font-bold">Children's Privacy</h2>
+      <p className="text-base sm:text-paragraph">
         Our service is not intended for individuals under 16. We do not
         knowingly collect information from children. If we become aware of such
         data, we will take steps to delete it.
       </p>
-      <h2 className="text-2xl font-bold">Third-Party Websites</h2>
-      <p className="text-paragraph">
+      <h2 className="text-xl sm:text-2xl font-bold">Third-Party Websites</h2>
+      <p className="text-base sm:text-paragraph">
         Our website may contain links to external sites. We are not responsible
         for the privacy practices of these websites.
       </p>
-      <h2 className="text-2xl font-bold">Changes to this Privacy Policy</h2>
-      <p className="text-paragraph">
+      <h2 className="text-xl sm:text-2xl font-bold">Changes to this Privacy Policy</h2>
+      <p className="text-base sm:text-paragraph">
         We may update this Privacy Policy periodically. We will notify you of
         significant changes via email and/or a prominent notice on our website.
       </p>
-      <h2 className="text-2xl font-bold">Contact Us</h2>
-      <p className="text-paragraph">
+      <h2 className="text-xl sm:text-2xl font-bold">Contact Us</h2>
+      <p className="text-base sm:text-paragraph">
         For questions or concerns about this Privacy Policy, please contact us
         at:{" "}
         <Link href={"mailto:support@clickedart.com"}>

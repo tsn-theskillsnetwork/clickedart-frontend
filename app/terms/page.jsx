@@ -2,10 +2,12 @@ import React from "react";
 
 export default function TermsConditionsPage() {
   return (
-    <div className="flex flex-col mt-4 pb-5 px-4 sm:px-8 md:px-16 lg:px-32 xl:px-64 2xl:px-96">
-      <h1 className="text-2xl font-bold">Terms of Use for ClickedArt.com</h1>
-      <p className="font-medium mt-2">Last Updated: 26 January 2025</p>
-      <p className="mt-4 text-justify">
+    <div className="flex flex-col mt-4 pb-5 px-4 sm:px-8 md:px-16 lg:px-20">
+      <h1 className="text-xl sm:text-4xl font-bold text-center">
+        Terms of Use for ClickedArt.com
+      </h1>
+      <p className="text-base sm:text-paragraph font-semibold mt-2">Last Updated: 26 January 2025</p>
+      <p className="mt-4 text-justify text-base sm:text-paragraph font-medium">
         Welcome to ClickedArt.com! These Terms of Use ("Terms") govern your
         access to and use of the website and services provided by ClickedArt.com
         ("Platform"). By accessing or using the Platform, you agree to be bound
@@ -38,7 +40,9 @@ export default function TermsConditionsPage() {
         </p>
       </div>
       <hr className="border-2 my-5 border-surface-300" />
-      <h6 className="text-paragraph font-bold">2. Acceptance of Terms</h6>
+      <h6 className="text-base sm:text-paragraph font-bold">
+        2. Acceptance of Terms
+      </h6>
       <div className="mt-2 space-y-2">
         <p>
           2.1. By registering, uploading content, purchasing, or otherwise
@@ -51,7 +55,7 @@ export default function TermsConditionsPage() {
         </p>
       </div>
       <hr className="border-2 my-5 border-surface-300" />
-      <h6 className="text-paragraph font-bold">
+      <h6 className="text-base sm:text-paragraph font-bold">
         3. Account Registration and Management
       </h6>
       <div className="mt-2 space-y-2">
@@ -75,7 +79,9 @@ export default function TermsConditionsPage() {
         </p>
       </div>
       <hr className="border-2 my-5 border-surface-300" />
-      <h6 className="text-paragraph font-bold">4. Photographer Guidelines</h6>
+      <h6 className="text-base sm:text-paragraph font-bold">
+        4. Photographer Guidelines
+      </h6>
       <div className="mt-2 space-y-2">
         <div>
           <p className="font-bold">4.1 Content Upload</p>
@@ -138,7 +144,9 @@ export default function TermsConditionsPage() {
         </div>
       </div>
       <hr className="border-2 my-5 border-surface-300" />
-      <h6 className="text-paragraph font-bold">5. Buyer Guidelines</h6>
+      <h6 className="text-base sm:text-paragraph font-bold">
+        5. Buyer Guidelines
+      </h6>
       <div className="mt-2 space-y-2">
         <p className="font-bold">5.1. Purchasing Content</p>
         <ul className="ml-6 list-disc list-inside">
@@ -179,7 +187,9 @@ export default function TermsConditionsPage() {
         </ul>
       </div>
       <hr className="border-2 my-5 border-surface-300" />
-      <h6 className="text-paragraph font-bold">6. Fees and Payments</h6>
+      <h6 className="text-base sm:text-paragraph font-bold">
+        6. Fees and Payments
+      </h6>
       <div className="mt-2 space-y-2">
         <p>
           6.1. Prices displayed on the Platform are inclusive of applicable
@@ -195,7 +205,7 @@ export default function TermsConditionsPage() {
         </p>
       </div>
       <hr className="border-2 my-5 border-surface-300" />
-      <h6 className="text-paragraph font-bold">
+      <h6 className="text-base sm:text-paragraph font-bold">
         7. Intellectual Property Rights
       </h6>
       <div className="mt-2 space-y-2">
@@ -210,7 +220,7 @@ export default function TermsConditionsPage() {
         </p>
       </div>
       <hr className="border-2 my-5 border-surface-300" />
-      <h6 className="text-paragraph font-bold">
+      <h6 className="text-base sm:text-paragraph font-bold">
         8. Privacy and Data Protection
       </h6>
       <div className="mt-2 space-y-2">
@@ -228,7 +238,9 @@ export default function TermsConditionsPage() {
         </p>
       </div>
       <hr className="border-2 my-5 border-surface-300" />
-      <h6 className="text-paragraph font-bold">9. Dispute Resolution</h6>
+      <h6 className="text-base sm:text-paragraph font-bold">
+        9. Dispute Resolution
+      </h6>
       <div className="mt-2 space-y-2">
         <p>
           9.1. Buyers and photographers are encouraged to resolve disputes
@@ -244,7 +256,9 @@ export default function TermsConditionsPage() {
         </p>
       </div>
       <hr className="border-2 my-5 border-surface-300" />
-      <h6 className="text-paragraph font-bold">10. Prohibited Activities</h6>
+      <h6 className="text-base sm:text-paragraph font-bold">
+        10. Prohibited Activities
+      </h6>
       <div className="mt-2 space-y-2">
         <p>10.1. Users must not:</p>
         <ul className="list-disc list-inside ml-5">
@@ -254,7 +268,9 @@ export default function TermsConditionsPage() {
         </ul>
       </div>
       <hr className="border-2 my-5 border-surface-300" />
-      <h6 className="text-paragraph font-bold">11. Indemnification</h6>
+      <h6 className="text-base sm:text-paragraph font-bold">
+        11. Indemnification
+      </h6>
       <div className="mt-2 space-y-2">
         <p>
           Users agree to indemnify ClickedArt, its affiliates, and employees
@@ -263,7 +279,9 @@ export default function TermsConditionsPage() {
         </p>
       </div>
       <hr className="border-2 my-5 border-surface-300" />
-      <h6 className="text-paragraph font-bold">12. Limitation of Liability</h6>
+      <h6 className="text-base sm:text-paragraph font-bold">
+        12. Limitation of Liability
+      </h6>
       <div className="mt-2 space-y-2">
         <p>ClickedArt is not liable for:</p>
         <ul className="list-disc list-inside ml-5">
@@ -273,7 +291,7 @@ export default function TermsConditionsPage() {
         </ul>
       </div>
       <hr className="border-2 my-5 border-surface-300" />
-      <h6 className="text-paragraph font-bold">13. Termination</h6>
+      <h6 className="text-base sm:text-paragraph font-bold">13. Termination</h6>
       <div className="mt-2 space-y-2">
         <p>
           13.1. ClickedArt reserves the right to suspend or terminate user
@@ -285,7 +303,9 @@ export default function TermsConditionsPage() {
         </p>
       </div>
       <hr className="border-2 my-5 border-surface-300" />
-      <h6 className="text-paragraph font-bold">14. Contact Information</h6>
+      <h6 className="text-base sm:text-paragraph font-bold">
+        14. Contact Information
+      </h6>
       <div className="mt-2 space-y-2">
         <p>
           For queries, feedback, or complaints, please contact ClickedArt at:
