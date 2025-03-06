@@ -212,7 +212,6 @@ const ProfilePage = () => {
       setPhoto({ ...photo, description: newValue });
     }
   };
-  console.log(uploading);
 
   //photo upload
   const handleChange = async (event) => {
@@ -220,7 +219,7 @@ const ProfilePage = () => {
     try {
       let fileInput = event.target;
       let file = fileInput.files[0];
-  
+
       if (!file) {
         console.error("No file selected");
         toast.error("No file selected for upload!");
@@ -228,7 +227,7 @@ const ProfilePage = () => {
         setUploading(false);
         return;
       }
-  
+
       // Check file size (max 200MB)
       if (file.size > 200 * 1024 * 1024) {
         Swal.fire({
@@ -241,15 +240,15 @@ const ProfilePage = () => {
         setUploading(false);
         return;
       }
-  
+
       // Detect HEIC file
       const fileExtension = file.name.split(".").pop().toLowerCase();
       const isHEIC = fileExtension === "heic" || fileExtension === "heif";
-  
+
       if (isHEIC) {
         const toastId = toast.loading("Processing...");
         const heic2any = (await import("heic2any")).default;
-  
+
         try {
           const convertedBlob = await heic2any({
             blob: file,
@@ -262,23 +261,25 @@ const ProfilePage = () => {
         } catch (conversionError) {
           console.error("HEIC conversion failed:", conversionError);
           toast.dismiss(toastId);
-          toast.error("HEIC conversion failed. Please use a supported image format.");
+          toast.error(
+            "HEIC conversion failed. Please use a supported image format."
+          );
           setImageUrl("");
           fileInput.value = "";
           setUploading(false);
           return;
         }
       }
-  
+
       // Check image resolution
       const image = new Image();
       const imageUrl = URL.createObjectURL(file);
-  
+
       image.onload = async () => {
         const width = image.width;
         const height = image.height;
         const megapixels = (width * height) / 1000000;
-  
+
         if (megapixels < 5) {
           Swal.fire({
             title: "Error!",
@@ -291,7 +292,7 @@ const ProfilePage = () => {
           setUploading(false);
           return;
         }
-  
+
         try {
           // Upload to S3
           const s3 = new S3Client({
@@ -301,26 +302,28 @@ const ProfilePage = () => {
               secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
             },
           });
-  
+
           const target = {
             Bucket: "clickedart-bucket",
             Key: `images/${file.name}`,
             Body: file,
             ContentType: file.type,
           };
-  
+
           const upload = new Upload({
             client: s3,
             params: target,
           });
-  
+
           upload.on("httpUploadProgress", (progress) => {
-            const percentCompleted = Math.round((progress.loaded / progress.total) * 100);
+            const percentCompleted = Math.round(
+              (progress.loaded / progress.total) * 100
+            );
             setProgr(percentCompleted);
           });
-  
+
           await upload.done();
-  
+
           const fileUrl = `https://${target.Bucket}.s3.ap-south-1.amazonaws.com/${target.Key}`;
           setImageUrl(fileUrl);
           setPhoto({ ...photo, imageLinks: { image: fileUrl } });
@@ -330,7 +333,7 @@ const ProfilePage = () => {
           setUploading(false); // Now correctly placed
         }
       };
-  
+
       image.src = imageUrl;
     } catch (error) {
       console.error("Error uploading file:", error);
@@ -338,7 +341,6 @@ const ProfilePage = () => {
       setUploading(false);
     }
   };
-  
 
   const getResolutions = async () => {
     try {
@@ -569,7 +571,11 @@ const ProfilePage = () => {
                           className="max-h-[80vh] mx-auto"
                         />
                         <button
-                          onClick={() => setImageUrl("")}
+                          onClick={() => {
+                            setImageUrl("");
+                            setUploading(false);
+                            setProgr(0);
+                          }}
                           className="bg-black text-white py-2 px-4 rounded-full mt-5"
                         >
                           Change Image
