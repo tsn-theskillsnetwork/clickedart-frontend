@@ -256,11 +256,12 @@ export default function ExplorePage() {
           }
           className="absolute inset-0 w-full h-full z-0 object-cover "
           alt="Contact"
-          width={1920}
-          height={1080}
+          fill
+          quality={75}
+          priority
         />
         <div className="bg-black bg-opacity-10 absolute inset-0 z-0"></div>
-        <div className="text-center z-10 my-10 text-white">
+        <div className="text-center z-10 my-10 px-2 text-white">
           <h1 className="2xl:text-heading-lg lg:text-heading-03 sm:text-heading-05 text-heading-06 font-bold text-shadow-dark">
             Explore
           </h1>
