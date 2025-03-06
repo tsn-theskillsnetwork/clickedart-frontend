@@ -218,6 +218,7 @@ const ProfilePage = () => {
 
       if (!file) {
         console.error("No file selected");
+        toast.error("No file selected for upload!");
         return;
       }
 
@@ -228,6 +229,7 @@ const ProfilePage = () => {
           icon: "error",
           confirmButtonText: "OK",
         });
+        event.target.value = "";
         return;
       }
 
@@ -275,7 +277,7 @@ const ProfilePage = () => {
             icon: "error",
             confirmButtonText: "OK",
           });
-          router.push("/profile/upload");
+          event.target.value = "";
           return;
         }
 
