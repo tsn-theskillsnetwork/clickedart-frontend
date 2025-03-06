@@ -229,7 +229,7 @@ const ProfilePage = () => {
           icon: "error",
           confirmButtonText: "OK",
         });
-        event.target.value = "";
+        setImageUrl("")
         return;
       }
 
@@ -257,6 +257,7 @@ const ProfilePage = () => {
           toast.error(
             "HEIC conversion failed. Please use a supported image format."
           );
+          setImageUrl("")
           return;
         }
       }
@@ -277,7 +278,7 @@ const ProfilePage = () => {
             icon: "error",
             confirmButtonText: "OK",
           });
-          event.target.value = "";
+          setImageUrl("")
           return;
         }
 
