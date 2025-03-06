@@ -11,7 +11,6 @@ export default function ImageSection({ selectedFrame, image }) {
       <div className="relative w-full h-full  inner-shadow-3 z-10">
         <Image
           priority
-          quality={30}
           width={800}
           height={800}
           src={image.imageLinks?.thumbnail || "/assets/images/img3.jpg"}
@@ -20,11 +19,6 @@ export default function ImageSection({ selectedFrame, image }) {
         />
       </div>
       {selectedFrame && (
-        // <img
-        //   className="absolute z-10 inset-0 h-full w-2"
-        //   src={selectedFrame.image[0]}
-        //   alt={selectedFrame.name}
-        // />
         <>
           <Image
             priority

@@ -738,14 +738,20 @@ export default function ImagePage({ image }) {
   const height = clampedHeight + "%";
 
   useEffect(() => {
-    if (isHydrated && photographer && image.photographer?._id === photographer._id) {
+    if (
+      isHydrated &&
+      photographer &&
+      image.photographer?._id === photographer._id
+    ) {
       router.push(`/profile/print/${id}`);
     }
   }, [isHydrated, photographer, image]);
 
   return (
     <>
-      {loading || !isHydrated || (photographer && image.photographer?._id === photographer._id) ? (
+      {loading ||
+      !isHydrated ||
+      (photographer && image.photographer?._id === photographer._id) ? (
         <ImageSkeleton />
       ) : (
         <>
@@ -753,63 +759,65 @@ export default function ImagePage({ image }) {
             <div className={`px-5 lg:px-20 pb-5`}>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-16 pt-10 bg-[#FBFBFB] -mt-2">
                 <div className="lg:col-span-2 flex flex-col gap-10  h-full">
-                  <motion.div
-                    layout
-                    className="flex justify-center sticky top-32"
-                  >
+                  <div className="sticky top-32">
                     <motion.div
                       layout
-                      style={{
-                        aspectRatio:
-                          selectedPaper &&
-                          selectedSize &&
-                          `${
-                            image.resolutions?.thumbnail?.width >
-                            image.resolutions?.thumbnail?.height
-                              ? selectedSize.height
-                              : selectedSize.width
-                          }/${
-                            image.resolutions?.thumbnail?.width >
-                            image.resolutions?.thumbnail?.height
-                              ? selectedSize.width
-                              : selectedSize.height
-                          }`,
-                        height: selectedSize ? height : "100%",
-                      }}
-                      className={`${
-                        selectedPaper &&
-                        selectedSize &&
-                        `mt-[4%] w-auto -ml-[10%]`
-                      } absolute inset-y-0 z-10 shadow-[2px_2px_6px_rgba(0,0,0,0.7)]`}
+                      className="flex justify-center relative min-h-60"
                     >
-                      <ImageSection
-                        selectedFrame={selectedFrame}
-                        image={image}
-                      />
-                    </motion.div>
-
-                    <AnimatePresence mode="popLayout">
                       <motion.div
                         layout
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
+                        style={{
+                          aspectRatio:
+                            selectedPaper &&
+                            selectedSize &&
+                            `${
+                              image.resolutions?.thumbnail?.width >
+                              image.resolutions?.thumbnail?.height
+                                ? selectedSize.height
+                                : selectedSize.width
+                            }/${
+                              image.resolutions?.thumbnail?.width >
+                              image.resolutions?.thumbnail?.height
+                                ? selectedSize.width
+                                : selectedSize.height
+                            }`,
+                          height: selectedSize ? height : "100%",
+                        }}
+                        className={`${
+                          selectedPaper &&
+                          selectedSize &&
+                          `mt-[4%] w-auto -ml-[10%]`
+                        } absolute inset-y-0 z-10 shadow-[2px_2px_6px_rgba(0,0,0,0.7)]`}
                       >
-                        <Image
-                          src="/assets/placeholders/Sofa Room Logo Mockup.jpg"
-                          alt="mockup"
-                          priority
-                          width={800}
-                          height={400}
-                          className={`w-full h-full object-cover ${
-                            selectedPaper && selectedSize
-                              ? "opacity-100"
-                              : "opacity-0"
-                          } transition-all duration-300 ease-in-out`}
+                        <ImageSection
+                          selectedFrame={selectedFrame}
+                          image={image}
                         />
                       </motion.div>
-                    </AnimatePresence>
-                  </motion.div>
+
+                      <AnimatePresence mode="popLayout">
+                        <motion.div
+                          layout
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                        >
+                          <Image
+                            src="/assets/placeholders/Sofa Room Logo Mockup.jpg"
+                            alt="mockup"
+                            priority
+                            width={800}
+                            height={400}
+                            className={`w-full h-full object-cover ${
+                              selectedPaper && selectedSize
+                                ? "opacity-100"
+                                : "opacity-0"
+                            } transition-all duration-300 ease-in-out`}
+                          />
+                        </motion.div>
+                      </AnimatePresence>
+                    </motion.div>
+                  </div>
                 </div>
                 <div className="">
                   <div className="flex gap-4">
@@ -818,7 +826,7 @@ export default function ImagePage({ image }) {
                         !selectedPaper
                           ? "border-blue-400"
                           : "border-transparent"
-                      }`}
+                      } min-h-24 min-w-40`}
                       onClick={handleDigital}
                     >
                       <Image
@@ -832,7 +840,7 @@ export default function ImagePage({ image }) {
                     <div
                       className={`border-4 ${
                         selectedPaper ? "border-blue-400" : "border-transparent"
-                      }`}
+                      } min-h-24 min-w-40`}
                       onClick={handleMockup}
                     >
                       <Image
