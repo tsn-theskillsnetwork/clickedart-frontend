@@ -214,11 +214,13 @@ const ProfilePage = () => {
 
   const handleChange = async (event) => {
     try {
-      let file = event.target.files[0];
+      let fileInput = event.target;
+      let file = fileInput.files[0];
 
       if (!file) {
         console.error("No file selected");
         toast.error("No file selected for upload!");
+        fileInput.value = ""; // Reset input field
         return;
       }
 
@@ -229,15 +231,15 @@ const ProfilePage = () => {
           icon: "error",
           confirmButtonText: "OK",
         });
-        setImageUrl("")
+        setImageUrl("");
+        fileInput.value = ""; // Reset input field
         return;
       }
 
-      // Detect HEIC file by extension as a fallback
+      // Detect HEIC file by extension
       const fileExtension = file.name.split(".").pop().toLowerCase();
       const isHEIC = fileExtension === "heic" || fileExtension === "heif";
 
-      // If it's a HEIC file, convert it to JPEG
       if (isHEIC) {
         const toastId = toast.loading("Processing...");
         const heic2any = (await import("heic2any")).default;
@@ -250,26 +252,27 @@ const ProfilePage = () => {
           file = new File([convertedBlob], `${file.name.split(".")[0]}.jpeg`, {
             type: "image/jpeg",
           });
-          toast.dismiss(toastId); // Dismiss only the loading toast
+          toast.dismiss(toastId);
         } catch (conversionError) {
           console.error("HEIC conversion failed:", conversionError);
           toast.dismiss(toastId);
           toast.error(
             "HEIC conversion failed. Please use a supported image format."
           );
-          setImageUrl("")
+          setImageUrl("");
+          fileInput.value = ""; // Reset input field
           return;
         }
       }
 
-      // Create an image element to check its dimensions
+      // Create an image element to check dimensions
       const image = new Image();
       const imageUrl = URL.createObjectURL(file);
 
       image.onload = async () => {
         const width = image.width;
         const height = image.height;
-        const megapixels = (width * height) / 1000000; // calculate in MP
+        const megapixels = (width * height) / 1000000;
 
         if (megapixels < 5) {
           Swal.fire({
@@ -278,11 +281,12 @@ const ProfilePage = () => {
             icon: "error",
             confirmButtonText: "OK",
           });
-          setImageUrl("")
+          setImageUrl("");
+          fileInput.value = ""; // Reset input field
           return;
         }
 
-        // Upload the image to S3
+        // Upload to S3
         const s3 = new S3Client({
           region: "ap-south-1",
           credentials: {
@@ -317,10 +321,10 @@ const ProfilePage = () => {
         setPhoto({ ...photo, imageLinks: { image: fileUrl } });
       };
 
-      // Trigger image loading
       image.src = imageUrl;
     } catch (error) {
       console.error("Error uploading file:", error);
+      event.target.value = "";
     }
   };
 
@@ -329,7 +333,6 @@ const ProfilePage = () => {
       setStep("2");
       window.scrollTo(0, 160);
       setProcessing(true);
-      toast.loading("Processing Image...");
       if (photo.imageLinks.original) {
         return;
       }
@@ -360,7 +363,6 @@ const ProfilePage = () => {
       setError(true);
     } finally {
       setProcessing(false);
-      toast.dismiss();
     }
   };
 
@@ -783,8 +785,12 @@ const ProfilePage = () => {
                           className="w-full h-auto shadow-[3px_3px_10px_rgba(0,0,0,0.5)]"
                           alt="Uploaded Image"
                         />
-                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                          <Loader />
+                        <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
+                          <div className="flex flex-row gap-2">
+                            <div className="w-4 h-4 rounded-full bg-white animate-bounce [animation-delay:.7s]"></div>
+                            <div className="w-4 h-4 rounded-full bg-white animate-bounce [animation-delay:.3s]"></div>
+                            <div className="w-4 h-4 rounded-full bg-white animate-bounce [animation-delay:.7s]"></div>
+                          </div>
                         </div>
                       </div>
                     </div>
