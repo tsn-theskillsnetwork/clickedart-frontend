@@ -41,7 +41,6 @@ export default function page() {
         `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-featured-artwork`
       );
       setImages(res.data.featuredArtwork);
-      //console.log(res.data);
     } catch (error) {
       console.error("Failed to fetch featured artists:", error);
     } finally {

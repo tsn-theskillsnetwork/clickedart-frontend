@@ -126,7 +126,6 @@ export default function CheckoutPage() {
         `${process.env.NEXT_PUBLIC_SERVER}/api/download/calculate-price`,
         { items, photographerId: photographer?._id }
       );
-      console.log("Price:", res.data);
       setPrice(res.data);
     } catch (error) {
       console.error("Error calculating price:", error);
@@ -142,7 +141,6 @@ export default function CheckoutPage() {
       }
 
       if (!validateOrder(orderData)) return;
-      //console.log("Test:", orderData.finalAmount, user._id);
       const result = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/download/payment`,
         {
@@ -304,8 +302,6 @@ export default function CheckoutPage() {
       gst: "",
     }));
   }, [user, cartItems, discount, coupon, price] || []);
-
-  //console.log("Order Data:", orderData);
 
   const handleCoupon = async (event) => {
     event.preventDefault();

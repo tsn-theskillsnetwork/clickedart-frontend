@@ -1,8 +1,6 @@
 const BASE_URL = process.env.NEXT_PUBLIC_CLIENT || "https://www.clickedart.com";
 
 export async function GET() {
-  console.log("Fetching story routes...");
-
   try {
     const stories = await getStories();
 
@@ -10,8 +8,6 @@ export async function GET() {
       url: `${BASE_URL}/story/${s._id}`,
       lastModified: s.updatedAt || s.createdAt || new Date().toISOString(),
     }));
-
-    console.log("Total story routes generated:", storyRoutes.length);
 
     if (storyRoutes.length === 0) {
       console.error("🚨 No story URLs found for the sitemap!");

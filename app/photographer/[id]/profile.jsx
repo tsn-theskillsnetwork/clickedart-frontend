@@ -64,7 +64,6 @@ export default function ProfilePage({ photographer }) {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/images/get-images-by-photographer?photographer=${id}&pageSize=1000`
       );
-      // //console.log(res.data);
       setPhotos(res.data.photos);
     } catch (error) {
       setError(error);

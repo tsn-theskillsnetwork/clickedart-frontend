@@ -19,13 +19,9 @@ export default function ThemesPage() {
     const fetchThemes = async () => {
       setLoading(true);
       try {
-        const start = performance.now();
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_SERVER}/api/category/get?pageSize=${pageSize}`
         );
-        const end = performance.now();
-        console.log("API Response Time:", end - start, "ms");
-
         const data = await response.json();
         setThemes(data.categories);
         setPageCount(data.pageCount);

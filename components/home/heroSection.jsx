@@ -34,8 +34,6 @@ export default function HeroSection({ layout, loading }) {
     }
   };
 
-  console.log(loading);
-
   const heroPhotos = layout?.heroSectionPhotos || [];
 
   useEffect(() => {

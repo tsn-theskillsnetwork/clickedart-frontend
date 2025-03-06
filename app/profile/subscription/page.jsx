@@ -16,7 +16,6 @@ export default function ManageSubscriptionPage() {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/get-user-subscription?userId=${photographer?._id}`
       );
-      console.log(res.data);
       setSubscriptions(res.data.subscriptions);
     } catch (err) {
       console.log(err);
@@ -42,11 +41,10 @@ export default function ManageSubscriptionPage() {
 
   const cancelSubscription = async (id) => {
     try {
-      const res = await axios.post(
+      await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/subscriptions/cancel-subscription`,
         { id }
       );
-      console.log(res.data);
       fetchSubscriptions();
     } catch (err) {
       console.log(err);

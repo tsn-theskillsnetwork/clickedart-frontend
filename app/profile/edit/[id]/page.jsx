@@ -140,7 +140,6 @@ export default function ImageEdit() {
           `${process.env.NEXT_PUBLIC_SERVER}/api/category/get`
         );
         setCategories(res.data.categories);
-        // //console.log(res.data.categories);
       } catch (error) {
         console.log(error);
       }

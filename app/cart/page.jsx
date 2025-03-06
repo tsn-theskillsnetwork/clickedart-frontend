@@ -20,8 +20,6 @@ export default function CartPage() {
     toast.success("Removed from cart!");
   };
 
-  //console.log(cartItems);
-
   const calculateTotal = () => {
     return cartItems?.reduce((acc, item) => acc + item.subTotal, 0);
   };

@@ -52,8 +52,6 @@ export default function BulkDownloadForm() {
   const [selectedFiles, setSelectedFiles] = useState({});
   const [uploadProgress, setUploadProgress] = useState({});
 
-  //console.log("formData", formData);
-
   const validateForm = () => {
     const newErrors = {};
     if (!formData.address.residentialAddress) {
@@ -265,7 +263,6 @@ export default function BulkDownloadForm() {
         formData
       );
       toast.success("Form submitted successfully");
-      //console.log("Form submitted successfully", response.data);
       router.push("/profile");
     } catch (error) {
       toast.error("Error submitting enquiry");

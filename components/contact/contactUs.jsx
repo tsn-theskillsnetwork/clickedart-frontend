@@ -50,7 +50,6 @@ export default function ContactUs() {
     behance: "text-[#131418]",
     snapchat: "text-[#fffc00]",
   };
-  //console.log(layout);
   return (
     <div className="flex flex-col items-center my-10 min-h-screen">
       <div className="relative flex flex-col w-full overflow-hidden rounded-lg">

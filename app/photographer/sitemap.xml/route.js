@@ -1,8 +1,6 @@
 const BASE_URL = process.env.NEXT_PUBLIC_CLIENT || "https://www.clickedart.com";
 
 export async function GET() {
-  console.log("Fetching photographer routes...");
-
   try {
     const photographers = await getPhotographers();
 
@@ -11,7 +9,6 @@ export async function GET() {
       lastModified: p.updatedAt || p.createdAt || new Date().toISOString(),
     }));
 
-    console.log("Total photographer routes generated:", photographerRoutes.length);
 
     if (photographerRoutes.length === 0) {
       console.error("🚨 No photographer URLs found for the sitemap!");

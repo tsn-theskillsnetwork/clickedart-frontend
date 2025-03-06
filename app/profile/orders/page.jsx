@@ -71,7 +71,6 @@ export default function OrdersPage() {
       ...orderSupport,
       order: order,
     };
-    //console.log("Updated Order:", updatedOrderSupport);
 
     if (!validateOrderSupport()) return;
 
@@ -80,7 +79,6 @@ export default function OrdersPage() {
         `${process.env.NEXT_PUBLIC_SERVER}/api/ordersupport/create-order-support-request`,
         updatedOrderSupport
       );
-      //console.log(response.data);
       toast.success("Order Support Requested");
     } catch (error) {
       if (
@@ -99,7 +97,6 @@ export default function OrdersPage() {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/delivery/track-shipment?waybill=${waybill}`
       );
-      console.log(response.data);
       setShipment(response.data.ShipmentData[0].Shipment);
     } catch (error) {
       console.log(error);
@@ -120,7 +117,6 @@ export default function OrdersPage() {
             (user || photographer)?._id
           }&pageNumber=${page}&pageSize=10`
         );
-        console.log(response.data);
         setOrders(response.data.orders);
         setPageCount(Number(response.data.pageCount));
       } catch (error) {
@@ -133,9 +129,6 @@ export default function OrdersPage() {
 
     fetchOrders();
   }, [user, photographer, page]);
-
-  console.log("Type of Page:", typeof page);
-  console.log("Type of PageCount:", typeof pageCount);
 
   useEffect(() => {
     if (!(user || photographer)) return;

@@ -17,7 +17,6 @@ export default function BillPage() {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/download/get-order-by-id?orderId=${id}`
       );
-      //console.log("invoice", response.data);
       setData(response.data.order);
     } catch (error) {
       console.log("error", error);

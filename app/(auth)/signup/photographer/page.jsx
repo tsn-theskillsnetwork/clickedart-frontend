@@ -322,7 +322,6 @@ const RegistrationForm = () => {
       }
     }
   };
-  console.log(loading);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -336,7 +335,6 @@ const RegistrationForm = () => {
     const combinedErrors = { ...formErrors, ...serverErrors };
 
     if (Object.keys(combinedErrors).length > 0) {
-      console.log("worked", combinedErrors);
       setLoading(false);
       setErrors(combinedErrors);
       toast.error("Please fill the required fields before submitting.");

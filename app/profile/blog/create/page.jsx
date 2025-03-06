@@ -193,8 +193,6 @@ export default function BlogCreate() {
     }
   }, [photographer]);
 
-  console.log(blog);
-
   return (
     <div className="p-4">
       {photographer ? (

@@ -44,8 +44,6 @@ export default async function StoryPage({ params }) {
     return <p>Invalid Story ID.</p>;
   }
 
-  console.log("Rendering StoryPage with ID:", id);
-
   try {
     const story = await fetchStoryData(id);
     return <StoryPageComponent story={story} />;

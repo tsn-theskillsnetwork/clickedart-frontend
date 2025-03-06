@@ -15,7 +15,6 @@ export default function CataloguesPage() {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/catalogue/get-catalogue-by-id?catalogueId=${id}`
       );
-      console.log(res.data.catalogue);
       setCatalogue(res.data.catalogue);
     } catch (err) {
       console.log(err);

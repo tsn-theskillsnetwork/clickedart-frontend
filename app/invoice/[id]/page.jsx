@@ -18,7 +18,6 @@ export default function InvoicePage() {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/invoice/get-invoice-by-id?id=${id}`
       );
-      //console.log("invoice", response.data.invoice);
       setData(response.data.invoice);
 
       if (response.data.invoice.photographer?._id) {
@@ -36,7 +35,6 @@ export default function InvoicePage() {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/monetization/getMonetizationByPhotographerId?photographerId=${photographerId}`
       );
-      //console.log("monetization", response.data);
       setMonetizationData(response.data);
     } catch (error) {
       console.log("error", error);

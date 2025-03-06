@@ -105,8 +105,6 @@ const RegistrationForm = () => {
     setFormData({ ...formData, [name]: value ?? "" });
   };
 
-  //console.log(errors);
-
   const checkUsernameAndEmailExists = async () => {
     const serverErrors = {};
     try {

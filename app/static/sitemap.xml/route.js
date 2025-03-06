@@ -1,7 +1,6 @@
 const BASE_URL = process.env.NEXT_PUBLIC_CLIENT || "https://www.clickedart.com";
 
 export async function GET() {
-  console.log("Fetching static routes...");
 
   try {
     const staticRoutes = [
@@ -28,8 +27,6 @@ export async function GET() {
       url,
       lastModified: new Date().toISOString(),
     }));
-
-    console.log("Total static routes generated:", staticRoutes.length);
 
     if (staticRoutes.length === 0) {
       console.error("🚨 No static URLs found for the sitemap!");

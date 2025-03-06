@@ -79,7 +79,6 @@ const ProfileEditPage = () => {
           ...prev,
           userId: data.user._id,
         }));
-        //console.log(data);
       }
     } catch (error) {
       console.log(error);
@@ -109,7 +108,6 @@ const ProfileEditPage = () => {
           ...prev,
           photographerId: data.photographer._id,
         }));
-        //console.log(data);
       }
     } catch (error) {
       console.log(error);

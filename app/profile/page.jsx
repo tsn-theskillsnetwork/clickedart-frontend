@@ -273,7 +273,6 @@ const ProfilePage = () => {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/photographer/get-pending-images-by-photographer?photographer=${photographer._id}`
       );
-      console.log(res.data);
       setPendingPhotos(res.data.pendingImages);
       setLoading(false);
     } catch (error) {
@@ -316,8 +315,6 @@ const ProfilePage = () => {
     fetchBlogs();
     fetchActivePlan();
   }, [photographer]);
-
-  //console.log("photos", photos);
 
   useEffect(() => {
     if (photographer) {

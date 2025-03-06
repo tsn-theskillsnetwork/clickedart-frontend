@@ -40,8 +40,6 @@ export default function SearchResultPage() {
       }
     };
 
-    console.log("page", page);
-
     const fetchAllPhotographers = async () => {
       try {
         const res = await fetch(

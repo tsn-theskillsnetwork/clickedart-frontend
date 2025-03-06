@@ -1,8 +1,6 @@
 const BASE_URL = process.env.NEXT_PUBLIC_CLIENT || "https://www.clickedart.com";
 
 export async function GET() {
-  console.log("Fetching blog routes...");
-
   try {
     const blogPosts = await getBlogs();
 
@@ -11,7 +9,6 @@ export async function GET() {
       lastModified: b.updatedAt || b.createdAt || new Date().toISOString(),
     }));
 
-    console.log("Total blog routes generated:", blogRoutes.length);
 
     if (blogRoutes.length === 0) {
       console.error("🚨 No blog URLs found for the sitemap!");

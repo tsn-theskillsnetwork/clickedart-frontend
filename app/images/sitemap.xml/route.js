@@ -1,8 +1,6 @@
 const BASE_URL = process.env.NEXT_PUBLIC_CLIENT || "https://www.clickedart.com";
 
 export async function GET() {
-  console.log("Fetching dynamic image routes...");
-
   try {
     const images = await getImages();
 
@@ -10,8 +8,6 @@ export async function GET() {
       url: `${BASE_URL}/images/${i._id}`,
       lastModified: i.updatedAt || i.createdAt || new Date().toISOString(),
     }));
-
-    console.log("Total image routes generated:", dynamicRoutes.length);
 
     if (dynamicRoutes.length === 0) {
       console.error("🚨 No image URLs found for the sitemap!");

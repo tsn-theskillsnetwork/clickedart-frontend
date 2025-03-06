@@ -45,7 +45,6 @@ const PhotographerSignInPage = () => {
       );
 
       const data = response.data;
-      //console.log(data);
 
       signin(data.token);
       setUserType("Photographer");

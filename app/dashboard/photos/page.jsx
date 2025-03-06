@@ -57,7 +57,6 @@ export default function PhotosPage() {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/photographer/get-pending-images-by-photographer?photographer=${photographer._id}`
       );
-      console.log(res.data);
       setPhotos(res.data.pendingImages);
       setLoading(false);
     } catch (error) {
@@ -73,7 +72,6 @@ export default function PhotosPage() {
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_SERVER}/api/photographeranalytics/get-photographer-analytics?photographer=${photographer._id}`
         );
-        //console.log("Stats", res.data);
         setStats(res.data);
         setLoading(false);
       } catch (error) {

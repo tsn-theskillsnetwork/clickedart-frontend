@@ -42,7 +42,6 @@ export default function Page() {
       );
       setStats(res.data.payoutHistory);
       setLoading(false);
-      //console.log(res.data);
     } catch (error) {
       setError(error);
       setLoading(false);

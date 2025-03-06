@@ -58,7 +58,6 @@ export default function MembershipPage() {
           userId: photographer._id,
         }
       );
-      //console.log("result", result);
 
       const options = {
         key: result.data.result.notes.key,
@@ -93,8 +92,6 @@ export default function MembershipPage() {
           color: "#3399cc",
         },
       };
-
-      //console.log("options", options);
 
       const rzpay = new Razorpay(options);
       rzpay.open();
@@ -169,7 +166,6 @@ export default function MembershipPage() {
       });
       return;
     }
-    console.log(subscriptions);
     if (subscriptions.some((sub) => sub.planId.name === "Premium")) {
       Swal.fire({
         icon: "error",
