@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  devIndicators: {
-    appIsrStatus: false,
-  },
+  // devIndicators: {
+  //   appIsrStatus: false,
+  // },
   images: {
     // unoptimized: true,
     remotePatterns: [
