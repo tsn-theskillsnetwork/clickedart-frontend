@@ -46,8 +46,9 @@ export default function BlogPage() {
           src="/assets/banners/story-page.png"
           className="absolute inset-0 w-full h-full z-0 object-cover object-bottom"
           alt="Blog"
-          width={1800}
-          height={1400}
+          fill
+          quality={75}
+          priority
         />
         <div className="bg-black opacity-10 absolute inset-0 z-0"></div>
         <div className="flex flex-col gap-2 my-20 items-center z-10 text-white">
@@ -86,8 +87,9 @@ export default function BlogPage() {
             <Image
               src={post.media_url || "/assets/placeholders/profile.jpg"}
               alt={post.title || "Blog Post"}
-              width={600}
-              height={400}
+              width={640}
+              height={360}
+              quality={80}
               className="w-full aspect-[16/9] rounded-lg object-cover"
             />
             <div className="flex flex-col gap-2">
