@@ -47,6 +47,7 @@ const ProfilePage = () => {
   const [newWatermark, setNewWatermark] = useState("");
   const [limit, setLimit] = useState(10);
   const [photosLength, setPhotosLength] = useState(0);
+  const [uploading, setUploading] = useState(false);
   const [photo, setPhoto] = useState({
     category: "",
     photographer: "",
@@ -211,20 +212,24 @@ const ProfilePage = () => {
       setPhoto({ ...photo, description: newValue });
     }
   };
+  console.log(uploading);
 
+  //photo upload
   const handleChange = async (event) => {
+    setUploading(true);
     try {
       let fileInput = event.target;
       let file = fileInput.files[0];
-
+  
       if (!file) {
         console.error("No file selected");
         toast.error("No file selected for upload!");
         fileInput.value = ""; // Reset input field
+        setUploading(false);
         return;
       }
-
-      // Check file size (in MB)
+  
+      // Check file size (max 200MB)
       if (file.size > 200 * 1024 * 1024) {
         Swal.fire({
           title: "File size should not exceed 200MB",
@@ -233,17 +238,18 @@ const ProfilePage = () => {
         });
         setImageUrl("");
         fileInput.value = ""; // Reset input field
+        setUploading(false);
         return;
       }
-
-      // Detect HEIC file by extension
+  
+      // Detect HEIC file
       const fileExtension = file.name.split(".").pop().toLowerCase();
       const isHEIC = fileExtension === "heic" || fileExtension === "heif";
-
+  
       if (isHEIC) {
         const toastId = toast.loading("Processing...");
         const heic2any = (await import("heic2any")).default;
-
+  
         try {
           const convertedBlob = await heic2any({
             blob: file,
@@ -256,24 +262,23 @@ const ProfilePage = () => {
         } catch (conversionError) {
           console.error("HEIC conversion failed:", conversionError);
           toast.dismiss(toastId);
-          toast.error(
-            "HEIC conversion failed. Please use a supported image format."
-          );
+          toast.error("HEIC conversion failed. Please use a supported image format.");
           setImageUrl("");
-          fileInput.value = ""; // Reset input field
+          fileInput.value = "";
+          setUploading(false);
           return;
         }
       }
-
-      // Create an image element to check dimensions
+  
+      // Check image resolution
       const image = new Image();
       const imageUrl = URL.createObjectURL(file);
-
+  
       image.onload = async () => {
         const width = image.width;
         const height = image.height;
         const megapixels = (width * height) / 1000000;
-
+  
         if (megapixels < 5) {
           Swal.fire({
             title: "Error!",
@@ -282,51 +287,58 @@ const ProfilePage = () => {
             confirmButtonText: "OK",
           });
           setImageUrl("");
-          fileInput.value = ""; // Reset input field
+          fileInput.value = "";
+          setUploading(false);
           return;
         }
-
-        // Upload to S3
-        const s3 = new S3Client({
-          region: "ap-south-1",
-          credentials: {
-            accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
-            secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
-          },
-        });
-
-        const target = {
-          Bucket: "clickedart-bucket",
-          Key: `images/${file.name}`,
-          Body: file,
-          ContentType: file.type,
-        };
-
-        const upload = new Upload({
-          client: s3,
-          params: target,
-        });
-
-        upload.on("httpUploadProgress", (progress) => {
-          const percentCompleted = Math.round(
-            (progress.loaded / progress.total) * 100
-          );
-          setProgr(percentCompleted);
-        });
-
-        await upload.done();
-
-        const fileUrl = `https://${target.Bucket}.s3.ap-south-1.amazonaws.com/${target.Key}`;
-        setImageUrl(fileUrl);
-        setPhoto({ ...photo, imageLinks: { image: fileUrl } });
+  
+        try {
+          // Upload to S3
+          const s3 = new S3Client({
+            region: "ap-south-1",
+            credentials: {
+              accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
+              secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
+            },
+          });
+  
+          const target = {
+            Bucket: "clickedart-bucket",
+            Key: `images/${file.name}`,
+            Body: file,
+            ContentType: file.type,
+          };
+  
+          const upload = new Upload({
+            client: s3,
+            params: target,
+          });
+  
+          upload.on("httpUploadProgress", (progress) => {
+            const percentCompleted = Math.round((progress.loaded / progress.total) * 100);
+            setProgr(percentCompleted);
+          });
+  
+          await upload.done();
+  
+          const fileUrl = `https://${target.Bucket}.s3.ap-south-1.amazonaws.com/${target.Key}`;
+          setImageUrl(fileUrl);
+          setPhoto({ ...photo, imageLinks: { image: fileUrl } });
+        } catch (uploadError) {
+          console.error("Upload failed:", uploadError);
+        } finally {
+          setUploading(false); // Now correctly placed
+        }
       };
-
+  
       image.src = imageUrl;
     } catch (error) {
       console.error("Error uploading file:", error);
       event.target.value = "";
+      setUploading(false);
     }
   };
+  
 
   const getResolutions = async () => {
     try {
@@ -567,24 +579,34 @@ const ProfilePage = () => {
                       <div className="w-full mx-auto rounded-lg overflow-hidden">
                         <div className="md:flex">
                           <div className="w-full p-3">
-                            <div className="relative w-full md:w-8/12 mx-auto aspect-[16/9] rounded-lg border flex justify-center items-center shadow-[0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_4px_10px_rgba(0,0,0,0.3)] transition-shadow duration-300 ease-in-out">
-                              <div className="absolute flex flex-col items-center">
-                                <Plus className="w-12 h-12 text-surface-200" />
-                                <span className="block text-gray-500 font-semibold">
-                                  Drop your image here
-                                </span>
-                                <span className="block text-gray-400 font-normal mt-1">
-                                  or click to upload
-                                </span>
+                            {uploading ? (
+                              <div className="relative w-full bg-primary-100 md:w-8/12 mx-auto aspect-[16/9] rounded-lg border flex justify-center items-center shadow-[0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_4px_10px_rgba(0,0,0,0.3)] transition-shadow duration-300 ease-in-out">
+                                <div className="flex flex-row gap-2">
+                                  <div className="w-4 h-4 rounded-full bg-primary animate-bounce [animation-delay:.7s]"></div>
+                                  <div className="w-4 h-4 rounded-full bg-primary animate-bounce [animation-delay:.3s]"></div>
+                                  <div className="w-4 h-4 rounded-full bg-primary animate-bounce [animation-delay:.7s]"></div>
+                                </div>
                               </div>
-                              <input
-                                name=""
-                                onChange={handleChange}
-                                className="h-full w-full opacity-0 cursor-pointer"
-                                type="file"
-                                accept="image/*, .heic, .heif"
-                              />
-                            </div>
+                            ) : (
+                              <div className="relative w-full md:w-8/12 mx-auto aspect-[16/9] rounded-lg border flex justify-center items-center shadow-[0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_4px_10px_rgba(0,0,0,0.3)] transition-shadow duration-300 ease-in-out">
+                                <div className="absolute flex flex-col items-center">
+                                  <Plus className="w-12 h-12 text-surface-200" />
+                                  <span className="block text-gray-500 font-semibold">
+                                    Drop your image here
+                                  </span>
+                                  <span className="block text-gray-400 font-normal mt-1">
+                                    or click to upload
+                                  </span>
+                                </div>
+                                <input
+                                  name=""
+                                  onChange={handleChange}
+                                  className="h-full w-full opacity-0 cursor-pointer"
+                                  type="file"
+                                  accept="image/*, .heic, .heif"
+                                />
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
