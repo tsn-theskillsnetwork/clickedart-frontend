@@ -222,8 +222,12 @@ const ProfilePage = () => {
       }
 
       // Check file size (in MB)
-      if (file.size > 100 * 1024 * 1024) {
-        toast.error("File size should not exceed 100 MB.");
+      if (file.size > 200 * 1024 * 1024) {
+        Swal.fire({
+          title: "File size should not exceed 200MB",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
         return;
       }
 
@@ -265,8 +269,13 @@ const ProfilePage = () => {
         const megapixels = (width * height) / 1000000; // calculate in MP
 
         if (megapixels < 5) {
-          // Check if the image size is less than 5 megapixels
-          toast.error("Image should be at least 5 MP.");
+          Swal.fire({
+            title: "Error!",
+            text: "Image should be more than 5MP",
+            icon: "error",
+            confirmButtonText: "OK",
+          });
+          router.push("/profile/upload");
           return;
         }
 
@@ -602,7 +611,7 @@ const ProfilePage = () => {
                           aspect ratio).
                         </li>
                         <li className="text-xs mt-1">
-                          File size should not exceed 100 MB.
+                          File size should not exceed 200 MB.
                         </li>
                       </ul>
                       <ul className="text-xs text-primary font-medium mt-1">
