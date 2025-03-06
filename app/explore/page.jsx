@@ -257,7 +257,7 @@ export default function ExplorePage() {
           className="absolute inset-0 w-full h-full z-0 object-cover "
           alt="Contact"
           fill
-          quality={75}
+          quality={10}
           priority
         />
         <div className="bg-black bg-opacity-10 absolute inset-0 z-0"></div>

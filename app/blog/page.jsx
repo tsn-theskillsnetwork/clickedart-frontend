@@ -145,8 +145,9 @@ export default function BlogPage() {
                           "/assets/placeholders/profile.jpg"
                         }
                         alt={post.content.title || "Blog Post"}
-                        width={600}
-                        height={400}
+                        width={320}
+                        height={180}
+                        quality={80}
                         className="w-full aspect-[16/9] rounded-lg object-cover"
                       />
                       <h5 className="text-heading-sm sm:text-base lg:text-heading-06 font-semibold line-clamp-2">
@@ -237,8 +238,9 @@ export default function BlogPage() {
                       post.coverImage[0] || "/assets/placeholders/profile.jpg"
                     }
                     alt={post.content.title || "Blog Post"}
-                    width={600}
-                    height={400}
+                    width={320}
+                    height={180}
+                    quality={80}
                     className="w-full aspect-[16/9] rounded-lg object-cover"
                   />
 

@@ -87,8 +87,8 @@ export default function BlogPage() {
             <Image
               src={post.media_url || "/assets/placeholders/profile.jpg"}
               alt={post.title || "Blog Post"}
-              width={640}
-              height={360}
+              width={320}
+              height={180}
               quality={80}
               className="w-full aspect-[16/9] rounded-lg object-cover"
             />
