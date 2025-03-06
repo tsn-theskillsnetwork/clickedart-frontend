@@ -4,7 +4,7 @@ const nextConfig = {
     appIsrStatus: false,
   },
   images: {
-    unoptimized: true,
+    // unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",

@@ -37,7 +37,6 @@ const ProfilePage = () => {
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
-  const [licenses, setLicenses] = useState([]);
   const [progr, setProgr] = useState(0);
   const [step, setStep] = useState("1");
   const [activePlan, setActivePlan] = useState("basic");
@@ -416,12 +415,6 @@ const ProfilePage = () => {
       `category/get?pageSize=1000`,
       "categories",
       setCategories,
-      setLoading
-    );
-    fetchData(
-      `license/get-all-license?pageSize=1000`,
-      "licenses",
-      setLicenses,
       setLoading
     );
   }, []);
