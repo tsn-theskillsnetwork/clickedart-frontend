@@ -19,6 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
 import ImageSearch from "@/components/search/imageSearch";
+import ImagesLoader from "@/components/image/imagesLoader";
 
 export default function ThemesResultPage() {
   const { user, photographer } = useAuthStore();
@@ -41,7 +42,6 @@ export default function ThemesResultPage() {
   const [pageCount, setPageCount] = useState(1);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-
 
   useEffect(() => {
     setSearch(searchValue);
@@ -191,181 +191,137 @@ export default function ThemesResultPage() {
   }, [themeValue, pageSize, page]);
 
   return (
-    <AnimatePresence mode="popLayout">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.3 }}
-        className="flex my-10 flex-col min-h-screen"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 px-4 sm:px-10 lg:px-20 justify-between items-start gap-5">
-          <ImageSearch />
-          <div className="grid grid-cols-2 2xl:w-1/2 gap-4 md:ml-auto md:justify-end">
+    <div className="flex my-10 flex-col min-h-screen">
+      <div className="grid grid-cols-1 md:grid-cols-2 px-4 sm:px-10 lg:px-20 justify-between items-start gap-5">
+        <ImageSearch />
+        <div className="grid grid-cols-2 2xl:w-1/2 gap-4 md:ml-auto md:justify-end">
+          <div className="flex flex-col">
+            <p className="font-semibold text-primary-dark text-paragraph">
+              Themes
+            </p>
+            <Select
+              className="w-full"
+              defaultValue={theme}
+              onValueChange={(value) => {
+                setTheme(value);
+                router.push(
+                  `/images?theme=${value}&sort=${sort}${
+                    search && `&search=${search}`
+                  }`
+                );
+              }}
+            >
+              <SelectTrigger className="!text-base py-5 w-full font-semibold shadow-sm bg-gray-200">
+                <SelectValue />
+                <p className="sr-only">Themes</p>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                {themes.map((theme, index) => (
+                  <SelectItem key={index} value={theme.name.toLowerCase()}>
+                    {theme.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex flex-col">
             <div className="flex flex-col">
               <p className="font-semibold text-primary-dark text-paragraph">
-                Themes
+                Sort by
               </p>
               <Select
                 className="w-full"
-                defaultValue={theme}
+                defaultValue={sort}
                 onValueChange={(value) => {
-                  setTheme(value);
+                  setSort(value);
                   router.push(
-                    `/images?theme=${value}&sort=${sort}${
+                    `/images?theme=${theme}&sort=${value}${
                       search && `&search=${search}`
                     }`
                   );
                 }}
               >
-                <SelectTrigger className="!text-base py-5 w-full font-semibold shadow-sm bg-gray-200">
+                <SelectTrigger className="!text-base w-full py-5 font-semibold shadow-sm bg-gray-200">
                   <SelectValue />
-                  <p className="sr-only">Themes</p>
+                  <p className="sr-only">Sort by</p>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  {themes.map((theme, index) => (
-                    <SelectItem key={index} value={theme.name.toLowerCase()}>
-                      {theme.name}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="price">Price</SelectItem>
+                  <SelectItem value="popularity">Popularity</SelectItem>
+                  <SelectItem value="date">Date</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex flex-col">
-              <div className="flex flex-col">
-                <p className="font-semibold text-primary-dark text-paragraph">
-                  Sort by
-                </p>
-                <Select
-                  className="w-full"
-                  defaultValue={sort}
-                  onValueChange={(value) => {
-                    setSort(value);
-                    router.push(
-                      `/images?theme=${theme}&sort=${value}${
-                        search && `&search=${search}`
-                      }`
-                    );
-                  }}
-                >
-                  <SelectTrigger className="!text-base w-full py-5 font-semibold shadow-sm bg-gray-200">
-                    <SelectValue />
-                    <p className="sr-only">Sort by</p>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="price">Price</SelectItem>
-                    {/* <SelectItem value="rating">Rating</SelectItem> */}
-                    <SelectItem value="popularity">Popularity</SelectItem>
-                    <SelectItem value="date">Date</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
           </div>
         </div>
-        {loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-20 px-10 sm:px-10 md:px-10 lg:px-20 xl:px-44">
-            {[...Array(pageSize)].map((_, index) => (
-              <div key={index} className="flex flex-col gap-4">
-                <Skeleton className="w-full aspect-[1/1] rounded-lg" />
-                <div className="flex flex-col gap-4">
-                  <Skeleton className="w-full h-6" />
-                  <Skeleton className="w-1/2 h-4" />
-                  <Skeleton className="w-1/2 h-4" />
-                  <Skeleton className="w-1/4 h-4" />
+      </div>
+      {loading && <ImagesLoader />}
+      <div className="sm:columns-2 lg:columns-3 gap-2 mt-10 px-4 sm:px-10 md:px-10 lg:px-20">
+        {sortedImages.map((image, index) => (
+          <div
+            key={index}
+            className="relative w-full mb-2 shadow-[0px_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out"
+          >
+            <Link href={`/images/${image._id}`} className="cursor-pointer">
+              <Image
+                src={
+                  image.imageLinks.thumbnail ||
+                  "/assets/placeholders/image.webp"
+                }
+                width={image.resolutions?.thumbnail?.width / 10 || 500}
+                height={image.resolutions?.thumbnail.height / 10 || 500}
+                priority
+                alt={image.description}
+                className="w-full"
+              />
+              <div className="absolute inset-0 flex flex-col justify-between py-2 px-4 transition-all duration-200 ease-linear">
+                <div className="flex justify-between items-center">
+                  <p
+                    style={{
+                      textShadow: "-1px 1px 2px #666, 1px 1px 2px #666",
+                    }}
+                    className="text-white font-medium text-xs"
+                  >
+                    {image.title || "Untitled"}
+                  </p>
+                  <div className="flex gap-2">
+                    <Heart
+                      size={24}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (user || photographer) {
+                          wishlist?.some((item) => item._id === image._id)
+                            ? removeImageFromWishlist(image._id)
+                            : addImageToWishlist(image._id);
+                        } else {
+                          toast.error("Please login to add to wishlist");
+                        }
+                      }}
+                      className={` ${
+                        wishlist?.some((item) => item._id === image._id)
+                          ? "text-red-400 fill-red-500"
+                          : "text-white"
+                      } transition-all duration-200 ease-linear cursor-pointer`}
+                    />
+                  </div>
                 </div>
               </div>
-            ))}
+            </Link>
+          </div>
+        ))}
+      </div>
+      <div className="w-full flex justify-center items-center mt-10">
+        {pageCount > page && (
+          <div
+            onClick={() => setPageSize((prev) => prev + 12)}
+            className="flex items-center justify-center px-4 rounded-lg mb-10 py-4 bg-primary text-white font-semibold text-heading-06 uppercase cursor-pointer hover:bg-primary-dark transition-all duration-300 ease-in-out"
+          >
+            View More <ChevronDown size={24} className="ml-2" />
           </div>
         )}
-        <div className="sm:columns-2 lg:columns-3 gap-2 mt-10 px-4 sm:px-10 md:px-10 lg:px-20">
-          {sortedImages.map((image, index) => (
-            <div
-              key={index}
-              className="relative w-full mb-2 shadow-[0px_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out"
-            >
-              <Link href={`/images/${image._id}`} className="cursor-pointer">
-                <Image
-                  src={
-                    image.imageLinks.thumbnail ||
-                    "/assets/placeholders/image.webp"
-                  }
-                  width={500}
-                  height={500}
-                  alt={image.description}
-                  className="w-full"
-                />
-                <div className="absolute inset-0 flex flex-col justify-between py-2 px-4 transition-all duration-200 ease-linear">
-                  <div className="flex justify-between items-center">
-                    <p
-                      style={{
-                        textShadow: "-1px 1px 2px #666, 1px 1px 2px #666",
-                      }}
-                      className="text-white font-medium text-xs"
-                    >
-                      {image.title || "Untitled"}
-                    </p>
-                    <div className="flex gap-2">
-                      <Heart
-                        size={24}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          if (user || photographer) {
-                            wishlist?.some((item) => item._id === image._id)
-                              ? removeImageFromWishlist(image._id)
-                              : addImageToWishlist(image._id);
-                          } else {
-                            toast.error(
-                              "Please login to add to wishlist"
-                            );
-                          }
-                        }}
-                        className={` ${
-                          wishlist?.some((item) => item._id === image._id)
-                            ? "text-red-400 fill-red-500"
-                            : "text-white"
-                        } transition-all duration-200 ease-linear cursor-pointer`}
-                      />
-                    </div>
-                  </div>
-                  {/* <div className="flex justify-between items-center">
-                    <p className="text-white font-medium text-xs sm:text-sm">
-                      {image.photographer?.firstName
-                        ? image.photographer?.firstName +
-                          " " +
-                          image.photographer?.lastName
-                        : image.photographer?.name}
-                    </p>
-                    <p className="text-white font-medium text-paragraph">
-                    {image.category?.name}
-                    </p>
-                    <p
-                      style={{
-                        textShadow: "-1px 1px 2px #666, 1px 1px 2px #666",
-                      }}
-                      className="text-white font-semibold text-paragraph"
-                    >
-                      ₹ {image.price?.original?.toLocaleString()}
-                    </p>
-                  </div> */}
-                </div>
-              </Link>
-            </div>
-          ))}
-        </div>
-        <div className="w-full flex justify-center items-center mt-10">
-          {pageCount > page && (
-            <div
-              onClick={() => setPageSize((prev) => prev + 12)}
-              className="flex items-center justify-center px-4 rounded-lg mb-10 py-4 bg-primary text-white font-semibold text-heading-06 uppercase cursor-pointer hover:bg-primary-dark transition-all duration-300 ease-in-out"
-            >
-              View More <ChevronDown size={24} className="ml-2" />
-            </div>
-          )}
-        </div>
-      </motion.div>
-    </AnimatePresence>
+      </div>
+    </div>
   );
 }

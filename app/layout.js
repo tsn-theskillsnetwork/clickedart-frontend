@@ -5,7 +5,6 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Image from "next/image";
 import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata = {
   title: "ClickedArt - Buy Digital Art & Premium Archival Prints",
@@ -66,8 +65,7 @@ export default async function RootLayout({ children }) {
             <Footer />
           </>
         )}
-        <Analytics />
-        <SpeedInsights />
+        <Analytics mode="production" />
       </body>
     </html>
   );

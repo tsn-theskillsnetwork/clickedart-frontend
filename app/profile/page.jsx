@@ -668,7 +668,7 @@ const ProfilePage = () => {
                             image.imageLinks.thumbnail
                           }
                           alt={image.description || "Image"}
-                          onClick={() => router.push(`/images/${image._id}`)}
+                          onClick={() => router.push(`/profile/print/${image._id}`)}
                           className="object-cover w-full aspect-[1/1] transition-transform duration-300 hover:scale-[1.02] cursor-pointer"
                         />
                       </div>

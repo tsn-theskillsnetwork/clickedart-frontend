@@ -353,21 +353,6 @@ export default function CheckoutPage() {
     }
   }, [paymentStatus]);
 
-  const toastShownRef = useRef(false);
-
-  useEffect(() => {
-    if (!isHydrated) return;
-
-    if (!(user || photographer) && !toastShownRef.current) {
-      toastShownRef.current = true;
-      toast("Please Login to continue", {
-        duration: 4000,
-        position: "top-center",
-      });
-      router.push("/signin");
-    }
-  }, [isHydrated, user, photographer, router]);
-
   return (
     <div>
       {loading || !isHydrated ? (

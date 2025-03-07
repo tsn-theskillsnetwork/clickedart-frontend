@@ -195,7 +195,7 @@ const ProfilePage = () => {
       );
       setWatermark(response.data.watermarkImage);
     } catch (error) {
-      console.log("Error fetching watermarks:", error);
+      console.log("Watermark not found");
     }
   };
   useEffect(() => {
@@ -218,33 +218,41 @@ const ProfilePage = () => {
     try {
       let fileInput = event.target;
       let file = fileInput.files[0];
+      let step = 0;
 
       if (!file) {
-        console.error("No file selected");
+        console.error(`Step ${++step}: No file selected`);
         toast.error("No file selected for upload!");
         fileInput.value = ""; // Reset input field
         setUploading(false);
         return;
       }
 
+      console.log(`Step ${++step}: File selected -`, file.name);
+
       // Check file size (max 200MB)
-      if (file.size > 200 * 1024 * 1024) {
+      if (file.size > 150 * 1024 * 1024) {
+        console.error(`Step ${++step}: File size exceeds 150MB -`, file.size);
         Swal.fire({
-          title: "File size should not exceed 200MB",
+          title: "File size should not exceed 150MB",
           icon: "error",
           confirmButtonText: "OK",
         });
         setImageUrl("");
-        fileInput.value = ""; // Reset input field
+        fileInput.value = "";
         setUploading(false);
         return;
       }
 
+      console.log(`Step ${++step}: Checking file format...`);
       // Detect HEIC file
       const fileExtension = file.name.split(".").pop().toLowerCase();
       const isHEIC = fileExtension === "heic" || fileExtension === "heif";
 
       if (isHEIC) {
+        console.log(
+          `Step ${++step}: HEIC file detected, starting conversion...`
+        );
         const toastId = toast.loading("Processing...");
         const heic2any = (await import("heic2any")).default;
 
@@ -257,8 +265,12 @@ const ProfilePage = () => {
             type: "image/jpeg",
           });
           toast.dismiss(toastId);
+          console.log(`Step ${++step}: HEIC conversion successful`);
         } catch (conversionError) {
-          console.error("HEIC conversion failed:", conversionError);
+          console.error(
+            `Step ${++step}: HEIC conversion failed -`,
+            conversionError
+          );
           toast.dismiss(toastId);
           toast.error(
             "HEIC conversion failed. Please use a supported image format."
@@ -270,6 +282,7 @@ const ProfilePage = () => {
         }
       }
 
+      console.log(`Step ${++step}: Checking image resolution...`);
       // Check image resolution
       const image = new Image();
       const imageUrl = URL.createObjectURL(file);
@@ -280,6 +293,11 @@ const ProfilePage = () => {
         const megapixels = (width * height) / 1000000;
 
         if (megapixels < 5) {
+          console.error(
+            `Step ${++step}: Image resolution too low -`,
+            megapixels,
+            "MP"
+          );
           Swal.fire({
             title: "Error!",
             text: "Image should be more than 5MP",
@@ -292,7 +310,9 @@ const ProfilePage = () => {
           return;
         }
 
+        console.log(`Step ${++step}: Preparing image upload to S3...`);
         try {
+          console.log(`Step ${++step}: Uploading image to S3...`);
           // Upload to S3
           const s3 = new S3Client({
             region: "ap-south-1",
@@ -313,29 +333,40 @@ const ProfilePage = () => {
             client: s3,
             params: target,
           });
+          step += 1;
 
           upload.on("httpUploadProgress", (progress) => {
             const percentCompleted = Math.round(
               (progress.loaded / progress.total) * 100
             );
             setProgr(percentCompleted);
+            console.log(`Step ${step}: Upload progress - ${percentCompleted}%`);
           });
 
           await upload.done();
 
           const fileUrl = `https://${target.Bucket}.s3.ap-south-1.amazonaws.com/${target.Key}`;
+          console.log(
+            `Step ${++step}: File uploaded successfully, URL:`,
+            fileUrl
+          );
           setImageUrl(fileUrl);
           setPhoto({ ...photo, imageLinks: { image: fileUrl } });
         } catch (uploadError) {
-          console.error("Upload failed:", uploadError);
+          console.error(`Step ${++step}: Upload failed -`, uploadError);
+          toast.error("Upload failed. Please try again later.");
         } finally {
-          setUploading(false); // Now correctly placed
+          console.log(`Step ${++step}: Upload process completed.`);
+          setUploading(false);
         }
       };
 
       image.src = imageUrl;
     } catch (error) {
-      console.error("Error uploading file:", error);
+      console.error(
+        `Step ${++step}: Unexpected error during file upload -`,
+        error
+      );
       event.target.value = "";
       setUploading(false);
     }
@@ -637,7 +668,7 @@ const ProfilePage = () => {
                           aspect ratio).
                         </li>
                         <li className="text-xs mt-1">
-                          File size should not exceed 200 MB.
+                          File size should not exceed 150 MB.
                         </li>
                       </ul>
                       <ul className="text-xs text-primary font-medium mt-1">

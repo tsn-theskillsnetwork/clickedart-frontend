@@ -4,7 +4,7 @@ export function middleware(req) {
   const token = req.cookies.get("token")?.value;
   const { pathname, search, origin } = req.nextUrl;
 
-  const protectedRoutes = ["/dashboard", "/profile"];
+  const protectedRoutes = ["/dashboard", "/profile", "/checkout"];
   const authRoutes = ["/signin", "/signup"];
 
   // If user tries to access protected routes without a token, store attempted URL
@@ -24,5 +24,5 @@ export function middleware(req) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/profile/:path*", "/signin", "/signup/:path*"],
+  matcher: ["/dashboard/:path*", "/profile/:path*", "/signin", "/signup/:path*", "/checkout"],
 };
