@@ -78,15 +78,15 @@ const ProfilePage = () => {
 
   const sendLogToServer = async (message) => {
     try {
-        await fetch("/api/log", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message }),
-        });
+      await fetch("/api/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message }),
+      });
     } catch (err) {
-        console.error("Failed to send log:", err);
+      console.error("Failed to send log:", err);
     }
-};
+  };
 
   const handlePriceChange = (e) => {
     const newValue = e.target.value;
@@ -228,7 +228,11 @@ const ProfilePage = () => {
   const handleChange = async (event) => {
     setUploading(true);
     let step = 0;
-    await sendLogToServer(`Photographer: ${photographer?.firstName || ""} (${photographer?._id}) started uploading photo`);
+    await sendLogToServer(
+      `Photographer: ${photographer?.firstName || ""} (${
+        photographer?._id
+      }) started uploading photo`
+    );
     try {
       let fileInput = event.target;
       let file = fileInput.files[0];
@@ -263,9 +267,19 @@ const ProfilePage = () => {
       }
 
       if (file.size < 500 * 1024) {
-        console.error(`Step ${++step}: File size less than 500KB -> ${file.size / 1024 > 1024 ? file.size / 1024 / 1024 + " MB" : file.size / 1024 + " KB"}`);
+        console.error(
+          `Step ${++step}: File size less than 500KB -> ${
+            file.size / 1024 > 1024
+              ? file.size / 1024 / 1024 + " MB"
+              : file.size / 1024 + " KB"
+          }`
+        );
         await sendLogToServer(
-          `Step ${step}: File size less than 500KB -> ${file.size / 1024 > 1024 ? file.size / 1024 / 1024 + " MB" : file.size / 1024 + " KB"}`
+          `Step ${step}: File size less than 500KB -> ${
+            file.size / 1024 > 1024
+              ? file.size / 1024 / 1024 + " MB"
+              : file.size / 1024 + " KB"
+          }`
         );
         Swal.fire({
           title: "File size should be more than 500KB",
@@ -382,7 +396,6 @@ const ProfilePage = () => {
             params: target,
           });
           step += 1;
-          await sendLogToServer(`Step ${step}: Upload in Progress...`);
 
           upload.on("httpUploadProgress", (progress) => {
             const percentCompleted = Math.round(
@@ -390,6 +403,9 @@ const ProfilePage = () => {
             );
             setProgr(percentCompleted);
             console.log(`Step ${step}: Upload progress - ${percentCompleted}%`);
+            sendLogToServer(
+              `Step ${step}: Upload progress - ${percentCompleted}%`
+            );
           });
 
           await upload.done();
