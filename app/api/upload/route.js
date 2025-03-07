@@ -20,11 +20,12 @@ export async function POST(req) {
 
     const params = {
       Bucket: "clickedart-bucket",
-      Key: `images/${Date.now()}-${fileName}`, // Ensure unique filename
+      Key: `images/${Date.now()}-${fileName}`,
       ContentType: fileType,
     };
 
     const signedUrl = await getSignedUrl(s3, new PutObjectCommand(params), { expiresIn: 300 });
+    console.log("Generated Signed URL:", signedUrl);
 
     return NextResponse.json({ url: signedUrl });
   } catch (error) {
