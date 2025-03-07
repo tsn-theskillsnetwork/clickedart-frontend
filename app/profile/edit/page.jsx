@@ -588,14 +588,13 @@ const ProfileEditPage = () => {
 
               <div>
                 <Label>
-                  Last Name <span className="text-red-500">*</span>
+                  Last Name
                 </Label>
                 <Input
                   type="text"
                   name="lastName"
                   value={formData.lastName || ""}
                   onChange={handleInputChange}
-                  required
                 />
               </div>
             </div>
@@ -891,14 +890,13 @@ const ProfileEditPage = () => {
 
               <div>
                 <Label>
-                  Last Name <span className="text-red-500">*</span>
+                  Last Name
                 </Label>
                 <Input
                   type="text"
                   name="lastName"
                   value={formData.lastName || ""}
                   onChange={handleInputChange}
-                  required
                 />
               </div>
             </div>

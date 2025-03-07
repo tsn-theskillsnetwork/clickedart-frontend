@@ -4,6 +4,7 @@ import Button from "@/components/button";
 import Loader from "@/components/loader";
 import { Icon } from "@iconify/react";
 import axios from "axios";
+import { CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -143,11 +144,14 @@ export default function ProfilePage({ photographer }) {
             <p className="px-4 py-2 rounded-full capitalize bg-black font-medium text-white -mt-6">
               {photographer?.rank}
             </p>
-            <p className="text-heading-06 lg:text-heading-02 font-semibold lg:font-medium">
-              {photographer.firstName
-                ? photographer?.firstName + " " + photographer?.lastName
-                : photographer?.name}
-            </p>
+            <div className="flex gap-2 items-center">
+              <p className="text-heading-06 lg:text-heading-02 font-semibold lg:font-medium">
+                {photographer?.firstName + " " + photographer?.lastName}
+              </p>
+              {photographer?._id === process.env.NEXT_PUBLIC_OFFICIAL_ID && (
+                <CheckCircle2 className="text-white fill-blue-500 size-6 lg:size-12" />
+              )}
+            </div>
             <p className="text-sm lg:text-heading-05 font-medium lg:font-normal text-surface-500 lg:-mt-4">
               {photographer.shippingAddress &&
                 photographer.shippingAddress?.city +

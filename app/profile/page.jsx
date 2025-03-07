@@ -9,6 +9,7 @@ import Button2 from "@/components/button2";
 import Cookies from "js-cookie";
 import {
   ArrowUpCircleIcon,
+  CheckCircle2,
   ClockIcon,
   EllipsisIcon,
   IndianRupeeIcon,
@@ -367,7 +368,7 @@ const ProfilePage = () => {
               alt="avatar"
               width={150}
               height={150}
-              className="rounded-full h-28 w-28 lg:h-52 lg:w-52 object-cover border-[3px] lg:border-[6px] border-white"
+              className="rounded-full h-28 w-28 lg:h-52 lg:w-52 object-cover border-[3px] lg:border-[6px] border-white shadow-[0_2px_2px_rgba(0,0,0,0.2)]"
             />
             {photographer && (
               <p className="px-4 py-2 rounded-full capitalize bg-black font-medium text-white -mt-6">
@@ -395,11 +396,16 @@ const ProfilePage = () => {
                 />
               </div>
             )}
-            <p className="text-heading-06 lg:text-heading-02 font-semibold lg:font-medium">
-              {(user || photographer)?.firstName +
-                " " +
-                (user || photographer)?.lastName}
-            </p>
+            <div className="flex gap-2 items-center">
+              <p className="text-heading-06 lg:text-heading-02 font-semibold lg:font-medium">
+                {(user || photographer)?.firstName +
+                  " " +
+                  (user || photographer)?.lastName}
+              </p>
+              {photographer?._id === process.env.NEXT_PUBLIC_OFFICIAL_ID && (
+                <CheckCircle2 className="text-white fill-blue-500 size-6 lg:size-12" />
+              )}
+            </div>
             <p className="text-sm lg:text-heading-05 font-medium lg:font-normal text-surface-500 lg:-mt-4">
               {photographer
                 ? photographer.shippingAddress?.city +

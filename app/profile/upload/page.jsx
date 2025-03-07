@@ -424,6 +424,9 @@ const ProfilePage = () => {
           console.error(`Step ${++step}: Upload failed -`, uploadError);
           await sendLogToServer(`Step ${step}: Upload failed - ${uploadError}`);
           toast.error("Upload failed. Please try again later.");
+          setImageUrl("");
+          fileInput.value = "";
+          setUploading(false);
         } finally {
           console.log(`Step ${++step}: Upload process completed.`);
           await sendLogToServer(`Step ${step}: Upload process completed.`);
