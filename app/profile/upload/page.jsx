@@ -382,6 +382,8 @@ const ProfilePage = () => {
               accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
               secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
             },
+            requestHandler: new NodeHttpHandler({ timeout: 300000 }),
+            credentials: "same-origin",
           });
 
           const target = {
@@ -394,6 +396,8 @@ const ProfilePage = () => {
           const upload = new Upload({
             client: s3,
             params: target,
+            queueSize: 2,
+            partSize: 5 * 1024 * 1024,
           });
           step += 1;
 
@@ -422,7 +426,11 @@ const ProfilePage = () => {
           setPhoto({ ...photo, imageLinks: { image: fileUrl } });
         } catch (uploadError) {
           console.error(`Step ${++step}: Upload failed -`, uploadError);
-          await sendLogToServer(`Step ${step}: Upload failed - ${uploadError}`);
+          await sendLogToServer(
+            `Step ${step}: Upload failed - ${uploadError}. User-Agent: ${
+              navigator.userAgent
+            }, Location: ${Intl.DateTimeFormat().resolvedOptions().timeZone}`
+          );
           toast.error("Upload failed. Please try again later.");
           setImageUrl("");
           fileInput.value = "";
