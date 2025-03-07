@@ -76,6 +76,18 @@ const ProfilePage = () => {
   const [timeoutId, setTimeoutId] = useState(null);
   const [keywordInput, setKeywordInput] = useState(photo.keywords.join(", "));
 
+  const sendLogToServer = async (message) => {
+    try {
+        await fetch("/api/log", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message }),
+        });
+    } catch (err) {
+        console.error("Failed to send log:", err);
+    }
+};
+
   const handlePriceChange = (e) => {
     const newValue = e.target.value;
 
@@ -215,13 +227,15 @@ const ProfilePage = () => {
   //photo upload
   const handleChange = async (event) => {
     setUploading(true);
+    let step = 0;
+    await sendLogToServer(`Photographer: ${photographer?._id} - ${photographer?.firstName || ""} started uploading photo`);
     try {
       let fileInput = event.target;
       let file = fileInput.files[0];
-      let step = 0;
 
       if (!file) {
         console.error(`Step ${++step}: No file selected`);
+        await sendLogToServer(`Step ${++step}: No file selected`);
         toast.error("No file selected for upload!");
         fileInput.value = ""; // Reset input field
         setUploading(false);
@@ -229,10 +243,14 @@ const ProfilePage = () => {
       }
 
       console.log(`Step ${++step}: File selected -`, file.name);
+      await sendLogToServer(`Step ${++step}: File selected - ${file.name}`);
 
-      // Check file size (max 200MB)
+      // Check file size (max 150MB)
       if (file.size > 150 * 1024 * 1024) {
         console.error(`Step ${++step}: File size exceeds 150MB -`, file.size);
+        await sendLogToServer(
+          `Step ${++step}: File size exceeds 150MB - ${file.size}`
+        );
         Swal.fire({
           title: "File size should not exceed 150MB",
           icon: "error",
@@ -244,13 +262,33 @@ const ProfilePage = () => {
         return;
       }
 
+      if (file.size < 500 * 1024) {
+        console.error(`Step ${++step}: File size less than 500KB -`, file.size);
+        await sendLogToServer(
+          `Step ${++step}: File size less than 500KB - ${file.size / 1024 > 1024 ? file.size / 1024 / 1024 + " MB" : file.size / 1024 + " KB"}`
+        );
+        Swal.fire({
+          title: "File size should be more than 500KB",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+        setImageUrl("");
+        fileInput.value = "";
+        setUploading(false);
+        return;
+      }
+
       console.log(`Step ${++step}: Checking file format...`);
+      await sendLogToServer(`Step ${++step}: Checking file format...`);
       // Detect HEIC file
       const fileExtension = file.name.split(".").pop().toLowerCase();
       const isHEIC = fileExtension === "heic" || fileExtension === "heif";
 
       if (isHEIC) {
         console.log(
+          `Step ${++step}: HEIC file detected, starting conversion...`
+        );
+        await sendLogToServer(
           `Step ${++step}: HEIC file detected, starting conversion...`
         );
         const toastId = toast.loading("Processing...");
@@ -266,10 +304,14 @@ const ProfilePage = () => {
           });
           toast.dismiss(toastId);
           console.log(`Step ${++step}: HEIC conversion successful`);
+          await sendLogToServer(`Step ${++step}: HEIC conversion successful`);
         } catch (conversionError) {
           console.error(
             `Step ${++step}: HEIC conversion failed -`,
             conversionError
+          );
+          await sendLogToServer(
+            `Step ${++step}: HEIC conversion failed - ${conversionError}`
           );
           toast.dismiss(toastId);
           toast.error(
@@ -283,6 +325,7 @@ const ProfilePage = () => {
       }
 
       console.log(`Step ${++step}: Checking image resolution...`);
+      await sendLogToServer(`Step ${++step}: Checking image resolution...`);
       // Check image resolution
       const image = new Image();
       const imageUrl = URL.createObjectURL(file);
@@ -298,6 +341,9 @@ const ProfilePage = () => {
             megapixels,
             "MP"
           );
+          await sendLogToServer(
+            `Step ${++step}: Image resolution too low - ${megapixels} MP`
+          );
           Swal.fire({
             title: "Error!",
             text: "Image should be more than 5MP",
@@ -311,8 +357,10 @@ const ProfilePage = () => {
         }
 
         console.log(`Step ${++step}: Preparing image upload to S3...`);
+        await sendLogToServer(`Step ${++step}: Preparing image upload to S3...`);
         try {
           console.log(`Step ${++step}: Uploading image to S3...`);
+          await sendLogToServer(`Step ${++step}: Uploading image to S3...`);
           // Upload to S3
           const s3 = new S3Client({
             region: "ap-south-1",
@@ -334,6 +382,7 @@ const ProfilePage = () => {
             params: target,
           });
           step += 1;
+          await sendLogToServer(`Step ${step}: Upload in Progress...`);
 
           upload.on("httpUploadProgress", (progress) => {
             const percentCompleted = Math.round(
@@ -350,13 +399,18 @@ const ProfilePage = () => {
             `Step ${++step}: File uploaded successfully, URL:`,
             fileUrl
           );
+          await sendLogToServer(
+            `Step ${step}: File uploaded successfully, URL: ${fileUrl}`
+          );
           setImageUrl(fileUrl);
           setPhoto({ ...photo, imageLinks: { image: fileUrl } });
         } catch (uploadError) {
           console.error(`Step ${++step}: Upload failed -`, uploadError);
+          await sendLogToServer(`Step ${step}: Upload failed - ${uploadError}`);
           toast.error("Upload failed. Please try again later.");
         } finally {
           console.log(`Step ${++step}: Upload process completed.`);
+          await sendLogToServer(`Step ${step}: Upload process completed.`);
           setUploading(false);
         }
       };

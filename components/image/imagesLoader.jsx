@@ -21,7 +21,7 @@ export default function ImagesLoader() {
           className="relative w-full mb-2 shadow-[0px_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden transition-all duration-200 ease-out"
         >
           <Skeleton
-            className={`w-full ${aspects[index] || "aspect-[3/4]"} rounded-lg`}
+            className={`w-full ${aspects[index] || "aspect-[4/3]"} rounded-lg`}
           />
           <div className="flex flex-col gap-4 absolute inset-0 justify-between py-2 px-4 transition-all duration-200 ease-linear">
             <div className="flex justify-between items-center">
