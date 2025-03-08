@@ -50,7 +50,7 @@ const ProfilePage = () => {
   const [message, setMessage] = useState("");
   const [blogs, setBlogs] = useState([]);
   const [selectedImage, setSelectedImage] = useState([]);
-  const [selectedCatelogue, setSelectedCatelogue] = useState([]);
+  const [selectedCatalogue, setSelectedCatalogue] = useState([]);
   const [photos, setPhotos] = useState([]);
   const [pendingPhotos, setPendingPhotos] = useState([]);
   const [catalogues, setCatalogues] = useState([]);
@@ -126,7 +126,7 @@ const ProfilePage = () => {
     return true;
   };
 
-  const handleCreateCatelogue = async () => {
+  const handleCreateCatalogue = async () => {
     if (!catalogueValidation()) return;
     setMessage("");
     setError("");
@@ -156,7 +156,7 @@ const ProfilePage = () => {
     setNewCatalogue({ ...newCatalogue, photographer: photographer?._id });
   }, [photographer]);
 
-  const handleCatelogueUpdate = async (catalogueId) => {
+  const handleCatalogueUpdate = async (catalogueId) => {
     setMessage("");
     setError("");
 
@@ -175,8 +175,8 @@ const ProfilePage = () => {
         {
           catalogueId: catalogueId,
           photographer: photographer?._id,
-          name: selectedCatelogue?.name,
-          description: selectedCatelogue?.description,
+          name: selectedCatalogue?.name,
+          description: selectedCatalogue?.description,
           images: selectedImage,
         },
         {
@@ -187,15 +187,15 @@ const ProfilePage = () => {
       );
 
       fetchCatalogues();
-      toast.success("Catelogue Updated successfully!");
-      setMessage("Catelogue Updated successfully!");
+      toast.success("Catalogue Updated successfully!");
+      setMessage("Catalogue Updated successfully!");
       setError("");
     } catch (err) {
       console.log("err", err.response.data.message);
     }
   };
 
-  const handleCatelogueDelete = async (catalogueId) => {
+  const handleCatalogueDelete = async (catalogueId) => {
     setMessage("");
     setError("");
 
@@ -779,7 +779,7 @@ const ProfilePage = () => {
                             {/* <DialogClose asChild> */}
                             <Button2
                               size="sm"
-                              onClick={() => handleCreateCatelogue()}
+                              onClick={() => handleCreateCatalogue()}
                             >
                               Save changes
                             </Button2>
@@ -860,7 +860,7 @@ const ProfilePage = () => {
                                       <DialogTrigger asChild>
                                         <p
                                           onClick={() => {
-                                            setSelectedCatelogue(catalogue);
+                                            setSelectedCatalogue(catalogue);
                                           }}
                                         >
                                           Edit
@@ -869,7 +869,7 @@ const ProfilePage = () => {
                                       <DialogContent className="sm:max-w-[425px]">
                                         <DialogHeader>
                                           <DialogTitle>
-                                            Edit Catelogue
+                                            Edit Catalogue
                                           </DialogTitle>
                                         </DialogHeader>
                                         <div className="grid gap-4 py-4">
@@ -881,12 +881,12 @@ const ProfilePage = () => {
                                           </Label>
                                           <Input
                                             onChange={(e) => {
-                                              setSelectedCatelogue({
+                                              setSelectedCatalogue({
                                                 ...catalogue,
                                                 name: e.target.value,
                                               });
                                             }}
-                                            value={selectedCatelogue?.name}
+                                            value={selectedCatalogue?.name}
                                           />
                                           <Label
                                             htmlFor="description"
@@ -896,13 +896,13 @@ const ProfilePage = () => {
                                           </Label>
                                           <Input
                                             onChange={(e) => {
-                                              setSelectedCatelogue({
+                                              setSelectedCatalogue({
                                                 ...catalogue,
                                                 description: e.target.value,
                                               });
                                             }}
                                             value={
-                                              selectedCatelogue?.description
+                                              selectedCatalogue?.description
                                             }
                                           />
                                         </div>
@@ -910,7 +910,7 @@ const ProfilePage = () => {
                                           <Button2
                                             size="sm"
                                             onClick={() =>
-                                              handleCatelogueUpdate(
+                                              handleCatalogueUpdate(
                                                 catalogue._id
                                               )
                                             }
@@ -927,7 +927,7 @@ const ProfilePage = () => {
                                   variant="ghost"
                                   size="sm"
                                   onClick={() =>
-                                    handleCatelogueDelete(catalogue._id)
+                                    handleCatalogueDelete(catalogue._id)
                                   }
                                 >
                                   Delete

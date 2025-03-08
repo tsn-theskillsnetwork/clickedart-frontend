@@ -248,7 +248,7 @@ export default function CataloguesPage() {
                 removeImage(catalogue._id, image._id);
               }}
             >
-              Remove From Catelogue
+              Remove From Catalogue
             </Button>
           </div>
         ))}
