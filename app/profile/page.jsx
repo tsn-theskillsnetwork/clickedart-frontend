@@ -114,7 +114,7 @@ const ProfilePage = () => {
     router.push(`/profile?section=${newSection}`, { scroll: false });
   };
 
-  const catelogueValidation = () => {
+  const catalogueValidation = () => {
     if (!newCatalogue.name) {
       toast.error("Please enter the name of the catalogue.");
       return false;
@@ -127,7 +127,7 @@ const ProfilePage = () => {
   };
 
   const handleCreateCatelogue = async () => {
-    if (!catelogueValidation()) return;
+    if (!catalogueValidation()) return;
     setMessage("");
     setError("");
 
@@ -732,7 +732,7 @@ const ProfilePage = () => {
                       >
                         <Plus className="w-20 h-20 text-surface-400" />
                         <p className="text-surface-400 font-semibold">
-                          Create New Catelogue
+                          Create New Catalogue
                         </p>
                       </div>
                     ) : (
@@ -744,13 +744,13 @@ const ProfilePage = () => {
                         >
                           <Plus className="w-20 h-20 text-surface-400" />
                           <p className="text-surface-400 font-semibold">
-                            Create New Catelogue
+                            Create New Catalogue
                           </p>
                         </div>
                         {/* </DialogTrigger> */}
                         <DialogContent className="sm:max-w-[425px]">
                           <DialogHeader>
-                            <DialogTitle>Create Catelogue</DialogTitle>
+                            <DialogTitle>Create Catalogue</DialogTitle>
                           </DialogHeader>
                           <div className="grid gap-4 py-4">
                             <div>
