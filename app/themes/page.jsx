@@ -6,6 +6,7 @@ import { ChevronDown, Search } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
 
 export default function ThemesPage() {
   const router = useRouter();
@@ -53,12 +54,9 @@ export default function ThemesPage() {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 my-5 justify-center w-full px-4">
             {themes.map((theme, index) => (
-              <div
+              <Link href={`/images?theme=${theme.name.toLowerCase()}`}
                 key={index}
                 className={`relative border-8 border-transparent shadow-none hover:border-white hover:shadow-[rgba(0,0,15,0.3)_5px_5px_4px_0px] group transition-all duration-300 ease-in-out`}
-                onClick={() => {
-                  router.push(`/images?theme=${theme.name.toLowerCase()}`);
-                }}
                 aria-label={`Navigate to ${theme.name}`}
               >
                 <div className="overflow-hidden shadow-[rgba(0,0,15,0.3)_5px_5px_4px_0px] group-hover:shadow-none transition-all duration-300 ease-in-out">
@@ -76,7 +74,7 @@ export default function ThemesPage() {
                     {theme.name}
                   </h1>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
           <div className="w-full flex justify-center items-center">

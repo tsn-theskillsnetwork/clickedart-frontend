@@ -82,23 +82,28 @@ export default function ProductCategoriesMobile() {
             }}
             className={`${
               active1 === index ? "aspect-[16/9]" : "aspect-[1/1]"
-            } h-[24.5vw] relative flex flex-row gap-4 shadow-md shadow-zinc-300 rounded-2xl justify-center cursor-pointer overflow-hidden transition-all duration-300 ease-in-out`}
-            onClick={() => {
-              router.push(`/images?theme=${theme.name.toLowerCase()}`);
-            }}
+            } h-[24.5vw] relative flex flex-row gap-4 shadow-md shadow-zinc-300 rounded-2xl justify-center overflow-hidden transition-all duration-300 ease-in-out`}
+            // onClick={() => {
+            //   router.push(`/images?theme=${theme.name.toLowerCase()}`);
+            // }}
           >
             <div className="absolute bottom-2">
               <h1 className="text-xs sm:text-paragraph md:text-heading-06 lg:text-heading-05 xl:text-heading-04 font-bold text-white drop-shadow-md">
                 {theme.name.toUpperCase()}
               </h1>
             </div>
-            <Image
-              width={800}
-              height={800}
-              src={theme.coverImage || "/images/placeholder.jpg"}
-              alt={theme.name}
-              className={`img1 w-full h-full object-cover rounded-2xl transition-all duration-300 ease-in-out`}
-            />
+            <Link
+              className="w-full h-full"
+              href={`/images?theme=${theme.name.toLowerCase()}`}
+            >
+              <Image
+                width={800}
+                height={800}
+                src={theme.coverImage || "/images/placeholder.jpg"}
+                alt={theme.name}
+                className={`img1 w-full h-full object-cover rounded-2xl transition-all duration-300 ease-in-out`}
+              />
+            </Link>
           </motion.div>
         ))}
       </div>
@@ -115,23 +120,25 @@ export default function ProductCategoriesMobile() {
             }}
             className={`${
               active2 === index ? "aspect-[16/9]" : "aspect-[1/1]"
-            } h-[24.5vw] relative flex flex-row gap-4 shadow-md shadow-zinc-300 rounded-2xl justify-center cursor-pointer overflow-hidden transition-all duration-300 ease-in-out`}
-            onClick={() => {
-              router.push(`/images?theme=${theme.name.toLowerCase()}`);
-            }}
+            } h-[24.5vw] relative flex flex-row gap-4 shadow-md shadow-zinc-300 rounded-2xl justify-center overflow-hidden transition-all duration-300 ease-in-out`}
           >
             <div className="absolute bottom-2">
               <h1 className="text-xs sm:text-paragraph md:text-heading-06 lg:text-heading-05 xl:text-heading-04 font-bold text-white drop-shadow-md">
                 {theme.name.toUpperCase()}
               </h1>
             </div>
-            <Image
-              width={800}
-              height={800}
-              src={theme.coverImage || "/images/placeholder.jpg"}
-              alt={theme.name}
-              className={`img1 w-full h-full object-cover rounded-2xl transition-all duration-300 ease-in-out`}
-            />
+            <Link
+              className="w-full h-full"
+              href={`/images?theme=${theme.name.toLowerCase()}`}
+            >
+              <Image
+                width={800}
+                height={800}
+                src={theme.coverImage || "/images/placeholder.jpg"}
+                alt={theme.name}
+                className={`img1 w-full h-full object-cover rounded-2xl transition-all duration-300 ease-in-out`}
+              />
+            </Link>
           </motion.div>
         ))}
       </div>
@@ -148,23 +155,25 @@ export default function ProductCategoriesMobile() {
             }}
             className={`${
               active3 === index ? "aspect-[16/9]" : "aspect-[1/1]"
-            } h-[24.5vw] relative flex flex-row gap-4 shadow-md shadow-zinc-300 rounded-2xl justify-center cursor-pointer overflow-hidden transition-all duration-300 ease-in-out`}
-            onClick={() => {
-              router.push(`/images?theme=${theme.name.toLowerCase()}`);
-            }}
+            } h-[24.5vw] relative flex flex-row gap-4 shadow-md shadow-zinc-300 rounded-2xl justify-center overflow-hidden transition-all duration-300 ease-in-out`}
           >
             <div className="absolute bottom-2">
               <h1 className="text-xs sm:text-paragraph md:text-heading-06 lg:text-heading-05 xl:text-heading-04 font-bold text-white drop-shadow-md">
                 {theme.name.toUpperCase()}
               </h1>
             </div>
-            <Image
-              width={800}
-              height={800}
-              src={theme.coverImage || "/images/placeholder.jpg"}
-              alt={theme.name}
-              className={`img1 w-full h-full object-cover rounded-2xl transition-all duration-300 ease-in-out`}
-            />
+            <Link
+              className="w-full h-full"
+              href={`/images?theme=${theme.name.toLowerCase()}`}
+            >
+              <Image
+                width={800}
+                height={800}
+                src={theme.coverImage || "/images/placeholder.jpg"}
+                alt={theme.name}
+                className={`img1 w-full h-full object-cover rounded-2xl transition-all duration-300 ease-in-out`}
+              />
+            </Link>
           </motion.div>
         ))}
       </div>
