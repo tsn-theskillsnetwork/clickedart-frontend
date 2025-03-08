@@ -353,6 +353,20 @@ export default function CheckoutPage() {
     }
   }, [paymentStatus]);
 
+  if (!isHydrated) {
+    return (
+      <div className="bg-gray-100 h-[80vh] w-screen top-0 left-0 z-50 flex items-center justify-center bg-opacity-50">
+        <Loader />
+      </div>
+    );
+  }
+
+  useEffect(() => {
+    if (isHydrated && !(user || photographer)) {
+      router.push("/signin");
+    }
+  }, [isHydrated]);
+
   return (
     <div>
       {loading || !isHydrated ? (
