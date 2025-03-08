@@ -56,7 +56,7 @@ export default function Home() {
       <div className="px-4 my-5">
         <ProductCategoriesMobile />
       </div>
-      <div className="hidden sm:block px-4 mb-5">
+      <div className="hidden sm:block px-4 mt-10 bg-gray-100 mb-5">
         {storyLoading ? <DiscoverLoader /> : <Discover stories={stories} />}
       </div>
       <div className="block sm:hidden px-6 mb-5">
@@ -70,8 +70,8 @@ export default function Home() {
         <BestSelling />
       </div> */}
       <div className="px-4">
-      <motion.div layout>
-        <Testimonial />
+        <motion.div layout>
+          <Testimonial />
         </motion.div>
       </div>
       <div className="mt-5">
