@@ -408,7 +408,6 @@ const RegistrationForm = () => {
                   name="lastName"
                   value={formData.lastName || ""}
                   onChange={handleInputChange}
-                  required
                 />
               </div>
             </div>
