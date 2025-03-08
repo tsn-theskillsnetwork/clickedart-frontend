@@ -135,8 +135,6 @@ const RegistrationForm = () => {
     const newErrors = {};
     if (formData.firstName.length < 3)
       newErrors.firstName = "First Name must be at least 3 characters.";
-    if (formData.lastName.length < 3)
-      newErrors.lastName = "Last Name must be at least 3 characters.";
     if (!/^\S+@\S+\.\S+$/.test(formData.email))
       newErrors.email = "Enter a valid email address.";
     if (!formData.password) newErrors.password = "Password is required.";
@@ -403,7 +401,7 @@ const RegistrationForm = () => {
 
               <div>
                 <Label>
-                  Last Name <span className="text-red-500">*</span>
+                  Last Name
                 </Label>
                 <Input
                   type="text"
@@ -413,9 +411,6 @@ const RegistrationForm = () => {
                   required
                 />
               </div>
-              {errors.lastName && (
-                <p className="text-red-500 text-sm">{errors.lastName}</p>
-              )}
             </div>
 
             <div>

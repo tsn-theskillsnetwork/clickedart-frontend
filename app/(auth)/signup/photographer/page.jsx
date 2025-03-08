@@ -195,12 +195,6 @@ const RegistrationForm = () => {
       newErrors.firstName = "First Name is required.";
     else if (formData.firstName.trim().length < 3)
       newErrors.firstName = "First Name must be at least 3 characters.";
-
-    if (!formData.lastName.trim())
-      newErrors.lastName = "Last Name is required.";
-    else if (formData.lastName.length < 3)
-      newErrors.lastName = "Last Name must be at least 3 characters.";
-
     if (!formData.username.trim()) newErrors.username = "Username is required.";
     else if (formData.username.length < 3)
       newErrors.username = "Username must be at least 3 characters.";
@@ -499,7 +493,7 @@ const RegistrationForm = () => {
 
                 <div>
                   <Label>
-                    Last Name <span className="text-red-500">*</span>
+                    Last Name
                   </Label>
                   <Input
                     type="text"
@@ -508,9 +502,6 @@ const RegistrationForm = () => {
                     value={formData.lastName || ""}
                     onChange={handleInputChange}
                   />
-                  {errors.lastName && (
-                    <p className="text-red-500 text-sm">{errors.lastName}</p>
-                  )}
                 </div>
                 <div>
                   <Label>
