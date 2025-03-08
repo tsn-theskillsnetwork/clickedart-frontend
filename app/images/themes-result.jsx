@@ -38,7 +38,7 @@ export default function ThemesResultPage() {
   const [themes, setThemes] = useState([]);
   const [theme, setTheme] = useState(themeValue);
   const [sort, setSort] = useState(sortValue);
-  const [pageSize, setPageSize] = useState(24);
+  const [pageSize, setPageSize] = useState(120);
   const [pageCount, setPageCount] = useState(1);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -271,7 +271,6 @@ export default function ThemesResultPage() {
                 }
                 width={image.resolutions?.thumbnail?.width / 10 || 500}
                 height={image.resolutions?.thumbnail.height / 10 || 500}
-                priority
                 alt={image.description}
                 className="w-full"
               />
@@ -315,10 +314,10 @@ export default function ThemesResultPage() {
       <div className="w-full flex justify-center items-center mt-10">
         {pageCount > page && (
           <div
-            onClick={() => setPageSize((prev) => prev + 12)}
-            className="flex items-center justify-center px-4 rounded-lg mb-10 py-4 bg-primary text-white font-semibold text-heading-06 uppercase cursor-pointer hover:bg-primary-dark transition-all duration-300 ease-in-out"
+            onClick={() => setPageSize((prev) => prev + 30)}
+            className="flex items-center justify-center px-4 rounded-lg mb-10 py-3 bg-primary text-white font-medium text-base uppercase cursor-pointer hover:bg-primary-dark transition-all duration-300 ease-in-out"
           >
-            View More <ChevronDown size={24} className="ml-2" />
+            View More <ChevronDown size={18} className="ml-2" />
           </div>
         )}
       </div>
