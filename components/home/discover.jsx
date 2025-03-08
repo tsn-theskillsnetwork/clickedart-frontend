@@ -70,6 +70,7 @@ export default function Discover({ stories }) {
           className="bg-gray-200 p-2 rounded-full shadow hover:bg-gray-300"
         >
           <ChevronLeft size={32} className="text-gray-600" />
+          <p className="sr-only">Previous Story</p>
         </button>
       </div>
       <div className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10">
@@ -78,6 +79,7 @@ export default function Discover({ stories }) {
           className="bg-gray-200 p-2 rounded-full shadow hover:bg-gray-300"
         >
           <ChevronRight size={32} className="text-gray-600" />
+          <p className="sr-only">Next Story</p>
         </button>
       </div>
       <div className="flex flex-row items-center justify-center gap-8 -mt-3 mb-10">

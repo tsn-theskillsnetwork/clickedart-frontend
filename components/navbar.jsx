@@ -297,6 +297,7 @@ export default function Navbar() {
 
               <Link onClick={() => setIsMenuOpen(false)} href="/wishlist">
                 <Heart />
+                <p className="sr-only">Wishlist</p>
                 {wishlist?.length > 0 && (
                   <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
                     <p className="text-xs text-white font-semibold">
@@ -308,6 +309,7 @@ export default function Navbar() {
               </Link>
               <Link className="relative" onClick={() => setIsMenuOpen(false)} href="/cart">
                 <ShoppingCart />
+                <p className="sr-only">Cart</p>
                 {cartItems?.length > 0 && (
                   <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
                     <p className="text-xs text-white font-semibold">
@@ -358,6 +360,7 @@ export default function Navbar() {
                     : "text-white"
                 } cursor-pointer`}
               />
+              <p className="sr-only">Search</p>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
@@ -434,6 +437,7 @@ export default function Navbar() {
                         : "text-white"
                     } cursor-pointer`}
                   />
+                  <p className="sr-only">Wishlist</p>
                   {wishlist?.length > 0 && (
                     <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
                       <p className="text-xs text-white font-semibold">
@@ -459,6 +463,7 @@ export default function Navbar() {
                         : "text-white"
                     } cursor-pointer`}
                   />
+                  <p className="sr-only">Cart</p>
                   {cartItems?.length > 0 && (
                     <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
                       <p className="text-xs text-white font-semibold">

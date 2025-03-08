@@ -20,7 +20,7 @@ export default function DiscoverMobile({ stories }) {
                 quality={50}
                 priority
                 src={story.media_url}
-                alt={story.title || `Story ${index + 1}`}
+                alt={`Story ${index + 1}`}
                 className="w-full h-40 object-cover"
               />
               <div className="absolute inset-0 flex flex-col justify-between p-4 transition-all duration-200 ease-linear">
@@ -36,12 +36,6 @@ export default function DiscoverMobile({ stories }) {
                   </p>
                 </div>
               </div>
-              {/* <div className="absolute inset-0 flex flex-col justify-center items-center bg-black bg-opacity-50 p-4 z-50 transition-opacity duration-300 opacity-0 group-hover:opacity-100">
-                <h2 className="font-bold text-heading-06 sm:text-heading-06 md:text-heading-06 text-white">
-                  {story.title}
-                </h2>
-                <p className="text-paragraph text-white">{`${story.inspiredBy?.photographer?.firstName} ${story.inspiredBy?.photographer?.lastName}`}</p>
-              </div> */}
             </Link>
           </div>
         ))}

@@ -103,6 +103,7 @@ export default function GoogleReviews() {
             onClick={handlePrev}
             className="bg-gray-200 p-2 rounded-full shadow hover:bg-gray-300"
           >
+            <p className="sr-only">Previous Testimonial</p>
             <ChevronLeft size={32} className="text-gray-600" />
           </button>
         </div>
@@ -111,6 +112,7 @@ export default function GoogleReviews() {
             onClick={handleNext}
             className="bg-gray-200 p-2 rounded-full shadow hover:bg-gray-300"
           >
+            <p className="sr-only">Next Testimonial</p>
             <ChevronRight size={32} className="text-gray-600" />
           </button>
         </div>
