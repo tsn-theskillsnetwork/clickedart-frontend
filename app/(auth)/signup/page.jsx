@@ -22,7 +22,6 @@ import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 import countries from "@/lib/address/countries.json";
 import states from "@/lib/address/states.json";
-import cities from "@/lib/address/cities.json";
 import useAuthStore from "@/authStore";
 import Loader from "@/components/loader";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -88,19 +87,23 @@ const RegistrationForm = () => {
           file.type === "image/heif" ||
           fileExtension === "heic" ||
           fileExtension === "heif";
-  
+
         if (isHEIC) {
           toast.loading("Processing...");
           const heic2any = (await import("heic2any")).default;
-  
+
           try {
             const convertedBlob = await heic2any({
               blob: file,
               toType: "image/jpeg",
             });
-            const newFile = new File([convertedBlob], `${file.name.split(".")[0]}.jpeg`, {
-              type: "image/jpeg",
-            });
+            const newFile = new File(
+              [convertedBlob],
+              `${file.name.split(".")[0]}.jpeg`,
+              {
+                type: "image/jpeg",
+              }
+            );
             // Use the new JPEG file for cropping
             const reader = new FileReader();
             reader.onload = () => {
@@ -127,7 +130,6 @@ const RegistrationForm = () => {
       }
     }
   };
-  
 
   const validateForm = () => {
     const newErrors = {};
@@ -280,7 +282,6 @@ const RegistrationForm = () => {
     } finally {
       setLoading(false);
     }
-
   };
   const toastShownRef = useRef(false);
 
@@ -335,9 +336,7 @@ const RegistrationForm = () => {
                   />
                   <button
                     type="button"
-                    onClick={() =>
-                      setFormData({ ...formData, image: "" })
-                    }
+                    onClick={() => setFormData({ ...formData, image: "" })}
                     className="text-red-500"
                   >
                     Remove
@@ -590,30 +589,19 @@ const RegistrationForm = () => {
                   <Label>
                     District<span className="text-red-500">*</span>
                   </Label>
-                  <Select
-                    defaultValue={formData.shippingAddress?.city}
-                    onValueChange={(value) => {
+                  <Input
+                    type="text"
+                    name="shippingAddress.city"
+                    value={formData.shippingAddress?.city || ""}
+                    onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
-                      newAddress.city = value;
+                      newAddress.city = e.target.value;
                       setFormData({
                         ...formData,
                         shippingAddress: newAddress,
                       });
                     }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select City" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {cities[2].data
-                        .filter((city) => city.stateId === selectedState) // Filter cities by selected state ID
-                        .map((city) => (
-                          <SelectItem key={city.id} value={city.name}>
-                            {city.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
+                  />
                   {errors.city && (
                     <p className="text-red-500 text-sm">{errors.city}</p>
                   )}
@@ -728,7 +716,9 @@ const RegistrationForm = () => {
             {message && <p className="text-green-500">{message}</p>}
             {error && <p className="text-red-500">{error}</p>}
             <div className="flex flex-col items-center">
-              <Button disabled={loading} type="submit">Register</Button>
+              <Button disabled={loading} type="submit">
+                Register
+              </Button>
             </div>
           </form>
           <div className="flex flex-col items-center mt-4">

@@ -25,7 +25,6 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import countries from "@/lib/address/countries.json";
 import states from "@/lib/address/states.json";
-import cities from "@/lib/address/cities.json";
 import useAuthStore from "@/authStore";
 import Loader from "@/components/loader";
 import SpinLoader from "@/components/spinLoader";
@@ -743,30 +742,19 @@ const RegistrationForm = () => {
                   <Label>
                     District<span className="text-red-500">*</span>
                   </Label>
-                  <Select
-                    defaultValue={formData.shippingAddress?.city}
-                    onValueChange={(value) => {
+                  <Input
+                    type="text"
+                    name="shippingAddress.city"
+                    value={formData.shippingAddress?.city || ""}
+                    onChange={(e) => {
                       const newAddress = { ...formData.shippingAddress };
-                      newAddress.city = value;
+                      newAddress.city = e.target.value;
                       setFormData({
                         ...formData,
                         shippingAddress: newAddress,
                       });
                     }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select City" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {cities[2].data
-                        .filter((city) => city.stateId === selectedState) // Filter cities by selected state ID
-                        .map((city) => (
-                          <SelectItem key={city.id} value={city.name || ""}>
-                            {city.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
+                  />
                   {errors.city && (
                     <p className="text-red-500 text-sm">{errors.city}</p>
                   )}
