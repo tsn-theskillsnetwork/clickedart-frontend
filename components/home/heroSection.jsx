@@ -120,10 +120,10 @@ export default function HeroSection({ layout, loading }) {
               onChange={(e) => setSearchType(e.target.value)}
               className="bg-transparent border-l-2 active:border-none active:outline-none focus:ring-0 text-white py-2 px-0 w-20 sm:w-40 md:w-full font-semibold text-sm sm:text-base md:text-lg lg:text-xl rounded-md"
             >
-              <option className="text-black" value="images">
+              <option label="Images" className="text-black" value="images">
                 Images
               </option>
-              <option className="text-black" value="photographers">
+              <option label="Photographers" className="text-black" value="photographers">
                 Photographers
               </option>
             </select>
