@@ -37,6 +37,8 @@ import {
 import toast from "react-hot-toast";
 import { Icon } from "@iconify/react";
 import Swal from "sweetalert2";
+import ShareButton from "@/components/share/shareButton";
+import ShareIcon from "@/components/share/shareIcon";
 
 const ProfilePage = () => {
   const router = useRouter();
@@ -955,12 +957,14 @@ const ProfilePage = () => {
                       </div>
                     </Link>
                     {blogs.map((blog) => (
-                      <Link
-                        href={`/profile/blog/edit/${blog._id}`}
+                      <div
                         key={blog._id}
-                        className="flex flex-col w-full aspect-[1/1] justify-between gap-4 p-4 bg-white rounded-lg shadow-md"
+                        className="relative flex flex-col w-full aspect-[1/1] justify-between gap-1 p-4 bg-white rounded-lg shadow-md"
                       >
-                        <div className="flex flex-col gap-4">
+                        <Link
+                          href={`/profile/blog/edit/${blog._id}`}
+                          className="block"
+                        >
                           <Image
                             width={800}
                             height={800}
@@ -968,32 +972,31 @@ const ProfilePage = () => {
                             alt={blog.content?.title || "Blog cover image"}
                             className="w-full object-cover rounded-lg"
                           />
+                        </Link>
 
+                        <div className="absolute top-4 right-4 z-20 bg-white shadow-[-2px_2px_2px_rgba(0,0,0,0.2)] rounded-bl-lg">
+                          <ShareIcon
+                            url={`https://www.clickedart.com/blog/${blog._id}`}
+                            title={blog.content.title}
+                          />
+                        </div>
+
+                        <Link
+                          href={`/profile/blog/edit/${blog._id}`}
+                          className="block mt-2"
+                        >
                           <h2 className="text-lg font-semibold">
                             {blog.content.title}
                           </h2>
-                          <p className="text-sm text-gray-700 truncate">
-                            {blog.content.summary}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {new Date(blog.createdAt).toLocaleDateString()}
-                          </p>
-                          <div className="flex flex-wrap gap-2 items-center">
-                            {blog.tags.slice(0, 3).map((tag) => (
-                              <span
-                                key={tag}
-                                className="px-2 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-semibold"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                            <span className="text-sm text-gray-600 font-semibold">
-                              {blog.tags.length > 3 &&
-                                `+${blog.tags.length - 3} more`}
-                            </span>
-                          </div>
-                        </div>
-                      </Link>
+                        </Link>
+
+                        <p className="text-sm text-gray-700 truncate">
+                          {blog.content.summary}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {new Date(blog.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
                     ))}
                   </div>
                 )
