@@ -215,13 +215,11 @@ const ProfilePage = () => {
   const handleChange = async (event) => {
     setUploading(true);
     let step = 0;
-
     await sendLogToServer(
       `Photographer: ${photographer?.firstName || ""} (${
         photographer?._id
       }) started uploading photo`
     );
-
     try {
       let fileInput = event.target;
       let file = fileInput.files[0];
@@ -230,7 +228,7 @@ const ProfilePage = () => {
         console.error(`Step ${++step}: No file selected`);
         await sendLogToServer(`Step ${step}: No file selected`);
         toast.error("No file selected for upload!");
-        fileInput.value = "";
+        fileInput.value = ""; // Reset input field
         setUploading(false);
         return;
       }
@@ -238,17 +236,44 @@ const ProfilePage = () => {
       console.log(`Step ${++step}: File selected -`, file.name);
       await sendLogToServer(`Step ${step}: File selected - ${file.name}`);
 
-      // File size validation
-      if (file.size > 150 * 1024 * 1024 || file.size < 500 * 1024) {
-        console.error(`Step ${++step}: File size out of range -`, file.size);
+      // Check file size (max 150MB)
+      if (file.size > 150 * 1024 * 1024) {
+        console.error(`Step ${++step}: File size exceeds 150MB -`, file.size);
         await sendLogToServer(
-          `Step ${step}: File size out of range - ${file.size}`
+          `Step ${step}: File size exceeds 150MB - ${file.size}`
         );
         Swal.fire({
-          title: "File size must be between 500KB and 150MB",
+          title: "File size should not exceed 150MB",
           icon: "error",
           confirmButtonText: "OK",
         });
+        setImageUrl("");
+        fileInput.value = "";
+        setUploading(false);
+        return;
+      }
+
+      if (file.size < 500 * 1024) {
+        console.error(
+          `Step ${++step}: File size less than 500KB -> ${
+            file.size / 1024 > 1024
+              ? file.size / 1024 / 1024 + " MB"
+              : file.size / 1024 + " KB"
+          }`
+        );
+        await sendLogToServer(
+          `Step ${step}: File size less than 500KB -> ${
+            file.size / 1024 > 1024
+              ? file.size / 1024 / 1024 + " MB"
+              : file.size / 1024 + " KB"
+          }`
+        );
+        Swal.fire({
+          title: "File size should be more than 500KB",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+        setImageUrl("");
         fileInput.value = "";
         setUploading(false);
         return;
@@ -256,127 +281,150 @@ const ProfilePage = () => {
 
       console.log(`Step ${++step}: Checking file format...`);
       await sendLogToServer(`Step ${step}: Checking file format...`);
-
-      // HEIC conversion
+      // Detect HEIC file
       const fileExtension = file.name.split(".").pop().toLowerCase();
-      if (["heic", "heif"].includes(fileExtension)) {
-        console.log(
-          `Step ${++step}: HEIC file detected, starting conversion...`
-        );
-        await sendLogToServer(
-          `Step ${step}: HEIC file detected, starting conversion...`
-        );
+      const isHEIC = fileExtension === "heic" || fileExtension === "heif";
 
-        const toastId = toast.loading("Processing...");
-        const heic2any = (await import("heic2any")).default;
+      // if (isHEIC) {
+      //   console.log(
+      //     `Step ${++step}: HEIC file detected, starting conversion...`
+      //   );
+      //   await sendLogToServer(
+      //     `Step ${step}: HEIC file detected, starting conversion...`
+      //   );
+      //   const toastId = toast.loading("Processing...");
+      //   const heic2any = (await import("heic2any")).default;
 
-        try {
-          const convertedBlob = await heic2any({
-            blob: file,
-            toType: "image/jpeg",
-          });
-          file = new File([convertedBlob], `${file.name.split(".")[0]}.jpeg`, {
-            type: "image/jpeg",
-          });
-          toast.dismiss(toastId);
-          console.log(`Step ${++step}: HEIC conversion successful`);
-          await sendLogToServer(`Step ${step}: HEIC conversion successful`);
-        } catch (conversionError) {
+      //   try {
+      //     const convertedBlob = await heic2any({
+      //       blob: file,
+      //       toType: "image/jpeg",
+      //     });
+      //     file = new File([convertedBlob], `${file.name.split(".")[0]}.jpeg`, {
+      //       type: "image/jpeg",
+      //     });
+      //     toast.dismiss(toastId);
+      //     console.log(`Step ${++step}: HEIC conversion successful`);
+      //     await sendLogToServer(`Step ${step}: HEIC conversion successful`);
+      //   } catch (conversionError) {
+      //     console.error(
+      //       `Step ${++step}: HEIC conversion failed -`,
+      //       conversionError
+      //     );
+      //     await sendLogToServer(
+      //       `Step ${step}: HEIC conversion failed - ${conversionError}`
+      //     );
+      //     toast.dismiss(toastId);
+      //     toast.error(
+      //       "HEIC conversion failed. Please use a supported image format."
+      //     );
+      //     setImageUrl("");
+      //     fileInput.value = "";
+      //     setUploading(false);
+      //     return;
+      //   }
+      // }
+
+      console.log(`Step ${++step}: Checking image resolution...`);
+      await sendLogToServer(`Step ${step}: Checking image resolution...`);
+      // Check image resolution
+      const image = new Image();
+      const imageUrl = URL.createObjectURL(file);
+
+      image.onload = async () => {
+        const width = image.width;
+        const height = image.height;
+        const megapixels = (width * height) / 1000000;
+
+        if (megapixels < 5) {
           console.error(
-            `Step ${++step}: HEIC conversion failed -`,
-            JSON.stringify(conversionError)
+            `Step ${++step}: Image resolution too low -`,
+            megapixels,
+            "MP"
           );
           await sendLogToServer(
-            `Step ${step}: HEIC conversion failed - ${JSON.stringify(
-              conversionError
-            )}`
+            `Step ${step}: Image resolution too low - ${megapixels} MP`
           );
-          toast.dismiss(toastId);
-          toast.error(
-            "HEIC conversion failed. Please use a supported image format."
-          );
+          Swal.fire({
+            title: "Error!",
+            text: "Image should be more than 5MP",
+            icon: "error",
+            confirmButtonText: "OK",
+          });
+          setImageUrl("");
           fileInput.value = "";
           setUploading(false);
           return;
         }
-      }
 
-      console.log(`Step ${++step}: Requesting signed URL...`);
-      await sendLogToServer(`Step ${step}: Requesting signed URL...`);
+        console.log(`Step ${++step}: Preparing image upload to S3...`);
+        await sendLogToServer(`Step ${step}: Preparing image upload to S3...`);
+        try {
+          console.log(`Step ${++step}: Uploading image to S3...`);
+          await sendLogToServer(`Step ${step}: Uploading image to S3...`);
+          // Upload to S3
+          const s3 = new S3Client({
+            region: "ap-south-1",
+            credentials: {
+              accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
+              secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
+            },
+          });
 
-      // Get presigned URL from API
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileName: file.name, fileType: file.type }),
-      });
+          const target = {
+            Bucket: "clickedart-bucket",
+            Key: `images/${file.name}`,
+            Body: file,
+            ContentType: file.type,
+          };
 
-      const { url, error } = await res.json();
-      if (error) {
-        throw new Error(error);
-      }
+          const upload = new Upload({
+            client: s3,
+            params: target,
+          });
+          step += 1;
 
-      console.log(`Step ${++step}: Uploading to S3...`);
-      await sendLogToServer(`Step ${step}: Uploading to S3...`);
+          upload.on("httpUploadProgress", (progress) => {
+            const percentCompleted = Math.round(
+              (progress.loaded / progress.total) * 100
+            );
+            setProgr(percentCompleted);
+            console.log(`Step ${step}: Upload progress - ${percentCompleted}%`);
+            sendLogToServer(
+              `Step ${step}: Upload progress - ${percentCompleted}%`
+            );
+          });
 
-      // Upload file with live progress
-      const xhr = new XMLHttpRequest();
-      xhr.open("PUT", url, true);
-      xhr.setRequestHeader("Content-Type", file.type);
+          await upload.done();
 
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable) {
-          const percent = Math.round((event.loaded / event.total) * 100);
-          console.log(`Step ${step}: Upload progress - ${percent}%`);
-          setProgr(percent);
-          sendLogToServer(`Step ${step}: Upload progress - ${percent}%`);
-        }
-      };
-
-      xhr.onload = async () => {
-        if (xhr.status === 200) {
-          console.log(`Step ${++step}: File uploaded successfully`);
-          const fileUrl = url.split("?")[0];
-          await sendLogToServer(
-            `Step ${step}: File uploaded successfully - ${fileUrl}`
+          const fileUrl = `https://${target.Bucket}.s3.ap-south-1.amazonaws.com/${target.Key}`;
+          console.log(
+            `Step ${++step}: File uploaded successfully, URL:`,
+            fileUrl
           );
-
+          await sendLogToServer(
+            `Step ${step}: File uploaded successfully, URL: ${fileUrl}`
+          );
           setImageUrl(fileUrl);
           setPhoto({ ...photo, imageLinks: { image: fileUrl } });
-
-          setUploading(false);
-        } else {
-          console.error(
-            `Step ${++step}: Upload failed with status: ${xhr.status}`
-          );
-          await sendLogToServer(
-            `Step ${step}: Upload failed with status: ${JSON.stringify(
-              xhr.status
-            )}`
-          );
-          toast.error("Upload failed. Please try again.");
+        } catch (uploadError) {
+          console.error(`Step ${++step}: Upload failed -`, uploadError);
+          await sendLogToServer(`Step ${step}: Upload failed - ${uploadError}`);
+          toast.error("Upload failed. Please try again later.");
+        } finally {
+          console.log(`Step ${++step}: Upload process completed.`);
+          await sendLogToServer(`Step ${step}: Upload process completed.`);
           setUploading(false);
         }
       };
 
-      xhr.onerror = async (err) => {
-        console.error(`Step ${++step}: Upload failed due to network issues`, JSON.stringify(err));
-        await sendLogToServer(
-          `Step ${step}: Upload failed due to network issues - ${JSON.stringify(err)}`
-        );
-        toast.error("Upload failed. Please try again later.");
-        setImageUrl("");
-        setUploading(false);
-      };
-
-      xhr.send(file);
-    } catch (uploadError) {
-      console.error(`Step ${++step}: Upload failed -`, uploadError);
-      await sendLogToServer(
-        `Step ${step}: Upload failed - ${JSON.stringify(uploadError)}`
+      image.src = imageUrl;
+    } catch (error) {
+      console.error(
+        `Step ${++step}: Unexpected error during file upload -`,
+        error
       );
-      toast.error("Upload failed. Please try again later.");
-      setImageUrl("");
+      event.target.value = "";
       setUploading(false);
     }
   };
