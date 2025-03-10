@@ -3,6 +3,7 @@
 import Button from "@/components/button";
 import Button2 from "@/components/button2";
 import Loader from "@/components/loader";
+import ShareButton from "@/components/share/shareButton";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Share } from "lucide-react";
 import Link from "next/link";
@@ -76,6 +77,12 @@ export default function BlogPageComponent({ blog }) {
 
             <div className="flex flex-col mt-4 sm:mt-0 sm:w-1/5 px-4">
               <div className="flex flex-col gap-4 sm:pt-28">
+                <div className="mb-4">
+                  <ShareButton
+                    url={`${process.env.NEXT_PUBLIC_CLIENT}/blog/${blog._id}`}
+                    title={blog.content.title}
+                  />
+                </div>
                 <h5 className="text-heading-05 text-primary font-bold">
                   {blog.authorInfo?.authorType === "Photographer" ? (
                     <Link
@@ -126,19 +133,6 @@ export default function BlogPageComponent({ blog }) {
                   </Link>
                 </div>
               )}
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:w-4/5 mx-auto px-4 mt-5 justify-start items-start">
-            <div className="flex flex-row gap-4 py-4">
-              <Button
-                onClick={handleShare}
-                icon={<Share size={16} />}
-                variant="filled"
-                size="base"
-              >
-                Share
-              </Button>
             </div>
           </div>
         </div>

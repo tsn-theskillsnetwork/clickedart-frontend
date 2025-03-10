@@ -27,6 +27,7 @@ import { Tag } from "lucide-react";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import Loader from "@/components/loader";
 
 export default function CataloguesPage() {
   const router = useRouter();
@@ -149,8 +150,14 @@ export default function CataloguesPage() {
   }, [photographer]);
 
   useEffect(() => {
-    router.push("/profile");
+    router.push("/profile?section=catalogues");
   }, []);
+
+  return (
+    <div className="flex justify-center items-center h-screen">
+      <Loader />
+    </div>
+  );
 
   return (
     <div className="flex flex-col px-4 sm:px-8 md:px-12 lg:px-20 xl:px-32 gap-10 py-20">
