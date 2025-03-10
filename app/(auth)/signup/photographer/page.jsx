@@ -317,7 +317,6 @@ const RegistrationForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    sendLogToServer("Registration form submitted." + JSON.stringify(formData));
     // Validate client-side fields
     const formErrors = validateForm1();
 
@@ -347,8 +346,12 @@ const RegistrationForm = () => {
 
       setMessage(data.message);
       setError("");
+      sendLogToServer("Registration successful." + JSON.stringify(data));
+      sendLogToServer("Form Data." + JSON.stringify(formData));
       router.push("/verify?type=photographer&email=" + formData.email);
     } catch (err) {
+      sendLogToServer("Error in registration." + JSON.stringify(err));
+      console.error("Error in registration:", err);
       if (err.response && err.response.data) {
         setError(
           err.response.data.message ||
