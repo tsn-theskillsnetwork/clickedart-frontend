@@ -13,8 +13,12 @@ import React, { useEffect, useState } from "react";
 import DiscoverMobileLoader from "@/components/home/discoverMobileLoader";
 import DiscoverLoader from "@/components/home/discoverLoader";
 import { AnimatePresence, motion } from "framer-motion";
+import Cookies from "js-cookie";
+import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
   const [stories, setStories] = useState([]);
   const [storyLoading, setStoryLoading] = useState(true);
   const [layout, setLayout] = useState(null);
@@ -50,6 +54,31 @@ export default function Home() {
     fetchLayout();
     fetchStories();
   }, []);
+
+  useEffect(() => {
+    const isAlertClosed = Cookies.get("signupAlert");
+    const token = Cookies.get("token");
+    if (token || isAlertClosed) {
+      return;
+    }
+
+    Swal.fire({
+      // title: "",
+      // text: "",
+      // icon: "info",
+      imageUrl: "/assets/banners/signup-popup.png",
+      showCancelButton: true,
+      confirmButtonText: "Signup Now",
+      cancelButtonText: "Later",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        router.push("/signup/photographer");
+      } else {
+        Cookies.set("signupAlert", 1, { expires: 1 });
+      }
+    });
+  }, []);
+
   return (
     <div className="-mt-24 sm:-mt-28">
       <HeroSection layout={layout} loading={layoutLoading} />
