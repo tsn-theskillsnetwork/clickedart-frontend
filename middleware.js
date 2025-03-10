@@ -15,8 +15,11 @@ export function middleware(req) {
   }
 
   // If authenticated and visiting auth pages, redirect to stored page or home
-  if (authRoutes.includes(pathname) && token) {
-    const redirectUrl = new URL(req.nextUrl.searchParams.get("redirect") || "/", origin);
+  if (authRoutes.some((route) => pathname.startsWith(route)) && token) {
+    const redirectUrl = new URL(
+      req.nextUrl.searchParams.get("redirect") || "/",
+      origin
+    );
     return NextResponse.redirect(redirectUrl);
   }
 
@@ -24,5 +27,10 @@ export function middleware(req) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/profile/:path*", "/signin", "/signup/:path*"],
+  matcher: [
+    "/dashboard/:path*",
+    "/profile/:path*",
+    "/signin",
+    "/signup/:path*",
+  ],
 };

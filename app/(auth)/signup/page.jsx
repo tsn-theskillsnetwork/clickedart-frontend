@@ -26,6 +26,7 @@ import useAuthStore from "@/authStore";
 import Loader from "@/components/loader";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import Swal from "sweetalert2";
 
 const RegistrationForm = () => {
   const { user, photographer, isHydrated } = useAuthStore();
@@ -80,6 +81,17 @@ const RegistrationForm = () => {
     const file = e.target.files[0];
     if (file) {
       try {
+        let fileInput = e.target;
+        //return if file size is more than 10mb
+        if (file.size > 10 * 1024 * 1024) {
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "File size should not exceed 10MB",
+          });
+          fileInput.value = "";
+          return;
+        }
         // Detect HEIC file by extension as a fallback
         const fileExtension = file.name.split(".").pop().toLowerCase();
         const isHEIC = fileExtension === "heic" || fileExtension === "heif";
@@ -265,26 +277,26 @@ const RegistrationForm = () => {
   };
   const toastShownRef = useRef(false);
 
-  useEffect(() => {
-    if (!isHydrated) return;
+  // useEffect(() => {
+  //   if (!isHydrated) return;
 
-    if ((user || photographer) && !toastShownRef.current) {
-      toastShownRef.current = true;
-      // toast(`Already Signed In as ${user ? "User" : "Photographer"}`, {
-      //   duration: 4000,
-      //   position: "top-center",
-      // });
-      router.push("/");
-    }
-  }, [isHydrated, user, router]);
+  //   if ((user || photographer) && !toastShownRef.current) {
+  //     toastShownRef.current = true;
+  //     // toast(`Already Signed In as ${user ? "User" : "Photographer"}`, {
+  //     //   duration: 4000,
+  //     //   position: "top-center",
+  //     // });
+  //     router.push("/");
+  //   }
+  // }, [isHydrated, user, router]);
 
   return (
-    <>
-      {user || photographer || !isHydrated ? (
-        <div className="flex flex-col items-center justify-center min-h-[50vh]">
-          <Loader />
-        </div>
-      ) : (
+    // <>
+    //   {user || photographer || !isHydrated ? (
+    //     <div className="flex flex-col items-center justify-center min-h-[50vh]">
+    //       <Loader />
+    //     </div>
+    //   ) : (
         <div className="flex flex-col items-center justify-center min-h-[80vh] mt-5 mb-10">
           <Toaster position="top-center" reverseOrder={false} />
 
@@ -704,8 +716,8 @@ const RegistrationForm = () => {
             </p>
           </div>
         </div>
-      )}
-    </>
+    //   )}
+    // </>
   );
 };
 

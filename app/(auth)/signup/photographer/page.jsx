@@ -28,6 +28,7 @@ import states from "@/lib/address/states.json";
 import useAuthStore from "@/authStore";
 import Loader from "@/components/loader";
 import SpinLoader from "@/components/spinLoader";
+import Swal from "sweetalert2";
 
 const RegistrationForm = () => {
   const router = useRouter();
@@ -135,15 +136,27 @@ const RegistrationForm = () => {
     const file = e.target.files[0];
     if (!file) return;
 
+    
     sendLogToServer(
       `File uploaded: ${JSON.stringify(file.name)} - ${JSON.stringify(
         file.size / 1024 / 1024
       )} MB
-        - ${JSON.stringify(file.type)}`
+      - ${JSON.stringify(file.type)}`
     );
     console.log("File uploaded:", file);
-
+    
     try {
+      let fileInput = e.target;
+      //return if file size is more than 10mb
+      if (file.size > 10 * 1024 * 1024) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "File size should not exceed 10MB",
+        });
+        fileInput.value = "";
+        return;
+      }
       const fileExtension = file.name.split(".").pop().toLowerCase();
       const isHEIC = fileExtension === "heic" || fileExtension === "heif";
 
@@ -382,22 +395,22 @@ const RegistrationForm = () => {
 
   const toastShownRef = useRef(false);
 
-  useEffect(() => {
-    if (!isHydrated) return;
+  // useEffect(() => {
+  //   if (!isHydrated) return;
 
-    if ((user || photographer) && !toastShownRef.current) {
-      toastShownRef.current = true;
-      router.push("/");
-    }
-  }, [isHydrated, user, router]);
+  //   if ((user || photographer) && !toastShownRef.current) {
+  //     toastShownRef.current = true;
+  //     router.push("/");
+  //   }
+  // }, [isHydrated, user, router]);
 
   return (
     <div className="flex flex-col items-center  min-h-[80vh] mt-5 mb-10">
-      {user || photographer || !isHydrated ? (
+      {/* {user || photographer || !isHydrated ? (
         <div className="flex flex-col items-center justify-center min-h-[50vh]">
           <Loader />
         </div>
-      ) : (
+      ) : ( */}
         <form
           onSubmit={handleSubmit}
           className="flex flex-col w-full md:w-1/2 px-5 gap-4"
@@ -1119,7 +1132,7 @@ const RegistrationForm = () => {
             </div>
           </div>
         </form>
-      )}
+      {/* )} */}
     </div>
   );
 };
