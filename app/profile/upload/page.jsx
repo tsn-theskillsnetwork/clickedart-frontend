@@ -138,19 +138,6 @@ const ProfilePage = () => {
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/upload/uploadSingleImage`,
         uploadFormData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          onUploadProgress: (progressEvent) => {
-            const percentCompleted = Math.round(
-              (progressEvent.loaded * 100) / progressEvent.total
-            );
-            toast.loading(`Uploading... ${percentCompleted}%`, {
-              id: toastId,
-            });
-          },
-        }
       );
 
       const data = res.data;
@@ -287,8 +274,8 @@ const ProfilePage = () => {
                 console.log(`Step ${++step}: HEIC conversion successful`);
                 await sendLogToServer(`Step ${step}: HEIC conversion successful`);
             } catch (conversionError) {
-                console.error(`Step ${++step}: HEIC conversion failed -`, conversionError);
-                await sendLogToServer(`Step ${step}: HEIC conversion failed - ${conversionError}`);
+                console.error(`Step ${++step}: HEIC conversion failed -`, JSON.stringify(conversionError));
+                await sendLogToServer(`Step ${step}: HEIC conversion failed - ${JSON.stringify(conversionError)}`);
                 toast.dismiss(toastId);
                 toast.error("HEIC conversion failed. Please use a supported image format.");
                 fileInput.value = "";
@@ -341,7 +328,7 @@ const ProfilePage = () => {
                 setUploading(false);
             } else {
                 console.error(`Step ${++step}: Upload failed with status: ${xhr.status}`);
-                await sendLogToServer(`Step ${step}: Upload failed with status: ${xhr.status}`);
+                await sendLogToServer(`Step ${step}: Upload failed with status: ${JSON.stringify(xhr.status)}`);
                 toast.error("Upload failed. Please try again.");
                 setUploading(false);
             }
@@ -359,7 +346,7 @@ const ProfilePage = () => {
 
     } catch (uploadError) {
         console.error(`Step ${++step}: Upload failed -`, uploadError);
-        await sendLogToServer(`Step ${step}: Upload failed - ${uploadError}`);
+        await sendLogToServer(`Step ${step}: Upload failed - ${JSON.stringify(uploadError)}`);
         toast.error("Upload failed. Please try again later.");
         setImageUrl("");
         setUploading(false);

@@ -82,11 +82,7 @@ const RegistrationForm = () => {
       try {
         // Detect HEIC file by extension as a fallback
         const fileExtension = file.name.split(".").pop().toLowerCase();
-        const isHEIC =
-          file.type === "image/heic" ||
-          file.type === "image/heif" ||
-          fileExtension === "heic" ||
-          fileExtension === "heif";
+        const isHEIC = fileExtension === "heic" || fileExtension === "heif";
 
         if (isHEIC) {
           toast.loading("Processing...");
@@ -104,7 +100,6 @@ const RegistrationForm = () => {
                 type: "image/jpeg",
               }
             );
-            // Use the new JPEG file for cropping
             const reader = new FileReader();
             reader.onload = () => {
               setCropperImage(reader.result);
@@ -118,7 +113,6 @@ const RegistrationForm = () => {
             );
           }
         } else {
-          // If not HEIC, proceed with normal file
           const reader = new FileReader();
           reader.onload = () => {
             setCropperImage(reader.result);
@@ -185,19 +179,7 @@ const RegistrationForm = () => {
       try {
         const res = await axios.post(
           `${process.env.NEXT_PUBLIC_SERVER}/api/upload/uploadSingleImage`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-            onUploadProgress: (progressEvent) => {
-              const percentCompleted = Math.round(
-                (progressEvent.loaded * 100) / progressEvent.total
-              );
-              setUploadProgress(percentCompleted);
-              toast.loading("Uploading image...", { id: toastId });
-            },
-          }
+          formData
         );
 
         const data = res.data;
@@ -400,9 +382,7 @@ const RegistrationForm = () => {
               </div>
 
               <div>
-                <Label>
-                  Last Name
-                </Label>
+                <Label>Last Name</Label>
                 <Input
                   type="text"
                   name="lastName"

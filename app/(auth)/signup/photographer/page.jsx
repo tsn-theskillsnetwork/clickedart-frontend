@@ -133,56 +133,66 @@ const RegistrationForm = () => {
 
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      try {
-        // Detect HEIC file by extension as a fallback
-        const fileExtension = file.name.split(".").pop().toLowerCase();
-        const isHEIC =
-          file.type === "image/heic" ||
-          file.type === "image/heif" ||
-          fileExtension === "heic" ||
-          fileExtension === "heif";
+    if (!file) return;
 
-        if (isHEIC) {
-          toast.loading("Processing...");
-          const heic2any = (await import("heic2any")).default;
+    try {
+      const fileExtension = file.name.split(".").pop().toLowerCase();
+      const isHEIC = fileExtension === "heic" || fileExtension === "heif";
 
-          try {
-            const convertedBlob = await heic2any({
-              blob: file,
-              toType: "image/jpeg",
-            });
-            const newFile = new File(
-              [convertedBlob],
-              `${file.name.split(".")[0]}.jpeg`,
-              {
-                type: "image/jpeg",
-              }
-            );
-            // Use the new JPEG file for cropping
-            const reader = new FileReader();
-            reader.onload = () => {
-              setCropperImage(reader.result);
-            };
-            reader.readAsDataURL(newFile);
-            toast.dismiss();
-          } catch (conversionError) {
-            console.error("HEIC conversion failed:", conversionError);
-            toast.error(
-              "HEIC conversion failed. Please use a supported image format."
-            );
-          }
-        } else {
-          // If not HEIC, proceed with normal file
-          const reader = new FileReader();
-          reader.onload = () => {
-            setCropperImage(reader.result);
-          };
-          reader.readAsDataURL(file);
+      if (isHEIC) {
+        toast.loading("Processing...");
+        const heic2any = (await import("heic2any")).default;
+
+        try {
+          const converted = await heic2any({
+            blob: file,
+            toType: "image/jpeg",
+            quality: 0.8,
+          });
+
+          const convertedBlob = Array.isArray(converted)
+            ? converted[0]
+            : converted;
+          const newFile = new File(
+            [convertedBlob],
+            file.name.replace(/\.\w+$/, ".jpeg"),
+            {
+              type: "image/jpeg",
+            }
+          );
+
+          readFile(newFile);
+        } catch (conversionError) {
+          console.error("HEIC conversion failed:", conversionError);
+          toast.error("HEIC conversion failed. Please use a supported format.");
+        } finally {
+          toast.dismiss();
         }
-      } catch (error) {
-        console.error("Error handling image:", error);
+      } else {
+        readFile(file);
       }
+    } catch (error) {
+      console.error("Error handling image:", error);
+    }
+  };
+
+  const readFile = (file) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCropperImage(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const sendLogToServer = async (message) => {
+    try {
+      await fetch("/api/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message }),
+      });
+    } catch (err) {
+      console.error("Failed to send log:", err);
     }
   };
 
@@ -264,7 +274,7 @@ const RegistrationForm = () => {
     const cropper = cropperRef.current?.cropper;
     if (cropper) {
       const croppedCanvas = cropper.getCroppedCanvas();
-      const toastId = toast.loading("Processing image...");
+      const toastId = toast.loading("Uploading image...");
 
       const blob = await new Promise((resolve) =>
         croppedCanvas.toBlob(resolve)
@@ -276,22 +286,7 @@ const RegistrationForm = () => {
       try {
         const res = await axios.post(
           `${process.env.NEXT_PUBLIC_SERVER}/api/upload/uploadSingleImage`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-            onUploadProgress: (progressEvent) => {
-              const percentCompleted = Math.round(
-                (progressEvent.loaded * 100) / progressEvent.total
-              );
-              setUploadProgress(percentCompleted);
-
-              toast.loading("Uploading image...", {
-                id: toastId,
-              });
-            },
-          }
+          formData
         );
 
         const data = res.data;
@@ -306,11 +301,14 @@ const RegistrationForm = () => {
         toast.success("Image cropped and uploaded successfully!", {
           id: toastId,
         });
+        sendLogToServer("Image cropped and uploaded successfully!" + JSON.stringify(data));
       } catch (error) {
         if (res.status !== 200 || !data.imageUrl) {
+          sendLogToServer("Failed to upload image." + JSON.stringify(error));
           throw new Error("Failed to upload image.");
         }
         console.error("Error uploading cropped image:", error);
+        sendLogToServer("Error uploading cropped image:" + JSON.stringify(error));
         toast.error("Image upload failed.", { id: toastId });
       }
     }
@@ -319,7 +317,7 @@ const RegistrationForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+    sendLogToServer("Registration form submitted." + JSON.stringify(formData));
     // Validate client-side fields
     const formErrors = validateForm1();
 
@@ -330,6 +328,7 @@ const RegistrationForm = () => {
     if (Object.keys(combinedErrors).length > 0) {
       setLoading(false);
       setErrors(combinedErrors);
+      sendLogToServer("Error in form submission." + JSON.stringify(combinedErrors));
       toast.error("Please fill the required fields before submitting.");
       return;
     }
@@ -492,9 +491,7 @@ const RegistrationForm = () => {
                 </div>
 
                 <div>
-                  <Label>
-                    Last Name
-                  </Label>
+                  <Label>Last Name</Label>
                   <Input
                     type="text"
                     name="lastName"
