@@ -285,45 +285,45 @@ const ProfilePage = () => {
       const fileExtension = file.name.split(".").pop().toLowerCase();
       const isHEIC = fileExtension === "heic" || fileExtension === "heif";
 
-      // if (isHEIC) {
-      //   console.log(
-      //     `Step ${++step}: HEIC file detected, starting conversion...`
-      //   );
-      //   await sendLogToServer(
-      //     `Step ${step}: HEIC file detected, starting conversion...`
-      //   );
-      //   const toastId = toast.loading("Processing...");
-      //   const heic2any = (await import("heic2any")).default;
+      if (isHEIC) {
+        console.log(
+          `Step ${++step}: HEIC file detected, starting conversion...`
+        );
+        await sendLogToServer(
+          `Step ${step}: HEIC file detected, starting conversion...`
+        );
+        const toastId = toast.loading("Processing...");
+        const heic2any = (await import("heic2any")).default;
 
-      //   try {
-      //     const convertedBlob = await heic2any({
-      //       blob: file,
-      //       toType: "image/jpeg",
-      //     });
-      //     file = new File([convertedBlob], `${file.name.split(".")[0]}.jpeg`, {
-      //       type: "image/jpeg",
-      //     });
-      //     toast.dismiss(toastId);
-      //     console.log(`Step ${++step}: HEIC conversion successful`);
-      //     await sendLogToServer(`Step ${step}: HEIC conversion successful`);
-      //   } catch (conversionError) {
-      //     console.error(
-      //       `Step ${++step}: HEIC conversion failed -`,
-      //       conversionError
-      //     );
-      //     await sendLogToServer(
-      //       `Step ${step}: HEIC conversion failed - ${conversionError}`
-      //     );
-      //     toast.dismiss(toastId);
-      //     toast.error(
-      //       "HEIC conversion failed. Please use a supported image format."
-      //     );
-      //     setImageUrl("");
-      //     fileInput.value = "";
-      //     setUploading(false);
-      //     return;
-      //   }
-      // }
+        try {
+          const convertedBlob = await heic2any({
+            blob: file,
+            toType: "image/jpeg",
+          });
+          file = new File([convertedBlob], `${file.name.split(".")[0]}.jpeg`, {
+            type: "image/jpeg",
+          });
+          toast.dismiss(toastId);
+          console.log(`Step ${++step}: HEIC conversion successful`);
+          await sendLogToServer(`Step ${step}: HEIC conversion successful`);
+        } catch (conversionError) {
+          console.error(
+            `Step ${++step}: HEIC conversion failed -`,
+            conversionError
+          );
+          await sendLogToServer(
+            `Step ${step}: HEIC conversion failed - ${conversionError}`
+          );
+          toast.dismiss(toastId);
+          toast.error(
+            "HEIC conversion failed. Please use a supported image format."
+          );
+          setImageUrl("");
+          fileInput.value = "";
+          setUploading(false);
+          return;
+        }
+      }
 
       console.log(`Step ${++step}: Checking image resolution...`);
       await sendLogToServer(`Step ${step}: Checking image resolution...`);
