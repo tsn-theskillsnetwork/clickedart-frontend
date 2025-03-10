@@ -135,6 +135,14 @@ const RegistrationForm = () => {
     const file = e.target.files[0];
     if (!file) return;
 
+    sendLogToServer(
+      `File uploaded: ${JSON.stringify(file.name)} - ${JSON.stringify(
+        file.size / 1024 / 1024
+      )} MB
+        - ${JSON.stringify(file.type)}`
+    );
+    console.log("File uploaded:", file);
+
     try {
       const fileExtension = file.name.split(".").pop().toLowerCase();
       const isHEIC = fileExtension === "heic" || fileExtension === "heif";
@@ -301,14 +309,18 @@ const RegistrationForm = () => {
         toast.success("Image cropped and uploaded successfully!", {
           id: toastId,
         });
-        sendLogToServer("Image cropped and uploaded successfully!" + JSON.stringify(data));
+        sendLogToServer(
+          "Image cropped and uploaded successfully!" + JSON.stringify(data)
+        );
       } catch (error) {
         if (res.status !== 200 || !data.imageUrl) {
           sendLogToServer("Failed to upload image." + JSON.stringify(error));
           throw new Error("Failed to upload image.");
         }
         console.error("Error uploading cropped image:", error);
-        sendLogToServer("Error uploading cropped image:" + JSON.stringify(error));
+        sendLogToServer(
+          "Error uploading cropped image:" + JSON.stringify(error)
+        );
         toast.error("Image upload failed.", { id: toastId });
       }
     }
@@ -327,7 +339,9 @@ const RegistrationForm = () => {
     if (Object.keys(combinedErrors).length > 0) {
       setLoading(false);
       setErrors(combinedErrors);
-      sendLogToServer("Error in form submission." + JSON.stringify(combinedErrors));
+      sendLogToServer(
+        "Error in form submission." + JSON.stringify(combinedErrors)
+      );
       toast.error("Please fill the required fields before submitting.");
       return;
     }
